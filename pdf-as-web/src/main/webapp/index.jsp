@@ -8,16 +8,16 @@
     <link rel="stylesheet" href="assets/css/style.css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+	<script src="assets/js/pdf.js/build/pdf.js"></script>
 	<script src="assets/js/dragNdrop.js"></script>
-	<script src="assets/js/jspdf/jspdf.js"></script>
+
 </head>
 <body>
  <header>
 	<p>header</p>
 </header>
 
-	<div id="leftMain">
-	
+	<div id="sidebar">
 		<div id="fileSelector" class="container">
 			<h3 class="center">File Selector</h3>
 			<div id="dropzone" class="center">
@@ -34,19 +34,19 @@
 			<fieldset>
 				<table>
 					<tr>
-						<td><input type="radio" id="handy" name="sign" value="handy"></td>
-						<td><label for="handy">Handy</td>
-						<td><label for="handy"><img src="assets/img/mobileBKU.png" alt="Sign via mobile BKU"/></td>
+						<td><input type="radio" id="mobileBKU" name="connector" value="mobileBKU" checked></td>
+						<td><label for="mobileBKU">Handy</td>
+						<td><label for="mobileBKU"><img src="assets/img/mobileBKU.png" alt="Sign via mobile BKU"/></td>
 						
 					</tr>
 					<tr>
-						<td><input type="radio" id="localBKU" name="sign" value="localBKU" checked></td>
+						<td><input type="radio" id="localBKU" name="connector" value="localBKU"></td>
 						<td><label for="localBKU">Lokale BKU</label></td>
 						<td><label for="localBKU"><img src="assets/img/onlineBKU.png" alt="Sign via local BKU" /></label></td>
 						
 					</tr>
 					<tr>
-						<td><input type="radio" id="onlineBKU" name="sign" value="onlineBKU"></td>
+						<td><input type="radio" id="onlineBKU" name="connector" value="onlineBKU"></td>
 						<td><label for="onlineBKU">Online BKU</label></td>
 						<td><label for="onlineBKU"><img src="assets/img/onlineBKU.png" alt="Sign via online BKU"/></label></td>
 						
@@ -59,9 +59,13 @@
 		<div id="language" class="container">
 			<h3 class="center">Language</h3>
 				<fieldset>
-					<input type="radio" id="langEn" name="lang" value="langEn" checked><label>Englisch</label><br>
-					<input type="radio" id="langDe" name="lang" value="langDe"><label>Deutsch</label><br> 
+					<input type="radio" id="EN" name="locale" value="EN" checked><label>Englisch</label><br>
+					<input type="radio" id="DE" name="locale" value="DE"><label>Deutsch</label><br> 
 				</fieldset>
+		</div>
+		
+		<div id="btnSign">
+			<h3 class="center">Sign Document</h3>
 		</div>
 	</div>
 	

@@ -4,6 +4,11 @@ $(document).ready(function() {
 });
 
 function registerEventListeners() {
+	
+	var file;
+	var locale = "EN";
+	var connector = "mobilebku";
+	
 	$(document).bind("dragover", function(evt) {
 		evt.preventDefault();
 	});
@@ -41,12 +46,36 @@ function registerEventListeners() {
 		unhighlightDropzone();
 		
 		var files = evt.originalEvent.dataTransfer.files;
-		if(files == null) {
+		if(files == null || files.length === 0) {
 			return;
 		}
 		
-		previewFile(files[0]);
+		file = files[0];
+		previewFile(file);
 	});
+	
+	$("#pdf-file").bind("change", function(evt) {
+		var files = evt.target.files;
+		if(files == null || files.length === 0) {
+			return;
+		}
+		
+		file = files[0];
+		previewFile(file);
+	});
+	
+	$("input[name='connector']").bind("change", function(evt) {
+		connector = this.value;
+	});
+	
+	$("input[name='locale']").bind("change", function(evt) {
+		locale = this.value;
+	});
+	
+	$("#btnSign").bind("click", function(evt) {
+		sign(file, connector, locale);
+	});
+	
 }
 
 function previewFile(file) {
@@ -54,25 +83,25 @@ function previewFile(file) {
 		
 	fr.onload = function(file) {
 		var buffer = fr.result;
-		/*var int8View = new Uint8Array(buffer);
-		var output = document.getElementById("output");
-		output.innerHTML =
-		int8View[0].toString(16)
-		+ int8View[1].toString(16)
-		+ int8View[2].toString(16)
-		+ int8View[3].toString(16);*/
-		displaypdf(buffer);
+		var uint8array = new Uint8Array(buffer);
+		displaypdf(uint8array);
 	};
 	
 	clearContentDiv();
-	fr.readAsDataURL(file);
+	fr.readAsArrayBuffer(file);
 }
 
-function sign() {
-	/*var fd = new FormData();
-	fd.append("pdf-file", files[0]);
+function sign(file, connector, locale) {
+	if(file == null) {
+		alert("No file selected");
+		return
+	}
+
+	var fd = new FormData();
 	fd.append("source", "internal");
-	fd.append("connector", "mobilebku");
+	fd.append("pdf-file", file);
+	fd.append("connector", connector);
+	fd.append("locale", locale);
 	
 	$.ajax({
 		url: "Sign",
@@ -84,7 +113,7 @@ function sign() {
 			$("html").empty();
 			$("html").html(response);
 		}
-	});*/
+	});
 }
 
 function highlightDropzone() {
@@ -95,9 +124,22 @@ function unhighlightDropzone() {
 	$("#dropzone").css("background", "#E8F4FF");
 }
 
-function displaypdf(datauri) {
+function clearContentDiv() {
+	$("#content").empty();
+}
+
+function displaypdf(uint8array) {
 	$("#content").append("<img src='assets/img/signature.png' alt='Signature' id='signature' draggable='true' style='position: absolute'>");
-	$("#content").append("<iframe src=" + datauri + " width='800px' height='868px'></iframe>");
+	$("#content").append("<canvas id='pdf-preview'></canvas>");
+	
+	
+	PDFJS.getDocument(uint8array).then(function(__pdf) {
+		var pdf = __pdf;
+		var last_page = pdf.numPages;
+		
+		pdf.getPage(last_page).then(renderPage);
+		
+	});
 	
 	$("#signature").draggable({
 		drag: function() {
@@ -107,6 +149,18 @@ function displaypdf(datauri) {
 	});
 }
 
-function clearContentDiv() {
-	$("#content").empty();
+function renderPage(page) {
+	var viewport = page.getViewport(1);
+	var canvas = document.getElementById("pdf-preview");
+	var context = canvas.getContext('2d');
+	canvas.height = 868;
+	canvas.width = 800;
+	
+	page.render({
+		canvasContext: context,
+		viewport: viewport
+	});
+	
 }
+
+

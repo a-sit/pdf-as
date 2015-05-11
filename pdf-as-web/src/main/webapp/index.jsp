@@ -10,6 +10,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
 	<script src="assets/js/pdf.js/build/pdf.js"></script>
 	<script src="assets/js/dragNdrop.js"></script>
+	
 
 </head>
 <body>
@@ -33,25 +34,54 @@
 			<h3 class="center">Sign Method</h3>
 			<fieldset>
 				<table>
+					<%
+					if (WebConfiguration.getHandyBKUURL() != null) {
+					%>
 					<tr>
-						<td><input type="radio" id="mobileBKU" name="connector" value="mobileBKU" checked></td>
+						<td><input type="radio" id="mobileBKU" name="connector" value="mobilebku" checked></td>
 						<td><label for="mobileBKU">Handy</td>
 						<td><label for="mobileBKU"><img src="assets/img/mobileBKU.png" alt="Sign via mobile BKU"/></td>
 						
 					</tr>
+					<%
+						}
+					%>
+					<%
+					if (WebConfiguration.getLocalBKUURL() != null) {
+					%>
 					<tr>
-						<td><input type="radio" id="localBKU" name="connector" value="localBKU"></td>
+						<td><input type="radio" id="localBKU" name="connector" value="bku"></td>
 						<td><label for="localBKU">Lokale BKU</label></td>
 						<td><label for="localBKU"><img src="assets/img/onlineBKU.png" alt="Sign via local BKU" /></label></td>
 						
 					</tr>
+					<%
+						}
+					%>
+					<%
+					if (WebConfiguration.getOnlineBKUURL() != null) {
+					%>
 					<tr>
-						<td><input type="radio" id="onlineBKU" name="connector" value="onlineBKU"></td>
+						<td><input type="radio" id="onlineBKU" name="connector" value="onlinebku"></td>
 						<td><label for="onlineBKU">Online BKU</label></td>
 						<td><label for="onlineBKU"><img src="assets/img/onlineBKU.png" alt="Sign via online BKU"/></label></td>
 						
 					</tr>
-					
+					<%
+						}
+					%>
+					<%
+						if(WebConfiguration.getKeystoreDefaultEnabled()) {
+					%>
+					<tr>
+						<td><input type="radio" id="jks" name="connector" value="jks"></td>
+						<td><label for="jks">Server Keystore</label></td>
+						<td><label for="jks"><img src="assets/img/onlineBKU.png" alt="Sign via Server Keystore"/></label></td>
+					</tr>
+					<%
+						}
+					%>
+
 				</table>
 			</fieldset>
 		</div>
@@ -59,8 +89,8 @@
 		<div id="language" class="container">
 			<h3 class="center">Language</h3>
 				<fieldset>
-					<input type="radio" id="EN" name="locale" value="EN" checked><label>Englisch</label><br>
-					<input type="radio" id="DE" name="locale" value="DE"><label>Deutsch</label><br> 
+					<input type="radio" id="EN" name="locale" value="EN" checked><label for="EN">Englisch</label><br>
+					<input type="radio" id="DE" name="locale" value="DE"><label for="DE">Deutsch</label><br> 
 				</fieldset>
 		</div>
 		
@@ -71,6 +101,7 @@
 	
 	
 	<div id="main" class="container">
+	
 		<h3 class="center">Preview</h3>
 		<div id="content" class="center">
 			Please select the pdf file you want to sign!

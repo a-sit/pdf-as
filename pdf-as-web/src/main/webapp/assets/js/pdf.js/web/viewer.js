@@ -27,7 +27,7 @@
 
 'use strict';
 
-var DEFAULT_URL = 'compressed.tracemonkey-pldi-09.pdf';
+var DEFAULT_URL = '';
 var DEFAULT_SCALE_DELTA = 1.1;
 var MIN_SCALE = 0.25;
 var MAX_SCALE = 10.0;
@@ -5843,7 +5843,7 @@ var PDFViewerApplication = {
       function getDocumentCallback(pdfDocument) {
         self.load(pdfDocument, scale);
         self.loading = false;
-      },
+	  },
       function getDocumentError(exception) {
         var message = exception && exception.message;
         var loadingErrorMessage = mozL10n.get('loading_error', null,
@@ -6666,14 +6666,18 @@ window.PDFView = PDFViewerApplication; // obsolete name, using it as an alias
 
 
 function webViewerLoad(evt) {
-  PDFViewerApplication.initialize().then(webViewerInitialized);
+	//PDFViewerApplication.initialize().then(webViewerInitialized);
+  PDFViewerApplication.initialize().then(function() {
+	  webViewerInitialized();
+	  window.parent.postMessage("asdf yooooooo","*");
+  });
 }
 
 function webViewerInitialized() {
   var queryString = document.location.search.substring(1);
   var params = PDFViewerApplication.parseQueryString(queryString);
   var file = 'file' in params ? params.file : DEFAULT_URL;
-
+  
   var fileInput = document.createElement('input');
   fileInput.id = 'fileInput';
   fileInput.className = 'fileInput';
@@ -7005,6 +7009,7 @@ window.addEventListener('change', function webViewerChange(evt) {
   if (!files || files.length === 0) {
     return;
   }
+  
   var file = files[0];
 
   if (!PDFJS.disableCreateObjectURL &&

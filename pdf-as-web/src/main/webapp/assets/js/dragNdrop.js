@@ -5,9 +5,18 @@ $(document).ready(function() {
 
 function registerEventListeners() {
 	
-	var file;
+	var file = null;
 	var locale = "EN";
 	var connector = "mobilebku";
+	
+	window.addEventListener("message", function receiveMessage(evt) {
+		console.log("parent: message received");
+		console.log(evt.data);
+		var iframewindow = document.getElementById("iFrame");
+		console.log(file);
+		iframewindow.contentWindow.postMessage(file, "*");
+		console.log("postmessage to child sent");
+	}, false);
 	
 	$(document).bind("dragover", function(evt) {
 		evt.preventDefault();
@@ -51,10 +60,11 @@ function registerEventListeners() {
 		}
 		
 		file = files[0];
-		previewFile(file);
+		previewFile();
 	});
 	
 	$("#pdf-file").bind("change", function(evt) {
+		file_event = evt;
 		var files = evt.target.files;
 		if(files == null || files.length === 0) {
 			return;
@@ -70,25 +80,21 @@ function registerEventListeners() {
 	
 	$("input[name='locale']").bind("change", function(evt) {
 		locale = this.value;
+		
+		//REMOVE
+		alert("Locale");
+		alert($("#iFrame").contents().find("#numPages").html());
+		//REMOVE
 	});
 	
 	$("#btnSign").bind("click", function(evt) {
 		sign(file, connector, locale);
 	});
-	
 }
 
-function previewFile(file) {
-	var fr = new FileReader();
-		
-	fr.onload = function(file) {
-		var buffer = fr.result;
-		var uint8array = new Uint8Array(buffer);
-		displaypdf(uint8array);
-	};
-	
+function previewFile() {
 	clearContentDiv();
-	fr.readAsArrayBuffer(file);
+	createIframe();
 }
 
 function sign(file, connector, locale) {
@@ -128,39 +134,6 @@ function clearContentDiv() {
 	$("#content").empty();
 }
 
-function displaypdf(uint8array) {
-	$("#content").append("<img src='assets/img/signature.png' alt='Signature' id='signature' draggable='true' style='position: absolute'>");
-	$("#content").append("<canvas id='pdf-preview'></canvas>");
-	
-	
-	PDFJS.getDocument(uint8array).then(function(__pdf) {
-		var pdf = __pdf;
-		var last_page = pdf.numPages;
-		
-		pdf.getPage(last_page).then(renderPage);
-		
-	});
-	
-	$("#signature").draggable({
-		drag: function() {
-			
-		},
-		containment: "parent"
-	});
+function createIframe() {
+	$("#content").append("<iframe src='assets/js/pdf.js/web/viewer.html' height='863px' width='800px' id='iFrame'></iframe>");
 }
-
-function renderPage(page) {
-	var viewport = page.getViewport(1);
-	var canvas = document.getElementById("pdf-preview");
-	var context = canvas.getContext('2d');
-	canvas.height = 868;
-	canvas.width = 800;
-	
-	page.render({
-		canvasContext: context,
-		viewport: viewport
-	});
-	
-}
-
-

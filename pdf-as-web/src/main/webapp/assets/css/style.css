@@ -10,8 +10,8 @@ footer {
 	clear: both;
 }
 
-canvas {
-	border: 1px solid black;
+iframe {
+	border: none;
 }
 
 #sidebar {
@@ -38,16 +38,13 @@ canvas {
 	height: 900px;
 	width: 800px;
 	float: left;
+	margin: 0px;
 }
 
 #content {
 	clear: both;
-	height: 868px;
+	height: 863px;
 	font-size: 150%;
-}
-
-#states {
-	height: 5%;
 }
 
 #btnSign {
@@ -88,12 +85,12 @@ canvas {
 }
 
 .container h3 {
-	border-top-left-radius: 11px;
-	border-top-right-radius: 11px;
+	border-top-left-radius: 15px;
+	border-top-right-radius: 15px;
 	background: #66A3FF;
 	color: #FFFFFF;
 	text-align: center;
-	margin: 0px;
+	margin: -1px;
 	height: 2em;
 }
 

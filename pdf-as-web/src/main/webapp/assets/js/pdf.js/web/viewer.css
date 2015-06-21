@@ -1052,6 +1052,16 @@ html[dir='rtl'] .toolbarButton.pageDown::before {
   content: url(images/toolbarButton-openFile.png);
 }
 
+.toolbarButton.placeSignature::before,
+.secondaryToolbarButton.placeSignature::before {
+  content: url(images/document_signature.png);
+}
+
+.toolbarButton.delSignature::before,
+.secondaryToolbarButton.delSignature::before {
+  content: url(images/document_del_signature.png);
+}
+
 .toolbarButton.download::before,
 .secondaryToolbarButton.download::before {
   content: url(images/toolbarButton-download.png);
@@ -1766,6 +1776,16 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
   .toolbarButton.openFile::before,
   .secondaryToolbarButton.openFile::before {
     content: url(images/toolbarButton-openFile@2x.png);
+  }
+  
+  .toolbarButton.placeSignature::before,
+  .secondaryToolbarButton.placeSignature::before {
+    content: url(images/document_signature@2x.png);
+  }
+  
+  .toolbarButton.delSignature::before,
+  .secondaryToolbarButton.delSignature::before {
+    content: url(images/document_del_signature@2x.png);
   }
 
   .toolbarButton.download::before,

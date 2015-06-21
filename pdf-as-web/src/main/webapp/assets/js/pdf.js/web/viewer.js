@@ -6667,10 +6667,13 @@ window.PDFView = PDFViewerApplication; // obsolete name, using it as an alias
 
 function webViewerLoad(evt) {
 	//PDFViewerApplication.initialize().then(webViewerInitialized);
-  PDFViewerApplication.initialize().then(function() {
-	  webViewerInitialized();
-	  window.parent.postMessage("asdf yooooooo","*");
-  });
+	PDFViewerApplication.initialize().then(function() {
+		webViewerInitialized();
+		if (window.self !== window.parent) {
+			window.parent.postMessage("asdf yooooooo","*");
+		}
+	
+	});
 }
 
 function webViewerInitialized() {
@@ -7011,7 +7014,11 @@ window.addEventListener('change', function webViewerChange(evt) {
   }
   
   var file = files[0];
-
+  
+  //ADDED
+  if(window.self !== window.parent) {
+	  setFileForParent(file);
+  }
   if (!PDFJS.disableCreateObjectURL &&
       typeof URL !== 'undefined' && URL.createObjectURL) {
     PDFViewerApplication.open(URL.createObjectURL(file), 0);

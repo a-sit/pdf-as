@@ -1,11 +1,11 @@
 
+var file = null;
+
 $(document).ready(function() {
 	registerEventListeners();
 });
 
 function registerEventListeners() {
-	
-	var file = null;
 	var locale = "EN";
 	var connector = "mobilebku";
 	
@@ -80,11 +80,6 @@ function registerEventListeners() {
 	
 	$("input[name='locale']").bind("change", function(evt) {
 		locale = this.value;
-		
-		//REMOVE
-		alert("Locale");
-		alert($("#iFrame").contents().find("#numPages").html());
-		//REMOVE
 	});
 	
 	$("#btnSign").bind("click", function(evt) {
@@ -102,13 +97,23 @@ function sign(file, connector, locale) {
 		alert("No file selected");
 		return
 	}
-
+	
 	var fd = new FormData();
 	fd.append("source", "internal");
 	fd.append("pdf-file", file);
 	fd.append("connector", connector);
 	fd.append("locale", locale);
 	
+	signature_overlay = $("#iFrame").contents().find(".cl_signature");
+	if(signature_overlay.length > 0) {
+		var sig_pos_x = $("#iFrame").contents().find(".cl_signature").attr("data-pos-x");
+		var sig_pos_y = $("#iFrame").contents().find(".cl_signature").attr("data-pos-y");
+		var sig_pos_p = $("#iFrame").contents().find(".cl_signature").attr("data-page");
+		fd.append("sig-pos-x", sig_pos_x);
+		fd.append("sig-pos-y", sig_pos_y);
+		fd.append("sig-pos-p", sig_pos_p);
+	}
+
 	$.ajax({
 		url: "Sign",
 		data: fd,

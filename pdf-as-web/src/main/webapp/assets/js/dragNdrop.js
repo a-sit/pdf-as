@@ -10,12 +10,8 @@ function registerEventListeners() {
 	var connector = "mobilebku";
 	
 	window.addEventListener("message", function receiveMessage(evt) {
-		console.log("parent: message received");
-		console.log(evt.data);
 		var iframewindow = document.getElementById("iFrame");
-		console.log(file);
 		iframewindow.contentWindow.postMessage(file, "*");
-		console.log("postmessage to child sent");
 	}, false);
 	
 	$(document).bind("dragover", function(evt) {

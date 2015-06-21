@@ -1,6 +1,5 @@
 
 function setFileForParent(file) {
-	console.log("SettingFileFOrparent");
 	if (window.self != window.parent) {
 		window.parent.file = file;
 	}
@@ -10,7 +9,6 @@ window.addEventListener("message", handlePostMessage, false);
 
 function handlePostMessage(evt) {
 	var file = evt.data;
-	console.log(file)
 	var signature_placed_manually = false;
 	var fileReader = new FileReader();
 	

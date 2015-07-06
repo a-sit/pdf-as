@@ -78,6 +78,24 @@ public class StringUtils {
 		return value;
 	}
 
+	public static String transformToUTF16(String test)
+			throws UnsupportedEncodingException{
+		byte[] bytes = test.getBytes("UTF-8");
+		return new String(bytes, "UTF-8");
+	}
+	
+	public static byte[] applyUTF16Encoding(String text)
+			throws UnsupportedEncodingException{
+		byte[] replace_bytes;
+		replace_bytes = text.getBytes("UTF-8");
+		return replace_bytes;
+	}
+	
+	public static String unapplyUTF16Encoding(byte[] replace_bytes) throws UnsupportedEncodingException {
+		String text = new String(replace_bytes, "UTF-8");
+		return text;
+	}
+	
 	public static byte[] applyWinAnsiEncoding(String text)
 			throws UnsupportedEncodingException {
 		byte[] replace_bytes;

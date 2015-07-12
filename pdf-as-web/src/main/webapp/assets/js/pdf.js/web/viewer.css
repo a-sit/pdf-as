@@ -1057,6 +1057,11 @@ html[dir='rtl'] .toolbarButton.pageDown::before {
   content: url(images/document_signature.png);
 }
 
+.toolbarButton.sign::before,
+.secondaryToolbarButton.sign::before {
+  content: url(images/signature-icon.png);
+}
+
 .toolbarButton.delSignature::before,
 .secondaryToolbarButton.delSignature::before {
   content: url(images/document_del_signature.png);

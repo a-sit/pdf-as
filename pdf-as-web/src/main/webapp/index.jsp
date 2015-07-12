@@ -10,12 +10,9 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
 	<script src="assets/js/pdf.js/build/pdf.js"></script>
 	<script src="assets/js/dragNdrop.js"></script>
-	
-
 </head>
 <body>
  <header>
-	<p>header</p>
 </header>
 
 	<div id="sidebar">
@@ -173,7 +170,6 @@
 	
 	<p><small>Version: <%= PdfAsHelper.getVersion() %> - <%= PdfAsHelper.getSCMRevision() %></small></p>-->
 	<footer>
-	  <p>footer</p>
 	</footer>
 </body>
 </html>

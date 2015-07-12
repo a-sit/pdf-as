@@ -6669,10 +6669,7 @@ function webViewerLoad(evt) {
 	//PDFViewerApplication.initialize().then(webViewerInitialized);
 	PDFViewerApplication.initialize().then(function() {
 		webViewerInitialized();
-		if (window.self !== window.parent) {
-			window.parent.postMessage("asdf yooooooo","*");
-		}
-	
+		displayPdf()
 	});
 }
 
@@ -6871,8 +6868,7 @@ function webViewerInitialized() {
   document.getElementById('download').addEventListener('click',
     SecondaryToolbar.downloadClick.bind(SecondaryToolbar));
 
-
-  if (file && file.lastIndexOf('file:', 0) === 0) {
+  /*if (file && file.lastIndexOf('file:', 0) === 0) {
     // file:-scheme. Load the contents in the main thread because QtWebKit
     // cannot load file:-URLs in a Web Worker. file:-URLs are usually loaded
     // very quickly, so there is no need to set up progress event listeners.
@@ -6894,7 +6890,7 @@ function webViewerInitialized() {
 
   if (file) {
     PDFViewerApplication.open(file, 0);
-  }
+  }*/
 }
 
 document.addEventListener('DOMContentLoaded', webViewerLoad, true);
@@ -7016,9 +7012,8 @@ window.addEventListener('change', function webViewerChange(evt) {
   var file = files[0];
   
   //ADDED
-  if(window.self !== window.parent) {
-	  setFileForParent(file);
-  }
+  setFile(file);
+  
   if (!PDFJS.disableCreateObjectURL &&
       typeof URL !== 'undefined' && URL.createObjectURL) {
     PDFViewerApplication.open(URL.createObjectURL(file), 0);

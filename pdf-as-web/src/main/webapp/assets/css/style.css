@@ -99,3 +99,39 @@ iframe {
 	border: none;
 }
 
+
+.black_overlay{
+	display: block;
+	position: fixed;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index:1001;
+	-moz-opacity: 0.8;
+	opacity:.80;
+	filter: alpha(opacity=80);
+}
+
+.white_content {
+	display: block;
+	position: fixed;
+	top: 25%;
+	left: 32%;
+	width: 36%;
+	height: 30%;
+	padding: 16px;
+	border: 4px solid orange;
+	background-color: white;
+	z-index:1002;
+	overflow: auto;
+}
+
+.white_content div {
+	z-index: -1;
+}
+
+.white_content a {
+	z-index: 3000;
+}

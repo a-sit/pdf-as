@@ -106,10 +106,22 @@
 		<servlet-class>at.gv.egiz.pdfas.web.servlets.PDFData</servlet-class>
 	</servlet>
 	<servlet>
+		<servlet-name>PDFPosData</servlet-name>
+		<display-name>PDFPosData</display-name>
+		<description></description>
+		<servlet-class>at.gv.egiz.pdfas.web.servlets.PDFPositioningDataServlet</servlet-class>
+	</servlet>
+	<servlet>
 		<servlet-name>ErrorPage</servlet-name>
 		<display-name>ErrorPage</display-name>
 		<description></description>
 		<servlet-class>at.gv.egiz.pdfas.web.servlets.ErrorPage</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>SIGNNOW</servlet-name>
+		<display-name>SIGNNOW</display-name>
+		<description></description>
+		<servlet-class>at.gv.egiz.pdfas.web.servlets.SignNowServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>PDFVerifyData</servlet-name>
@@ -182,12 +194,20 @@
 		<url-pattern>/PDFData</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>PDFPosData</servlet-name>
+		<url-pattern>/PDFPosData</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>ErrorPage</servlet-name>
 		<url-pattern>/ErrorPage</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>PDFVerifyData</servlet-name>
 		<url-pattern>/signData</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SIGNNOW</servlet-name>
+		<url-pattern>/signNow</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>PDFVerifyCert</servlet-name>

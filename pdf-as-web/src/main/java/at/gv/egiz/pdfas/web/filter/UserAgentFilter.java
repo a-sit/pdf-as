@@ -37,7 +37,7 @@ public class UserAgentFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		if(request instanceof HttpServletRequest) {
-			logger.debug("Processing Parameters into Attributes");
+			logger.trace("Processing Parameters into Attributes");
 			HttpServletRequest httpRequest = (HttpServletRequest)request;
 			requestUserAgent.set(httpRequest.getHeader("User-Agent"));
 		}

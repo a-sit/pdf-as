@@ -36,6 +36,7 @@ import java.security.cert.CertificateException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.servlet.RequestDispatcher;
@@ -76,6 +77,7 @@ import at.gv.egiz.pdfas.sigs.pades.PAdESSigner;
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.exception.PdfAsWebException;
+import at.gv.egiz.pdfas.web.servlets.PDFPositioningDataServlet;
 import at.gv.egiz.pdfas.web.servlets.UIEntryPointServlet;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.sl.schema.CreateCMSSignatureResponseType;
@@ -117,6 +119,16 @@ public class PdfAsHelper {
 	private static final String SIGNATURE_ACTIVE = "SIGNATURE_ACTIVE";
 	private static final String VERIFICATION_RESULT = "VERIFICATION_RESULT";
 	private static final String QRCODE_CONTENT = "QR_CONT";
+	private static final String PDF_DATA = "PDF_DATA";
+	private static final String PDF_DATA_TOKEN = "PDF_DATA_TOKEN";
+	private static final String PDF_CONNECTOR = "CONNECTOR";
+	private static final String PDF_TRANSACTION = "TID";
+	private static final String SIG_TYPE = "SIG_TYPE";
+	private static final String PRE_PROCESSOR_MAP = "PREPROCMAP";
+	private static final String OVERWRITE_MAP = "OVERWRITEMAP";
+	private static final String KEYID = "KEYID";
+
+	private static final String POSITIONING_URL = "/assets/js/pdf.js/web/viewer.html";
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(PdfAsHelper.class);
@@ -286,9 +298,54 @@ public class PdfAsHelper {
 			sb.append("f:0;");
 		}
 
+		logger.debug("Build position string: {}", sb.toString());
+		
 		return sb.toString();
 	}
 
+	public static String storePdfData(byte[] data, HttpServletRequest request)
+			throws UnsupportedEncodingException {
+		String token = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8");
+		HttpSession session = request.getSession();
+		session.setAttribute(PDF_DATA, data);
+		session.setAttribute(PDF_DATA_TOKEN, token);
+		logger.info("Stored pdf data and token {} into session {}", token, session.getId());
+		return token;
+	}
+
+	public static byte[] getPdfData(String token, HttpServletRequest request)
+			throws UnsupportedEncodingException {
+		HttpSession session = request.getSession();
+		logger.info("Fetching pdf data and token {} from session {}", token, session.getId());
+		String storedToken = (String) session.getAttribute(PDF_DATA_TOKEN);
+		byte[] data = null;
+		if (storedToken != null) {
+			if (storedToken.equals(token)) {
+				data = (byte[]) session.getAttribute(PDF_DATA);
+			} else {
+				logger.warn("PDF Data token missmatch!");
+			}
+		} else {
+			logger.warn("No PDF Data token stored!");
+		}
+		return data;
+	}
+
+	public static byte[] getPdfData(HttpServletRequest request)
+			throws UnsupportedEncodingException {
+		HttpSession session = request.getSession();
+		logger.info("Fetching pdf data from session {}", session.getId());
+		byte[] data = (byte[]) session.getAttribute(PDF_DATA);
+		return data;
+	}
+	
+	public static void clearPdfData(HttpServletRequest request)
+			throws UnsupportedEncodingException {
+		HttpSession session = request.getSession();
+		logger.info("Removing pdf data from session {}", session.getId());
+		session.removeAttribute(PDF_DATA);
+	}
+	
 	public static List<VerifyResult> synchornousVerify(
 			HttpServletRequest request, HttpServletResponse response,
 			byte[] pdfData) throws Exception {
@@ -361,10 +418,10 @@ public class PdfAsHelper {
 
 		Configuration config = pdfAs.getConfiguration();
 
-
-		Map<String,String> configOverwrite = PdfAsParameterExtractor.getOverwriteMap(request);
+		Map<String, String> configOverwrite = PdfAsHelper
+				.getOverwriteMap(request);
 		ConfigurationOverwrite.overwriteConfiguration(configOverwrite, config);
-		
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		// Generate Sign Parameter
@@ -372,7 +429,7 @@ public class PdfAsHelper {
 				new ByteArrayDataSource(pdfData), baos);
 
 		// Get Connector
-		String connector = PdfAsParameterExtractor.getConnector(request);
+		String connector = PdfAsHelper.getConnector(request);
 
 		if (!connector.equals("moa") && !connector.equals("jks")) {
 			throw new PdfAsWebException("Invalid connector (moa | jks)");
@@ -381,7 +438,7 @@ public class PdfAsHelper {
 		IPlainSigner signer;
 		if (connector.equals("moa")) {
 
-			String keyIdentifier = PdfAsParameterExtractor
+			String keyIdentifier = PdfAsHelper
 					.getKeyIdentifier(request);
 
 			if (keyIdentifier != null) {
@@ -408,7 +465,7 @@ public class PdfAsHelper {
 			signer = new PAdESSigner(new MOAConnector(config));
 		} else if (connector.equals("jks")) {
 
-			String keyIdentifier = PdfAsParameterExtractor
+			String keyIdentifier = PdfAsHelper
 					.getKeyIdentifier(request);
 
 			boolean ksEnabled = false;
@@ -463,7 +520,7 @@ public class PdfAsHelper {
 
 		signParameter.setPlainSigner(signer);
 
-		String profileId = PdfAsParameterExtractor.getSigType(request);
+		String profileId = PdfAsHelper.getSignatureType(request);
 		String qrCodeContent = PdfAsHelper.getQRCodeContent(request);
 
 		if (qrCodeContent != null) {
@@ -516,8 +573,10 @@ public class PdfAsHelper {
 			PDFASSignParameters params) throws Exception {
 		Configuration config = pdfAs.getConfiguration();
 
-		if (WebConfiguration.isAllowExtOverwrite() && params.getOverrides() != null) {
-			ConfigurationOverwrite.overwriteConfiguration(params.getOverrides().getMap(), config);
+		if (WebConfiguration.isAllowExtOverwrite()
+				&& params.getOverrides() != null) {
+			ConfigurationOverwrite.overwriteConfiguration(params.getOverrides()
+					.getMap(), config);
 		}
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -668,7 +727,8 @@ public class PdfAsHelper {
 			HttpServletResponse response, ServletContext context,
 			byte[] pdfData, String connector, String position,
 			String transactionId, String profile,
-			Map<String, String> preProcessor, Map<String, String> overwrite) throws Exception {
+			Map<String, String> preProcessor, Map<String, String> overwrite)
+			throws Exception {
 
 		// TODO: Protect session so that only one PDF can be signed during one
 		// session
@@ -689,7 +749,7 @@ public class PdfAsHelper {
 		session.setAttribute(PDF_CONFIG, config);
 
 		ConfigurationOverwrite.overwriteConfiguration(overwrite, config);
-		
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		session.setAttribute(PDF_OUTPUT, baos);
 
@@ -840,7 +900,7 @@ public class PdfAsHelper {
 
 	public static void logAccess(HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		logger.debug("Access to " + request.getServletPath() + " in Session: "
+		logger.trace("Access to " + request.getServletPath() + " in Session: "
 				+ session.getId());
 	}
 
@@ -1193,6 +1253,29 @@ public class PdfAsHelper {
 		return generateURL(request, response, PDF_PDFDATA_PAGE);
 	}
 
+	public static String generatePositioningURL(String token,
+			HttpServletRequest request, HttpServletResponse response) {
+		String publicURL = WebConfiguration.getPublicURL();
+		if (publicURL == null) {
+			logger.error("To use this functionality "
+					+ WebConfiguration.PUBLIC_URL
+					+ " has to be configured in the web configuration");
+			return null;
+		}
+
+		String pdfDataUrl = generateURL(request, response, "/PDFPosData") + "?"
+				+ PDFPositioningDataServlet.PARAM_TOKEN + "=" + token;
+
+		try {
+			String positioningUrl = generateURL(request, response, POSITIONING_URL) + "?file" + "="
+					+ URLEncoder.encode(pdfDataUrl, "UTF-8") + "&running=true";
+			return positioningUrl;
+		} catch (UnsupportedEncodingException e) {
+			logger.error("Failed to generate positioning URL!", e);
+			return null;
+		}
+	}
+
 	public static String generateUserEntryURL(String storeId) {
 		String publicURL = WebConfiguration.getPublicURL();
 		if (publicURL == null) {
@@ -1252,6 +1335,51 @@ public class PdfAsHelper {
 		}
 		return "";
 	}
+	
+	public static void setSignatureType(HttpServletRequest request,
+			String value) {
+		HttpSession session = request.getSession();
+		session.setAttribute(SIG_TYPE, value);
+	}
+
+	public static String getSignatureType(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute(SIG_TYPE);
+		if (obj != null) {
+			return obj.toString();
+		}
+		return null;
+	}
+	
+	public static void setPreProcessorMap(HttpServletRequest request,
+			Map<String, String> value) {
+		HttpSession session = request.getSession();
+		session.setAttribute(PRE_PROCESSOR_MAP, value);
+	}
+
+	public static Map<String, String> getPreProcessorMap(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute(PRE_PROCESSOR_MAP);
+		if (obj != null) {
+			return (Map<String, String>)obj;
+		}
+		return null;
+	}
+	
+	public static void setOverwriteMap(HttpServletRequest request,
+			Map<String, String> value) {
+		HttpSession session = request.getSession();
+		session.setAttribute(OVERWRITE_MAP, value);
+	}
+
+	public static Map<String, String> getOverwriteMap(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute(OVERWRITE_MAP);
+		if (obj != null) {
+			return (Map<String, String>)obj;
+		}
+		return null;
+	}
 
 	public static void setQRCodeContent(HttpServletRequest request, String value) {
 		HttpSession session = request.getSession();
@@ -1261,6 +1389,48 @@ public class PdfAsHelper {
 	public static String getQRCodeContent(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Object obj = session.getAttribute(QRCODE_CONTENT);
+		if (obj != null) {
+			return obj.toString();
+		}
+		return null;
+	}
+
+	public static void setConnector(HttpServletRequest request, String value) {
+		HttpSession session = request.getSession();
+		session.setAttribute(PDF_CONNECTOR, value);
+	}
+
+	public static String getConnector(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute(PDF_CONNECTOR);
+		if (obj != null) {
+			return obj.toString();
+		}
+		return null;
+	}
+	
+	public static void setKeyIdentifier(HttpServletRequest request, String value) {
+		HttpSession session = request.getSession();
+		session.setAttribute(KEYID, value);
+	}
+
+	public static String getKeyIdentifier(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute(KEYID);
+		if (obj != null) {
+			return obj.toString();
+		}
+		return null;
+	}
+
+	public static void setTransactionid(HttpServletRequest request, String value) {
+		HttpSession session = request.getSession();
+		session.setAttribute(PDF_TRANSACTION, value);
+	}
+
+	public static String getTransactionid(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute(PDF_TRANSACTION);
 		if (obj != null) {
 			return obj.toString();
 		}

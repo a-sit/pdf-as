@@ -62,6 +62,9 @@ public class PdfAsParameterExtractor {
 	public static final String PARAM_SIG_POS_P = "sig-pos-p";
 	public static final String PARAM_SIG_POS_Y = "sig-pos-y";
 	public static final String PARAM_SIG_POS_X = "sig-pos-x";
+	public static final String PARAM_SIG_POS_P_ALT = "sigPosP";
+	public static final String PARAM_SIG_POS_Y_ALT = "sigPosY";
+	public static final String PARAM_SIG_POS_X_ALT = "sigPosX";
 	public static final String PARAM_SIG_POS_W = "sig-pos-w";
 	public static final String PARAM_SIG_POS_R = "sig-pos-r";
 	public static final String PARAM_SIG_POS_F = "sig-pos-f";
@@ -71,7 +74,15 @@ public class PdfAsParameterExtractor {
 	public static final String PARAM_PREPROCESSOR_PREFIX = "pp:";
 	public static final String PARAM_OVERWRITE_PREFIX = "ov:";
 	public static final String PARAM_QRCODE_CONTENT = "qrcontent";
+	public static final String PARAM_USER_POSITIONING = "upos";
 	
+	public static boolean isUserPositioning(HttpServletRequest request) {
+		String paramerterValue = (String)request.getAttribute(PARAM_USER_POSITIONING);
+		if(paramerterValue != null) {
+			return Boolean.parseBoolean(paramerterValue);
+		} 
+		return false;
+	}
 	
 	public static String getConnector(HttpServletRequest request) {
 		String connector = (String)request.getAttribute(PARAM_CONNECTOR);
@@ -201,15 +212,27 @@ public class PdfAsParameterExtractor {
 	}
 	
 	public static String getSigPosP(HttpServletRequest request) {
-		return (String)request.getAttribute(PARAM_SIG_POS_P);
+		if(request.getAttribute(PARAM_SIG_POS_P) != null) {
+			return (String)request.getAttribute(PARAM_SIG_POS_P);
+		} else {
+			return (String)request.getAttribute(PARAM_SIG_POS_P_ALT);	
+		}
 	}
 	
 	public static String getSigPosY(HttpServletRequest request) {
-		return (String)request.getAttribute(PARAM_SIG_POS_Y);
+		if(request.getAttribute(PARAM_SIG_POS_Y) != null) {
+			return (String)request.getAttribute(PARAM_SIG_POS_Y);
+		} else {
+			return (String)request.getAttribute(PARAM_SIG_POS_Y_ALT);
+		}
 	}
 	
 	public static String getSigPosX(HttpServletRequest request) {
-		return (String)request.getAttribute(PARAM_SIG_POS_X);
+		if(request.getAttribute(PARAM_SIG_POS_X) != null) {
+			return (String)request.getAttribute(PARAM_SIG_POS_X);
+		} else {
+			return (String)request.getAttribute(PARAM_SIG_POS_X_ALT);	
+		}
 	}
 	
 	public static String getSigPosW(HttpServletRequest request) {

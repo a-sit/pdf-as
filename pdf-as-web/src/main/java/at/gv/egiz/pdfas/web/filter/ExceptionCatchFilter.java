@@ -66,7 +66,7 @@ public class ExceptionCatchFilter implements Filter {
 		//try {
 		
 		if(request instanceof HttpServletRequest) {
-			logger.debug("Processing Parameters into Attributes");
+			logger.trace("Processing Parameters into Attributes");
 			HttpServletRequest httpRequest = (HttpServletRequest)request;
 			PdfAsHelper.logAccess(httpRequest);
 			@SuppressWarnings("unchecked")
@@ -75,7 +75,7 @@ public class ExceptionCatchFilter implements Filter {
 				String name = parameterNames.nextElement();
 				String value = httpRequest.getParameter(name);
 				request.setAttribute(name, value);
-				logger.debug("Setting attribute: " + name + " - " + value);
+				logger.trace("Setting attribute: " + name + " - " + value);
 			}
 		}
 		

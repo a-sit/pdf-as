@@ -12,7 +12,17 @@ function statusObject() {
 		this.connector = null;
 		this.file_path = null;
 		this.file = null;
-		this.signature = null,
+		this.signature = null;
+		this.running = false;
+		this.applicationContext = '../../../../';
+		
+		this.setRunning = function(r) {
+			this.running = (r === 'true');
+		}
+		
+		this.getRunning = function() {
+			return this.running;
+		}
 		
 		this.setFile = function(f) {
 			this.file = f;
@@ -180,7 +190,7 @@ function isSignaturePlaced() {
 function placeSignature(evt, page_to_place, s) {
 	var current_scale = PDFViewerApplication.pdfViewer.currentScale;
 	var sig_size = Math.floor(96 * current_scale);
-	var defaultSignature = "<img src='/pdf-as-web/visblock?r=" + sig_size.toString() + "' alt='Signature' id='img_signature' class='cl_signature' draggable='true' style='position: absolute; z-index:4; cursor:move'>";
+	var defaultSignature = "<img src='" + global_status.applicationContext + "/visblock?r=" + sig_size.toString() + "' alt='Signature' id='img_signature' class='cl_signature' draggable='true' style='position: absolute; z-index:4; cursor:move'>";
 	if (typeof page_to_place === 'undefined') { page_to_place = PDFView.page;}
 	if (typeof s === 'undefined') { s = defaultSignature}
 	
@@ -251,13 +261,15 @@ $(document).ready(function() {
 		if(!results) {
 		   return null;
 		} else {
-		   return results[1] || 0;
+		   return decodeURIComponent(results[1]) || decodeURI(0);
 		}
 	}
 	
 	global_status.setConnector($.urlParam("connector"));
 	global_status.setPdfUlr($.urlParam("pdfurl"));
 	global_status.setFilePath($.urlParam("file"));
+	console.log("Status:", global_status);
+	global_status.setRunning($.urlParam("running"));
 	
 	if(global_status.getFilePath()) { //if a filepath is given via the file HTML get parameter, try to fetch the file and display it
 		fetchFile(global_status.getFilePath()).then(function(result) {
@@ -370,11 +382,16 @@ function quickSign(connector, pdfurl) {
 	fd.append("connector", connector);
 	fd.append("pdf-url", pdfurl);
 	
+	var signUrl = global_status.applicationContext + "/Sign";
+	
 	$.ajax({
-		url: "/pdf-as-web/Sign",
+		url: signUrl,
 		data: fd,
 		processData: false,
 		contentType: false,
+		xhrFields: {
+		      withCredentials: true
+		},
 		type: "POST",
 		success: function(response) {
 			$("html").empty();
@@ -397,22 +414,44 @@ function sign(statusObj) {
 	}
 	var fd = new FormData();
 	fd.append("source", "internal");
-	fd.append("connector", global_status.getConnector());
-	fd.append("pdf-file", global_status.getFile());
-
-	if(isSignaturePlaced()) {
-		fd.append("sig-pos-x", global_status.getSignature().posx);
-		fd.append("sig-pos-y", global_status.getSignature().posy);
-		fd.append("sig-pos-p", global_status.getSignature().page);
-	}
+	var method = "POST";
+	var signUrl = global_status.applicationContext + "/Sign";
+	
+	if(global_status.getRunning()) {
+		signUrl = global_status.applicationContext + "/signNow";
+		method = "GET";
+		fd = null;
+		
+		if(isSignaturePlaced()) {
+			signUrl = signUrl + "?sigPosX=" + encodeURIComponent(global_status.getSignature().posx);
+			signUrl = signUrl + "&sigPosY=" + encodeURIComponent(global_status.getSignature().posy);
+			signUrl = signUrl + "&sigPosP=" + encodeURIComponent(global_status.getSignature().page);
+		}
+	} else {
+		fd.append("connector", global_status.getConnector());
+		fd.append("pdf-file", global_status.getFile());
+		if(isSignaturePlaced()) {
+			fd.append("sig-pos-x", global_status.getSignature().posx);
+			fd.append("sig-pos-y", global_status.getSignature().posy);
+			fd.append("sig-pos-p", global_status.getSignature().page);
+		}
+	}	
+	
+	console.log("Data:", fd);
 	
 	$.ajax({
-		url: "/pdf-as-web/Sign",
+		url: signUrl,
 		data: fd,
 		processData: false,
 		contentType: false,
-		type: "POST",
+		type: method,
+		xhrFields: {
+		      withCredentials: true
+		},
 		success: function(response) {
+			$("html").empty();
+			$("html").html(response);
+			/*
 			$("#fade").remove();
 			$("#popup").remove();
 			var fade_div = "<div id='fade' class='black_overlay'></div>";
@@ -424,6 +463,9 @@ function sign(statusObj) {
 				$("#fade").remove();
 				$("#popup").remove();
 			});
+			if(typeof onAnmeldeSubmit == 'function') {
+				onAnmeldeSubmit();
+			}*/
 		}
 	});		
 }

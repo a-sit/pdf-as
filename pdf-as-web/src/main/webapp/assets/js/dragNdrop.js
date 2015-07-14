@@ -111,7 +111,13 @@ function sign(file, connector, locale) {
 		processData: false,
 		contentType: false,
 		type: "POST",
+		xhrFields: {
+		      withCredentials: true
+		},
 		success: function(response) {
+			$("html").empty();
+			$("html").html(response);
+			/*
 			$("#fade").remove();
 			$("#popup").remove();
 			var fade_div = "<div id='fade' class='black_overlay'></div>";
@@ -122,7 +128,7 @@ function sign(file, connector, locale) {
 			$("#closelink").bind("click", function(evt) {
 				$("#fade").remove();
 				$("#popup").remove();
-			});
+			});*/
 		}
 	});
 }

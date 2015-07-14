@@ -26,6 +26,7 @@ package at.gv.egiz.pdfas.web.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -289,8 +290,10 @@ public class ExternSignServlet extends HttpServlet {
 			HttpServletResponse response, byte[] pdfData, StatisticEvent statisticEvent) throws Exception {
 		// Get Connector
 		String connector = PdfAsParameterExtractor.getConnector(request);
+		PdfAsHelper.setConnector(request, connector);
 		
 		String transactionId = PdfAsParameterExtractor.getTransactionId(request);
+		PdfAsHelper.setTransactionid(request, transactionId);
 		
 		statisticEvent.setFilesize(pdfData.length);
 		statisticEvent.setProfileId(null);
@@ -329,7 +332,24 @@ public class ExternSignServlet extends HttpServlet {
 		PdfAsHelper.setSignatureDataHash(request, pdfDataHash);
 		logger.debug("Storing signatures data hash: " + pdfDataHash);
 		
+		boolean manualPositioning = PdfAsParameterExtractor.isUserPositioning(request);
+		
 		logger.debug("Starting signature creation with: " + connector);
+		
+		String sigType = PdfAsParameterExtractor
+				.getSigType(request);
+		PdfAsHelper.setSignatureType(request, sigType);
+		
+		Map<String, String> preProcessorMap = PdfAsParameterExtractor.getPreProcessorMap(request);
+		PdfAsHelper.setPreProcessorMap(request, preProcessorMap);
+		
+		Map<String, String> overwriteMap = PdfAsParameterExtractor.getOverwriteMap(request);
+		PdfAsHelper.setOverwriteMap(request, overwriteMap);
+		
+		String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
+		PdfAsHelper.setKeyIdentifier(request, keyIdentifier);
+		
+		PdfAsHelper.setStatisticEvent(request, response, statisticEvent);
 		
 		//IPlainSigner signer;
 		if (connector.equals("bku") || connector.equals("onlinebku") || connector.equals("mobilebku")) {
@@ -351,21 +371,33 @@ public class ExternSignServlet extends HttpServlet {
 				if(WebConfiguration.getLocalBKUURL() == null) {
 					throw new PdfAsWebException("Invalid connector mobilebku is not supported");
 				}
+			}			
+			
+			if(manualPositioning) {
+				// store pdf data
+				// redirect to viewer html
+				String token = PdfAsHelper.storePdfData(pdfData, request);
+				
+				String pdfDataUrl = PdfAsHelper.generatePositioningURL(token, request, response);
+				
+				if(pdfDataUrl != null) {
+					response.sendRedirect(response.encodeRedirectURL(pdfDataUrl));
+					return;
+				} else {
+					// remove Pdf data form session again!
+					PdfAsHelper.getPdfData(token, request);
+				}
 			}
 			
-			PdfAsHelper.setStatisticEvent(request, response, statisticEvent);
-			
 			PdfAsHelper.startSignature(request, response, getServletContext(), pdfData, connector, 
-					PdfAsHelper.buildPosString(request, response), transactionId, PdfAsParameterExtractor
-					.getSigType(request), PdfAsParameterExtractor.getPreProcessorMap(request), 
-					PdfAsParameterExtractor.getOverwriteMap(request));
+					PdfAsHelper.buildPosString(request, response), transactionId, sigType, 
+					preProcessorMap, 
+					overwriteMap);
 			return;
 		} else if (connector.equals("jks") || connector.equals("moa")) {
 			// start synchronous siganture creation
 			
 			if(connector.equals("jks")) {
-				
-				String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
 
 				boolean ksEnabled = false;
 
@@ -390,7 +422,21 @@ public class ExternSignServlet extends HttpServlet {
 				}
 			}
 			
-			
+			if(manualPositioning) {
+				// store pdf data
+				// redirect to viewer html
+				String token = PdfAsHelper.storePdfData(pdfData, request);
+				
+				String pdfDataUrl = PdfAsHelper.generatePositioningURL(token, request, response);
+				
+				if(pdfDataUrl != null) {
+					response.sendRedirect(response.encodeRedirectURL(pdfDataUrl));
+					return;
+				} else {
+					// remove Pdf data form session again!
+					PdfAsHelper.getPdfData(token, request);
+				}
+			}
 			
 			byte[] pdfSignedData = PdfAsHelper.synchornousSignature(request,
 					response, pdfData);

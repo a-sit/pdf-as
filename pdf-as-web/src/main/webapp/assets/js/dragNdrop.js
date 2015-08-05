@@ -26,6 +26,8 @@ function registerEventListeners() {
 	$("#dropzone").bind("dragover", function(evt) {
 		evt.preventDefault();
 		evt.stopPropagation();
+		highlightDropzone(); // test
+
 	});
 	
 	$("#dropzone").bind("dragleave", function(evt) {

@@ -26,7 +26,7 @@
 				<input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
 			</div>
 		</div>
-		// Test Kommentar
+
 		<div id="signMethod" class="container">
 			<h3 class="center">Sign Method</h3>
 			<fieldset>

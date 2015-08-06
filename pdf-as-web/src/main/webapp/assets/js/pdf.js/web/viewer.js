@@ -6680,6 +6680,7 @@ function webViewerInitialized() {
   
   var fileInput = document.createElement('input');
   fileInput.id = 'fileInput';
+  fileInput.accept = 'application/pdf'
   fileInput.className = 'fileInput';
   fileInput.setAttribute('type', 'file');
   fileInput.oncontextmenu = noContextMenuHandler;
@@ -6861,7 +6862,7 @@ function webViewerInitialized() {
 
   document.getElementById('openFile').addEventListener('click',
     SecondaryToolbar.openFileClick.bind(SecondaryToolbar));
-
+    
   document.getElementById('print').addEventListener('click',
     SecondaryToolbar.printClick.bind(SecondaryToolbar));
 

@@ -50,11 +50,11 @@ function registerEventListeners() {
 		if(files == null || files.length === 0) {
 			return;
 		}
-		else if(files[0].name.indexOf(".pdf") < 0)
+	/*	else if(files[0].name.indexOf(".pdf") < 0)
 		{
 			window.alert("The file type must be PDF");
 			return;
-		} 
+		}  */ // the pdf viewer will handle this
 		
 		file = files[0];
 		previewFile();

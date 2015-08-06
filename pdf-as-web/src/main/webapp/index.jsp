@@ -16,17 +16,17 @@
 </header>
 
 	<div id="sidebar">
-		<div id="fileSelector" class="container">
+		<!-- <div id="fileSelector" class="container">
 			<h3 class="center">File Selector</h3>
-			<!--<div id="dropzone" class="center">
+			<div id="dropzone" class="center">
 				Drag and Drop your Document here ...
 			</div>
 			  <div id="traditionalUpload">
 				<p>... or select File here</p>
 				<input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
-			</div> --> <!-- Care: id and name must be unique! -->
+			</div>
 			
-		</div>
+		</div>  -->
 
 		<div id="signMethod" class="container">
 			<h3 class="center">Sign Method</h3>

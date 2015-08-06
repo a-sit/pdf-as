@@ -41,6 +41,15 @@ iframe {
 	margin: 0px;
 }
 
+#borderBox {
+	 height: 815px; 
+	 width: 750px; 
+	float: center;
+	margin: 20px;
+	border: 2px dashed;
+	border-color: black;
+}
+
 #content {
 	clear: both;
 	height: 863px;

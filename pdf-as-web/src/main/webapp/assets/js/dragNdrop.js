@@ -17,32 +17,32 @@ function registerEventListeners() {
 		evt.preventDefault();
 	});
 	
-	$("#dropzone").bind("dragenter", function(evt) {
+	$("#borderBox").bind("dragenter", function(evt) {
 		evt.preventDefault();
 		evt.stopPropagation();
 		highlightDropzone();
 	});
 	
-	$("#dropzone").bind("dragover", function(evt) {
+	$("#borderBox").bind("dragover", function(evt) {
 		evt.preventDefault();
 		evt.stopPropagation();
-		highlightDropzone(); // test
+		highlightDropzone();
 
 	});
 	
-	$("#dropzone").bind("dragleave", function(evt) {
+	$("#borderBox").bind("dragleave", function(evt) {
 		evt.preventDefault();
 		evt.stopPropagation();
 		unhighlightDropzone();
 	});
 	
-	$("#dropzone").bind("dragend", function(evt) {
+	$("#borderBox").bind("dragend", function(evt) {
 		evt.preventDefault();
 		evt.stopPropagation();
 		unhighlightDropzone();
 	});
 	
-	$("#dropzone").bind("drop", function(evt) {
+	$("#borderBox").bind("drop", function(evt) {
 		evt.preventDefault();
 		evt.stopPropagation();
 		unhighlightDropzone();
@@ -50,9 +50,32 @@ function registerEventListeners() {
 		if(files == null || files.length === 0) {
 			return;
 		}
+		else if(files[0].name.indexOf(".pdf") < 0)
+		{
+			window.alert("The file type must be PDF");
+			return;
+		} 
+		
 		file = files[0];
 		previewFile();
 	});
+	
+/*	$("#main").bind("drop", function(evt) {
+		evt.preventDefault();
+		evt.stopPropagation();
+		var files = evt.originalEvent.dataTransfer.files;
+		if(files == null || files.length === 0) {
+			return;
+		}
+		else if(files[0].name.indexOf(".pdf") < 0)
+		{
+			window.alert("The file type must be PDF");
+			return;
+		} 
+		
+		file = files[0];
+		previewFile();
+	}); */
 	
 	$("#pdf-file").bind("change", function(evt) {
 		file_event = evt;
@@ -139,14 +162,14 @@ function sign(file, connector, locale) {
 //Changes color if the user drags a file over the dropzone
 //
 function highlightDropzone() {
-	$("#dropzone").css("background", "#D8FFD8");
+	$("#borderBox").css("background", "#D8FFD8");
 }
 
 //
 //Changes color back to original, if the user stops dragging a file over the dropzone (or drops the file)
 //
 function unhighlightDropzone() {
-	$("#dropzone").css("background", "#E8F4FF");
+	$("#borderBox").css("background", "#E8F4FF");
 }
 
 //

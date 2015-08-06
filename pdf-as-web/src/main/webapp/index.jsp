@@ -18,13 +18,14 @@
 	<div id="sidebar">
 		<div id="fileSelector" class="container">
 			<h3 class="center">File Selector</h3>
-			<div id="dropzone" class="center">
+			<!--<div id="dropzone" class="center">
 				Drag and Drop your Document here ...
 			</div>
-			<div id="traditionalUpload">
+			  <div id="traditionalUpload">
 				<p>... or select File here</p>
 				<input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
-			</div>
+			</div> --> <!-- Care: id and name must be unique! -->
+			
 		</div>
 
 		<div id="signMethod" class="container">
@@ -77,8 +78,7 @@
 					</tr>
 					<%
 						}
-					%>
-
+					%> 
 				</table>
 			</fieldset>
 		</div>
@@ -86,8 +86,8 @@
 		<div id="language" class="container">
 			<h3 class="center">Language</h3>
 				<fieldset>
-					<input type="radio" id="EN" name="locale" value="EN" checked><label for="EN">Englisch</label><br>
-					<input type="radio" id="DE" name="locale" value="DE"><label for="DE">Deutsch</label><br> 
+				  <input type="radio" id="EN" name="locale" value="EN" checked><label for="EN">Englisch</label><br>
+				  <input type="radio" id="DE" name="locale" value="DE"><label for="DE">Deutsch</label><br> 
 				</fieldset>
 		</div>
 		
@@ -98,10 +98,15 @@
 	
 	
 	<div id="main" class="container">
-	
 		<h3 class="center">Preview</h3>
 		<div id="content" class="center">
-			Please select the pdf file you want to sign!
+			<div id="borderBox" class="center">
+				<div>
+					<p> Drop your file here</p>
+					<p>... or select File here</p>
+						<input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
+				</div>
+			</div>
 		</div>
 	</div>
 	

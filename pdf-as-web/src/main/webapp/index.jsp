@@ -5,18 +5,28 @@
 <head>
 	<meta charset="utf-8">
 	<title>PDF-Signatur</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+     <link rel="stylesheet" href="assets/css/style.css">    
+    
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
 	<script src="assets/js/pdf.js/build/pdf.js"></script>
 	<script src="assets/js/dragNdrop.js"></script>
+	
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <script src="assets/bootstrap/js/bootstrap.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-nav2/dist/bootstrap-nav-wizard.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
 </head>
 <body>
  <header>
 </header>
 
-	<div id="sidebar">
-		<!-- <div id="fileSelector" class="container">
+	<!-- Old sidebar -->
+	<!-- <div id="sidebar">
+		 <div id="fileSelector" class="container">
 			<h3 class="center">File Selector</h3>
 			<div id="dropzone" class="center">
 				Drag and Drop your Document here ...
@@ -26,7 +36,7 @@
 				<input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
 			</div>
 			
-		</div>  -->
+		</div>  
 
 		<div id="signMethod" class="container">
 			<h3 class="center">Sign Method</h3>
@@ -95,20 +105,137 @@
 			<h3 class="center">Sign Document</h3>
 		</div>
 	</div>
+	-->
 	
+	<!-- Header -->
+<div class="container">
+	  <div class="center" id="navBar">
+	  <ul class="nav nav-wizard">
+	    <li class="active" id="UploadStepButton"><a href="#"><span class="glyphicon glyphicon-open-file" aria-hidden="true"></span><span id="uploadNavText"> Upload</span></a></li>
+	    <li id="PlaceStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span><span id="placeNavText" style="display:none;"> Place</span></a></li>
+	    <li id="SignStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span><span id="signNavText" style="display:none;"> Sign</span></a></li>
+	    <li id="FinishStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></span><span id="downloadNavText" style="display:none;"> Download</span></a></li>
+	  </ul>
+	  </div>
+ </div>
+
 	
-	<div id="main" class="container">
-		<h3 class="center">Preview</h3>
-		<div id="content" class="center">
-			<div id="borderBox" class="center">
-				<div>
-					<p> Drop your file here</p>
-					<p>... or select File here</p>
-						<input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
-				</div>
+<!-- Main Switch Frame -->
+<div class="row">
+
+	<div class="col-md-12">
+	
+		<div id="DropContainer" class="container">
+			<h3 class="center">Upload your Document</h3>
+			<div class="center">
+				<div id="borderBox" class="center">
+					<div>
+						<h5 class="center"> Drop your file here</h5>
+						<h5 class="center">... or select File here</h5>
+							<div id="FormDefine" class="form-group has-feedback">
+					            <div class="input-group">
+					                <span class="input-group-btn">
+					                    <span class="btn btn-primary btn-file">
+					                     Browse... <input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
+					                    </span>
+					                </span>
+					                <input id= "FileNamePreview" type="text" class="form-control" readonly>
+					                <span id="BadFeedback" class="glyphicon glyphicon-remove form-control-feedback" style="display: none;" aria-hidden="true"></span>
+					                <span id="GoodFeedback" class="glyphicon glyphicon-ok form-control-feedback" style="display: none;" aria-hidden="true"></span>
+					            </div>
+					            <div id="fileTypeErrorMessage" class="pull-right">
+					            <p id="noPdfMessage" style="display:none;"><span class="glyphicon glyphicon-alert" aria-hidden="true"></span> The file type must be PDF!</p>
+					            </div>
+
+				            </div>	
+				            
+				            <div class="col-md-12 center">
+				            <button id="uploadContinue" class="btn btn-primary btn-lg btn-block" disabled="disabled" >Continue</button>
+				            </div>				        
+					</div>
+				</div>	
+			</div>		
+		</div>
+
+		<div id="ViewContainer" class="container" style="display: none;">
+			<h3 class="center">Place your Signature<small></h3>
+			<h6 class="center">(If no Signature is placed, one will be appended at the end of the Document)</h6>
+			<div class="pull-right">
+			<button id="placeContinue" class="btn btn-lg btn-primary">Continue</button>
+			</div>
+			<div id="content" class="center">
+			Loading your PDF, please wait...
 			</div>
 		</div>
+		
+		<div id="SignContainer" class="container" style="display: none;">
+			<h3 class="center">Choose your Sign Method</h3>
+				<fieldset>
+					<table>
+						<%
+						if (WebConfiguration.getHandyBKUURL() != null) {
+						%>
+						<tr>
+							<td><input type="radio" id="mobileBKU" name="connector" value="mobilebku" checked></td>
+							<td><label for="mobileBKU">Handy</td>
+							<td><label for="mobileBKU"><img src="assets/img/mobileBKU.png" alt="Sign via mobile BKU"/></td>
+							
+						</tr>
+						<%
+							}
+						%>
+						<%
+						if (WebConfiguration.getLocalBKUURL() != null) {
+						%>
+						<tr>
+							<td><input type="radio" id="localBKU" name="connector" value="bku"></td>
+							<td><label for="localBKU">Lokale BKU</label></td>
+							<td><label for="localBKU"><img src="assets/img/onlineBKU.png" alt="Sign via local BKU" /></label></td>
+							
+						</tr>
+						<%
+							}
+						%>
+						<%
+						if (WebConfiguration.getOnlineBKUURL() != null) {
+						%>
+						<tr>
+							<td><input type="radio" id="onlineBKU" name="connector" value="onlinebku"></td>
+							<td><label for="onlineBKU">Online BKU</label></td>
+							<td><label for="onlineBKU"><img src="assets/img/onlineBKU.png" alt="Sign via online BKU"/></label></td>
+							
+						</tr>
+						<%
+							}
+						%>
+						<%
+							if(WebConfiguration.getKeystoreDefaultEnabled()) {
+						%>
+						<tr>
+							<td><input type="radio" id="jks" name="connector" value="jks"></td>
+							<td><label for="jks">Server Keystore</label></td>
+							<td><label for="jks"><img src="assets/img/onlineBKU.png" alt="Sign via Server Keystore"/></label></td>
+						</tr>
+						<%
+							}
+						%> 
+					</table>
+				</fieldset>
+		</div>
+		<div id="DownloadContainer" class="container" style="display: none;">
+			<h3 class="center">Download your Document</h3>
+			
+			<div id="btnSign">
+				<h3 class="center">Sign Document</h3>
+			</div>
+		
+		</div>
+				
 	</div>
+</div>
+	
+	
+	
 	
 	<!--<form action="Sign" method="POST"
 		enctype="multipart/form-data">

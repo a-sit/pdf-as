@@ -5853,6 +5853,7 @@ var PDFViewerApplication = {
           // change error message also for other builds
           loadingErrorMessage = mozL10n.get('invalid_file_error', null,
                                             'Invalid or corrupted PDF file.');
+                                           
         } else if (exception instanceof PDFJS.MissingPDFException) {
           // special message for missing PDF's
           loadingErrorMessage = mozL10n.get('missing_file_error', null,
@@ -6074,7 +6075,7 @@ var PDFViewerApplication = {
 
     var errorMessage = document.getElementById('errorMessage');
     errorMessage.textContent = message;
-
+    
     var closeButton = document.getElementById('errorClose');
     closeButton.onclick = function() {
       errorWrapper.setAttribute('hidden', 'true');

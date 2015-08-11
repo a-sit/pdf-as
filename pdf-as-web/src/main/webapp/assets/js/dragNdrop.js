@@ -5,6 +5,12 @@ $(document).ready(function() {
 	registerEventListeners();
 });
 
+$(window).unload(function() {
+    console.log("REFRESHED");
+    $("#uploadContinue").prop("disabled", true);
+    $("#FileNamePreview").val("");
+});
+
 function registerEventListeners() {
 	var locale = "EN";
 	var connector = "mobilebku";
@@ -50,15 +56,102 @@ function registerEventListeners() {
 		if(files == null || files.length === 0) {
 			return;
 		}
-	/*	else if(files[0].name.indexOf(".pdf") < 0)
-		{
-			window.alert("The file type must be PDF");
-			return;
-		}  */ // the pdf viewer will handle this
+		
+		$("#FileNamePreview").val(files[0].name);
+		$("uploadContinue").prop("disabled", true);
 		
 		file = files[0];
-		previewFile();
+		checkPDF(file);
 	});
+	
+	$("#UploadStepButton").bind("click", function(evt) {
+		
+		toggleView("upload");
+	});
+	$("#PlaceStepButton").bind("click", function(evt) {
+		
+		toggleView("place");
+	});
+	$("#SignStepButton").bind("click", function(evt) {
+		
+		toggleView("sign");
+	});
+	$("#FinishStepButton").bind("click", function(evt) {
+		
+		toggleView("finish");
+	});
+	
+	$("#uploadContinue").bind("click", function(evt) {
+				
+		$("#PlaceStepButton").click();
+	});
+	
+	$("#placeContinue").bind("click", function(evt) {
+		
+		$("#SignStepButton").click();
+	});
+	
+	function toggleView(input)
+	{
+		console.log("toggleView : " + input);
+		
+		$("#DropContainer").hide();
+		$("#ViewContainer").hide();
+		$("#SignContainer").hide();
+		$("#DownloadContainer").hide();
+		
+		$("#UploadStepButton").removeClass("active");
+		$("#PlaceStepButton").removeClass("active");
+		$("#SignStepButton").removeClass("active");
+		$("#FinishStepButton").removeClass("active");
+		
+		$("#UploadStepButton").removeClass("active");
+		$("#PlaceStepButton").removeClass("active");
+		$("#SignStepButton").removeClass("active");
+		$("#FinishStepButton").removeClass("active");
+		
+		$("#uploadNavText").hide();
+		$("#placeNavText").hide();
+		$("#signNavText").hide();
+		$("#downloadNavText").hide();
+		
+		
+		switch(input)
+		{
+		case "upload":
+			$("#DropContainer").show();
+			$("#UploadStepButton").addClass("active");
+			$("#PlaceStepButton").prop("style", "pointer-events:none;");
+			$("#SignStepButton").prop("style", "pointer-events:none;");
+			$("#FinishStepButton").prop("style", "pointer-events:none;");
+			$("#uploadNavText").show();
+			break;
+			
+		case "place":
+			$("#ViewContainer").show();
+			$("#PlaceStepButton").addClass("active");
+			$("#PlaceStepButton").prop("style", "");
+			$("#SignStepButton").prop("style", "pointer-events:none;");
+			$("#FinishStepButton").prop("style", "pointer-events:none;");
+			$("#placeNavText").show();
+			break;
+			
+		case "sign":
+			$("#SignContainer").show();
+			$("#SignStepButton").addClass("active");
+			$("#SignStepButton").prop("style", "");
+			$("#FinishStepButton").prop("style", "pointer-events:none;");
+			$("#signNavText").show();
+			break;
+			
+		case "finish":
+			$("#DownloadContainer").show();
+			$("#FinishStepButton").addClass("active");
+			$("#SignStepButton").prop("style", "");
+			$("#downloadNavText").show();
+			break;
+		}
+	}
 	
 /*	$("#main").bind("drop", function(evt) {
 		evt.preventDefault();
@@ -77,15 +170,104 @@ function registerEventListeners() {
 		previewFile();
 	}); */
 	
+	
+	
 	$("#pdf-file").bind("change", function(evt) {
 		file_event = evt;
 		var files = evt.target.files;
 		if(files == null || files.length === 0) {
 			return;
 		}
+		
+		$("#FileNamePreview").val(files[0].name);
+		$("uploadContinue").prop("disabled", true);
+
+		
 		file = files[0];
-		previewFile(file);
+		checkPDF(file);
+								
 	});
+	
+	function checkPDF(to_check)
+	{
+		// Read the local file into a Uint8Array.
+	    var fileReader = new FileReader();
+	    
+	    var is_pdf = true;
+	    fileReader.onload = function webViewerChangeFileReaderOnload(evt) 
+	    {
+	       var buffer = evt.target.result;
+		   var uint8Array = new Uint8Array(buffer);
+		  		  
+		   if(uint8Array[0] == 37 && // %
+			  uint8Array[1] == 80 && // P
+			  uint8Array[2] == 68 && // D
+			  uint8Array[3] == 70	 // F 
+		   )
+		   {
+			   console.log("File is PDF");
+		   }
+		   else
+		   {
+			   console.log("File is NOT PDF");
+			   is_pdf = false;
+		   }
+		   
+		    console.log("setting view now..");
+			setFeedbackView(is_pdf);		   
+		   
+	    };
+	    
+	    console.log("test if pdf..");
+	    fileReader.readAsArrayBuffer(to_check);
+	    
+	}
+	
+	function setFeedbackView(is_pdf) // and load PDF if successful
+	{
+		
+		if(!is_pdf) // if no pdf
+		{
+			console.log("setting Error Feedback");
+			if($("#FormDefine").hasClass("has-success"))
+			{
+				$("#FormDefine").switchClass("has-success", "has-error");
+			}
+			else
+			{
+				$("#FormDefine").addClass("has-error");
+			}
+			
+			$("#BadFeedback").show();
+			$("#GoodFeedback").hide();
+			
+			$("#noPdfMessage").show();
+			
+			$("#uploadContinue").prop("disabled", true);
+
+		}
+		else // if it is pdf
+		{
+			console.log("setting Success Feedback");
+			if($("#FormDefine").hasClass("has-error"))
+			{
+				$("#FormDefine").switchClass("has-error", "has-success");
+			}
+			else
+			{
+				$("#FormDefine").addClass("has-success");
+			}
+			
+			$("#BadFeedback").hide();
+			$("#GoodFeedback").show();
+			
+			$("#noPdfMessage").hide();
+			
+			$("#uploadContinue").prop("disabled", false);
+
+			previewFile(file);
+		} 
+	}
 	
 	$("input[name='connector']").bind("change", function(evt) {
 		connector = this.value;
@@ -97,7 +279,7 @@ function registerEventListeners() {
 	
 	$("#btnSign").bind("click", function(evt) {
 		sign(file, connector, locale);
-	});
+	});	
 }
 
 //

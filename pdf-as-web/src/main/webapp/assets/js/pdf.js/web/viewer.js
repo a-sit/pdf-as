@@ -3182,8 +3182,8 @@ var PDFPageView = (function PDFPageViewClosure() {
 
     cssTransform: function PDFPageView_transform(canvas, redrawAnnotations) {
       // Scale canvas, canvas wrapper, and page container.
-      var width = this.viewport.width;
-      var height = this.viewport.height;
+      var width = this.viewport.width / 50;
+      var height = this.viewport.height / 50;
       var div = this.div;
       canvas.style.width = canvas.parentNode.style.width = div.style.width =
         Math.floor(width) + 'px';

@@ -86,10 +86,21 @@ function registerEventListeners() {
 		$("#PlaceStepButton").click();
 	});
 	
+	
 	$("#placeContinue").bind("click", function(evt) {
-		
+
 		$("#SignStepButton").click();
 	});
+	
+	$("#placeSignatureExtern").bind("click", function(evt) {
+		
+		$("#iFrame").contents().find("#placeSignature").click();
+	});
+	
+	$("#delSignatureExtern").bind("click", function(evt) {
+		
+		$("#iFrame").contents().find("#delSignature").click();
+	})
 	
 	function toggleView(input)
 	{
@@ -152,25 +163,6 @@ function registerEventListeners() {
 			break;
 		}
 	}
-	
-/*	$("#main").bind("drop", function(evt) {
-		evt.preventDefault();
-		evt.stopPropagation();
-		var files = evt.originalEvent.dataTransfer.files;
-		if(files == null || files.length === 0) {
-			return;
-		}
-		else if(files[0].name.indexOf(".pdf") < 0)
-		{
-			window.alert("The file type must be PDF");
-			return;
-		} 
-		
-		file = files[0];
-		previewFile();
-	}); */
-	
-	
 	
 	$("#pdf-file").bind("change", function(evt) {
 		file_event = evt;

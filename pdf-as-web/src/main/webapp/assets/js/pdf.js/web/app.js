@@ -121,6 +121,12 @@ function displayPdf() {
 	fileReader.readAsArrayBuffer(file);
 }
 
+/*$("#placeSignatureExtern").bind("click", function(evt) {
+	console.log("PLACE SIGNATURE EXTERN");
+	$("#placeSignature").click();
+	
+}); */
+
 //
 //Attaches event handlers to the signature placement icons
 //

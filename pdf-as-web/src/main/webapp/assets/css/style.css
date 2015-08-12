@@ -12,14 +12,75 @@ footer {
 
 iframe {
 	border: none;
+	min-width:10em;
+}
+
+.methodChooseContainer {
+	width: 80px;
+	height: 130px;
+	text-align: center;
+}
+
+.methodChooseContainer div button {
+	margin-top:1em;
+}
+
+#methodContainer {
+	margin: 2em;
+}
+
+#ImageBox {
+	width: 80px;
+	height: 85px;
+}
+
+.BKUImage {
+	margin-top: 12px;
 }
 
 #navBar {
 	margin: 2em;
+	min-width: 25em;
 }
 
-#placeContinue {
-	margin: 1em;
+#ViewerExternToolbar {
+	margin-bottom: 2em !important;
+	min-width: 25em;
+}
+
+#ViewerExternToolbar button {
+	margin-left:0.5em;
+	margin-right:0.5em;
+	width: 3em;
+	height:	3em;
+}
+
+#ViewerExternToolbar div {
+	margin-left:0.5em;
+	margin-right:0.5em;
+	width: 3em;
+	height:	3em;
+	text-align: center;
+	font-size: 1em;
+}
+
+#ViewerExternToolbar img {
+	width: 3em;
+	height: 3em;
+}
+
+#ViewerExternToolbar img:hover {
+	cursor: hand;
+	cursor: pointer;
+}
+
+#ViewerExternToolbar span {
+	font-size: 2em;
+}
+
+#ViewerExternToolbar span:hover {
+	cursor: hand;
+	cursor: pointer;
 }
 
 #fileSelector {
@@ -60,6 +121,10 @@ iframe {
 	margin-bottom: 5em;
 }
 
+#noSignatureWarning {
+	text-align:center;
+}
+
 #btnSign {
 	border-top-left-radius: 15px;
 	border-top-right-radius: 15px;
@@ -88,26 +153,22 @@ iframe {
 }
 
 .container {
-	border-top-left-radius: 1em;
-	border-top-right-radius: 1em;
 	border: 0.125em solid;
 	border-color: #66A3FF;
 	background: #E8F4FF;
 	box-shadow: 0em 0em 1em #333333;
-	margin-bottom: 1em;
+	margin-bottom: 0em;
 	margin-left: 5em;
 	margin-right: 5em;
 	width: 100%;
 }
 
 .container h3 {
-	border-top-left-radius: 0.5em;
-	border-top-right-radius: 0.5em;
-	background: #66A3FF;
-	color: #FFFFFF;
+	font-style: bold;
+	color: #204a87;
 	text-align: center;
 	margin: -0.125em;
-	margin-left: -0.7em;
+	margin-left: -0.6em;
 	margin-right: -0.7em;
 	height: 2em;	
 }

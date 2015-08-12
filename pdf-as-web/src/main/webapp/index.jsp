@@ -107,12 +107,13 @@
 	</div>
 	-->
 	
-	<!-- Header -->
 <div class="container">
+	<!-- Header -->
+<div class="center">
 	  <div class="center" id="navBar">
 	  <ul class="nav nav-wizard">
 	    <li class="active" id="UploadStepButton"><a href="#"><span class="glyphicon glyphicon-open-file" aria-hidden="true"></span><span id="uploadNavText"> Upload</span></a></li>
-	    <li id="PlaceStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span><span id="placeNavText" style="display:none;"> Place</span></a></li>
+	    <li id="PlaceStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-move" aria-hidden="true"></span><span id="placeNavText" style="display:none;"> Place</span></a></li>
 	    <li id="SignStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span><span id="signNavText" style="display:none;"> Sign</span></a></li>
 	    <li id="FinishStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></span><span id="downloadNavText" style="display:none;"> Download</span></a></li>
 	  </ul>
@@ -125,7 +126,7 @@
 
 	<div class="col-md-12">
 	
-		<div id="DropContainer" class="container">
+		<div id="DropContainer">
 			<h3 class="center">Upload your Document</h3>
 			<div class="center">
 				<div id="borderBox" class="center">
@@ -157,72 +158,81 @@
 			</div>		
 		</div>
 
-		<div id="ViewContainer" class="container" style="display: none;">
-			<h3 class="center">Place your Signature<small></h3>
-			<h6 class="center">(If no Signature is placed, one will be appended at the end of the Document)</h6>
-			<div class="pull-right">
-			<button id="placeContinue" class="btn btn-lg btn-primary">Continue</button>
-			</div>
+		<div id="ViewContainer" style="display: none;">
+			<h3 class="center">Place your Signature</h3>
+			<h6 class="center" id="noSignatureWarning">(If no Signature is placed, one will be appended at the end of the Document)</h6>
+			<div class="center">
+				<div id="ViewerExternToolbar" class="center">
+				<div id="placeSignatureExtern">
+				<span class="glyphicon glyphicon-pencil"></span><!--<img src="assets/img/federohne.svg" title="Place Signature on current Page"> --><caption>Add</caption>
+				</div>
+				<div id="delSignatureExtern">
+				<span class="glyphicon glyphicon-ban-circle"></span><!-- <img src="assets/img/federohne.svg" title="Remove Signature from current Page"> --><caption>Remove</caption> 
+				</div>
+	            <div id="placeContinue">
+	            <span class="glyphicon glyphicon-ok"></span><!-- <img src="assets/img/federohne.svg" title="Continue"> --><caption>Continue</caption>
+	            </div>
+                </div>
+             </div>
 			<div id="content" class="center">
 			Loading your PDF, please wait...
 			</div>
 		</div>
 		
-		<div id="SignContainer" class="container" style="display: none;">
+		<div id="SignContainer" style="display: none;">
 			<h3 class="center">Choose your Sign Method</h3>
 				<fieldset>
-					<table>
+				<div class="center">
+					<div id="methodContainer" class="row center">
 						<%
 						if (WebConfiguration.getHandyBKUURL() != null) {
 						%>
-						<tr>
-							<td><input type="radio" id="mobileBKU" name="connector" value="mobilebku" checked></td>
-							<td><label for="mobileBKU">Handy</td>
-							<td><label for="mobileBKU"><img src="assets/img/mobileBKU.png" alt="Sign via mobile BKU"/></td>
-							
-						</tr>
+						
+						<div class="methodChooseContainer">
+							<div id="ImageBox"><img src="assets/img/mobileBKU.png" alt="Sign via mobile BKU"/></div>
+							<div><button class="btn btn-primary">Mobile<br>Phone</button></div>
+							<div style="display:none;"><input type="radio" id="mobileBKU" name="connector" value="mobilebku" checked></div>
+						</div>
 						<%
 							}
 						%>
 						<%
 						if (WebConfiguration.getLocalBKUURL() != null) {
 						%>
-						<tr>
-							<td><input type="radio" id="localBKU" name="connector" value="bku"></td>
-							<td><label for="localBKU">Lokale BKU</label></td>
-							<td><label for="localBKU"><img src="assets/img/onlineBKU.png" alt="Sign via local BKU" /></label></td>
-							
-						</tr>
+						<div class="methodChooseContainer">
+							<div id="ImageBox"><img class="BKUImage" src="assets/img/onlineBKU.png" alt="Sign via local BKU" /></div>
+							<div><button class="btn btn-primary">Lokale<br>BKU</button></div>
+							<div style="display:none;"><input type="radio" id="localBKU" name="connector" value="bku"></div>
+						</div>
 						<%
 							}
 						%>
 						<%
 						if (WebConfiguration.getOnlineBKUURL() != null) {
 						%>
-						<tr>
-							<td><input type="radio" id="onlineBKU" name="connector" value="onlinebku"></td>
-							<td><label for="onlineBKU">Online BKU</label></td>
-							<td><label for="onlineBKU"><img src="assets/img/onlineBKU.png" alt="Sign via online BKU"/></label></td>
-							
-						</tr>
+						<div class="methodChooseContainer">
+							<div id="ImageBox"><img class="BKUImage" src="assets/img/onlineBKU.png" alt="Sign via online BKU"/></div>
+							<div><button class="btn btn-primary">Online<br>BKU</button></div>
+							<div style="display:none;"><input type="radio" id="onlineBKU" name="connector" value="onlinebku"></div>
+						</div>
 						<%
 							}
 						%>
-						<%
+						<!--<%
 							if(WebConfiguration.getKeystoreDefaultEnabled()) {
 						%>
-						<tr>
-							<td><input type="radio" id="jks" name="connector" value="jks"></td>
-							<td><label for="jks">Server Keystore</label></td>
-							<td><label for="jks"><img src="assets/img/onlineBKU.png" alt="Sign via Server Keystore"/></label></td>
-						</tr>
+							<div id="ImageBox"><img class="BKUImage" src="assets/img/onlineBKU.png" alt="Sign via Server Keystore"/></div>
+						    <div><button class="btn btn-primary">Server<br>Keystore</button></div>
+							<div style="display:none;"><input type="radio" id="jks" name="connector" value="jks"></div>
+						</div> -->
 						<%
 							}
-						%> 
-					</table>
+						%>  
+					</div>
+				</div>
 				</fieldset>
 		</div>
-		<div id="DownloadContainer" class="container" style="display: none;">
+		<div id="DownloadContainer" style="display: none;">
 			<h3 class="center">Download your Document</h3>
 			
 			<div id="btnSign">
@@ -232,6 +242,8 @@
 		</div>
 				
 	</div>
+</div>
+
 </div>
 	
 	

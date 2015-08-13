@@ -180,7 +180,6 @@ function scrollIntoView(element, spot) {
  */
 function watchScroll(viewAreaElement, callback) {
 
-	console.log("watch scroll");
   var debounceScroll = function debounceScroll(evt) {
     if (rAF) {
       return;
@@ -198,6 +197,8 @@ function watchScroll(viewAreaElement, callback) {
   
       state.lastY = currentY;
     
+      // place the signature again on current page
+      $("#placeSignature").click();
       callback(state);
 
     });
@@ -2955,11 +2956,12 @@ var PDFRenderingQueue = (function PDFRenderingQueueClosure() {
         if (views[previousPageIndex] &&
           !this.isViewFinished(views[previousPageIndex])) {
           console.log("got to page: " + nextPageIndex);
-                  $("#placeSignature").click();
+                  
           return views[previousPageIndex];
         }
       }
       // Everything that needs to be rendered has been.
+      
       return null;
     },
 
@@ -6335,6 +6337,7 @@ var PDFViewerApplication = {
     });
     
     console.log("pdfview just finished loading");
+    
   },
 
   setInitialView: function pdfViewSetInitialView(storedHash, scale) {

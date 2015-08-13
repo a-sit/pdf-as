@@ -164,10 +164,10 @@
 			<div class="center">
 				<div id="ViewerExternToolbar" class="center">
 				<div id="placeSignatureExtern">
-				<img src="assets/img/federohne.svg" title="Place Signature on current Page"><br>Add
+				<img src="assets/img/federohne.svg" title="Place Signature on current Page"><br>new page
 				</div>
 	            <div id="placeContinue">
-	            <img src="assets/img/federohne.svg" title="Continue"><br>Continue
+	            <img src="assets/img/federohne.svg" title="Continue"><br>continue
 	            </div>
                 </div>
              </div>

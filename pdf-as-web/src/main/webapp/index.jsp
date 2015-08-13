@@ -164,13 +164,10 @@
 			<div class="center">
 				<div id="ViewerExternToolbar" class="center">
 				<div id="placeSignatureExtern">
-				<span class="glyphicon glyphicon-pencil"></span><!--<img src="assets/img/federohne.svg" title="Place Signature on current Page"> --><caption>Add</caption>
-				</div>
-				<div id="delSignatureExtern">
-				<span class="glyphicon glyphicon-ban-circle"></span><!-- <img src="assets/img/federohne.svg" title="Remove Signature from current Page"> --><caption>Remove</caption> 
+				<img src="assets/img/federohne.svg" title="Place Signature on current Page"><br>Add
 				</div>
 	            <div id="placeContinue">
-	            <span class="glyphicon glyphicon-ok"></span><!-- <img src="assets/img/federohne.svg" title="Continue"> --><caption>Continue</caption>
+	            <img src="assets/img/federohne.svg" title="Continue"><br>Continue
 	            </div>
                 </div>
              </div>

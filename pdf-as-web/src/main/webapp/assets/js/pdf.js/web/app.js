@@ -119,6 +119,7 @@ function displayPdf() {
 		registerSignaturePlacementEventHandlers();
 	};
 	fileReader.readAsArrayBuffer(file);
+	console.log("now finished");
 }
 
 /*$("#placeSignatureExtern").bind("click", function(evt) {

@@ -179,6 +179,8 @@ function scrollIntoView(element, spot) {
  * PDF.js friendly one: with scroll debounce and scroll direction.
  */
 function watchScroll(viewAreaElement, callback) {
+
+	console.log("watch scroll");
   var debounceScroll = function debounceScroll(evt) {
     if (rAF) {
       return;
@@ -188,12 +190,16 @@ function watchScroll(viewAreaElement, callback) {
       rAF = null;
 
       var currentY = viewAreaElement.scrollTop;
+      console.log("currentY: " + currentY);
       var lastY = state.lastY;
       if (currentY !== lastY) {
         state.down = currentY > lastY;
       }
+  
       state.lastY = currentY;
+    
       callback(state);
+
     });
   };
 
@@ -392,7 +398,7 @@ var ProgressBar = (function ProgressBarClosure() {
     setWidth: function ProgressBar_setWidth(viewer) {
       if (viewer) {
         var container = viewer.parentNode;
-        var scrollbarWidth = container.offsetWidth - viewer.offsetWidth;
+        var scrollbarWidth = 0; //container.offsetWidth - viewer.offsetWidth;
         if (scrollbarWidth > 0) {
           this.bar.setAttribute('style', 'width: calc(100% - ' +
                                          scrollbarWidth + 'px);');
@@ -2948,6 +2954,8 @@ var PDFRenderingQueue = (function PDFRenderingQueueClosure() {
         var previousPageIndex = visible.first.id - 2;
         if (views[previousPageIndex] &&
           !this.isViewFinished(views[previousPageIndex])) {
+          console.log("got to page: " + nextPageIndex);
+                  $("#placeSignature").click();
           return views[previousPageIndex];
         }
       }
@@ -3556,7 +3564,7 @@ var TextLayerBuilder = (function TextLayerBuilderClosure() {
     this.viewport = options.viewport;
     this.textDivs = [];
     this.findController = options.findController || null;
-  }
+   }
 
   TextLayerBuilder.prototype = {
     _finishRendering: function TextLayerBuilder_finishRendering() {
@@ -4178,7 +4186,6 @@ var PDFViewer = (function pdfViewer() {
         this.container.dispatchEvent(event);
         return;
       }
-
       event.previousPageNumber = this._currentPageNumber;
       this._currentPageNumber = val;
       event.pageNumber = val;
@@ -4382,14 +4389,14 @@ var PDFViewer = (function pdfViewer() {
       }
     },
 
-    _scrollUpdate: function () {
+    _scrollUpdate: function () { 
       if (this.pagesCount === 0) {
         return;
       }
       this.update();
       for (var i = 0, ii = this.pages.length; i < ii; i++) {
         this.pages[i].updatePosition();
-      }
+      } 
     },
 
     _setScaleDispatchEvent: function pdfViewer_setScaleDispatchEvent(
@@ -4496,6 +4503,7 @@ var PDFViewer = (function pdfViewer() {
      */
     scrollPageIntoView: function PDFViewer_scrollPageIntoView(pageNumber,
                                                               dest) {
+                                                             
       var pageView = this.pages[pageNumber - 1];
 
       if (this.presentationModeState ===
@@ -4565,7 +4573,7 @@ var PDFViewer = (function pdfViewer() {
             height / CSS_UNITS;
           scale = Math.min(Math.abs(widthScale), Math.abs(heightScale));
           break;
-        default:
+        default: 
           return;
       }
 
@@ -4587,10 +4595,11 @@ var PDFViewer = (function pdfViewer() {
       var left = Math.min(boundingRect[0][0], boundingRect[1][0]);
       var top = Math.min(boundingRect[0][1], boundingRect[1][1]);
 
-      scrollIntoView(pageView.div, { left: left, top: top });
+      scrollIntoView(pageView.div, { left: left, top: top }); 
     },
 
     _updateLocation: function (firstPage) {
+    console.log("update location");
       var currentScale = this._currentScale;
       var currentScaleValue = this._currentScaleValue;
       var normalizedScaleValue =
@@ -4608,6 +4617,8 @@ var PDFViewer = (function pdfViewer() {
       var intLeft = Math.round(topLeft[0]);
       var intTop = Math.round(topLeft[1]);
       pdfOpenParams += ',' + intLeft + ',' + intTop;
+      
+      console.log("stats: " + topLeft +" "+ intLeft +" "+ intTop);
 
       this.location = {
         pageNumber: pageNumber,
@@ -4615,7 +4626,7 @@ var PDFViewer = (function pdfViewer() {
         top: intTop,
         left: intLeft,
         pdfOpenParams: pdfOpenParams
-      };
+      }; 
     },
 
     update: function () {
@@ -6318,8 +6329,12 @@ var PDFViewerApplication = {
         console.warn('Warning: AcroForm/XFA is not supported');
         self.fallback(PDFJS.UNSUPPORTED_FEATURES.forms);
       }
+      
+      
 
     });
+    
+    console.log("pdfview just finished loading");
   },
 
   setInitialView: function pdfViewSetInitialView(storedHash, scale) {
@@ -7149,10 +7164,11 @@ window.addEventListener('pagechange', function pagechange(evt) {
 }, true);
 
 function handleMouseWheel(evt) {
+
   var MOUSE_WHEEL_DELTA_FACTOR = 40;
   var ticks = (evt.type === 'DOMMouseScroll') ? -evt.detail :
               evt.wheelDelta / MOUSE_WHEEL_DELTA_FACTOR;
-  var direction = (ticks < 0) ? 'zoomOut' : 'zoomIn';
+  /*var direction = (ticks < 0) ? 'zoomOut' : 'zoomIn';
 
   if (PresentationMode.active) {
     evt.preventDefault();
@@ -7161,7 +7177,21 @@ function handleMouseWheel(evt) {
     // Only zoom the pages, not the entire viewer
     evt.preventDefault();
     PDFViewerApplication[direction](Math.abs(ticks));
+  } */
+  
+  if(ticks > 0)
+  {
+  	PDFViewerApplication.page--;
   }
+  else
+  {
+  	PDFViewerApplication.page++;
+  }
+  
+  if (evt.preventDefault) //disable default wheel action of scrolling page
+        evt.preventDefault()
+    else
+        return false
 }
 
 window.addEventListener('DOMMouseScroll', handleMouseWheel);

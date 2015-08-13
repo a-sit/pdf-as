@@ -44,43 +44,31 @@ iframe {
 }
 
 #ViewerExternToolbar {
-	margin-bottom: 2em !important;
+	margin-bottom: 1em !important;
 	min-width: 25em;
-}
-
-#ViewerExternToolbar button {
-	margin-left:0.5em;
-	margin-right:0.5em;
-	width: 3em;
-	height:	3em;
 }
 
 #ViewerExternToolbar div {
 	margin-left:0.5em;
 	margin-right:0.5em;
-	width: 3em;
-	height:	3em;
-	text-align: center;
-	font-size: 1em;
+	text-align:center;
+	width:5em;
+	height:5em;	
+}
+
+#ViewerExternToolbar div:hover {
+	cursor:hand;
+	cursor:pointer;
+	margin:0.5em;
+	margin-top:0em;
+	margin-bottom:0em;
+	
+	border: 0.1em dashed;
 }
 
 #ViewerExternToolbar img {
 	width: 3em;
 	height: 3em;
-}
-
-#ViewerExternToolbar img:hover {
-	cursor: hand;
-	cursor: pointer;
-}
-
-#ViewerExternToolbar span {
-	font-size: 2em;
-}
-
-#ViewerExternToolbar span:hover {
-	cursor: hand;
-	cursor: pointer;
 }
 
 #fileSelector {

@@ -119,6 +119,11 @@
 	  </ul>
 	  </div>
  </div>
+ <div class="center" id="OuterBackBox">
+ <div id="InnerBackBox">
+ <p id="BackBox">Back</p>
+ </div>
+ </div>
 
 	
 <!-- Main Switch Frame -->
@@ -171,8 +176,10 @@
 	            </div>
                 </div>
              </div>
-			<div id="content" class="center">
+             <div id="outerCenter" class="center">
+			<div id="content" class="">
 			Loading your PDF, please wait...
+			</div>
 			</div>
 		</div>
 		

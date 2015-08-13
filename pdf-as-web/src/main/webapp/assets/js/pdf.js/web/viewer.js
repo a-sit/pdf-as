@@ -52,6 +52,47 @@ var MAX_AUTO_SCALE = 1.25;
 var SCROLLBAR_PADDING = 40;
 var VERTICAL_PADDING = 5;
 
+
+// preventing from using arrow keys or page keys to scroll
+$(document).on('keypress', function(e) {
+	switch(e.which)
+	{
+	 	case 48: // 0
+	 	case 49:
+	 	case 50:
+	 	case 51:
+	 	case 52:
+	 	case 53:
+	 	case 54:
+	 	case 55:
+	 	case 56:
+	 	case 57: // 9
+	 	case 220: // backslash
+	 	case 27: // escape
+	 	case 13: // enter
+	 	break;
+		
+		default:
+		e.preventDefault();
+		break;
+	}
+});
+
+// handles the replacement of the signature (used when page changes)
+function replaceSignature()
+{
+	var previous_left = $("#img_signature").prop("left");
+	var previous_top = $("#img_signature").prop("top");
+	
+	// place it new
+	$("#placeSignature").click();
+	
+	// reapply the props
+	
+	$("#img_signature").prop("left", previous_left);
+	$("#img_signature").prop("top", previous_top);
+}
+
 // optimised CSS custom property getter/setter
 var CustomStyle = (function CustomStyleClosure() {
 
@@ -189,7 +230,6 @@ function watchScroll(viewAreaElement, callback) {
       rAF = null;
 
       var currentY = viewAreaElement.scrollTop;
-      console.log("currentY: " + currentY);
       var lastY = state.lastY;
       if (currentY !== lastY) {
         state.down = currentY > lastY;
@@ -198,7 +238,9 @@ function watchScroll(viewAreaElement, callback) {
       state.lastY = currentY;
     
       // place the signature again on current page
+      
       $("#placeSignature").click();
+      
       callback(state);
 
     });
@@ -399,7 +441,7 @@ var ProgressBar = (function ProgressBarClosure() {
     setWidth: function ProgressBar_setWidth(viewer) {
       if (viewer) {
         var container = viewer.parentNode;
-        var scrollbarWidth = 0; //container.offsetWidth - viewer.offsetWidth;
+        var scrollbarWidth = container.offsetWidth - viewer.offsetWidth;
         if (scrollbarWidth > 0) {
           this.bar.setAttribute('style', 'width: calc(100% - ' +
                                          scrollbarWidth + 'px);');
@@ -728,7 +770,7 @@ Preferences._readFromStorage = function (prefObj) {
     window.addEventListener('beforeprint', stopPropagationIfNeeded, false);
     window.addEventListener('afterprint', stopPropagationIfNeeded, false);
   }
-})();
+})(); 
 
 
 
@@ -2229,7 +2271,7 @@ var GrabToPan = (function GrabToPanClosure() {
     // a grab operation, to ensure that the cursor has the desired appearance.
     var overlay = this.overlay = document.createElement('div');
     overlay.className = 'grab-to-pan-grabbing';
-  }
+  } 
   GrabToPan.prototype = {
     /**
      * Class name of element which can be grabbed
@@ -2566,11 +2608,11 @@ var OverlayManager = {
    * @private
    */
   _keyDown: function overlayManager_keyDown(evt) {
-    var self = OverlayManager;
+    /* var self = OverlayManager;
     if (self.active && evt.keyCode === 27) { // Esc key.
       self._closeThroughCaller();
       evt.preventDefault();
-    }
+    } */
   },
 
   /**
@@ -4601,7 +4643,6 @@ var PDFViewer = (function pdfViewer() {
     },
 
     _updateLocation: function (firstPage) {
-    console.log("update location");
       var currentScale = this._currentScale;
       var currentScaleValue = this._currentScaleValue;
       var normalizedScaleValue =
@@ -4620,8 +4661,6 @@ var PDFViewer = (function pdfViewer() {
       var intTop = Math.round(topLeft[1]);
       pdfOpenParams += ',' + intLeft + ',' + intTop;
       
-      console.log("stats: " + topLeft +" "+ intLeft +" "+ intTop);
-
       this.location = {
         pageNumber: pageNumber,
         scale: normalizedScaleValue,
@@ -7330,18 +7369,19 @@ window.addEventListener('keydown', function keydown(evt) {
           PDFViewerApplication.currentScaleValue !== 'page-fit') {
           break;
         }
-        /* in presentation mode */
-        /* falls through */
+        
+        // in presentation mode 
+        // falls through 
       case 37: // left arrow
         // horizontal scrolling using arrow keys
         if (PDFViewerApplication.pdfViewer.isHorizontalScrollbarEnabled) {
           break;
-        }
-        /* falls through */
+        }  
+        // falls through 
       case 75: // 'k'
       case 80: // 'p'
         PDFViewerApplication.page--;
-        handled = true;
+        handled = true; 
         break;
       case 27: // esc key
         if (SecondaryToolbar.opened) {
@@ -7352,8 +7392,8 @@ window.addEventListener('keydown', function keydown(evt) {
             PDFViewerApplication.findBar.opened) {
           PDFViewerApplication.findBar.close();
           handled = true;
-        }
-        break;
+        } 
+        
       case 40: // down arrow
       case 34: // pg down
       case 32: // spacebar
@@ -7361,24 +7401,26 @@ window.addEventListener('keydown', function keydown(evt) {
             PDFViewerApplication.currentScaleValue !== 'page-fit') {
           break;
         }
-        /* falls through */
+       
+        // falls through 
       case 39: // right arrow
         // horizontal scrolling using arrow keys
         if (PDFViewerApplication.pdfViewer.isHorizontalScrollbarEnabled) {
           break;
-        }
-        /* falls through */
+        } 
+        
+        // falls through 
       case 74: // 'j'
       case 78: // 'n'
-        PDFViewerApplication.page++;
-        handled = true;
+         PDFViewerApplication.page++;
+        handled = true; 
         break;
 
       case 36: // home
         if (PresentationMode.active || PDFViewerApplication.page > 1) {
           PDFViewerApplication.page = 1;
           handled = true;
-        }
+        } 
         break;
       case 35: // end
         if (PresentationMode.active || (PDFViewerApplication.pdfDocument &&
@@ -7455,7 +7497,7 @@ window.addEventListener('keydown', function keydown(evt) {
     evt.preventDefault();
     PDFViewerApplication.clearMouseScrollState();
   }
-});
+}); 
 
 window.addEventListener('beforeprint', function beforePrint(evt) {
   PDFViewerApplication.beforePrint();

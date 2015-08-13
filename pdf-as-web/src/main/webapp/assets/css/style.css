@@ -10,10 +10,27 @@ footer {
 	clear: both;
 }
 
-iframe {
-	border: none;
-	min-width:10em;
-}
+
+
+@media all and (min-width: 320px) {
+ 
+	 iframe {
+		border: none;
+		min-width:5em;
+		height: 80%;
+		width:100%;
+	}
+ }
+
+ @media all and (max-width: 320px) {
+ 
+	 iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 40%;
+	 }
+ }
 
 .methodChooseContainer {
 	width: 80px;
@@ -41,10 +58,26 @@ iframe {
 #navBar {
 	margin: 2em;
 	min-width: 25em;
+	margin-bottom: 0.3em;
+}
+
+#InnerBackBox {
+	width: 25em;
+	min-width: 25em;
+}
+
+#BackBox {
+	margin-left: 1.7em;
+	width: 2.4em;
+}
+
+#BackBox:hover {
+	cursor:pointer;
+	cursor:hand;
 }
 
 #ViewerExternToolbar {
-	margin-bottom: 1em !important;
+	margin-bottom: 1em;
 	min-width: 25em;
 }
 
@@ -107,6 +140,7 @@ iframe {
 	height: 40em;
 	font-size: 150%;
 	margin-bottom: 5em;
+	width: 100%;
 }
 
 #noSignatureWarning {

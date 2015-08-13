@@ -122,11 +122,6 @@ function displayPdf() {
 	console.log("now finished");
 }
 
-/*$("#placeSignatureExtern").bind("click", function(evt) {
-	console.log("PLACE SIGNATURE EXTERN");
-	$("#placeSignature").click();
-	
-}); */
 
 //
 //Attaches event handlers to the signature placement icons
@@ -194,10 +189,44 @@ function isSignaturePlaced() {
 //Places signature given by parameter s on the page provided by the page_to_place parameter or on the current page if no such
 //parameter is provided. If the parameter s is omitted a default signature is placed.
 //
+
+var last_left;
+var last_top;
+
 function placeSignature(evt, page_to_place, s) {
+	
+	//check if properties are already assigned
+	
+	// get properties (if assigned) from last placement
+	
+	var left_pos;
+	var top_pos;
+	
+	//console.log("last left: " + last_left + " last top: " + last_top);
+	
+	if(typeof last_left != 'undefined')
+	{
+		//console.log("not undefined");
+		left_pos = last_left;
+		top_pos = last_top;
+	}
+	else // otherwise set default position
+	{
+		//console.log("first time set left and top");
+		left_pos = "30%";
+		top_pos = "20%";
+	}
+	
+	var image_width = "30%"; 
+	var image_height = "9%";
+	
+
 	var current_scale = PDFViewerApplication.pdfViewer.currentScale;
 	var sig_size = Math.floor(96 * current_scale);
-	var defaultSignature = "<img src='" + global_status.applicationContext + "/visblock?r=" + sig_size.toString() + "' alt='Signature' id='img_signature' class='cl_signature' draggable='true' style='position: absolute; z-index:4; cursor:move'>";
+	//var image_source = global_status.applicationContext + "/visblock?r=" + sig_size.toString();
+	var image_source = '../../../img/signature.png';
+	var defaultSignature = "<img src='" + image_source + "' alt='Signature' id='img_signature' class='cl_signature' draggable='true' style='position: absolute; z-index:4; " +
+	"cursor:move; left:" + left_pos + "; top:" + top_pos + "; width:" + image_width + "; height:" + image_height + ";'>";
 	if (typeof page_to_place === 'undefined') { page_to_place = PDFView.page;}
 	if (typeof s === 'undefined') { s = defaultSignature}
 	
@@ -214,6 +243,10 @@ function placeSignature(evt, page_to_place, s) {
 	});
 	updateSignaturePosition(global_status.getSignature());
 	makeSignatureDraggable(global_status.getSignature());
+	
+//console.log("left: " + $("#img_signature").css("left") + " top: " + $("#img_signature").css("top"));
+	
+	
 }
 
 //
@@ -243,6 +276,11 @@ function updateSignaturePosition(signature) {
 	var y = thisPos.top;
 	signature.posx = (Math.floor(x / current_scale / (4.0/3.0))).toString();
 	signature.posy = Math.floor((parseInt(canvas_height) - (thisPos.top)) / current_scale / (4.0/3.0)).toString();
+	
+	//console.log("last x: last y: " + $("#img_signature").css("left") + " " + $("#img_signature").css("top"));
+	
+	last_left = $("#img_signature").css("left");
+	last_top = $("#img_signature").css("top");
 }
 
 //

@@ -92,6 +92,26 @@ function registerEventListeners() {
 		$("#SignStepButton").click();
 	});
 	
+	$(document).bind("keypress", function(evt) {
+		
+		if(evt.which == 13)
+		{		
+			if($("#UploadStepButton").hasClass("active") && !$("#uploadContinue").prop("disabled"))
+			{
+				$("#PlaceStepButton").click();
+			}
+			else if($("#PlaceStepButton").hasClass("active"))
+			{
+				$("#SignStepButton").click();
+			}
+		}
+		else if(evt.which == 8)
+		{
+			$("#BackBox").click();
+		}
+		
+	});
+	
 	$("#placeSignatureExtern").bind("click", function(evt) {
 		
 		$("#iFrame").contents().find("#placeSignature").click();
@@ -101,6 +121,22 @@ function registerEventListeners() {
 		
 		$("#iFrame").contents().find("#delSignature").click();
 	})
+	
+	$("#BackBox").bind("click", function(evt) {
+		
+		if($("#PlaceStepButton").hasClass("active"))
+		{
+			$("#UploadStepButton").click();
+		}
+		else if($("#SignStepButton").hasClass("active"))
+		{
+			$("#PlaceStepButton").click();
+		}
+		else if($("#FinishStepButton").hasClass("active"))
+		{
+			$("#SignStepButton").click();
+		}
+	});
 	
 	function toggleView(input)
 	{

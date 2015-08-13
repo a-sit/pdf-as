@@ -1872,6 +1872,7 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
     overflow: visible;
   }
 
+
   #mainContainer, #viewerContainer, .page, .page canvas {
     position: static;
     padding: 0;

@@ -10,45 +10,744 @@ footer {
 	clear: both;
 }
 
+/* Devices Views */
 
+/* ----------- iPhone 4 and 4S ----------- */
 
-@media all and (min-width: 320px) {
- 
-	 iframe {
-		border: none;
-		min-width:5em;
-		height: 80%;
-		width:100%;
-	}
- }
-
- @media all and (max-width: 320px) {
- 
-	 iframe {
+/* Portrait */
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+  
+  iframe {
 	 	border: none;
 		min-width:5em;
 		width: 100%;
-		height: 40%;
+		height: 46%;
 	 }
- }
+	 
+  #FormBox {
+	width: 100%;
+	}
+	
+	ul.nav-wizard li {
+	padding: 0 20px 0 30px;
+    }
+    
+}
+
+/* Landscape */ 
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: landscape) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 73%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 3.7em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 32%;
+	}
+
+} 
+
+/* ----------- iPhone 5 and 5S ----------- */
+
+/* Portrait */ 
+@media only screen 
+  and (min-device-width: 567px) and (min-width: 567px)
+  and (max-device-width: 568px) and (max-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 46%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 20px 0 30px;
+    }
+
+} 
+
+/* Landscape */ 
+@media only screen 
+  and (min-device-width: 567px) and (min-width: 567px)
+  and (max-device-width: 568px) and (max-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: landscape) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 88%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 5.07em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 35%;
+	}
+
+} 
+
+/* ----------- iPhone 6 ----------- */
+
+/* Portrait */ 
+@media only screen 
+  and (device-width: 375px) 
+  and (device-height: 667px) 
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 55%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 2em 0 30px;
+    }
+} 
+
+/* Landscape */ 
+@media only screen 
+  and (device-width: 667px) 
+  and (device-height: 375px) 
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: landscape) { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 105%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 6.6em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 37%;
+	}
+
+} 
+
+/* ----------- iPhone 6+ ----------- */
+
+/* Portrait */ 
+@media only screen 
+  and (device-width: 414px) 
+  and (device-height: 736px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 62%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 2.6em 0 30px;
+    }
+
+} 
+
+/* Landscape */ 
+@media only screen 
+  and (device-width: 736px) 
+  and (device-height: 414px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: landscape) { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 112%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 7.7em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 37%;
+	}
+
+} 
+
+/* ----------- Google Nexus 6 ----------- */
+
+/* Portrait */ 
+@media only screen 
+  and (device-width: 412px) 
+  and (device-height: 732px) 
+  and (-webkit-device-pixel-ratio: 3.5)
+  and (orientation: portrait) { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 55%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 2.6em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 30%;
+	}
+} 
+
+/* Landscape */ 
+@media screen 
+  and (device-width: 732px) 
+  and (device-height: 412px) 
+  and (orientation: landscape)
+  and (-webkit-device-pixel-ratio: 3.5) { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 55%;
+	 }
+	 
+	   #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 7.6em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 38%;
+	}
+} 
+
+
+
+/* ----------- iPad mini ----------- */
+
+/* Portrait */
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px) 
+  and (orientation: portrait) 
+  and (-webkit-min-device-pixel-ratio: 1) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 90%;
+	 }
+	 
+	   #FormBox {
+	width: 20em;
+	margin-left:29.5%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 7.4em 0 30px;
+    }
+}
+
+/* Landscape */
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px) 
+  and (orientation: landscape) 
+  and (-webkit-min-device-pixel-ratio: 1) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 46%;
+	 }
+	 
+	   #FormBox {
+	width: 20em;
+	margin-left: 35%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 20px 0 30px;
+    }
+
+}
+
+/* G Nexus 7 */
+
+/* Portrait */
+@media only screen 
+  and (device-width: 600px) 
+  and (device-height: 960px) 
+  and (orientation: portrait) 
+  and (-webkit-device-pixel-ratio: 2) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 80%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 5.5em 0 30px;
+    } 	 
+    
+    #ViewerExternToolbar {
+		margin-left: 35%;
+	}
+}
+
+/* Landscape */
+@media only screen 
+  and (device-width: 960px) 
+  and (device-height: 600px) 
+  and (orientation: landscape) 
+  and (-webkit-device-pixel-ratio: 2) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 80%;
+	 }
+	 
+	 #FormBox {
+	width: 20em;
+	margin-left: 30%
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 7.4em 0 30px;
+    } 	 
+    
+    #ViewerExternToolbar {
+		margin-left: 38%;
+	}
+}
+
+/* Blackberry Playbook */
+
+/* Portrait */
+@media only screen 
+  and (device-width: 600px) 
+  and (device-height: 1024px) 
+  and (orientation: portrait) 
+  and (-webkit-device-pixel-ratio: 1) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 80%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 5.5em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 36%;
+	}
+	 
+	 
+}
+
+/* Google Nexus 4 */
+
+/* Portrait */
+@media only screen 
+  and (device-width: 384px) 
+  and (device-height: 640px) 
+  and (orientation: portrait) 
+  and (-webkit-device-pixel-ratio: 2) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 90%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 2.2em 0 30px;
+    }
+}
+
+/* Landscape */
+@media only screen 
+  and (device-width: 640px) 
+  and (device-height: 384px) 
+  and (orientation: landscape) 
+  and (-webkit-device-pixel-ratio: 2) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 90%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 6.2em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 36%;
+	}
+}
+
+
+
+/* ----------- HTC One ----------- NOKIA N9 / G NEXUS 5 / BLACKBERRY Z30 */
+
+/* Portrait */
+@media screen 
+  and (device-width: 360px) 
+  and (device-height: 640px) 
+  and (orientation: portrait) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 50%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 1.82em 0 30px;
+    }
+
+}
+
+/* Landscape */
+@media screen 
+  and (device-height: 360px) 
+  and (device-width: 640px) 
+  and (orientation: landscape) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 80%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 6.2em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 36%;
+	}
+
+}
+
+/* Nokia Lumia */
+
+/* Portrait */
+@media screen 
+  and (device-width: 320px) 
+  and (device-height: 533px) 
+  and (orientation: portrait) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 45%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 20px 0 30px;
+    }
+
+}
+
+/* Landscape */
+@media screen 
+  and (device-width: 533px) 
+  and (device-height: 320px)
+  and (orientation: landscape) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 80%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 4.5em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 34%;
+	}
+
+}
+
+/* LG Optimus L70*/
+
+/* Portrait */
+@media screen 
+  and (device-width: 384px) 
+  and (device-height: 640px) 
+  and (orientation: portrait)
+  and (-webkit-device-pixel-ratio: 1.25) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 45%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 2.2em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 27%;
+	}
+
+}
+
+/* Landscape */
+@media screen 
+  and (device-width: 640px) 
+  and (device-height: 384px)
+  and (orientation: landscape)
+  and (-webkit-device-pixel-ratio: 1.25) {
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 80%;
+	 }
+	 
+	 #FormBox {
+	width: 100%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 6.2em 0 30px;
+    }
+    
+    #ViewerExternToolbar {
+		margin-left: 38%;
+	}
+
+}
+
+
+
+/* ----------- Non-Retina Screens ----------- */
+@media screen 
+  and (min-width: 961px) 
+  and (max-width: 1600px)
+  and (orientation: landscape)  { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 80%;
+	 }
+	 
+	 #FormBox {
+	width: 20em;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 20px 0 30px;
+    }
+}
+
+/* ----------- Retina Screens ----------- */
+@media screen 
+  and (min-width: 961px) 
+  and (min-resolution: 192dpi)
+  and (orientation: landscape)
+  and (-webkit-max-device-pixel-ratio: 2) { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 80%;
+	 }
+	 
+	 #FormBox {
+	width: 20em;
+	margin-left: 35%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 20px 0 30px;
+    }
+}
+
+/* Big Landscape Monitors */
+
+ @media screen 
+  and (min-width: 1600px)  { 
+  
+  iframe {
+	 	border: none;
+		min-width:5em;
+		width: 100%;
+		height: 100%;
+	 }
+	 
+	 #FormBox {
+	width: 20em;
+	margin-left: 38.5%;
+	}
+	
+		ul.nav-wizard li {
+	padding: 0 20px 0 30px;
+    }
+    
+    #navBar {
+    margin-left: 37.5%;
+    }
+}
+
+
+#DropContainer {
+	
+}
+
+#SignContainer, #DownloadContainer {
+	height: 100vh;
+}
+
 
 .methodChooseContainer {
 	width: 80px;
 	height: 130px;
-	text-align: center;
+
+}
+
+.mainBox {
+	margin-top: 20vh;
 }
 
 .methodChooseContainer div button {
 	margin-top:1em;
 }
 
-#methodContainer {
-	margin: 2em;
+.ImageBox {
+	width: 100px;
+	height: 125px;
+	text-align:center;
 }
 
-#ImageBox {
-	width: 80px;
-	height: 85px;
+.ImageBox:hover {
+	cursor:hand;
+	cursor:pointer;
+	border: 1px dashed;
 }
 
 .BKUImage {
@@ -56,9 +755,7 @@ footer {
 }
 
 #navBar {
-	margin: 2em;
-	min-width: 25em;
-	margin-bottom: 0.3em;
+	min-width: 22.94em;
 }
 
 #InnerBackBox {
@@ -127,12 +824,15 @@ footer {
 }
 
 #borderBox {
-	height: 40em; 
-	width: 100%; 
+	height: 100vh;
 	float: center;
 	margin: 1.25em;
 	border: 0.2em dashed;
 	border-color: black;
+}
+
+#FormBox h5 {
+	text-align:center;
 }
 
 #content {
@@ -182,7 +882,7 @@ footer {
 	margin-bottom: 0em;
 	margin-left: 5em;
 	margin-right: 5em;
-	width: 100%;
+	
 }
 
 .container h3 {
@@ -193,7 +893,10 @@ footer {
 	margin-left: -0.6em;
 	margin-right: -0.7em;
 	height: 2em;	
+	margin-top: -0.6em;
 }
+
+
 
 .container fieldset {
 	border: none;
@@ -239,6 +942,10 @@ footer {
 #noPdfMessage
 {
 	color: red;
+}
+
+#ContinueButtonBox {
+	
 }
 
 .btn-file {

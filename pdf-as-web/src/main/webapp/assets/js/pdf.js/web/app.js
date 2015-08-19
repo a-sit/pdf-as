@@ -140,7 +140,7 @@ function registerSignaturePlacementEventHandlers() {
 	//if a user scrolls too far away from the page where the signature has
 	//been placed. To address this issue the following function is used.
 	//Every time a page is rendered, it is checked whether it is true that
-	//a signautre has been placed manually but is currently not in the DOM Tree.
+	//a signature has been placed manually but is currently not in the DOM Tree.
 	//In that case we have to check whether the page we placed the signature on
 	//is in the DOM tree. If thats true, we can restore the signature on that page.
 	//
@@ -241,9 +241,11 @@ function placeSignature(evt, page_to_place, s) {
 		posy: (s === defaultSignature) ? "0" : global_status.getSignature().posy,
 		sig: $(".cl_signature")
 	});
-	updateSignaturePosition(global_status.getSignature());
+	updateSignaturePosition(global_status.getSignature(), null, null, false);
 	makeSignatureDraggable(global_status.getSignature());
 	
+	 $("#pageFitOption").click();
+ 	 $("#scaleSelect").change();
 //console.log("left: " + $("#img_signature").css("left") + " top: " + $("#img_signature").css("top"));
 	
 	
@@ -256,10 +258,26 @@ function placeSignature(evt, page_to_place, s) {
 function makeSignatureDraggable(signature) {
 	signature.sig.draggable({
 		drag: function() {
-			updateSignaturePosition(signature)
+			console.log("drag");
+			updateSignaturePosition(signature, null, null, false)
 		},
 		containment: "parent"
 	});			
+	
+	$("#img_signature").on("touchmove", function(e) {
+		console.log("signature touchmove... x: " + e.originalEvent.touches[0].pageX + " y: " +e.originalEvent.touches[0].pageY);
+		updateSignaturePosition(signature, e.originalEvent.touches[0].pageX, e.originalEvent.touches[0].pageY, true);
+		
+	});
+	
+	$(window).on("touchmove", function(e) {
+		console.log("preventing default!");
+		e.preventDefault();
+	});
+	
+	$("#img_signature").on("contextmenu", function(e) {
+		e.preventDefault();
+	});
 }
 
 //
@@ -267,15 +285,53 @@ function makeSignatureDraggable(signature) {
 //The position is is saved in the html attributes 'data-pos-x' and 'data-pos-y' of the 
 //signature element.
 //
-function updateSignaturePosition(signature) {
+function updateSignaturePosition(signature, xpos, ypos, mobile) {
 	var page = signature.page;
 	var canvas_height = $("#page" + page.toString()).attr("height");
 	var current_scale = PDFViewerApplication.pdfViewer.currentScale;
 	var thisPos = $(signature.sig).position();
-	var x = thisPos.left;
-	var y = thisPos.top;
-	signature.posx = (Math.floor(x / current_scale / (4.0/3.0))).toString();
-	signature.posy = Math.floor((parseInt(canvas_height) - (thisPos.top)) / current_scale / (4.0/3.0)).toString();
+	var x;
+	var y;
+	
+	var mobile_x_offset = -parseInt($("#img_signature").css("width")) / 1.5;
+	var mobile_y_offset = -parseInt($("#img_signature").css("height"));
+	
+	//console.log("canvas-height: " + parseInt(canvas_height));
+	if(mobile)
+	{
+		
+		x = xpos;
+		y = ypos;// (parseInt(canvas_height) - ypos);
+		//console.log("changing x: " + x + " y: "+ y);
+	}
+	else
+	{
+		x = thisPos.left;
+		y = thisPos.top; 
+	}	
+	
+	if(mobile)
+	{
+		signature.posx = (x + mobile_x_offset).toString();
+		signature.posy = (y + mobile_y_offset).toString();	
+	}
+	else
+	{
+		signature.posx = Math.floor(x / current_scale / (4.0/3.0)).toString();
+		signature.posy = Math.floor((parseInt(canvas_height) - (y)) / current_scale / (4.0/3.0)).toString();
+	}
+	
+
+
+	
+
+	if(mobile)
+	{
+		$("#img_signature").css("left", signature.posx + "px");
+		$("#img_signature").css("top",  signature.posy + "px");
+	}
+	
+	console.log("signature. posx: " + signature.posx + " posy: " + signature.posy);
 	
 	//console.log("last x: last y: " + $("#img_signature").css("left") + " " + $("#img_signature").css("top"));
 	
@@ -439,8 +495,11 @@ function quickSign(connector, pdfurl) {
 		},
 		type: "POST",
 		success: function(response) {
-			$("html").empty();
-			$("html").html(response);
+			console.log("hello there, response is: " + response);
+			$("#DownloadResultButton").prop("href", response);
+			$("#FinishStepButton").click();
+			//$("html").empty();
+			//$("html").html(response);
 		}
 	});	
 }
@@ -494,8 +553,12 @@ function sign(statusObj) {
 		      withCredentials: true
 		},
 		success: function(response) {
-			$("html").empty();
-			$("html").html(response);
+			console.log("hello there, response is: " + response);
+			$("#DownloadResultButton").prop("href", response);
+			$("#FinishStepButton").click();
+			
+			//$("html").empty();
+			//$("html").html(response);
 			/*
 			$("#fade").remove();
 			$("#popup").remove();

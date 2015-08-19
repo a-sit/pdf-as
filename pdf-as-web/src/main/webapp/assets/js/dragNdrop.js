@@ -112,9 +112,13 @@ function registerEventListeners() {
 		
 	});
 	
-	$("#placeSignatureExtern").bind("click", function(evt) {
+	$("#QuickSign").bind("click", function(evt) {
 		
-		$("#iFrame").contents().find("#placeSignature").click();
+		console.log("quick sign..")
+		$("#iFrame").contents().find("#delSignature").click();
+		$("#SignStepButton").click();
+		// If you are going back from Finish to Place there should be a Signature again!
+		// Maybe even where you left it before!!
 	});
 	
 	$("#delSignatureExtern").bind("click", function(evt) {
@@ -168,33 +172,34 @@ function registerEventListeners() {
 		case "upload":
 			$("#DropContainer").show();
 			$("#UploadStepButton").addClass("active");
-			$("#PlaceStepButton").prop("style", "pointer-events:none;");
-			$("#SignStepButton").prop("style", "pointer-events:none;");
-			$("#FinishStepButton").prop("style", "pointer-events:none;");
+			$("#PlaceStepButton").css("pointer-events", "none");
+			$("#SignStepButton").css("pointer-events", "none");
+			$("#FinishStepButton").css("pointer-events", "none");
 			$("#uploadNavText").show();
 			break;
 			
 		case "place":
 			$("#ViewContainer").show();
 			$("#PlaceStepButton").addClass("active");
-			$("#PlaceStepButton").prop("style", "");
-			$("#SignStepButton").prop("style", "pointer-events:none;");
-			$("#FinishStepButton").prop("style", "pointer-events:none;");
+			$("#PlaceStepButton").css("pointer-events", "auto");
+			$("#SignStepButton").css("pointer-events", "none");
+			$("#FinishStepButton").css("pointer-events", "none");
 			$("#placeNavText").show();
 			break;
 			
 		case "sign":
 			$("#SignContainer").show();
 			$("#SignStepButton").addClass("active");
-			$("#SignStepButton").prop("style", "");
-			$("#FinishStepButton").prop("style", "pointer-events:none;");
+			$("#SignStepButton").css("pointer-events", "auto");
+			$("#PlaceStepButton").css("pointer-events", "auto");
+			$("#FinishStepButton").css("pointer-events", "none");
 			$("#signNavText").show();
 			break;
 			
 		case "finish":
 			$("#DownloadContainer").show();
 			$("#FinishStepButton").addClass("active");
-			$("#SignStepButton").prop("style", "");
+			$("#SignStepButton").css("pointer-events", "auto");
 			$("#downloadNavText").show();
 			break;
 		}
@@ -215,6 +220,7 @@ function registerEventListeners() {
 		checkPDF(file);
 								
 	});
+	
 	
 	function checkPDF(to_check)
 	{
@@ -271,6 +277,8 @@ function registerEventListeners() {
 			
 			$("#noPdfMessage").show();
 			
+			$("#FormDefine").css("margin-bottom", "2.2em");
+						
 			$("#uploadContinue").prop("disabled", true);
 
 		}
@@ -291,6 +299,8 @@ function registerEventListeners() {
 			
 			$("#noPdfMessage").hide();
 			
+			$("#FormDefine").css("margin-bottom", "");
+			
 			$("#uploadContinue").prop("disabled", false);
 
 			previewFile(file);
@@ -308,6 +318,25 @@ function registerEventListeners() {
 	$("#btnSign").bind("click", function(evt) {
 		sign(file, connector, locale);
 	});	
+	
+	$("#MobilePhoneSubmit").bind("click", function(evt) {
+		
+		$("#mobileBKU").click();
+		sign(file, connector, locale);
+		
+	});
+		
+	$("#LocalBKUSubmit").bind("click", function(evt) {
+		
+		$("#localBKU").click();	
+		sign(file, connector, locale);
+	});
+	
+	$("#KeystoreSubmit").bind("click", function(evt) {
+		
+		$("#jks").click();	
+		sign(file, connector, locale);
+	});
 }
 
 //
@@ -350,8 +379,11 @@ function sign(file, connector, locale) {
 		      withCredentials: true
 		},
 		success: function(response) {
-			$("html").empty();
-			$("html").html(response);
+			console.log("hello there, response is: " + response);
+			$("#DownloadResultButton").attr("onclick", "window.open('" + response + "')");
+			$("#FinishStepButton").click();
+			//$("html").empty();
+			//$("html").html(response);
 			/*
 			$("#fade").remove();
 			$("#popup").remove();

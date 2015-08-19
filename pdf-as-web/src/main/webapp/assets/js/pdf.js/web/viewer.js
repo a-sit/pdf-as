@@ -46,7 +46,7 @@ var mozL10n = document.mozL10n || document.webL10n;
 
 
 var CSS_UNITS = 96.0 / 72.0;
-var DEFAULT_SCALE = 'auto';
+var DEFAULT_SCALE = 'page-fit';
 var UNKNOWN_SCALE = 0;
 var MAX_AUTO_SCALE = 1.25;
 var SCROLLBAR_PADDING = 40;
@@ -2284,7 +2284,7 @@ var GrabToPan = (function GrabToPanClosure() {
     activate: function GrabToPan_activate() {
       if (!this.active) {
         this.active = true;
-        this.element.addEventListener('mousedown', this._onmousedown, true);
+       // this.element.addEventListener('mousedown', this._onmousedown, true);
         this.element.classList.add(this.CSS_CLASS_GRAB);
         if (this.onActiveChanged) {
           this.onActiveChanged(true);
@@ -2473,7 +2473,7 @@ var HandTool = {
       window.addEventListener('localized', function (evt) {
         Preferences.get('enableHandToolOnLoad').then(function resolved(value) {
           if (value) {
-            this.handTool.activate();
+            this.handTool.deactivate();
           }
         }.bind(this), function rejected(reason) {});
       }.bind(this));
@@ -2481,7 +2481,7 @@ var HandTool = {
   },
 
   toggle: function handToolToggle() {
-    this.handTool.toggle();
+    this.handTool.deactivate();
     SecondaryToolbar.close();
   },
 
@@ -2495,7 +2495,7 @@ var HandTool = {
   exitPresentationMode: function handToolExitPresentationMode() {
     if (this.wasActive) {
       this.wasActive = null;
-      this.handTool.activate();
+      this.handTool.deactivate();
     }
   }
 };
@@ -6266,6 +6266,7 @@ var PDFViewerApplication = {
         console.error(reason);
         self.setInitialView(null, scale);
       });
+      
     });
 
     pagesPromise.then(function() {
@@ -6371,11 +6372,15 @@ var PDFViewerApplication = {
         self.fallback(PDFJS.UNSUPPORTED_FEATURES.forms);
       }
       
-      
+       console.log("pdfview just finished loading");
+ 	 $("#pageFitOption").click();
+ 	 $("#scaleSelect").change();
 
     });
     
-    console.log("pdfview just finished loading");
+   
+    
+    $("#pageFitOption").click();
     
   },
 
@@ -6912,7 +6917,7 @@ function webViewerInitialized() {
 
   document.getElementById('scaleSelect').addEventListener('change',
     function() {
-      PDFViewerApplication.setScale(this.value, false);
+      PDFViewerApplication.setScale("page-fit", false); // former: this.value
     });
 
   document.getElementById('presentationMode').addEventListener('click',
@@ -7002,6 +7007,7 @@ function updateViewarea() {
     return;
   }
   PDFViewerApplication.pdfViewer.update();
+  
 }
 
 window.addEventListener('updateviewarea', function () {
@@ -7048,7 +7054,7 @@ window.addEventListener('resize', function webViewerResize(evt) {
        document.getElementById('pageFitOption').selected ||
        document.getElementById('pageWidthOption').selected)) {
     var selectedScale = document.getElementById('scaleSelect').value;
-    PDFViewerApplication.setScale(selectedScale, false);
+    PDFViewerApplication.setScale("page-fit", false); // former: selectedScale
   }
   updateViewarea();
 

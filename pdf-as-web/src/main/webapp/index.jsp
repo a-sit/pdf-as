@@ -37,8 +37,8 @@
 	
 <div class="container col-lg-8 col-lg-offset-2">
 	<!-- Header -->
-<div class="row">
-	  <div class="col-sm-12 col-md-1 col-md-offset-4 col-lg-1 col-lg-offset-4 col-xs-12" id="navBar">
+<div class="row center">
+	  <div class="" id="navBar">
 	  <ul class="nav nav-wizard">
 	    <li class="active" id="UploadStepButton"><a href="#"><span class="glyphicon glyphicon-open-file" aria-hidden="true"></span><span id="uploadNavText"> Upload</span></a></li>
 	    <li id="PlaceStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-move" aria-hidden="true"></span><span id="placeNavText" style="display:none;"> Place&nbsp;&nbsp;</span></a></li>
@@ -46,83 +46,69 @@
 	    <li id="FinishStepButton" style="pointer-events:none;"><a href="#"><span class="glyphicon glyphicon-save-file" aria-hidden="true"></span><span id="downloadNavText" style="display:none;"> Finish&nbsp;</span></a></li>
 	  </ul>
 	  </div>
+	   <button id="BackBox" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span></button>
  </div>
- <div class="row" id="OuterBackBox">
+ <div id="OuterBackBox" style="display:none;">
  <div id="InnerBackBox" class="col-sm-1 col-md-1 col-md-offset-4 col-lg-1 col-lg-offset-4">
- <p id="BackBox">Back</p>
+ <p >Back</p>
  </div>
  </div>
 
 	
 <!-- Main Switch Frame -->
-<div class="row">
-
-	<div class="col-md-12">
+<div class="row center">
 	
 		<div id="DropContainer">
-			<h3>Upload your Document</h3>
-			<div class="col-sm-12 col-md-12 col-lg-12">
-				<div id="borderBox">
-					<div class="row mainBox">
-						<div id="FormBox" class="col-lg-12 col-lg-offset-4 col-md-12 col-md-offset-4 col-sm-12 col-sm-offset-4 col-xs-12">
-							<h5 class="visible-lg-block"> Drop or select your file here</h5>
-							<h5 class="hidden-lg">Upload your File</h5>
-								<div id="FormDefine" class="form-group has-feedback">
-						            <div class="input-group">
-						                <span class="input-group-btn">
-						                    <span class="btn btn-primary btn-file">
-						                     Browse... <input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
-						                    </span>
-						                </span>
-						                <input id= "FileNamePreview" type="text" class="form-control" readonly>
-						                <span id="BadFeedback" class="glyphicon glyphicon-remove form-control-feedback" style="display: none;" aria-hidden="true"></span>
-						                <span id="GoodFeedback" class="glyphicon glyphicon-ok form-control-feedback" style="display: none;" aria-hidden="true"></span>
-						            </div>
-						            <div id="fileTypeErrorMessage" class="pull-right">
-						            <p id="noPdfMessage" style="display:none;"><span class="glyphicon glyphicon-alert" aria-hidden="true"></span> The file type must be PDF!</p>
-						            </div>
-	
-					            </div>	
-					            
-					            <div id="ContinueButtonBox" class="col-md-12 center">
-					            <button id="uploadContinue" class="btn btn-primary btn-lg btn-block" disabled="disabled" >Continue</button>
-					            </div>				        
-						</div>
+			<div id="borderBox">
+				<div class="row mainBox center">
+					<div id="FormBox" class="">
+						<h5 class="visible-lg-block"> Drop or select your file here</h5>
+						<h5 class="hidden-lg">Upload your File</h5>
+							<div id="FormDefine" class="form-group has-feedback">
+					            <div class="input-group">
+					                <span class="input-group-btn">
+					                    <span class="btn btn-primary btn-file">
+					                     Browse... <input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
+					                    </span>
+					                </span>
+					                <input id= "FileNamePreview" type="text" class="form-control" readonly>
+					                <span id="BadFeedback" class="glyphicon glyphicon-remove form-control-feedback" style="display: none;" aria-hidden="true"></span>
+					                <span id="GoodFeedback" class="glyphicon glyphicon-ok form-control-feedback" style="display: none;" aria-hidden="true"></span>
+					            </div>
+					            <div id="fileTypeErrorMessage" class="pull-right">
+					            <p id="noPdfMessage" style="display:none;"><span class="glyphicon glyphicon-alert" aria-hidden="true"></span> The file type must be PDF!</p>
+					            </div>
+
+				            </div>	
+				            
+				            <div id="ContinueButtonBox" class="col-md-12 center">
+				            <button id="uploadContinue" class="btn btn-primary btn-lg btn-block" disabled="disabled" >Continue</button>
+				            </div>				        
 					</div>
-				</div>	
-			</div>		
+				</div>
+			</div>	
 		</div>
 
 		<div id="ViewContainer" style="display: none;">
-			<h3>Place your Signature</h3>
-			<h6 id="noSignatureWarning">If you Quick Sign, the Signature will be appended at the end of the Document</h6>
-			<div>
-				<div id="ViewerExternToolbar" class="col-lg-6 col-lg-offset-5 col-md-6 col-md-offset-5 col-sm-6 col-sm-offset-5 col-xs-6 col-xs-offset-3">
-				<div id="QuickSign" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-				<img src="assets/img/federohne.svg" title="Place the Signature on a new Page"><br>Quick Sign
-				</div>
-	            <div id="placeContinue" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-	            <img src="assets/img/federohne.svg" title="Continue"><br>Continue
-	            </div>
+			<div> <!--  class="center" -->
+				<div id="ViewerExternToolbar" class="center pull-right">
+				<button id="QuickSign" class="btn btn-primary">Quick Sign</button>
+	            <button id="placeContinue" class="btn btn-success">Continue</button>
                 </div>
              </div>
-             <div id="outerCenter">
 			<div id="content" class="">
 			Loading your PDF, please wait...
-			</div>
 			</div>
 		</div>
 		
 		<div id="SignContainer" style="display: none;">
-			<h3>Choose your Sign Method</h3>
-				<fieldset>
-				<div class="row mainBox">
-					<div id="methodContainer" class="row">
+				<div class="row mainBox center">
+					<div id="methodContainer" class="row center">
 						<%
 						if (WebConfiguration.getHandyBKUURL() != null) {
 						%>
 						
-						<div class="methodChooseContainer col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xs-offset-3 col-md-offset-4">
+						<div class="methodChooseContainer">
 							<div class="ImageBox" id="MobilePhoneSubmit"><img src="assets/img/mobileBKU.png" alt="Sign via mobile BKU"/>Mobile</div>
 							<div style="display:none;"><input type="radio" id="mobileBKU" name="connector" value="mobilebku" checked></div>
 						</div>
@@ -132,7 +118,7 @@
 						<%
 						if (WebConfiguration.getLocalBKUURL() != null) {
 						%>
-						<div class="methodChooseContainer col-xs-3 col-sm-3 col-md-3 col-lg-3">
+						<div class="methodChooseContainer">
 							<div class="ImageBox" id="LocalBKUSubmit"><img src="assets/img/onlineBKU.png" alt="Sign via local BKU" />Card</div>
 							<div style="display:none;"><input type="radio" id="localBKU" name="connector" value="bku"></div>
 						</div>
@@ -153,7 +139,7 @@
 						<%
 							if(WebConfiguration.getKeystoreDefaultEnabled()) {
 						%>
-						<div class="methodChooseContainer col-xs-3 col-sm-3 col-md-3 col-lg-3">
+						<div class="methodChooseContainer">
 							<div class="ImageBox" id="KeystoreSubmit"><img class="BKUImage" src="assets/img/onlineBKU.png" alt="Sign via Server Keystore"/></div>
 							<div style="display:none;"><input type="radio" id="jks" name="connector" value="jks"></div>
 						</div>
@@ -163,23 +149,17 @@
 					</div>
 					<iframe id='mobileSignOnFrame' style="display:none;"></iframe>
 				</div>
-				</fieldset>
 		</div>
 		<div id="DownloadContainer" style="display: none;">
-			<h3 class="center">Download your Document</h3>
-			
 			<div id="btnSign" style="display:none">
 				<h3 class="center">Sign Document</h3>
 			</div>
-			<div class="center">
+			<div class="center" id="DownloadResultContainer">
 			<input id="DownloadResultButton" value="Download your PDF" class="btn btn-success btn-lg">
 			</div>
 		
-		</div>
-				
+		</div>	
 	</div>
-</div>
-
 </div>
 	
 	

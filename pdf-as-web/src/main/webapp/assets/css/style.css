@@ -20,21 +20,6 @@ footer {
   and (max-device-width: 480px)
   and (-webkit-min-device-pixel-ratio: 2)
   and (orientation: portrait) {
-  
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 46%;
-	 }
-	 
-  #FormBox {
-	width: 100%;
-	}
-	
-	ul.nav-wizard li {
-	padding: 0 20px 0 30px;
-    }
     
 }
 
@@ -45,25 +30,6 @@ footer {
   and (-webkit-min-device-pixel-ratio: 2)
   and (orientation: landscape) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 73%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 3.7em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 32%;
-	}
-
 } 
 
 /* ----------- iPhone 5 and 5S ----------- */
@@ -75,21 +41,6 @@ footer {
   and (-webkit-min-device-pixel-ratio: 2)
   and (orientation: portrait) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 46%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 20px 0 30px;
-    }
-
 } 
 
 /* Landscape */ 
@@ -99,25 +50,6 @@ footer {
   and (-webkit-min-device-pixel-ratio: 2)
   and (orientation: landscape) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 88%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 5.07em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 35%;
-	}
-
 } 
 
 /* ----------- iPhone 6 ----------- */
@@ -129,20 +61,6 @@ footer {
   and (-webkit-min-device-pixel-ratio: 2)
   and (orientation: portrait) { 
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 55%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 2em 0 30px;
-    }
 } 
 
 /* Landscape */ 
@@ -152,25 +70,6 @@ footer {
   and (-webkit-min-device-pixel-ratio: 2)
   and (orientation: landscape) { 
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 105%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 6.6em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 37%;
-	}
-
 } 
 
 /* ----------- iPhone 6+ ----------- */
@@ -182,21 +81,6 @@ footer {
   and (-webkit-min-device-pixel-ratio: 3)
   and (orientation: portrait) { 
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 62%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 2.6em 0 30px;
-    }
-
 } 
 
 /* Landscape */ 
@@ -206,25 +90,6 @@ footer {
   and (-webkit-min-device-pixel-ratio: 3)
   and (orientation: landscape) { 
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 112%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 7.7em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 37%;
-	}
-
 } 
 
 /* ----------- Google Nexus 6 ----------- */
@@ -236,24 +101,6 @@ footer {
   and (-webkit-device-pixel-ratio: 3.5)
   and (orientation: portrait) { 
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 55%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 2.6em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 30%;
-	}
 } 
 
 /* Landscape */ 
@@ -263,24 +110,6 @@ footer {
   and (orientation: landscape)
   and (-webkit-device-pixel-ratio: 3.5) { 
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 55%;
-	 }
-	 
-	   #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 7.6em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 38%;
-	}
 } 
 
 
@@ -294,21 +123,6 @@ footer {
   and (orientation: portrait) 
   and (-webkit-min-device-pixel-ratio: 1) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 90%;
-	 }
-	 
-	   #FormBox {
-	width: 20em;
-	margin-left:29.5%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 7.4em 0 30px;
-    }
 }
 
 /* Landscape */
@@ -318,22 +132,6 @@ footer {
   and (orientation: landscape) 
   and (-webkit-min-device-pixel-ratio: 1) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 46%;
-	 }
-	 
-	   #FormBox {
-	width: 20em;
-	margin-left: 35%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 20px 0 30px;
-    }
-
 }
 
 /* G Nexus 7 */
@@ -345,24 +143,6 @@ footer {
   and (orientation: portrait) 
   and (-webkit-device-pixel-ratio: 2) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 80%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 5.5em 0 30px;
-    } 	 
-    
-    #ViewerExternToolbar {
-		margin-left: 35%;
-	}
 }
 
 /* Landscape */
@@ -372,25 +152,6 @@ footer {
   and (orientation: landscape) 
   and (-webkit-device-pixel-ratio: 2) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 80%;
-	 }
-	 
-	 #FormBox {
-	width: 20em;
-	margin-left: 30%
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 7.4em 0 30px;
-    } 	 
-    
-    #ViewerExternToolbar {
-		margin-left: 38%;
-	}
 }
 
 /* Blackberry Playbook */
@@ -402,26 +163,6 @@ footer {
   and (orientation: portrait) 
   and (-webkit-device-pixel-ratio: 1) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 80%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 5.5em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 36%;
-	}
-	 
-	 
 }
 
 /* Google Nexus 4 */
@@ -433,20 +174,6 @@ footer {
   and (orientation: portrait) 
   and (-webkit-device-pixel-ratio: 2) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 90%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 2.2em 0 30px;
-    }
 }
 
 /* Landscape */
@@ -456,24 +183,6 @@ footer {
   and (orientation: landscape) 
   and (-webkit-device-pixel-ratio: 2) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 90%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 6.2em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 36%;
-	}
 }
 
 
@@ -486,21 +195,6 @@ footer {
   and (device-height: 640px) 
   and (orientation: portrait) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 50%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 1.82em 0 30px;
-    }
-
 }
 
 /* Landscape */
@@ -509,25 +203,6 @@ footer {
   and (device-width: 640px) 
   and (orientation: landscape) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 80%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 6.2em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 36%;
-	}
-
 }
 
 /* Nokia Lumia */
@@ -538,21 +213,6 @@ footer {
   and (device-height: 533px) 
   and (orientation: portrait) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 45%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 20px 0 30px;
-    }
-
 }
 
 /* Landscape */
@@ -561,25 +221,6 @@ footer {
   and (device-height: 320px)
   and (orientation: landscape) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 80%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 4.5em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 34%;
-	}
-
 }
 
 /* LG Optimus L70*/
@@ -591,25 +232,6 @@ footer {
   and (orientation: portrait)
   and (-webkit-device-pixel-ratio: 1.25) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 45%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 2.2em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 27%;
-	}
-
 }
 
 /* Landscape */
@@ -619,100 +241,14 @@ footer {
   and (orientation: landscape)
   and (-webkit-device-pixel-ratio: 1.25) {
   
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 80%;
-	 }
-	 
-	 #FormBox {
-	width: 100%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 6.2em 0 30px;
-    }
-    
-    #ViewerExternToolbar {
-		margin-left: 38%;
-	}
 
 }
 
-
-
-/* ----------- Non-Retina Screens ----------- */
-@media screen 
-  and (min-width: 961px) 
-  and (max-width: 1600px)
-  and (orientation: landscape)  { 
-  
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 80%;
-	 }
-	 
-	 #FormBox {
-	width: 20em;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 20px 0 30px;
-    }
-}
-
-/* ----------- Retina Screens ----------- */
-@media screen 
-  and (min-width: 961px) 
-  and (min-resolution: 192dpi)
-  and (orientation: landscape)
-  and (-webkit-max-device-pixel-ratio: 2) { 
-  
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 80%;
-	 }
-	 
-	 #FormBox {
-	width: 20em;
-	margin-left: 35%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 20px 0 30px;
-    }
-}
-
-/* Big Landscape Monitors */
-
- @media screen 
-  and (min-width: 1600px)  { 
-  
-  iframe {
-	 	border: none;
-		min-width:5em;
-		width: 100%;
-		height: 100%;
-	 }
-	 
-	 #FormBox {
-	width: 20em;
-	margin-left: 38.5%;
-	}
-	
-		ul.nav-wizard li {
-	padding: 0 20px 0 30px;
-    }
-    
-    #navBar {
-	    margin-left: 37.5%;
-	    
-    }
+iframe {
+ 	border: none;
+/*	min-width:5em; */
+	height: 70%;
+	width:100%
 }
 
 body.wait, body.wait *{
@@ -722,6 +258,12 @@ body.wait, body.wait *{
 
 #DropContainer {
 	
+	width: 100%;
+	
+}
+
+#ViewContainer {
+	width:100%
 }
 
 #SignContainer, #DownloadContainer {
@@ -730,7 +272,7 @@ body.wait, body.wait *{
 
 
 .methodChooseContainer {
-	width: 80px;
+	width: 125px;
 	height: 130px;
 
 }
@@ -741,6 +283,10 @@ body.wait, body.wait *{
 
 .methodChooseContainer div button {
 	margin-top:1em;
+}
+
+#DownloadResultContainer {
+	margin-top: 10%;
 }
 
 .ImageBox {
@@ -760,7 +306,8 @@ body.wait, body.wait *{
 }
 
 #navBar {
-	min-width: 22.94em;
+	/*min-width: 20em; */
+	width:100%
 }
 
 #InnerBackBox {
@@ -769,8 +316,7 @@ body.wait, body.wait *{
 }
 
 #BackBox {
-	margin-left: 1.7em;
-	width: 2.4em;
+	height: 46px;
 }
 
 #BackBox:hover {
@@ -779,27 +325,18 @@ body.wait, body.wait *{
 }
 
 #ViewerExternToolbar {
-	margin-bottom: 1em;
-	min-width: 25em;
+	margin: 0.5em;
+
 }
 
+/*
 #ViewerExternToolbar div {
 	margin-left:0.5em;
 	margin-right:0.5em;
 	text-align:center;
 	width:5em;
 	height:5em;	
-}
-
-#ViewerExternToolbar div:hover {
-	cursor:hand;
-	cursor:pointer;
-	margin:0.5em;
-	margin-top:0em;
-	margin-bottom:0em;
-	
-	border: 0.1em dashed;
-}
+} */
 
 #ViewerExternToolbar img {
 	width: 3em;
@@ -838,6 +375,10 @@ body.wait, body.wait *{
 
 #FormBox h5 {
 	text-align:center;
+}
+
+#FormBox {
+	width: 20em;
 }
 
 #content {

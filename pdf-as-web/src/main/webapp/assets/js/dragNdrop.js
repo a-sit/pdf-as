@@ -11,6 +11,10 @@ $(window).unload(function() {
     $("#FileNamePreview").val("");
 });
 
+var mobile_success = false;
+var local_success = false;
+var keystore_success = false;
+
 function registerEventListeners() {
 	var locale = "EN";
 	var connector = "mobilebku";
@@ -73,7 +77,11 @@ function registerEventListeners() {
 		toggleView("place");
 	});
 	$("#SignStepButton").bind("click", function(evt) {
-		
+		$("#methodContainer").show();
+		$("#mobileSignOnFrame").hide();
+		mobile_success = false;
+		local_success = false;
+		keystore_success = false;
 		toggleView("sign");
 	});
 	$("#FinishStepButton").bind("click", function(evt) {
@@ -88,7 +96,7 @@ function registerEventListeners() {
 	
 	
 	$("#placeContinue").bind("click", function(evt) {
-
+		
 		$("#SignStepButton").click();
 	});
 	
@@ -212,6 +220,8 @@ function registerEventListeners() {
 			return;
 		}
 		
+		$("body").addClass("wait");
+		
 		$("#FileNamePreview").val(files[0].name);
 		$("uploadContinue").prop("disabled", true);
 
@@ -305,6 +315,8 @@ function registerEventListeners() {
 
 			previewFile(file);
 		} 
+		
+		$("body").removeClass("wait");
 	}
 	
 	$("input[name='connector']").bind("change", function(evt) {
@@ -322,6 +334,8 @@ function registerEventListeners() {
 	$("#MobilePhoneSubmit").bind("click", function(evt) {
 		
 		$("#mobileBKU").click();
+		mobile_success = true;
+		$("body").addClass("wait");
 		sign(file, connector, locale);
 		
 	});
@@ -329,12 +343,16 @@ function registerEventListeners() {
 	$("#LocalBKUSubmit").bind("click", function(evt) {
 		
 		$("#localBKU").click();	
+		local_success = true;
+		$("body").addClass("wait");
 		sign(file, connector, locale);
 	});
 	
 	$("#KeystoreSubmit").bind("click", function(evt) {
 		
 		$("#jks").click();	
+		keystore_success = true;
+		$("body").addClass("wait");
 		sign(file, connector, locale);
 	});
 }
@@ -364,6 +382,8 @@ function sign(file, connector, locale) {
 	
 	ifr = document.getElementById('iFrame').contentWindow;
 	if(ifr.isSignaturePlaced()) { //Signature has been manually placed
+		
+		console.log("signature manually placed: x: y:" + ifr.global_status.getSignature().posx + ", " + ifr.global_status.getSignature().posy)
 		fd.append("sig-pos-x", ifr.global_status.getSignature().posx);
 		fd.append("sig-pos-y", ifr.global_status.getSignature().posy);
 		fd.append("sig-pos-p", ifr.global_status.getSignature().page);
@@ -380,8 +400,45 @@ function sign(file, connector, locale) {
 		},
 		success: function(response) {
 			console.log("hello there, response is: " + response);
-			$("#DownloadResultButton").attr("onclick", "window.open('" + response + "')");
-			$("#FinishStepButton").click();
+			
+			if(mobile_success)
+			{
+				console.log("mobile success...now switch html");
+				$("#methodContainer").hide();
+				$("#mobileSignOnFrame").show();
+				$("#mobileSignOnFrame").contents().find('html').empty();
+				$("#mobileSignOnFrame").contents().find('html').html(response);
+				mobile_success = false;
+				
+			}
+			else if(local_success)
+			{
+				console.log("local success...now switch html, nothing for now");
+				$("#methodContainer").hide();
+				$("#mobileSignOnFrame").show();
+				$("#mobileSignOnFrame").contents().find('html').empty();
+				$("#mobileSignOnFrame").contents().find('html').html(response);
+				local_success = false;
+			}
+			else if(keystore_success)
+			{
+				console.log("keystore success...now switch html");
+				$("#DownloadResultButton").attr("onclick", "window.open('" + response + "')");
+				$("#FinishStepButton").click();
+				keystore_success = false;
+			}
+			else
+			{
+				$("#methodContainer").show();
+				$("#mobileSignOnFrame").hide();
+			}
+			
+			$("body").removeClass("wait");
+			
+			console.log("finished switching html");
+			
+			
+			
 			//$("html").empty();
 			//$("html").html(response);
 			/*

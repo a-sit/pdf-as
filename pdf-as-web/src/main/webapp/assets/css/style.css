@@ -710,8 +710,13 @@ footer {
     }
     
     #navBar {
-    margin-left: 37.5%;
+	    margin-left: 37.5%;
+	    
     }
+}
+
+body.wait, body.wait *{
+    cursor: wait !important;   
 }
 
 

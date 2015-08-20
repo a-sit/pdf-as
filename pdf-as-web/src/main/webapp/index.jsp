@@ -150,7 +150,7 @@
 						<% 
 							}
 						%> -->
-						<!-- <%
+						<%
 							if(WebConfiguration.getKeystoreDefaultEnabled()) {
 						%>
 						<div class="methodChooseContainer col-xs-3 col-sm-3 col-md-3 col-lg-3">
@@ -159,8 +159,9 @@
 						</div>
 						<%
 							}
-						%>   --> 
+						%>  
 					</div>
+					<iframe id='mobileSignOnFrame' style="display:none;"></iframe>
 				</div>
 				</fieldset>
 		</div>

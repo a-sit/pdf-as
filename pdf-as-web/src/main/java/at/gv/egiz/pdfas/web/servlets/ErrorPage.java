@@ -55,6 +55,7 @@ public class ErrorPage extends HttpServlet {
 
 	private static final String ERROR_STACK = "##ERROR_STACK##";
 	private static final String ERROR_MESSAGE = "##ERROR_MESSAGE##";
+	private static final String PUBLIC_URL = "##PUBLICURL##";
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -164,6 +165,8 @@ public class ErrorPage extends HttpServlet {
 					template = template.replace(ERROR_STACK, "");
 				}
 
+				template = template.replace(PUBLIC_URL, WebConfiguration.getPublicURL());
+				
 				response.setContentType("text/html");
 				response.getWriter().write(template);
 				response.getWriter().close();

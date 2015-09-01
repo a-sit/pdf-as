@@ -50,6 +50,7 @@ public class ProvidePDFServlet extends HttpServlet {
 			.getLogger(ProvidePDFServlet.class);
 	
 	private static final String PDF_DATA_URL = "##PDFDATAURL##";
+	private static final String PUBLIC_URL = "##PUBLICURL##";
 	
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -89,6 +90,7 @@ public class ProvidePDFServlet extends HttpServlet {
 				
 				String template = PdfAsHelper.getProvideTemplate();
 				template = template.replace(PDF_DATA_URL, PdfAsHelper.generatePdfURL(request, response));
+				template = template.replace(PUBLIC_URL, WebConfiguration.getPublicURL());
 				// Deliver to Browser directly!
 				response.setContentType("text/html");
 				response.getWriter().write(template);

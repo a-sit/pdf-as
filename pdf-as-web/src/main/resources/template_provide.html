@@ -1,1 +1,20 @@
-##PDFDATAURL##
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="de">
+<head>
+<title>Provide PDF</title>
+</head>
+<body>
+PDF ready @: <a href="##PDFDATAURL##">download here</a>
+
+<script type="text/javascript">
+	var data = {
+	    pdfas: {
+	        success: true,
+	    	pdfUrl: "Child URL"
+		}
+	}
+
+	parent.postMessage(data, '##PUBLICURL##');
+</script>
+</body>
+</html>

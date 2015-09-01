@@ -343,8 +343,8 @@ function placeSignature(evt, page_to_place, s) {
 	}
 	else // otherwise set default position
 	{
-		left_pos = "30%";
-		top_pos = "20%";
+		left_pos = "4em";
+		top_pos = "4em";
 	}
 	
 	var current_scale = PDFViewerApplication.pdfViewer.currentScale;

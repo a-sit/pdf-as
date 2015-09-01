@@ -80,6 +80,7 @@ function registerEventListeners() {
 		
 		place_on_new_page = false;
 		toggleView("place");
+		$("#iFrame").contents().find("#placeSignature").click();
 	});
 	$("#SignStepButton").bind("click", function(evt) {
 		$("#methodContainer").show();

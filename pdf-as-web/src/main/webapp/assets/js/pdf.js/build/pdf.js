@@ -2028,6 +2028,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
      * @return {number} Total number of pages the PDF contains.
      */
     get numPages() {
+    	
       return this.pdfInfo.numPages;
     },
     /**

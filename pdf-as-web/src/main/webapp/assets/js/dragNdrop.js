@@ -1,19 +1,22 @@
 
+// custom insertAt Stringmethod
+String.prototype.insertAt=function(index, string) { 
+  return this.substr(0, index) + string + this.substr(index);
+}
+
+var default_language = "en";
 var file = null;
 
-$(document).ready(function() {
-	registerEventListeners();
-});
-
 $(window).unload(function() {
-    console.log("REFRESHED");
     $("#uploadContinue").prop("disabled", true);
+    $("#uploadContinueQuick").prop("disabled", true);
     $("#FileNamePreview").val("");
 });
 
 var mobile_success = false;
 var local_success = false;
 var keystore_success = false;
+var place_on_new_page = false;
 
 function registerEventListeners() {
 	var locale = "EN";
@@ -63,6 +66,7 @@ function registerEventListeners() {
 		
 		$("#FileNamePreview").val(files[0].name);
 		$("uploadContinue").prop("disabled", true);
+		$("uploadContinueQuick").prop("disabled", true);
 		
 		file = files[0];
 		checkPDF(file);
@@ -74,6 +78,7 @@ function registerEventListeners() {
 	});
 	$("#PlaceStepButton").bind("click", function(evt) {
 		
+		place_on_new_page = false;
 		toggleView("place");
 	});
 	$("#SignStepButton").bind("click", function(evt) {
@@ -83,6 +88,14 @@ function registerEventListeners() {
 		local_success = false;
 		keystore_success = false;
 		toggleView("sign");
+		
+		$("#DownloadResultButton").removeAttr("disabled");
+		$("#DownloadResultButton").attr("title", "Download your Document");
+		$("#DownloadResultButton").css("pointer-events", "auto");
+		
+		
+		
+		
 	});
 	$("#FinishStepButton").bind("click", function(evt) {
 		
@@ -94,65 +107,31 @@ function registerEventListeners() {
 		$("#PlaceStepButton").click();
 	});
 	
-	
-	$("#placeContinue").bind("click", function(evt) {
+	$("#uploadContinueQuick").bind("click", function(evt) {
 		
+		$("#iFrame").contents().find("#QuickSign").click();
+		$("#iFrame").contents().find("#delSignature").click();
+		place_on_new_page = false;
 		$("#SignStepButton").click();
 	});
 	
-	$(document).bind("keypress", function(evt) {
+	$("#DownloadResultButton").bind("click", function(evt) {
 		
-		if(evt.which == 13)
-		{		
-			if($("#UploadStepButton").hasClass("active") && !$("#uploadContinue").prop("disabled"))
-			{
-				$("#PlaceStepButton").click();
-			}
-			else if($("#PlaceStepButton").hasClass("active"))
-			{
-				$("#SignStepButton").click();
-			}
-		}
-		else if(evt.which == 8)
-		{
-			$("#BackBox").click();
-		}
-		
+		$("#DownloadResultButton").attr("disabled", "disabled");
+		$("#DownloadResultButton").attr("title", "The download is valid only once!");
+		$("#DownloadResultButton").css("pointer-events", "none");
 	});
 	
-	$("#QuickSign").bind("click", function(evt) {
+	
+	$("#LanguageDisplay").on("click", function(evt){
 		
-		console.log("quick sign..")
-		$("#iFrame").contents().find("#delSignature").click();
-		$("#SignStepButton").click();
-		// If you are going back from Finish to Place there should be a Signature again!
-		// Maybe even where you left it before!!
+		toggleLanguage();
 	});
 	
-	$("#delSignatureExtern").bind("click", function(evt) {
-		
-		$("#iFrame").contents().find("#delSignature").click();
-	})
 	
-	$("#BackBox").bind("click", function(evt) {
-		
-		if($("#PlaceStepButton").hasClass("active"))
-		{
-			$("#UploadStepButton").click();
-		}
-		else if($("#SignStepButton").hasClass("active"))
-		{
-			$("#PlaceStepButton").click();
-		}
-		else if($("#FinishStepButton").hasClass("active"))
-		{
-			$("#SignStepButton").click();
-		}
-	});
 	
 	function toggleView(input)
 	{
-		console.log("toggleView : " + input);
 		
 		$("#DropContainer").hide();
 		$("#ViewContainer").hide();
@@ -174,6 +153,9 @@ function registerEventListeners() {
 		$("#signNavText").hide();
 		$("#downloadNavText").hide();
 		
+		$("#BackBox").removeAttr("disabled");
+		$("#BackBox").css("pointer-events", "auto");
+		
 		
 		switch(input)
 		{
@@ -184,6 +166,8 @@ function registerEventListeners() {
 			$("#SignStepButton").css("pointer-events", "none");
 			$("#FinishStepButton").css("pointer-events", "none");
 			$("#uploadNavText").show();
+			$("#BackBox").attr("disabled", "disabled");
+			$("#BackBox").css("pointer-events", "none");
 			break;
 			
 		case "place":
@@ -223,7 +207,11 @@ function registerEventListeners() {
 		$("body").addClass("wait");
 		
 		$("#FileNamePreview").val(files[0].name);
-		$("uploadContinue").prop("disabled", true);
+		
+		$("#uploadContinue").prop("disabled", true);
+		$("#uploadContinueQuick").prop("disabled", true);
+		$("#ContinueButtonText").hide();
+		$("#MobileSpinner").show();
 
 		
 		file = files[0];
@@ -257,7 +245,6 @@ function registerEventListeners() {
 			   is_pdf = false;
 		   }
 		   
-		    console.log("setting view now..");
 			setFeedbackView(is_pdf);		   
 		   
 	    };
@@ -290,6 +277,9 @@ function registerEventListeners() {
 			$("#FormDefine").css("margin-bottom", "2.2em");
 						
 			$("#uploadContinue").prop("disabled", true);
+			$("#uploadContinueQuick").prop("disabled", true);
+			$("#ContinueButtonText").show();
+			$("#MobileSpinner").hide();
 
 		}
 		else // if it is pdf
@@ -311,12 +301,13 @@ function registerEventListeners() {
 			
 			$("#FormDefine").css("margin-bottom", "");
 			
-			$("#uploadContinue").prop("disabled", false);
+			//$("#uploadContinue").prop("disabled", false);
+			//$("#uploadContinueQuick").prop("disabled", false);
 
 			previewFile(file);
 		} 
 		
-		$("body").removeClass("wait");
+		//$("body").removeClass("wait");
 	}
 	
 	$("input[name='connector']").bind("change", function(evt) {
@@ -355,6 +346,8 @@ function registerEventListeners() {
 		$("body").addClass("wait");
 		sign(file, connector, locale);
 	});
+	
+	$('[data-toggle="tooltip"]').tooltip();
 }
 
 //
@@ -387,6 +380,16 @@ function sign(file, connector, locale) {
 		fd.append("sig-pos-x", ifr.global_status.getSignature().posx);
 		fd.append("sig-pos-y", ifr.global_status.getSignature().posy);
 		fd.append("sig-pos-p", ifr.global_status.getSignature().page);
+	}
+	else if(place_on_new_page)
+	{
+		console.log("signature will be placed on a new page");
+		fd.append("sig-pos-p", "new");
+		place_on_new_page = false;
+	}
+	else
+	{
+		console.log("signature will be placed on bottom");
 	}
 
 	$.ajax({
@@ -423,7 +426,13 @@ function sign(file, connector, locale) {
 			else if(keystore_success)
 			{
 				console.log("keystore success...now switch html");
-				$("#DownloadResultButton").attr("onclick", "window.open('" + response + "')");
+				$("#DownloadResultButton").attr("href", response);
+				
+				var insertIndex = file.name.indexOf(".pdf");
+				
+				var download_name = file.name.insertAt(insertIndex, "_signed");
+				$("#DownloadResultButton").attr("download", download_name);
+				
 				$("#FinishStepButton").click();
 				keystore_success = false;
 			}
@@ -483,4 +492,77 @@ function clearContentDiv() {
 //
 function createIframe() {
 	$("#content").append("<iframe src='assets/js/pdf.js/web/viewer.html' height='863px' width='800px' id='iFrame'></iframe>");
+}
+
+$(document).ready(function() {
+	window.lang = new Lang('en'); // set default language
+	window.lang.dynamic('th', 'assets/js/langpack/th.json'); // define language pack to load dynamically
+	
+	// check for language cookie
+	
+	var cookie_language = Cookies.get("language");
+	
+	if(cookie_language && cookie_language !== default_language)
+	{
+		toggleLanguage();
+	}
+	
+	registerEventListeners();
+});
+
+
+function toggleLanguage()
+{
+	if(default_language === "de")
+	{
+		$("#LanguageDisplay").html
+		(
+				"<span class='label label-info'><span class='flag-icon flag-icon-de'></span> DE</span>"
+		);
+		
+		default_language = "en";
+		window.lang.change('en');
+		
+		if($("#iFrame").get(0) != null) // check if ready 
+		{
+			$("#iFrame").get(0).contentWindow.switchLanguage("en");
+		}
+	}
+	else
+	{
+		$("#LanguageDisplay").html
+		(
+				"<span class='label label-info'><span class='flag-icon flag-icon-gb'></span> EN</span>"
+		);
+		
+		default_language = "de";
+		window.lang.change('th');
+		
+		if($("#iFrame").get(0) != null)
+		{
+			$("#iFrame").get(0).contentWindow.switchLanguage("de");
+		}
+		
+	}
+	
+	// set Cookie
+	Cookies.set("language", default_language);
+}
+
+function GoBack() {
+	
+	if($("#PlaceStepButton").hasClass("active"))
+	{
+		$("#UploadStepButton").click();
+	}
+	else if($("#SignStepButton").hasClass("active"))
+	{
+		$("#PlaceStepButton").click();
+	}
+	else if($("#FinishStepButton").hasClass("active"))
+	{
+		
+		$("#SignStepButton").click();
+	}
+	
 }

@@ -53,6 +53,21 @@ var SCROLLBAR_PADDING = 40;
 var VERTICAL_PADDING = 5;
 
 
+$(document).ready(function(){
+	
+	// Redirect scroll event from main container to outer Document so that only the page is scrolled
+
+	$("mainContainer").bind("scroll", function(evt) {
+	
+		console.log("scrolled mainContainer");
+		$(window.parent.document).trigger(evt);
+	
+	});
+
+});
+
+
+
 // preventing from using arrow keys or page keys to scroll
 $(document).on('keypress', function(e) {
 	switch(e.which)
@@ -92,6 +107,7 @@ function replaceSignature()
 	$("#img_signature").prop("left", previous_left);
 	$("#img_signature").prop("top", previous_top);
 }
+
 
 // optimised CSS custom property getter/setter
 var CustomStyle = (function CustomStyleClosure() {
@@ -223,11 +239,14 @@ function watchScroll(viewAreaElement, callback) {
 
   var debounceScroll = function debounceScroll(evt) {
     if (rAF) {
+    
       return;
     }
     // schedule an invocation of scroll for next animation frame.
     rAF = window.requestAnimationFrame(function viewAreaElementScrolled() {
       rAF = null;
+      
+      console.log("scrolled!");
 
       var currentY = viewAreaElement.scrollTop;
       var lastY = state.lastY;
@@ -239,7 +258,13 @@ function watchScroll(viewAreaElement, callback) {
     
       // place the signature again on current page
       
+      console.log("replace signature");
+      
       $("#placeSignature").click();
+      
+      // update pageNumberExtern
+      
+	  $(window.parent.document).find("#PageNumberExtern").val($("#pageNumber").val());
       
       callback(state);
 
@@ -3239,6 +3264,7 @@ var PDFPageView = (function PDFPageViewClosure() {
       var div = this.div;
       canvas.style.width = canvas.parentNode.style.width = div.style.width =
         Math.floor(width) + 'px';
+       
       canvas.style.height = canvas.parentNode.style.height = div.style.height =
         Math.floor(height) + 'px';
       // The canvas may have been originally rotated, rotate relative to that.
@@ -4547,6 +4573,8 @@ var PDFViewer = (function pdfViewer() {
      */
     scrollPageIntoView: function PDFViewer_scrollPageIntoView(pageNumber,
                                                               dest) {
+                                                              
+     
                                                              
       var pageView = this.pages[pageNumber - 1];
 
@@ -4565,6 +4593,8 @@ var PDFViewer = (function pdfViewer() {
         scrollIntoView(pageView.div);
         return;
       }
+      
+      
 
       var x = 0, y = 0;
       var width = 0, height = 0, widthScale, heightScale;
@@ -6203,8 +6233,19 @@ var PDFViewerApplication = {
 
     var pagesCount = pdfDocument.numPages;
     document.getElementById('numPages').textContent =
-      mozL10n.get('page_of', {pageCount: pagesCount}, 'of {{pageCount}}');
+      mozL10n.get('', {pageCount: pagesCount}, '{{pageCount}}'); // page_of in '' before, it generated the "von" / "of"
     document.getElementById('pageNumber').max = pagesCount;
+    
+    console.log("hide page navs when there is only 1 page..");
+    
+    if(pagesCount < 2)
+    {
+    	console.log("only 1 page -> hiding page navs");
+    	$("#previous, #next, #pageNumber, #numPages").hide();
+    	$("#placeContinue").css("margin-top", "8px");
+    	$("#BackBox").css("margin-top", "8px");
+    }
+
 
     var id = this.documentFingerprint = pdfDocument.fingerprint;
     var store = this.store = new ViewHistory(id);
@@ -6372,9 +6413,25 @@ var PDFViewerApplication = {
         self.fallback(PDFJS.UNSUPPORTED_FEATURES.forms);
       }
       
-       console.log("pdfview just finished loading");
- 	 $("#pageFitOption").click();
- 	 $("#scaleSelect").change();
+   	  console.log("pdfview just finished loading");
+   	  
+   	  
+   	  
+   	  // WEB APP ONLY
+   	  
+   	  $(window.parent.document).find("#uploadContinue").prop("disabled", false);
+   	   $(window.parent.document).find("#uploadContinueQuick").prop("disabled", false);
+   	   $(window.parent.document).find("body").removeClass("wait");
+   	   $(window.parent.document).find("#ContinueButtonText").show();
+		$(window.parent.document).find("#MobileSpinner").hide();
+   	  
+   	  // -----------------------------------------------------
+   	  
+   	  
+  	  console.log("Initialize Page Number: " + pageNumber);
+  	  $(window.parent.document).find("#PageNumberExtern").val($("#pageNumber").val());
+  	  $("#pageFitOption").click();
+  	  $("#scaleSelect").change();
 
     });
     
@@ -7184,6 +7241,8 @@ window.addEventListener('pagechange', function pagechange(evt) {
       PDFViewerApplication.pdfThumbnailViewer.scrollThumbnailIntoView(page);
     }
   }
+  
+
   var numPages = PDFViewerApplication.pagesCount;
 
   document.getElementById('previous').disabled = (page <= 1);
@@ -7227,13 +7286,29 @@ function handleMouseWheel(evt) {
     PDFViewerApplication[direction](Math.abs(ticks));
   } */
   
-  if(ticks > 0)
+  // get target of event
+  var target = evt.target;
+  
+  console.log("you scrolled on " + $(target).attr('class'));
+  
+  // WEB APP ONLY ... ?
+  if($(target).hasClass("textLayer") || $(target).parents('.left').length || $(target).parents('.page').length)
   {
-  	PDFViewerApplication.page--;
+  	console.log("react");
+  	
+ 	if(ticks > 0)
+	 {
+	  	PDFViewerApplication.page--;
+	 }
+	 else
+	 {
+	 	PDFViewerApplication.page++;
+	 }
   }
   else
   {
-  	PDFViewerApplication.page++;
+  	// redirect scroll event // WEB APP ONLY ... ?
+  	$(window.parent.document).trigger(evt);
   }
   
   if (evt.preventDefault) //disable default wheel action of scrolling page

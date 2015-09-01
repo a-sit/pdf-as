@@ -3,6 +3,123 @@
 //
 var global_status = new statusObject();
 
+/*
+ * Convert touch to mouse
+ */
+
+/*
+ * picked from http://stackoverflow.com/questions/5186441/javascript-drag-and-drop-for-touch-devices
+ *
+ */
+function touchHandler(event)
+{
+    // trick to add support for touch event to elements/widgets that do not support it 
+    // by convetting convert touchevents into mouseevents
+
+    // only apply this trick to ui-draggable elements
+    if ( ! $(event.target).hasClass('ui-draggable') ) { 
+        return;
+    }   
+
+    var touches = event.changedTouches,
+        first = touches[0],
+        type = ""; 
+
+    switch(event.type) {
+        case "touchstart": type = "mousedown"; break;
+        case "touchmove":  type="mousemove"; break;    
+        case "touchend":   type="mouseup"; break;
+        default: return;
+    }   
+
+    // convert touchevents into mouseevents
+    var simulatedEvent = document.createEvent("MouseEvent");
+    simulatedEvent.initMouseEvent(type, true, true, window, 1,
+                              first.screenX, first.screenY,
+                              first.clientX, first.clientY, false,
+                              false, false, false, 0/*left*/, null);
+
+    first.target.dispatchEvent(simulatedEvent);
+            event.preventDefault();
+}
+
+function init() {
+	console.log("init touchconverter");
+    if (Modernizr.touch){
+        // faster links for touch devices
+        // by wiring directly touchend event as if it was a click (and disabling click handler) 
+        var links = document.getElementsByTagName("a");
+        for (var i=0; i < links.length; i++) {
+            var link = links[i];
+            if ( link.href !== undefined && link.href !== '') {
+                link.addEventListener("click", function(e) {
+                  e.preventDefault();
+                }); 
+                link.addEventListener("touchend", function() {
+                  document.location = this.href;                                                                                                                                                                                                                                
+                }); 
+            }   
+        };  
+
+       // listen to touch events and provide support to them where needed 
+       document.addEventListener("touchstart", touchHandler, true);
+       document.addEventListener("touchmove", touchHandler, true);
+       document.addEventListener("touchend", touchHandler, true);
+       document.addEventListener("touchcancel", touchHandler, true);    
+    }   
+}
+
+$(document).ready(function(){
+	
+	init(); // initialize the touch converter
+	window.lang = new Lang('en'); // set default language
+	window.lang.dynamic('th', 'en.json'); // define language pack to load dynamically
+	
+	// check the language of the webapp , WEBAPP ONLY
+	
+	var webapp_language = window.parent.default_language;
+	console.log("parent default lang: " + webapp_language);
+	
+	switchLanguage(webapp_language);
+	
+    $("#placeContinue").bind("click", function(evt) {
+		
+		$(window.parent.document).find("#SignStepButton").click();
+	});
+	
+	$("#BackBox").on("click", function(evt){
+		
+		window.parent.GoBack();
+	});
+	
+	$("#PlaceOnNewPage").on("click", function(evt) {
+		
+		$("#delSignature").click();
+		console.log("setting placeonnewpage from " + window.parent.place_on_new_page);
+		window.parent.place_on_new_page = true;
+		console.log("to " + window.parent.place_on_new_page);
+		$(window.parent.document).find("#SignStepButton").click();
+		
+	});
+	
+});
+
+function switchLanguage(language)
+{
+	switch(language)
+	{
+	case "en":
+		window.lang.change("en");
+		break;
+	case "de":
+		window.lang.change("th");
+		break;
+		default:
+			console.log("The viewer does not support the language '" + language + "'");
+			break;
+	}
+}
+
 //
 //statusObject Definition
 //
@@ -145,12 +262,29 @@ function registerSignaturePlacementEventHandlers() {
 	//is in the DOM tree. If thats true, we can restore the signature on that page.
 	//
 	document.addEventListener('pagerendered', function(evt) {
+		var page;
 		if(!isSignatureInDomTree() && isSignaturePlaced()) {
-			var page = global_status.getSignature().page;
+			page = global_status.getSignature().page;
 			if(isPageInDomTree(page)) {
 				placeSignature(null, page, global_status.getSignature().sig[0].outerHTML);
 			}
+		
 		}
+		page = global_status.getSignature().page;
+		// every time when a page is rendered we have to make the children clickthrough
+		console.log("page is rendered: " + page);
+		// disabled pointer events on given page
+		$("#pageContainer" + page + " .textLayer").children().css("pointer-events", "none");
+		$("#pageContainer" + page + " .annotationLayer").children().css("pointer-events", "none");
+		
+		// resize img signature to adapt to a resized window
+		var current_scale = PDFViewerApplication.pdfViewer.currentScale;
+		var sig_size = Math.floor(96 * current_scale);
+		console.log("Signature resizing: " + sig_size);
+		var image_source = global_status.applicationContext + "/visblock?r=" + sig_size.toString();	
+		
+		$("#img_signature").attr("src", image_source);
+		
 	});
 }
 
@@ -201,32 +335,26 @@ function placeSignature(evt, page_to_place, s) {
 	
 	var left_pos;
 	var top_pos;
-	
-	//console.log("last left: " + last_left + " last top: " + last_top);
-	
+		
 	if(typeof last_left != 'undefined')
 	{
-		//console.log("not undefined");
 		left_pos = last_left;
 		top_pos = last_top;
 	}
 	else // otherwise set default position
 	{
-		//console.log("first time set left and top");
 		left_pos = "30%";
 		top_pos = "20%";
 	}
 	
-	var image_width = "30%"; 
-	var image_height = "9%";
-	
-
 	var current_scale = PDFViewerApplication.pdfViewer.currentScale;
 	var sig_size = Math.floor(96 * current_scale);
-	//var image_source = global_status.applicationContext + "/visblock?r=" + sig_size.toString();
-	var image_source = '../../../img/signature.png';
+	//sig_size = 300;
+	console.log("Signature resolution: " + sig_size);
+	var image_source = global_status.applicationContext + "/visblock?r=" + sig_size.toString();
 	var defaultSignature = "<img src='" + image_source + "' alt='Signature' id='img_signature' class='cl_signature' draggable='true' style='position: absolute; z-index:4; " +
-	"cursor:move; left:" + left_pos + "; top:" + top_pos + "; width:" + image_width + "; height:" + image_height + ";'>";
+	"cursor:move; left:" + left_pos + "; top:" + top_pos + ";'>";
+
 	if (typeof page_to_place === 'undefined') { page_to_place = PDFView.page;}
 	if (typeof s === 'undefined') { s = defaultSignature}
 	
@@ -241,12 +369,56 @@ function placeSignature(evt, page_to_place, s) {
 		posy: (s === defaultSignature) ? "0" : global_status.getSignature().posy,
 		sig: $(".cl_signature")
 	});
-	updateSignaturePosition(global_status.getSignature(), null, null, false);
+	updateSignaturePosition(global_status.getSignature());
 	makeSignatureDraggable(global_status.getSignature());
+	
+	$("#img_signature").on("mousedown", function(evt) {
+		evt.stopPropagation();
+	});
+	
+	$("#img_signature").on("mousedown", function(evt){
+		
+		if($(this).closest(".textLayer").children().css("pointer-events") !== "none" && 
+				$(this).closest(".annotationLayer").children().css("pointer-events") !== "none")
+		{			
+			$(this).closest(".textLayer").children().css("pointer-events", "none");
+			$(this).closest(".annotationLayer").children().css("pointer-events", "none");
+			
+			return;
+		}
+		
+	});
+	
+	$(".page").on("mousedown", function(evt){
+				
+		// check if there is already pointerevents: none on all page children, if not -> apply
+		
+		if($(this).find(".textLayer").children().css("pointer-events") !== "none" && 
+				$(this).find(".annotationLayer").children().css("pointer-events") !== "none")
+		{			
+			$(this).find(".textLayer").children().css("pointer-events", "none");
+			$(this).find(".annotationLayer").children().css("pointer-events", "none");
+			return;
+		}
+		
+		if($(this).find("#img_signature").length)
+		{
+			
+			// let the signature jump to the event position
+			$("#img_signature").css("left", evt.offsetX + "px");
+			$("#img_signature").css("top", evt.offsetY + "px");
+			
+			// update position
+			updateSignaturePosition(global_status.getSignature());	
+			
+			// start dragging signature
+			$("#img_signature").trigger(evt);
+			
+		}
+	});
 	
 	 $("#pageFitOption").click();
  	 $("#scaleSelect").change();
-//console.log("left: " + $("#img_signature").css("left") + " top: " + $("#img_signature").css("top"));
 	
 	
 }
@@ -258,21 +430,20 @@ function placeSignature(evt, page_to_place, s) {
 function makeSignatureDraggable(signature) {
 	signature.sig.draggable({
 		drag: function() {
-			console.log("drag");
-			updateSignaturePosition(signature, null, null, false)
+			updateSignaturePosition(signature)
 		},
 		containment: "parent"
 	});			
 	
-	$("#img_signature").on("touchmove", function(e) {
-		console.log("signature touchmove... x: " + e.originalEvent.touches[0].pageX + " y: " +e.originalEvent.touches[0].pageY);
-		updateSignaturePosition(signature, e.originalEvent.touches[0].pageX, e.originalEvent.touches[0].pageY, true);
-		
-	});
-	
 	$(window).on("touchmove", function(e) {
-		console.log("preventing default!");
-		e.preventDefault();
+		
+		// only if we are on the page we prevent the default scroll
+		var target = e.target;
+				
+		if($(target).hasClass("textLayer") || $(target).parents('.left').length || $(target).parents('.page').length)
+		{
+			e.preventDefault();
+		}
 	});
 	
 	$("#img_signature").on("contextmenu", function(e) {
@@ -285,7 +456,7 @@ function makeSignatureDraggable(signature) {
 //The position is is saved in the html attributes 'data-pos-x' and 'data-pos-y' of the 
 //signature element.
 //
-function updateSignaturePosition(signature, xpos, ypos, mobile) {
+function updateSignaturePosition(signature) {
 	var page = signature.page;
 	var canvas_height = $("#page" + page.toString()).attr("height");
 	var current_scale = PDFViewerApplication.pdfViewer.currentScale;
@@ -293,45 +464,13 @@ function updateSignaturePosition(signature, xpos, ypos, mobile) {
 	var x;
 	var y;
 	
-	var mobile_x_offset = -parseInt($("#img_signature").css("width")) / 1.5;
-	var mobile_y_offset = -parseInt($("#img_signature").css("height"));
-	
-	//console.log("canvas-height: " + parseInt(canvas_height));
-	if(mobile)
-	{
+	x = thisPos.left;
+	y = thisPos.top; 
+
+
+	signature.posx = Math.floor(x / current_scale / (4.0/3.0)).toString();
+	signature.posy = Math.floor((parseInt(canvas_height) - (y)) / current_scale / (4.0/3.0)).toString();
 		
-		x = xpos;
-		y = ypos;// (parseInt(canvas_height) - ypos);
-		//console.log("changing x: " + x + " y: "+ y);
-	}
-	else
-	{
-		x = thisPos.left;
-		y = thisPos.top; 
-	}	
-	
-	if(mobile)
-	{
-		signature.posx = (x + mobile_x_offset).toString();
-		signature.posy = (y + mobile_y_offset).toString();	
-	}
-	else
-	{
-		signature.posx = Math.floor(x / current_scale / (4.0/3.0)).toString();
-		signature.posy = Math.floor((parseInt(canvas_height) - (y)) / current_scale / (4.0/3.0)).toString();
-	}
-	
-
-
-	
-
-	if(mobile)
-	{
-		$("#img_signature").css("left", signature.posx + "px");
-		$("#img_signature").css("top",  signature.posy + "px");
-	}
-	
-	console.log("signature. posx: " + signature.posx + " posy: " + signature.posy);
 	
 	//console.log("last x: last y: " + $("#img_signature").css("left") + " " + $("#img_signature").css("top"));
 	

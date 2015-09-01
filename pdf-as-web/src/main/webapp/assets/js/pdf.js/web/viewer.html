@@ -34,12 +34,20 @@ http://sourceforge.net/adobe/cmap/wiki/License/
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
 	
+	<!-- Bootstrap includes -->
+	<link rel="stylesheet" href="../../../../assets/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="../../../../assets/bootstrap/css/bootstrap.min.css">
+    <script src="../../../../assets/bootstrap/js/bootstrap.js"></script>
+    <script src="../../../../assets/bootstrap/js/bootstrap.min.js"></script>
+	
 	<script src="l10n.js"></script>
 	<script src="../build/pdf.js"></script>
 
     <script src="debugger.js"></script>
     <script src="viewer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script> <!-- Used for touchvonverter in app.js -->
 	<script src="app.js"></script>
+	<script src="jquery-lang.js"></script>
 	<style>
 	.black_overlay{
 		display: inline-block;
@@ -196,28 +204,42 @@ http://sourceforge.net/adobe/cmap/wiki/License/
         </div>  <!-- secondaryToolbar -->
 
         <div class="toolbar">
-          <div id="toolbarContainer">
+          <div id="toolbarContainer" class="pull-right">
+          <!-- new toolbar -->
+			<button id="previous" class="btn btn-primary pull-left" title="Go one page up"><span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span></button>
+				<button id="next" class="btn btn-primary pull-left" title="Go one page down"><span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span></button>
+				<div class="input-group" id="PageInput">
+				  <input type="number" id="pageNumber" class="form-control" placeholder="..." aria-describedby="PageNumberExtern" value="..">
+				  <span class="input-group-addon" id="numPages">...</span>
+				<button id="PlaceOnNewPage" class="btn btn-primary pull-left" title="The signature will be automatically placed on a new page"><p id="PlaceOnNewPageText" lang="en">Auto</p><span class="glyphicon glyphicon-paste" id="PlaceOnNewPageIcon" aria-hidden="true"></span></button>
+				</div>
+	            <button id="placeContinue" class="btn btn-success pull-right" title="Continue signing your document"><p id="ContinueToSignText" lang="en">Continue</p><span class="glyphicon glyphicon-ok" id="ContinueToSignIcon" aria-hidden="true"></span></button>
+                <button id="BackBox" class="btn btn-primary pull-right"><p id="BackBoxText" lang="en">Back</p><span class="glyphicon glyphicon-chevron-left" id="BackBoxIcon" aria-hidden="true"></span></button>
+                 
+                        
+          <!-- Old toolbar -->
+          
             <div id="toolbarViewer">
               <div id="toolbarViewerLeft">
                 <button id="sidebarToggle" class="toolbarButton" style="display:none" title="Toggle Sidebar" tabindex="11" data-l10n-id="toggle_sidebar">
                   <span data-l10n-id="toggle_sidebar_label">Toggle Sidebar</span>
                 </button>
-                <div class="toolbarButtonSpacer"></div>
-                <button id="viewFind" class="toolbarButton group hiddenSmallView" title="Find in Document" tabindex="12" data-l10n-id="findbar">
+                <div style="display:none;" class="toolbarButtonSpacer"></div>
+                <button style="display:none;" id="viewFind" class="toolbarButton group hiddenSmallView" title="Find in Document" tabindex="12" data-l10n-id="findbar">
                    <span data-l10n-id="findbar_label">Find</span>
                 </button>
                 <div class="splitToolbarButton">
-                  <button class="toolbarButton pageUp" title="Previous Page" id="previous" tabindex="13" data-l10n-id="previous">
+                  <button class="toolbarButton pageUp" title="Previous Page" id="previousOLD!!" tabindex="13" data-l10n-id="previous">
                     <span data-l10n-id="previous_label">Previous</span>
                   </button>
                   <div class="splitToolbarButtonSeparator"></div>
-                  <button class="toolbarButton pageDown" title="Next Page" id="next" tabindex="14" data-l10n-id="next">
+                  <button class="toolbarButton pageDown" title="Next Page" id="nextOLD!!" tabindex="14" data-l10n-id="next">
                     <span data-l10n-id="next_label">Next</span>
                   </button>
                 </div>
                 <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber" data-l10n-id="page_label">Page: </label>
-                <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="15">
-                <span id="numPages" class="toolbarLabel"></span>
+                <input type="number" id="pageNumberOLD!!" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="15">
+                <span id="numPagesOLD!!" class="toolbarLabel"></span>
               </div>
                
               <div id="toolbarViewerRight" style="display:none;">

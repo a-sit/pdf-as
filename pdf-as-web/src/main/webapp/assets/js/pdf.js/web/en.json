@@ -1,0 +1,34 @@
+{
+	"token": {
+		"Drop or select your file here": "Wählen sie Ihre Datei zum Hochladen aus oder ziehen Sie sie herein",
+		"Upload your File": "Laden Sie Ihr Dokument hoch",
+		"Browse...": "Durchsuchen...",
+		"Upload": "Hochladen",
+		"Place": "Platzieren",
+		"Sign": "Signieren",
+		"Finished": "Fertig",
+		"Back": "Zurück",
+		"The file type must be PDF!": "Das Dokument muss PDF Format haben!",
+		"Continue": "Weiter",
+		"Quick Sign": "Schnell Signatur",
+		"Loading your PDF, please wait...": "Ihr PDF wird geladen...",
+		"Mobile": "Handy",
+		"Card": "Karte",
+		"You can download your signed document here:": "Sie können ihr signiertes Dokument jetzt herunterladen:",
+		"Download": "Herunterladen",
+		"Signature will be placed at the bottom of your document": "Die Signatur wird automatisch so weit unten wie möglich platziert",
+		"Place your Signature by yourself": "Signatur manuell platzieren",
+		"The signature will be automatically placed on the bottom": "Die Signatur wird automatisch so weit unten wie möglich platziert",
+		"Auto": "Auto",
+		"English": "Deutsch",
+		"English": "Deutsch",
+		"English": "Deutsch",
+		"English": "Deutsch",
+		"English": "Deutsch"
+	},
+	"regex": [
+		["Budget", "Budget"],
+		["^Something at start of text", ""],
+		["This will be case insensitive", "i", ""]
+	]
+}

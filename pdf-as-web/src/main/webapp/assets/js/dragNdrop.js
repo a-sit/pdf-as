@@ -426,7 +426,7 @@ function sign(file, connector, locale) {
 			}
 			else if(keystore_success)
 			{
-				console.log("keystore success...now switch html");
+				/*console.log("keystore success...now switch html"); // put this into success function in document ready()
 				$("#DownloadResultButton").attr("href", response);
 				
 				var insertIndex = file.name.indexOf(".pdf");
@@ -434,14 +434,21 @@ function sign(file, connector, locale) {
 				var download_name = file.name.insertAt(insertIndex, "_signed");
 				$("#DownloadResultButton").attr("download", download_name);
 				
-				$("#FinishStepButton").click();
+				$("#FinishStepButton").click(); */
+				$("#methodContainer").hide();
+				$("#mobileSignOnFrame").show();
+				$("#mobileSignOnFrame").contents().find('html').empty();
+				$("#mobileSignOnFrame").contents().find('html').html(response);
 				keystore_success = false;
 			}
 			else
 			{
 				$("#methodContainer").show();
 				$("#mobileSignOnFrame").hide();
-			}
+			} 
+			
+			// switch the html of the iframe
+			
 			
 			$("body").removeClass("wait");
 			
@@ -509,6 +516,56 @@ $(document).ready(function() {
 	}
 	
 	registerEventListeners();
+	
+	// handle server response after signing with mobile / card
+	
+	function success(arg) { // called when user successfully signed with mobile / card
+		 //document.getElementById("demo").innerHTML = arg;
+			console.log("recieved successful response from server, arg: " + arg);
+			
+			$("#DownloadResultButton").attr("href", arg);
+			
+			var insertIndex = file.name.indexOf(".pdf");
+			
+			var download_name = file.name.insertAt(insertIndex, "_signed");
+			$("#DownloadResultButton").attr("download", download_name);
+			$("#methodContainer").show();
+			$("#mobileSignOnFrame").hide();
+			$("#FinishStepButton").click();
+			
+			
+			
+		};
+
+		function error(arg) { // called when an error appears while user was signing, e.g: abort
+		  //document.getElementById("demo").innerHTML = arg;
+			console.log("recieved error response from server, arg: " + arg);
+			
+			// do something
+		};
+
+		function handle(event) { // handles the incoming server response
+		  if (event.data.pdfas) {
+		    if (event.data.pdfas.success) {
+		      success(event.data.pdfas.pdfUrl);
+		    } else if (event.data.pdfas.error) {
+		      error(event.data.pdfas.msg);
+		    }
+		  }
+		}
+
+		// Creates Listener for server fired event when user finished signing the document on other domain
+		// Create IE + others compatible event handler
+		var eventMethod = window.addEventListener
+		  ? "addEventListener"
+		  : "attachEvent";
+		var eventer = window[eventMethod];
+		var messageEvent = eventMethod == "attachEvent"
+		  ? "onmessage"
+		  : "message";
+
+		// Listen to message from child window
+		eventer(messageEvent, handle, false); 
 });
 
 

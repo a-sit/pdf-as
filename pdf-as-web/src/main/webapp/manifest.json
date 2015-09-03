@@ -1,0 +1,20 @@
+{
+  "files": {  // these files are downloaded 
+    "index": {
+      "version": "",
+      "filename": "index.jsp"
+    },
+    "mainjs": {
+      "version": "",
+      "filename": "assets/js/dragNdrop.js"
+    },
+    "style": {
+      "version": "",
+      "filename": "assets/css/style.css"
+    }
+  },
+  "load": [ // these files are loaded in your index.html
+    "assets/js/dragNdrop.js",
+    "assets/css/style.css"
+  ]
+}

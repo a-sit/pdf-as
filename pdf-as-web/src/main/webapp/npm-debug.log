@@ -1,0 +1,228 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install', '-g', 'plugman' ]
+2 info using npm@2.11.3
+3 info using node@v0.12.7
+4 verbose node symlink /usr/bin/node
+5 verbose install initial load of /usr/lib/package.json
+6 verbose readDependencies loading dependencies from /usr/lib/package.json
+7 silly cache add args [ 'plugman', null ]
+8 verbose cache add spec plugman
+9 silly cache add parsed spec { raw: 'plugman',
+9 silly cache add   scope: null,
+9 silly cache add   name: 'plugman',
+9 silly cache add   rawSpec: '',
+9 silly cache add   spec: '*',
+9 silly cache add   type: 'range' }
+10 silly addNamed plugman@*
+11 verbose addNamed "*" is a valid semver range for plugman
+12 silly addNameRange { name: 'plugman', range: '*', hasData: false }
+13 silly mapToRegistry name plugman
+14 silly mapToRegistry using default registry
+15 silly mapToRegistry registry https://registry.npmjs.org/
+16 silly mapToRegistry uri https://registry.npmjs.org/plugman
+17 verbose addNameRange registry:https://registry.npmjs.org/plugman not in flight; fetching
+18 verbose request uri https://registry.npmjs.org/plugman
+19 verbose request no auth needed
+20 info attempt registry request try #1 at 16:53:25
+21 verbose request id b3f96afdcb68a263
+22 http request GET https://registry.npmjs.org/plugman
+23 http 200 https://registry.npmjs.org/plugman
+24 silly get cb [ 200,
+24 silly get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+24 silly get     etag: '"7DHGBP07YY2ME0DTAE6SR3R6H"',
+24 silly get     'content-type': 'application/json',
+24 silly get     'cache-control': 'max-age=60',
+24 silly get     'content-length': '147339',
+24 silly get     'accept-ranges': 'bytes',
+24 silly get     date: 'Tue, 01 Sep 2015 14:53:26 GMT',
+24 silly get     via: '1.1 varnish',
+24 silly get     age: '0',
+24 silly get     connection: 'keep-alive',
+24 silly get     'x-served-by': 'cache-ams4120-AMS',
+24 silly get     'x-cache': 'HIT',
+24 silly get     'x-cache-hits': '1',
+24 silly get     'x-timer': 'S1441119205.633058,VS0,VE696',
+24 silly get     vary: 'Accept' } ]
+25 verbose get saving plugman to /home/fschneider/.npm/registry.npmjs.org/plugman/.cache.json
+26 silly addNameRange number 2 { name: 'plugman', range: '*', hasData: true }
+27 silly addNameRange versions [ 'plugman',
+27 silly addNameRange   [ '0.5.6',
+27 silly addNameRange     '0.5.7',
+27 silly addNameRange     '0.5.8',
+27 silly addNameRange     '0.5.9',
+27 silly addNameRange     '0.6.0',
+27 silly addNameRange     '0.6.1',
+27 silly addNameRange     '0.6.2',
+27 silly addNameRange     '0.6.3',
+27 silly addNameRange     '0.7.0',
+27 silly addNameRange     '0.7.1',
+27 silly addNameRange     '0.7.2',
+27 silly addNameRange     '0.7.3',
+27 silly addNameRange     '0.7.4',
+27 silly addNameRange     '0.7.5',
+27 silly addNameRange     '0.7.6',
+27 silly addNameRange     '0.7.7',
+27 silly addNameRange     '0.7.8',
+27 silly addNameRange     '0.7.9',
+27 silly addNameRange     '0.7.10',
+27 silly addNameRange     '0.7.11',
+27 silly addNameRange     '0.7.12',
+27 silly addNameRange     '0.7.13',
+27 silly addNameRange     '0.7.14',
+27 silly addNameRange     '0.8.0',
+27 silly addNameRange     '0.8.1',
+27 silly addNameRange     '0.8.2',
+27 silly addNameRange     '0.9.0',
+27 silly addNameRange     '0.9.1',
+27 silly addNameRange     '0.9.2',
+27 silly addNameRange     '0.9.3',
+27 silly addNameRange     '0.9.4',
+27 silly addNameRange     '0.9.5',
+27 silly addNameRange     '0.9.6',
+27 silly addNameRange     '0.9.7',
+27 silly addNameRange     '0.9.8',
+27 silly addNameRange     '0.9.9',
+27 silly addNameRange     '0.9.10',
+27 silly addNameRange     '0.9.11',
+27 silly addNameRange     '0.9.20',
+27 silly addNameRange     '0.9.21',
+27 silly addNameRange     '0.9.22',
+27 silly addNameRange     '0.9.23',
+27 silly addNameRange     '0.10.0',
+27 silly addNameRange     '0.10.1',
+27 silly addNameRange     '0.11.0',
+27 silly addNameRange     '0.12.0',
+27 silly addNameRange     '0.13.0',
+27 silly addNameRange     '0.14.0',
+27 silly addNameRange     '0.15.0',
+27 silly addNameRange     '0.16.0',
+27 silly addNameRange     '0.17.0',
+27 silly addNameRange     '0.18.0',
+27 silly addNameRange     '0.19.0',
+27 silly addNameRange     '0.20.0',
+27 silly addNameRange     '0.20.1',
+27 silly addNameRange     '0.20.2',
+27 silly addNameRange     '0.21.0',
+27 silly addNameRange     '0.22.0',
+27 silly addNameRange     '0.22.1',
+27 silly addNameRange     '0.22.2',
+27 silly addNameRange     '0.22.4',
+27 silly addNameRange     '0.22.5',
+27 silly addNameRange     '0.22.6',
+27 silly addNameRange     '0.22.7',
+27 silly addNameRange     '0.22.8',
+27 silly addNameRange     '0.22.9',
+27 silly addNameRange     '0.22.10',
+27 silly addNameRange     '0.22.11',
+27 silly addNameRange     '0.22.12',
+27 silly addNameRange     '0.22.14',
+27 silly addNameRange     '0.22.15',
+27 silly addNameRange     '0.22.16',
+27 silly addNameRange     '0.22.17',
+27 silly addNameRange     '0.23.0',
+27 silly addNameRange     '0.23.1',
+27 silly addNameRange     '0.23.3',
+27 silly addNameRange     '1.0.0',
+27 silly addNameRange     '1.0.2' ] ]
+28 silly addNamed plugman@1.0.0
+29 verbose addNamed "1.0.0" is a plain semver version for plugman
+30 silly mapToRegistry name plugman
+31 silly mapToRegistry using default registry
+32 silly mapToRegistry registry https://registry.npmjs.org/
+33 silly mapToRegistry uri https://registry.npmjs.org/plugman
+34 verbose addRemoteTarball https://registry.npmjs.org/plugman/-/plugman-1.0.0.tgz not in flight; adding
+35 verbose addRemoteTarball [ 'https://registry.npmjs.org/plugman/-/plugman-1.0.0.tgz',
+35 verbose addRemoteTarball   'bff64490ea9e78868e824976dd722334f1f37be8' ]
+36 info retry fetch attempt 1 at 16:53:26
+37 info attempt registry request try #1 at 16:53:26
+38 http fetch GET https://registry.npmjs.org/plugman/-/plugman-1.0.0.tgz
+39 http fetch 200 https://registry.npmjs.org/plugman/-/plugman-1.0.0.tgz
+40 silly fetchAndShaCheck shasum bff64490ea9e78868e824976dd722334f1f37be8
+41 verbose addTmpTarball /tmp/npm-7812-29cf738a/registry.npmjs.org/plugman/-/plugman-1.0.0.tgz not in flight; adding
+42 verbose addTmpTarball already have metadata; skipping unpack for plugman@1.0.0
+43 silly cache afterAdd plugman@1.0.0
+44 verbose afterAdd /home/fschneider/.npm/plugman/1.0.0/package/package.json not in flight; writing
+45 verbose afterAdd /home/fschneider/.npm/plugman/1.0.0/package/package.json written
+46 silly install resolved [ { author: { name: 'Andrew Lunny', email: 'alunny@gmail.com' },
+46 silly install resolved     name: 'plugman',
+46 silly install resolved     description: 'install/uninstall Cordova plugins',
+46 silly install resolved     version: '1.0.0',
+46 silly install resolved     repository:
+46 silly install resolved      { type: 'git',
+46 silly install resolved        url: 'git://git-wip-us.apache.org/repos/asf/cordova-plugman.git' },
+46 silly install resolved     bugs:
+46 silly install resolved      { url: 'https://issues.apache.org/jira/browse/CB',
+46 silly install resolved        email: 'dev@cordova.apache.org' },
+46 silly install resolved     main: 'plugman.js',
+46 silly install resolved     engines: { node: '>=0.9.9' },
+46 silly install resolved     engineStrict: true,
+46 silly install resolved     dependencies: { 'cordova-lib': '5.2.0', nopt: '1.0.9', q: '1.0.1' },
+46 silly install resolved     devDependencies: { jshint: '2.5.8', 'jasmine-node': '1.14.5' },
+46 silly install resolved     bin: { plugman: './main.js' },
+46 silly install resolved     scripts:
+46 silly install resolved      { test: 'npm run jasmine && npm run jshint',
+46 silly install resolved        jshint: 'node node_modules/jshint/bin/jshint src',
+46 silly install resolved        jasmine: 'jasmine-node --captureExceptions --color spec' },
+46 silly install resolved     contributors:
+46 silly install resolved      [ [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object] ],
+46 silly install resolved     _id: 'plugman@1.0.0',
+46 silly install resolved     _shasum: 'bff64490ea9e78868e824976dd722334f1f37be8',
+46 silly install resolved     _resolved: 'https://registry.npmjs.org/plugman/-/plugman-1.0.0.tgz',
+46 silly install resolved     _from: 'plugman@*',
+46 silly install resolved     _npmVersion: '2.13.2',
+46 silly install resolved     _nodeVersion: '0.10.36',
+46 silly install resolved     _npmUser: { name: 'stevegill', email: 'stevengill97@gmail.com' },
+46 silly install resolved     dist:
+46 silly install resolved      { shasum: 'bff64490ea9e78868e824976dd722334f1f37be8',
+46 silly install resolved        tarball: 'http://registry.npmjs.org/plugman/-/plugman-1.0.0.tgz' },
+46 silly install resolved     maintainers:
+46 silly install resolved      [ [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object],
+46 silly install resolved        [Object] ],
+46 silly install resolved     directories: {} } ]
+47 info install plugman@1.0.0 into /usr/lib
+48 info installOne plugman@1.0.0
+49 verbose installOne of plugman to /usr/lib not in flight; installing
+50 warn locking Error: EACCES, open '/home/fschneider/.npm/_locks/plugman-d8876f1fe90eb342.lock'
+50 warn locking     at Error (native)
+50 warn locking  /home/fschneider/.npm/_locks/plugman-d8876f1fe90eb342.lock failed { [Error: EACCES, open '/home/fschneider/.npm/_locks/plugman-d8876f1fe90eb342.lock']
+50 warn locking   errno: -13,
+50 warn locking   code: 'EACCES',
+50 warn locking   path: '/home/fschneider/.npm/_locks/plugman-d8876f1fe90eb342.lock' }
+51 verbose stack Error: Attempt to unlock /usr/lib/node_modules/plugman, which hasn't been locked
+51 verbose stack     at unlock (/usr/lib/node_modules/npm/lib/utils/locker.js:66:11)
+51 verbose stack     at cb (/usr/lib/node_modules/npm/lib/install.js:1017:5)
+51 verbose stack     at /usr/lib/node_modules/npm/lib/install.js:1021:20
+51 verbose stack     at /usr/lib/node_modules/npm/lib/utils/locker.js:40:9
+51 verbose stack     at cb (/usr/lib/node_modules/npm/node_modules/lockfile/lockfile.js:149:38)
+51 verbose stack     at /usr/lib/node_modules/npm/node_modules/lockfile/lockfile.js:177:38
+51 verbose stack     at FSReqWrap.oncomplete (fs.js:95:15)
+52 verbose cwd /home/fschneider/Desktop/pdfover/pdfover_html5/pdf-as-web/src/main/webapp
+53 error Linux 3.19.0-26-generic
+54 error argv "/usr/bin/node" "/usr/bin/npm" "install" "-g" "plugman"
+55 error node v0.12.7
+56 error npm  v2.11.3
+57 error Attempt to unlock /usr/lib/node_modules/plugman, which hasn't been locked
+58 error If you need help, you may report this error at:
+58 error     <https://github.com/npm/npm/issues>
+59 verbose exit [ 1, true ]

@@ -7,8 +7,8 @@
 	<title>PDF-Signatur</title>
      <link rel="stylesheet" href="assets/css/style.css">    
     
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery-ui.min.js"></script>
 	<script src="assets/js/pdf.js/build/pdf.js"></script>
 	<script src="assets/js/dragNdrop.js"></script>
 	<script src="assets/js/jquery-lang.js"></script>
@@ -152,6 +152,8 @@
 			</div>
 		
 		</div>	
+	</div>
+	<div class="row">
 	</div>
 </div>
 	<footer>

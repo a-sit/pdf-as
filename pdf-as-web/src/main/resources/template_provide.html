@@ -10,11 +10,12 @@ PDF ready @: <a href="##PDFDATAURL##">download here</a>
 	var data = {
 	    pdfas: {
 	        success: true,
-	    	pdfUrl: "Child URL"
+	    	pdfUrl: "##PDFDATAURL##"
 		}
 	}
-
-	parent.postMessage(data, '##PUBLICURL##');
+	
+	console.log("sending msg to parent: " + parent);
+	parent.postMessage(data, '*'); //'##PUBLICURL##');
 </script>
 </body>
 </html>

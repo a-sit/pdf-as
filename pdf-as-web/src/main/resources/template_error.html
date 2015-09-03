@@ -19,7 +19,7 @@ Error Page:
 	parent.postMessage(data, '##PUBLICURL##');
 	} catch(error) {
 		if(window.console) {
-			window.console.log("Sending message failed!", error);
+			window.console.log("Sending message failed! to parent: " + parent, error);
 		}
 	}
 </script>

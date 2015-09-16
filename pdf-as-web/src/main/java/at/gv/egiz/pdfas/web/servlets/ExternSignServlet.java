@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -63,44 +64,58 @@ public class ExternSignServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	public static final String PDF_AS_WEB_CONF = "pdf-as-web.conf";
-	
+
 	private static final String UPLOAD_PDF_DATA = "pdf-file";
+	private static final String UPLOAD_PDF_DATA_BASE64 = "pdf-file-b64";
 	private static final String UPLOAD_DIRECTORY = "upload";
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ExternSignServlet.class);
-	
+	private static final Logger logger = LoggerFactory.getLogger(ExternSignServlet.class);
+
 	/**
 	 * Default constructor.
 	 */
 	public ExternSignServlet() {
 		String webconfig = System.getProperty(PDF_AS_WEB_CONF);
-		
-		if(webconfig == null) {
+
+		if (webconfig == null) {
 			logger.error("No web configuration provided! Please specify: " + PDF_AS_WEB_CONF);
 			throw new RuntimeException("No web configuration provided! Please specify: " + PDF_AS_WEB_CONF);
 		}
-		
+
 		WebConfiguration.configure(webconfig);
 		PdfAsHelper.init();
 	}
 
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		
-		//PdfAsHelper.regenerateSession(request);
-		
+	private byte[] getPDFBase64File(HttpServletRequest request) {
+		Object object = request.getAttribute(UPLOAD_PDF_DATA_BASE64);
+		if (object != null && object instanceof String) {
+			try {
+				synchronized (Base64.class) {
+					return Base64.decodeBase64((String) object);
+				}
+			} catch (Throwable e) {
+				logger.warn("Failed to decode base64 pdf file!", e);
+			}
+		}
+		return null;
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		// PdfAsHelper.regenerateSession(request);
+
 		logger.debug("Get signing request");
-		
+
 		String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);
 		PdfAsHelper.setErrorURL(request, response, errorUrl);
-		
+
 		StatisticEvent statisticEvent = new StatisticEvent();
 		statisticEvent.setStartNow();
 		statisticEvent.setSource(Source.WEB);
 		statisticEvent.setOperation(Operation.SIGN);
 		statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
-		
+
 		try {
 			// Mandatory Parameters on Get Request:
 			String invokeUrl = PdfAsParameterExtractor.getInvokeURL(request);
@@ -108,30 +123,28 @@ public class ExternSignServlet extends HttpServlet {
 
 			String invokeTarget = PdfAsParameterExtractor.getInvokeTarget(request);
 			PdfAsHelper.setInvokeTarget(request, response, invokeTarget);
-			
+
 			String pdfUrl = PdfAsParameterExtractor.getPdfUrl(request);
 
 			if (pdfUrl == null) {
-				throw new PdfAsWebException(
-						"No PDF URL given! Use POST request to sign without PDF URL.");
+				throw new PdfAsWebException("No PDF URL given! Use POST request to sign without PDF URL.");
 			}
 
 			byte[] pdfData = RemotePDFFetcher.fetchPdfFile(pdfUrl);
 			doSignature(request, response, pdfData, statisticEvent);
 		} catch (Exception e) {
-			
+
 			statisticEvent.setStatus(Status.ERROR);
 			statisticEvent.setException(e);
-			if(e instanceof PDFASError) {
-				statisticEvent.setErrorCode(((PDFASError)e).getCode());
+			if (e instanceof PDFASError) {
+				statisticEvent.setErrorCode(((PDFASError) e).getCode());
 			}
 			statisticEvent.setEndNow();
 			statisticEvent.setTimestampNow();
 			StatisticFrontend.getInstance().storeEvent(statisticEvent);
 			statisticEvent.setLogged(true);
-			
-			PdfAsHelper.setSessionException(request, response, e.getMessage(),
-					e);
+
+			PdfAsHelper.setSessionException(request, response, e.getMessage(), e);
 			PdfAsHelper.gotoError(getServletContext(), request, response);
 		}
 	}
@@ -140,247 +153,243 @@ public class ExternSignServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		
-		//PdfAsHelper.regenerateSession(request);
-		
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		// PdfAsHelper.regenerateSession(request);
+
 		logger.debug("Post signing request");
-		
+
 		String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);
 		PdfAsHelper.setErrorURL(request, response, errorUrl);
-		
+
 		StatisticEvent statisticEvent = new StatisticEvent();
 		statisticEvent.setStartNow();
 		statisticEvent.setSource(Source.WEB);
 		statisticEvent.setOperation(Operation.SIGN);
 		statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
-		
+
 		try {
-			byte[] filecontent = null;
+			byte[] filecontent = this.getPDFBase64File(request);
 
-			// checks if the request actually contains upload file
-			if (!ServletFileUpload.isMultipartContent(request)) {
-				// No Uploaded data!
-				if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
-					doGet(request, response);
-					return;
-				} else {
-					throw new PdfAsWebException("No Signature data defined!");
-				}
-			} else {
-				// configures upload settings
-				DiskFileItemFactory factory = new DiskFileItemFactory();
-				factory.setSizeThreshold(WebConfiguration.getFilesizeThreshold());
-				factory.setRepository(new File(System
-						.getProperty("java.io.tmpdir")));
-
-				ServletFileUpload upload = new ServletFileUpload(factory);
-				upload.setFileSizeMax(WebConfiguration.getMaxFilesize());
-				upload.setSizeMax(WebConfiguration.getMaxRequestsize());
-
-				// constructs the directory path to store upload file
-				String uploadPath = getServletContext().getRealPath("")
-						+ File.separator + UPLOAD_DIRECTORY;
-				// creates the directory if it does not exist
-				File uploadDir = new File(uploadPath);
-				if (!uploadDir.exists()) {
-					uploadDir.mkdir();
-				}
-
-				List<?> formItems = upload.parseRequest(request);
-				logger.debug(formItems.size() + " Items in form data");
-				if (formItems.size() < 1) {
-					// No Uploaded data!
-					// Try do get
+			if (filecontent == null) {
+				// checks if the request actually contains upload file
+				if (!ServletFileUpload.isMultipartContent(request)) {
 					// No Uploaded data!
 					if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
 						doGet(request, response);
 						return;
 					} else {
-						throw new PdfAsWebException(
-								"No Signature data defined!");
+						throw new PdfAsWebException("No Signature data defined!");
 					}
 				} else {
-					for(int i = 0; i < formItems.size(); i++) {
-						Object obj = formItems.get(i);
-						if(obj instanceof FileItem) {
-							FileItem item = (FileItem) obj;
-							if(item.getFieldName().equals(UPLOAD_PDF_DATA)) {
-								filecontent = item.get();
-								try {
-									File f = new File(item.getName());
-									String name = f.getName();
-									logger.debug("Got upload: " + item.getName());
-									if(name != null) {
-										if(!(name.endsWith(".pdf") || name.endsWith(".PDF"))) {
-											name += ".pdf";
+					// configures upload settings
+					DiskFileItemFactory factory = new DiskFileItemFactory();
+					factory.setSizeThreshold(WebConfiguration.getFilesizeThreshold());
+					factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
+
+					ServletFileUpload upload = new ServletFileUpload(factory);
+					upload.setFileSizeMax(WebConfiguration.getMaxFilesize());
+					upload.setSizeMax(WebConfiguration.getMaxRequestsize());
+
+					// constructs the directory path to store upload file
+					String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
+					// creates the directory if it does not exist
+					File uploadDir = new File(uploadPath);
+					if (!uploadDir.exists()) {
+						uploadDir.mkdir();
+					}
+
+					List<?> formItems = upload.parseRequest(request);
+					logger.debug(formItems.size() + " Items in form data");
+					if (formItems.size() < 1) {
+						// No Uploaded data!
+						// Try do get
+						// No Uploaded data!
+						if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
+							doGet(request, response);
+							return;
+						} else {
+							throw new PdfAsWebException("No Signature data defined!");
+						}
+					} else {
+						for (int i = 0; i < formItems.size(); i++) {
+							Object obj = formItems.get(i);
+							if (obj instanceof FileItem) {
+								FileItem item = (FileItem) obj;
+								if (item.getFieldName().equals(UPLOAD_PDF_DATA)) {
+									filecontent = item.get();
+									try {
+										File f = new File(item.getName());
+										String name = f.getName();
+										logger.debug("Got upload: " + item.getName());
+										if (name != null) {
+											if (!(name.endsWith(".pdf") || name.endsWith(".PDF"))) {
+												name += ".pdf";
+											}
+
+											logger.debug("Setting Filename in session: " + name);
+											PdfAsHelper.setPDFFileName(request, name);
 										}
-										
-										logger.debug("Setting Filename in session: " + name);
-										PdfAsHelper.setPDFFileName(request, name);
+									} catch (Throwable e) {
+										logger.warn("In resolving filename", e);
 									}
-								}
-								catch(Throwable e) {
-									logger.warn("In resolving filename", e);
-								}
-								if(filecontent.length < 10) {
-									filecontent = null;
+									if (filecontent.length < 10) {
+										filecontent = null;
+									} else {
+										logger.debug("Found pdf Data! Size: " + filecontent.length);
+									}
 								} else {
-									logger.debug("Found pdf Data! Size: " + filecontent.length);
+									request.setAttribute(item.getFieldName(), item.getString());
+									logger.debug("Setting " + item.getFieldName() + " = " + item.getString());
 								}
 							} else {
-								request.setAttribute(item.getFieldName(), item.getString());
-								logger.debug("Setting " + item.getFieldName() + " = " + item.getString());
+								logger.debug(obj.getClass().getName() + " - " + obj.toString());
 							}
-						} else {
-							logger.debug(obj.getClass().getName() +  " - " + obj.toString());
 						}
 					}
 				}
 			}
-			
-			if(filecontent == null) {
+
+			if (filecontent == null) {
 				if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
 					filecontent = RemotePDFFetcher.fetchPdfFile(PdfAsParameterExtractor.getPdfUrl(request));
 				}
 			}
 
-			if(filecontent == null) {
+			if (filecontent == null) {
 				Object sourceObj = request.getAttribute("source");
-				if(sourceObj != null) {
+				if (sourceObj != null) {
 					String source = sourceObj.toString();
-					if(source.equals("internal")) {
+					if (source.equals("internal")) {
 						request.setAttribute("FILEERR", true);
 						request.getRequestDispatcher("index.jsp").forward(request, response);
-						
+
 						statisticEvent.setStatus(Status.ERROR);
 						statisticEvent.setException(new Exception("No file uploaded"));
 						statisticEvent.setEndNow();
 						statisticEvent.setTimestampNow();
 						StatisticFrontend.getInstance().storeEvent(statisticEvent);
 						statisticEvent.setLogged(true);
-						
+
 						return;
 					}
 				}
 				throw new PdfAsException("No Signature data available");
 			}
-			
+
 			doSignature(request, response, filecontent, statisticEvent);
 		} catch (Exception e) {
-			
+
 			statisticEvent.setStatus(Status.ERROR);
 			statisticEvent.setException(e);
-			if(e instanceof PDFASError) {
-				statisticEvent.setErrorCode(((PDFASError)e).getCode());
+			if (e instanceof PDFASError) {
+				statisticEvent.setErrorCode(((PDFASError) e).getCode());
 			}
 			statisticEvent.setEndNow();
 			statisticEvent.setTimestampNow();
 			StatisticFrontend.getInstance().storeEvent(statisticEvent);
 			statisticEvent.setLogged(true);
-			
-			PdfAsHelper.setSessionException(request, response, e.getMessage(),
-					e);
+
+			PdfAsHelper.setSessionException(request, response, e.getMessage(), e);
 			PdfAsHelper.gotoError(getServletContext(), request, response);
 		}
 	}
 
-	protected void doSignature(HttpServletRequest request,
-			HttpServletResponse response, byte[] pdfData, StatisticEvent statisticEvent) throws Exception {
+	protected void doSignature(HttpServletRequest request, HttpServletResponse response, byte[] pdfData,
+			StatisticEvent statisticEvent) throws Exception {
 		// Get Connector
 		String connector = PdfAsParameterExtractor.getConnector(request);
 		PdfAsHelper.setConnector(request, connector);
-		
+
 		String transactionId = PdfAsParameterExtractor.getTransactionId(request);
 		PdfAsHelper.setTransactionid(request, transactionId);
-		
+
 		statisticEvent.setFilesize(pdfData.length);
 		statisticEvent.setProfileId(null);
 		statisticEvent.setDevice(connector);
 
 		String invokeUrl = PdfAsParameterExtractor.getInvokeURL(request);
 		PdfAsHelper.setInvokeURL(request, response, invokeUrl);
-		
+
 		SignatureVerificationLevel lvl = PdfAsParameterExtractor.getVerificationLevel(request);
 		PdfAsHelper.setVerificationLevel(request, lvl);
-		
+
 		String qrcodeContent = PdfAsParameterExtractor.getQRCodeContent(request);
 		PdfAsHelper.setQRCodeContent(request, qrcodeContent);
-		
+
 		String invokeTarget = PdfAsParameterExtractor.getInvokeTarget(request);
 		PdfAsHelper.setInvokeTarget(request, response, invokeTarget);
-		
+
 		String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);
 		PdfAsHelper.setErrorURL(request, response, errorUrl);
-		
+
 		String locale = PdfAsParameterExtractor.getLocale(request);
 		PdfAsHelper.setLocale(request, response, locale);
-		
+
 		String filename = PdfAsParameterExtractor.getFilename(request);
-		if(filename != null) {
+		if (filename != null) {
 			logger.debug("Setting Filename in session: " + filename);
 			PdfAsHelper.setPDFFileName(request, filename);
 		}
-		
-		if(pdfData == null) {
+
+		if (pdfData == null) {
 			throw new PdfAsException("No Signature data available");
 		}
-		
+
 		String pdfDataHash = DigestHelper.getHexEncodedHash(pdfData);
-		
+
 		PdfAsHelper.setSignatureDataHash(request, pdfDataHash);
 		logger.debug("Storing signatures data hash: " + pdfDataHash);
-		
+
 		boolean manualPositioning = PdfAsParameterExtractor.isUserPositioning(request);
-		
+
 		logger.debug("Starting signature creation with: " + connector);
-		
-		String sigType = PdfAsParameterExtractor
-				.getSigType(request);
+
+		String sigType = PdfAsParameterExtractor.getSigType(request);
 		PdfAsHelper.setSignatureType(request, sigType);
-		
+
 		Map<String, String> preProcessorMap = PdfAsParameterExtractor.getPreProcessorMap(request);
 		PdfAsHelper.setPreProcessorMap(request, preProcessorMap);
-		
+
 		Map<String, String> overwriteMap = PdfAsParameterExtractor.getOverwriteMap(request);
 		PdfAsHelper.setOverwriteMap(request, overwriteMap);
-		
+
 		String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
 		PdfAsHelper.setKeyIdentifier(request, keyIdentifier);
-		
+
 		PdfAsHelper.setStatisticEvent(request, response, statisticEvent);
-		
-		//IPlainSigner signer;
+
+		// IPlainSigner signer;
 		if (connector.equals("bku") || connector.equals("onlinebku") || connector.equals("mobilebku")) {
 			// start asynchronous signature creation
-			
-			if(connector.equals("bku")) {
-				if(WebConfiguration.getLocalBKUURL() == null) {
+
+			if (connector.equals("bku")) {
+				if (WebConfiguration.getLocalBKUURL() == null) {
 					throw new PdfAsWebException("Invalid connector bku is not supported");
 				}
 			}
-			
-			if(connector.equals("onlinebku")) {
-				if(WebConfiguration.getLocalBKUURL() == null) {
+
+			if (connector.equals("onlinebku")) {
+				if (WebConfiguration.getLocalBKUURL() == null) {
 					throw new PdfAsWebException("Invalid connector onlinebku is not supported");
 				}
 			}
-			
-			if(connector.equals("mobilebku")) {
-				if(WebConfiguration.getLocalBKUURL() == null) {
+
+			if (connector.equals("mobilebku")) {
+				if (WebConfiguration.getLocalBKUURL() == null) {
 					throw new PdfAsWebException("Invalid connector mobilebku is not supported");
 				}
-			}			
-			
-			if(manualPositioning) {
+			}
+
+			if (manualPositioning) {
 				// store pdf data
 				// redirect to viewer html
 				String token = PdfAsHelper.storePdfData(pdfData, request);
-				
+
 				String pdfDataUrl = PdfAsHelper.generatePositioningURL(token, request, response);
-				
-				if(pdfDataUrl != null) {
+
+				if (pdfDataUrl != null) {
 					response.sendRedirect(response.encodeRedirectURL(pdfDataUrl));
 					return;
 				} else {
@@ -388,16 +397,15 @@ public class ExternSignServlet extends HttpServlet {
 					PdfAsHelper.getPdfData(token, request);
 				}
 			}
-			
-			PdfAsHelper.startSignature(request, response, getServletContext(), pdfData, connector, 
-					PdfAsHelper.buildPosString(request, response), transactionId, sigType, 
-					preProcessorMap, 
+
+			PdfAsHelper.startSignature(request, response, getServletContext(), pdfData, connector,
+					PdfAsHelper.buildPosString(request, response), transactionId, sigType, preProcessorMap,
 					overwriteMap);
 			return;
 		} else if (connector.equals("jks") || connector.equals("moa")) {
 			// start synchronous siganture creation
-			
-			if(connector.equals("jks")) {
+
+			if (connector.equals("jks")) {
 
 				boolean ksEnabled = false;
 
@@ -408,28 +416,28 @@ public class ExternSignServlet extends HttpServlet {
 				}
 
 				if (!ksEnabled) {
-					if(keyIdentifier != null) {
+					if (keyIdentifier != null) {
 						throw new PdfAsWebException("JKS connector [" + keyIdentifier + "] disabled or not existing.");
 					} else {
 						throw new PdfAsWebException("DEFAULT JKS connector disabled.");
 					}
 				}
 			}
-			
-			if(connector.equals("moa")) {
-				if(!WebConfiguration.getMOASSEnabled()) {
+
+			if (connector.equals("moa")) {
+				if (!WebConfiguration.getMOASSEnabled()) {
 					throw new PdfAsWebException("Invalid connector moa is not supported");
 				}
 			}
-			
-			if(manualPositioning) {
+
+			if (manualPositioning) {
 				// store pdf data
 				// redirect to viewer html
 				String token = PdfAsHelper.storePdfData(pdfData, request);
-				
+
 				String pdfDataUrl = PdfAsHelper.generatePositioningURL(token, request, response);
-				
-				if(pdfDataUrl != null) {
+
+				if (pdfDataUrl != null) {
 					response.sendRedirect(response.encodeRedirectURL(pdfDataUrl));
 					return;
 				} else {
@@ -437,17 +445,16 @@ public class ExternSignServlet extends HttpServlet {
 					PdfAsHelper.getPdfData(token, request);
 				}
 			}
-			
-			byte[] pdfSignedData = PdfAsHelper.synchornousSignature(request,
-					response, pdfData);
+
+			byte[] pdfSignedData = PdfAsHelper.synchornousSignature(request, response, pdfData);
 			PdfAsHelper.setSignedPdf(request, response, pdfSignedData);
-			
+
 			statisticEvent.setStatus(Status.OK);
 			statisticEvent.setEndNow();
 			statisticEvent.setTimestampNow();
 			StatisticFrontend.getInstance().storeEvent(statisticEvent);
 			statisticEvent.setLogged(true);
-			
+
 			PdfAsHelper.gotoProvidePdf(getServletContext(), request, response);
 			return;
 		} else {

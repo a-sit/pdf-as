@@ -436,13 +436,14 @@ function sign(file, connector, locale) {
 	       var buffer = evt.target.result;
 		   var uint8Array = new Uint8Array(buffer);
 		  
+		   console.log("onload filereader before string convert");
+
+		   var array_string = uint8ToString(uint8Array) 
 		   
-		   var b64encoded = btoa(String.fromCharCode.apply(null, uint8Array));
-		   
-		   var result = uint8ToString(b64encoded);
-		  		  
+		   console.log("onload filereader after string convert");
+		   var b64encoded = btoa(array_string);		  		  
 		 
-		   continueFormCreation(result);
+		   continueFormCreation(b64encoded);
 			   
 		   
 	    };

@@ -360,6 +360,21 @@ function previewFile() {
 	createIframe();
 }
 
+// from "Einfach Signieren"
+function addDataToForm(data, form) {
+	var ret = [];
+	   for (var d in data) {
+		   if (typeof data[d] != "undefined") {
+			   	var input = document.createElement('input');
+			   	input.type = 'hidden';
+			   	input.name = d;
+			   	input.value = data[d];
+			   	form.appendChild(input);
+		   }
+	   }
+}
+
+
 //
 //Calls the sign servlet with the provided file and the provided connector and locale
 //
@@ -368,32 +383,154 @@ function sign(file, connector, locale) {
 		alert("No file selected");
 		return
 	}
-	var fd = new FormData();
+	/*var fd = new FormData();
 	fd.append("source", "internal");
 	fd.append("pdf-file", file);
 	fd.append("connector", connector);
-	fd.append("locale", locale);
+	fd.append("locale", locale); */
 	
-	ifr = document.getElementById('iFrame').contentWindow;
-	if(ifr.isSignaturePlaced()) { //Signature has been manually placed
-		
-		console.log("signature manually placed: x: y:" + ifr.global_status.getSignature().posx + ", " + ifr.global_status.getSignature().posy)
-		fd.append("sig-pos-x", ifr.global_status.getSignature().posx);
-		fd.append("sig-pos-y", ifr.global_status.getSignature().posy);
-		fd.append("sig-pos-p", ifr.global_status.getSignature().page);
-	}
-	else if(place_on_new_page)
+	/*var parameters = {
+			source: "internal",
+			pdf-file: file,
+			connector: connector,
+			locale: local,
+			sig-pos-x: null,
+			sig-pos-y: null,
+			sig-pos-p: null
+	}; */
+	
+	var form = document.createElement('form');
+	form.method = "POST";
+	form.action = "Sign";
+	form.target = "mobileSignOnFrame";
+	form.enctype = "multipart/form-data";
+	
+	var input = document.createElement('input');
+   	input.type = 'hidden';
+   	input.name = "source";
+   	input.value = "internal";
+   	form.appendChild(input);
+   	
+   	// used beneath
+   	function uint8ToString(buf) {
+   	    var i, length, out = '';
+   	    for (i = 0, length = buf.length; i < length; i += 1) {
+   	        out += String.fromCharCode(buf[i]);
+   	    }
+   	    return out;
+   	}
+   	
+   	// starting the asynchronous things
+   	
+   	begin_convert(file);
+   	
+   	// convert file to b64 string
+   	
+   	function begin_convert(file)
 	{
-		console.log("signature will be placed on a new page");
-		fd.append("sig-pos-p", "new");
-		place_on_new_page = false;
+		// Read the local file into a Uint8Array.
+	    var fileReader = new FileReader();
+	    
+	    fileReader.onload = function webViewerChangeFileReaderOnload(evt) 
+	    {
+	       var buffer = evt.target.result;
+		   var uint8Array = new Uint8Array(buffer);
+		  
+		   
+		   var b64encoded = btoa(String.fromCharCode.apply(null, uint8Array));
+		   
+		   var result = uint8ToString(b64encoded);
+		  		  
+		 
+		   continueFormCreation(result);
+			   
+		   
+	    };
+	    
+	    console.log("converting to b64..");
+	    fileReader.readAsArrayBuffer(file);
+	    
 	}
-	else
-	{
-		console.log("signature will be placed on bottom");
-	}
+   	
+   	
+   	function continueFormCreation(result)
+   	{
+	   	
+	   	input = document.createElement('input');
+	   	input.type = 'hidden';
+	   	input.name = "pdf-file-b64";
+	   	input.value = result; // former: file
+	   	form.appendChild(input);
+	   	
+	   	input = document.createElement('input');
+	   	input.type = 'hidden';
+	   	input.name = "connector";
+	   	input.value = connector;
+	   	form.appendChild(input);
+	   	
+	   	input = document.createElement('input');
+	   	input.type = 'hidden';
+	   	input.name = "locale";
+	   	input.value = locale;
+	   	form.appendChild(input);
+			
+		ifr = document.getElementById('iFrame').contentWindow;
+		if(ifr.isSignaturePlaced()) { //Signature has been manually placed
+			
+			console.log("signature manually placed: x: y:" + ifr.global_status.getSignature().posx + ", " + ifr.global_status.getSignature().posy)
+			/*fd.append("sig-pos-x", ifr.global_status.getSignature().posx);
+			fd.append("sig-pos-y", ifr.global_status.getSignature().posy);
+			fd.append("sig-pos-p", ifr.global_status.getSignature().page); */
+			
+			/*parameters.sig-pos-x = ifr.global_status.getSignature().posx;
+			parameters.sig-pos-y = ifr.global_status.getSignature().posy;
+			parameters.sig-pos-p = ifr.global_status.getSignature().page; */
+			
+			input = document.createElement('input');
+		   	input.type = 'hidden';
+		   	input.name = "sig-pos-x";
+		   	input.value = ifr.global_status.getSignature().posx;
+		   	form.appendChild(input);
+		   	
+		   	input = document.createElement('input');
+		   	input.type = 'hidden';
+		   	input.name = "sig-pos-y";
+		   	input.value = ifr.global_status.getSignature().posy;
+		   	form.appendChild(input);
+		   	
+		   	input = document.createElement('input');
+		   	input.type = 'hidden';
+		   	input.name = "sig-pos-p";
+		   	input.value = ifr.global_status.getSignature().page;
+		   	form.appendChild(input);
+		}
+		else if(place_on_new_page)
+		{
+			console.log("signature will be placed on a new page");
+			/*fd.append("sig-pos-p", "new"); */
+		/*	parameters.sig-pos-p = "new"; */
+			
+			input = document.createElement('input');
+		   	input.type = 'hidden';
+		   	input.name = "sig-pos-p";
+		   	input.value = "new";
+		   	form.appendChild(input);
+		   	
+			place_on_new_page = false;
+		}
+		else
+		{
+			console.log("signature will be placed on bottom");
+		}
+			
+		document.body.appendChild(form);
+		$("#methodContainer").hide();
+		$("#mobileSignOnFrame").show();
+		form.submit();
+	
+   	}
 
-	$.ajax({
+/*	$.ajax({
 		url: "Sign",
 		data: fd,
 		processData: false,
@@ -434,7 +571,7 @@ function sign(file, connector, locale) {
 				var download_name = file.name.insertAt(insertIndex, "_signed");
 				$("#DownloadResultButton").attr("download", download_name);
 				
-				$("#FinishStepButton").click(); */
+				$("#FinishStepButton").click(); */ /*
 				$("#methodContainer").hide();
 				$("#mobileSignOnFrame").show();
 				$("#mobileSignOnFrame").contents().find('html').empty();
@@ -469,9 +606,9 @@ function sign(file, connector, locale) {
 			$("#closelink").bind("click", function(evt) {
 				$("#fade").remove();
 				$("#popup").remove();
-			});*/
+			});*/  /*
 		}
-	});
+	}); */
 }
 
 //
@@ -516,57 +653,34 @@ $(document).ready(function() {
 	}
 	
 	registerEventListeners();
-	
-	// handle server response after signing with mobile / card
-	
-	function success(arg) { // called when user successfully signed with mobile / card
-		 //document.getElementById("demo").innerHTML = arg;
-			console.log("recieved successful response from server, arg: " + arg);
-			
-			$("#DownloadResultButton").attr("href", arg);
-			
-			var insertIndex = file.name.indexOf(".pdf");
-			
-			var download_name = file.name.insertAt(insertIndex, "_signed");
-			$("#DownloadResultButton").attr("download", download_name);
-			$("#methodContainer").show();
-			$("#mobileSignOnFrame").hide();
-			$("#FinishStepButton").click();
-			
-			
-			
-		};
 
-		function error(arg) { // called when an error appears while user was signing, e.g: abort
-		  //document.getElementById("demo").innerHTML = arg;
-			console.log("recieved error response from server, arg: " + arg);
-			
-			// do something
-		};
-
-		function handle(event) { // handles the incoming server response
-		  if (event.data.pdfas) {
-		    if (event.data.pdfas.success) {
-		      success(event.data.pdfas.pdfUrl);
-		    } else if (event.data.pdfas.error) {
-		      error(event.data.pdfas.msg);
-		    }
-		  }
-		}
-
-		// Creates Listener for server fired event when user finished signing the document on other domain
-		// Create IE + others compatible event handler
-		var eventMethod = window.addEventListener
-		  ? "addEventListener"
-		  : "attachEvent";
-		var eventer = window[eventMethod];
-		var messageEvent = eventMethod == "attachEvent"
-		  ? "onmessage"
-		  : "message";
-
-		// Listen to message from child window
-		eventer(messageEvent, handle, false); 
 });
+
+function respond(arg, success) { // called when user successfully signed with mobile / card
+	 //document.getElementById("demo").innerHTML = arg;
+		console.log("recieved response after server contact, arg: " + arg + ", success: " + success);
+		
+		
+		if(!success)
+		{
+			window.alert("Server Response Error, please try again");
+			$("#SignStepButton").click();
+			return;
+		}
+		
+		$("#DownloadResultButton").attr("href", arg);
+		
+		var insertIndex = file.name.indexOf(".pdf");
+		
+		var download_name = file.name.insertAt(insertIndex, "_signed");
+		$("#DownloadResultButton").attr("download", download_name);
+		$("#methodContainer").show();
+		$("#mobileSignOnFrame").hide();
+		$("#FinishStepButton").click();
+		
+		
+		
+};
 
 
 function toggleLanguage()

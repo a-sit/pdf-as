@@ -7,15 +7,12 @@
 PDF ready @: <a href="##PDFDATAURL##">download here</a>
 
 <script type="text/javascript">
-	var data = {
-	    pdfas: {
-	        success: true,
-	    	pdfUrl: "##PDFDATAURL##"
-		}
-	}
 	
-	console.log("sending msg to parent: " + parent);
-	parent.postMessage(data, '*'); //'##PUBLICURL##');
+
+	console.log("sending success msg to parent: " + parent);
+	window.parent.respond("##PDFDATAURL##", true);
+
+	
 </script>
 </body>
 </html>

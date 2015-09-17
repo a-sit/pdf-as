@@ -12,6 +12,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+ /* Colors */
+ 
+ #mainContainer {
+ 
+   background-color: #9E9E9E;
+ }
+ 
+ .btn-primary {
+	color: #fff !important;
+    background-color: #0288D1 !important;
+    border-color: #0288D1 !important;
+}
+
+.btn-success {
+	color: #fff !important;
+    background-color: #8BC34A !important;
+    border-color: #8BC34A !important;
+}
+ 
+ /* Colors End */
+ 
+ #mainContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-width: 10em;
+  -webkit-transition-duration: 200ms;
+  -webkit-transition-timing-function: ease;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+ }
 
 .textLayer {
   position: absolute;
@@ -350,20 +384,7 @@ html[dir='rtl'] #outerContainer.sidebarOpen > #sidebarContainer {
   right: 0px;
 }
 
-#mainContainer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  min-width: 10em;
-  -webkit-transition-duration: 200ms;
-  -webkit-transition-timing-function: ease;
-  transition-duration: 200ms;
-  transition-timing-function: ease;
-  
-  background-color: #E8F4FF;
-}
+
 
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button {

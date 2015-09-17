@@ -4,9 +4,128 @@ html {
 }
 
 body {
-	background-image: url("../img/bg.png");
+	/*background-image: url("../img/bg.png"); */
 	font-family: 'OpenSans', sans-serif;
-	
+}
+
+/* Colors */
+body {
+	background-color: #9E9E9E !important;
+}
+
+.container {
+	background: #9E9E9E;
+	border: none !important;
+	box-shadow:none !important;
+}
+
+#PageTitle {
+	color: white;
+}
+
+.label-info {
+	background-color: #03A9F4 !important;
+	color: #212121 !important;
+}
+
+ul.nav-wizard li.active, ul.nav-wizard li.active a {
+	color: #212121 !important;
+    background: #03A9F4 !important;
+}
+
+ul.nav-wizard li.active:after {
+	border-left-color: #03A9F4 !important;
+}
+
+ul.nav-wizard {
+	border: none !important;
+}
+
+ul.nav-wizard li a {
+	color: #8BC34A;
+}
+
+.btn-primary {
+	color: #fff !important;
+    background-color: #0288D1 !important;
+    border-color: #0288D1 !important;
+}
+
+.btn-success {
+	color: #fff !important;
+    background-color: #8BC34A !important;
+    border-color: #8BC34A !important;
+}
+
+.has-success .form-control {
+	border-color: #8BC34A !important;
+}
+
+.has-success .form-control-feedback {
+	color: #8BC34A !important;
+}
+
+#noPdfMessage
+{
+	color: #D32F2F !important;
+}
+
+.has-error .form-control {
+	border-color: #D32F2F !important;
+}
+
+.has-error .form-control-feedback {
+	color: #D32F2F !important;
+}
+
+#ResultInfoText {
+	color: white;
+}
+
+#FormBox h5 {
+	color: white;
+}
+
+.ImageBox {
+	color: white;
+}
+
+/* Colors End */
+
+.ImageBox {
+	width: 100px;
+	height: 125px;
+	text-align:center;
+}
+
+.ImageBox:hover {
+	cursor:hand;
+	cursor:pointer;
+	border: 1px dashed;
+}
+
+#FormBox h5 {
+	text-align:center;
+}
+
+#ResultInfoText {
+	margin-left: 2em;
+	margin-right: 2em;
+	font-size: 16px;
+}
+
+#PageTitle {
+	font-weight: bold;
+	font-size: 150%;
+}
+
+.container {
+	border: 0.125em solid;
+	border-color: #66A3FF;
+	box-shadow: 0em 0em 1em #333333;
+	margin-bottom: 0em;
+	margin-left: 5em;
+	margin-right: 5em;
 }
 
 footer {
@@ -252,12 +371,6 @@ ul.nav-wizard li a {
 	margin-left: 0.5em;
 }
 
-#PageTitle {
-	color: grey;
-	font-weight: bold;
-	font-size: 150%;
-}
-
 iframe {
  	border: none;
 /*	min-width:5em; */
@@ -310,30 +423,11 @@ body.wait, body.wait *{
 	margin-top: 15em;;
 }
 
-#ResultInfoText {
-	margin-left: 2em;
-	margin-right: 2em;
-	font-size: 16px;
-	color: #286090;
-}
-
 #DownloadResultButton {
 	margin-left: auto;
 	margin-right: auto;
 	width: 15em;
 	display: block;
-}
-
-.ImageBox {
-	width: 100px;
-	height: 125px;
-	text-align:center;
-}
-
-.ImageBox:hover {
-	cursor:hand;
-	cursor:pointer;
-	border: 1px dashed;
 }
 
 .BKUImage {
@@ -435,10 +529,6 @@ body.wait, body.wait *{
 	}
 }
 
-#FormBox h5 {
-	text-align:center;
-}
-
 #FormBox {
 	width: 20em;
 }
@@ -480,17 +570,6 @@ body.wait, body.wait *{
 	display: flex;
 	justify-content: center; 
 	align-items: center; 
-}
-
-.container {
-	border: 0.125em solid;
-	border-color: #66A3FF;
-	background: #E8F4FF;
-	box-shadow: 0em 0em 1em #333333;
-	margin-bottom: 0em;
-	margin-left: 5em;
-	margin-right: 5em;
-	
 }
 
 .container h3 {
@@ -545,11 +624,6 @@ body.wait, body.wait *{
 
 .white_content a {
 	z-index: 3000;
-}
-
-#noPdfMessage
-{
-	color: red;
 }
 
 #ContinueButtonBox {

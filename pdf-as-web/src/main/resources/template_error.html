@@ -8,20 +8,11 @@ Error Page:
 <p>##ERROR_MESSAGE##</p>
 <p>##ERROR_STACK##</p>
 <script type="text/javascript">
-	try {
-	var data = {
-	    pdfas: {
-	    	error: true,
-	        msg: "##ERROR_MESSAGE##"
-		}
-	}
 
-	parent.postMessage(data, '##PUBLICURL##');
-	} catch(error) {
-		if(window.console) {
-			window.console.log("Sending message failed! to parent: " + parent, error);
-		}
-	}
+	console.log("sending error msg to parent: " + parent);
+	window.parent.respond("##PDFDATAURL##", false);
+
+
 </script>
 </body>
 </html>

@@ -403,7 +403,7 @@ function sign(file, connector, locale) {
 	form.method = "POST";
 	form.action = "Sign";
 	form.target = "mobileSignOnFrame";
-	form.enctype = "multipart/form-data";
+	form.enctype = "application/x-www-form-urlencoded";
 	
 	var input = document.createElement('input');
    	input.type = 'hidden';

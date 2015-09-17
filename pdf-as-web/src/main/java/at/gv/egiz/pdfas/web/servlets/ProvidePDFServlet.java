@@ -90,7 +90,11 @@ public class ProvidePDFServlet extends HttpServlet {
 				
 				String template = PdfAsHelper.getProvideTemplate();
 				template = template.replace(PDF_DATA_URL, PdfAsHelper.generatePdfURL(request, response));
-				template = template.replace(PUBLIC_URL, WebConfiguration.getPublicURL());
+				if(WebConfiguration.getPublicURL() != null) {
+					template = template.replace(PUBLIC_URL, WebConfiguration.getPublicURL());
+				} else {
+					template = template.replace(PUBLIC_URL, "");
+				}
 				// Deliver to Browser directly!
 				response.setContentType("text/html");
 				response.getWriter().write(template);

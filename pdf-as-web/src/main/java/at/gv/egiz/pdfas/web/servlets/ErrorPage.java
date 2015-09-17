@@ -165,7 +165,11 @@ public class ErrorPage extends HttpServlet {
 					template = template.replace(ERROR_STACK, "");
 				}
 
-				template = template.replace(PUBLIC_URL, WebConfiguration.getPublicURL());
+				if(WebConfiguration.getPublicURL() != null) {
+					template = template.replace(PUBLIC_URL, WebConfiguration.getPublicURL());
+				} else {
+					template = template.replace(PUBLIC_URL, "");
+				}
 				
 				response.setContentType("text/html");
 				response.getWriter().write(template);

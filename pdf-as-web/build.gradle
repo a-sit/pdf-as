@@ -188,3 +188,8 @@ releases.dependsOn sourcesJar
 releases.dependsOn war
 releases.dependsOn releaseConfig
 releases.dependsOn buildTomcatTar
+
+
+jettyRun.doFirst { 
+	System.setProperty("pdf-as-web.conf", project.projectDir.toString() + "/src/test/pdf-as-web.properties") 
+}

@@ -281,7 +281,7 @@ function registerSignaturePlacementEventHandlers() {
 		var current_scale = PDFViewerApplication.pdfViewer.currentScale;
 		var sig_size = Math.floor(96 * current_scale);
 		console.log("Signature resizing: " + sig_size);
-		var image_source = global_status.applicationContext + "/visblock?r=" + sig_size.toString();	
+		var image_source = global_status.applicationContext + "visblock?r=" + sig_size.toString();	
 		
 		$("#img_signature").attr("src", image_source);
 		
@@ -351,7 +351,7 @@ function placeSignature(evt, page_to_place, s) {
 	var sig_size = Math.floor(96 * current_scale);
 	//sig_size = 300;
 	console.log("Signature resolution: " + sig_size);
-	var image_source = global_status.applicationContext + "/visblock?r=" + sig_size.toString();
+	var image_source = global_status.applicationContext + "visblock?r=" + sig_size.toString();
 	var defaultSignature = "<img src='" + image_source + "' alt='Signature' id='img_signature' class='cl_signature' draggable='true' style='position: absolute; z-index:4; " +
 	"cursor:move; left:" + left_pos + "; top:" + top_pos + ";'>";
 

@@ -471,9 +471,7 @@ function updateSignaturePosition(signature) {
 	signature.posx = Math.floor(x / current_scale / (4.0/3.0)).toString();
 	signature.posy = Math.floor((parseInt(canvas_height) - (y)) / current_scale / (4.0/3.0)).toString();
 		
-	
-	//console.log("last x: last y: " + $("#img_signature").css("left") + " " + $("#img_signature").css("top"));
-	
+		
 	last_left = $("#img_signature").css("left");
 	last_top = $("#img_signature").css("top");
 }
@@ -649,7 +647,7 @@ function quickSign(connector, pdfurl) {
 //to decide what action should happen. Currently it only calls
 //the sign servlet.
 //
-function sign(statusObj) {
+function sign(statusObj) { // this is never used..?
 	var file = statusObj.getFile();
 	if(!file) {
 		alert("No File Opened");

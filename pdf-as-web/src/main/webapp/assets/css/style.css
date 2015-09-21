@@ -8,7 +8,7 @@ body {
 	font-family: 'OpenSans', sans-serif;
 }
 
-/* Colors */
+/* Colors -> Stick to Google's Material Design Color Scheme */ 
 body {
 	background-color: #9E9E9E !important;
 }

@@ -121,6 +121,10 @@ function registerEventListeners() {
 		$("#DownloadResultButton").attr("disabled", "disabled");
 		$("#DownloadResultButton").attr("title", "The download is valid only once!");
 		$("#DownloadResultButton").css("pointer-events", "none");
+		
+		window.open($("#DownloadResultButton").attr("href"));
+		
+		//return false;
 	});
 	
 	
@@ -383,21 +387,6 @@ function sign(file, connector, locale) {
 		alert("No file selected");
 		return
 	}
-	/*var fd = new FormData();
-	fd.append("source", "internal");
-	fd.append("pdf-file", file);
-	fd.append("connector", connector);
-	fd.append("locale", locale); */
-	
-	/*var parameters = {
-			source: "internal",
-			pdf-file: file,
-			connector: connector,
-			locale: local,
-			sig-pos-x: null,
-			sig-pos-y: null,
-			sig-pos-p: null
-	}; */
 	
 	var form = document.createElement('form');
 	form.method = "POST";
@@ -460,7 +449,7 @@ function sign(file, connector, locale) {
 	   	input = document.createElement('input');
 	   	input.type = 'hidden';
 	   	input.name = "pdf-file-b64";
-	   	input.value = result; // former: file
+	   	input.value = result;
 	   	form.appendChild(input);
 	   	
 	   	input = document.createElement('input');
@@ -479,13 +468,6 @@ function sign(file, connector, locale) {
 		if(ifr.isSignaturePlaced()) { //Signature has been manually placed
 			
 			console.log("signature manually placed: x: y:" + ifr.global_status.getSignature().posx + ", " + ifr.global_status.getSignature().posy)
-			/*fd.append("sig-pos-x", ifr.global_status.getSignature().posx);
-			fd.append("sig-pos-y", ifr.global_status.getSignature().posy);
-			fd.append("sig-pos-p", ifr.global_status.getSignature().page); */
-			
-			/*parameters.sig-pos-x = ifr.global_status.getSignature().posx;
-			parameters.sig-pos-y = ifr.global_status.getSignature().posy;
-			parameters.sig-pos-p = ifr.global_status.getSignature().page; */
 			
 			input = document.createElement('input');
 		   	input.type = 'hidden';
@@ -508,8 +490,6 @@ function sign(file, connector, locale) {
 		else if(place_on_new_page)
 		{
 			console.log("signature will be placed on a new page");
-			/*fd.append("sig-pos-p", "new"); */
-		/*	parameters.sig-pos-p = "new"; */
 			
 			input = document.createElement('input');
 		   	input.type = 'hidden';
@@ -528,88 +508,9 @@ function sign(file, connector, locale) {
 		$("#methodContainer").hide();
 		$("#mobileSignOnFrame").show();
 		form.submit();
+		$("body").removeClass("wait");
 	
    	}
-
-/*	$.ajax({
-		url: "Sign",
-		data: fd,
-		processData: false,
-		contentType: false,
-		type: "POST",
-		xhrFields: {
-		      withCredentials: true
-		},
-		success: function(response) {
-			console.log("hello there, response is: " + response);
-			
-			if(mobile_success)
-			{
-				console.log("mobile success...now switch html");
-				$("#methodContainer").hide();
-				$("#mobileSignOnFrame").show();
-				$("#mobileSignOnFrame").contents().find('html').empty();
-				$("#mobileSignOnFrame").contents().find('html').html(response);
-				mobile_success = false;
-				
-			}
-			else if(local_success)
-			{
-				console.log("local success...now switch html, nothing for now");
-				$("#methodContainer").hide();
-				$("#mobileSignOnFrame").show();
-				$("#mobileSignOnFrame").contents().find('html').empty();
-				$("#mobileSignOnFrame").contents().find('html').html(response);
-				local_success = false;
-			}
-			else if(keystore_success)
-			{
-				/*console.log("keystore success...now switch html"); // put this into success function in document ready()
-				$("#DownloadResultButton").attr("href", response);
-				
-				var insertIndex = file.name.indexOf(".pdf");
-				
-				var download_name = file.name.insertAt(insertIndex, "_signed");
-				$("#DownloadResultButton").attr("download", download_name);
-				
-				$("#FinishStepButton").click(); */ /*
-				$("#methodContainer").hide();
-				$("#mobileSignOnFrame").show();
-				$("#mobileSignOnFrame").contents().find('html').empty();
-				$("#mobileSignOnFrame").contents().find('html').html(response);
-				keystore_success = false;
-			}
-			else
-			{
-				$("#methodContainer").show();
-				$("#mobileSignOnFrame").hide();
-			} 
-			
-			// switch the html of the iframe
-			
-			
-			$("body").removeClass("wait");
-			
-			console.log("finished switching html");
-			
-			
-			
-			//$("html").empty();
-			//$("html").html(response);
-			/*
-			$("#fade").remove();
-			$("#popup").remove();
-			var fade_div = "<div id='fade' class='black_overlay'></div>";
-			var popup_div = "<div id='popup' class='white_content'><a href='javascript:void(0)' id='closelink'>Close</a><div id='resp'></div></div>"
-			$("body").append(fade_div);
-			$("body").append(popup_div);
-			$("#resp").html(response);
-			$("#closelink").bind("click", function(evt) {
-				$("#fade").remove();
-				$("#popup").remove();
-			});*/  /*
-		}
-	}); */
 }
 
 //
@@ -658,7 +559,6 @@ $(document).ready(function() {
 });
 
 function respond(arg, success) { // called when user successfully signed with mobile / card
-	 //document.getElementById("demo").innerHTML = arg;
 		console.log("recieved response after server contact, arg: " + arg + ", success: " + success);
 		
 		
@@ -674,7 +574,7 @@ function respond(arg, success) { // called when user successfully signed with mo
 		var insertIndex = file.name.indexOf(".pdf");
 		
 		var download_name = file.name.insertAt(insertIndex, "_signed");
-		$("#DownloadResultButton").attr("download", download_name);
+		//$("#DownloadResultButton").attr("download", download_name);
 		$("#methodContainer").show();
 		$("#mobileSignOnFrame").hide();
 		$("#FinishStepButton").click();

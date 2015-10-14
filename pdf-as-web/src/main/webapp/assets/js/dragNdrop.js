@@ -122,7 +122,7 @@ function registerEventListeners() {
 		$("#DownloadResultButton").attr("title", "The download is valid only once!");
 		$("#DownloadResultButton").css("pointer-events", "none");
 		
-		window.open($("#DownloadResultButton").attr("href"));
+		//window.open($("#DownloadResultButton").attr("href"));
 		
 		//return false;
 	});

@@ -75,9 +75,18 @@ public class PdfAsParameterExtractor {
 	public static final String PARAM_OVERWRITE_PREFIX = "ov:";
 	public static final String PARAM_QRCODE_CONTENT = "qrcontent";
 	public static final String PARAM_USER_POSITIONING = "upos";
+	public static final String PARAM_BASE64 = "base64";
 	
 	public static boolean isUserPositioning(HttpServletRequest request) {
 		String paramerterValue = (String)request.getAttribute(PARAM_USER_POSITIONING);
+		if(paramerterValue != null) {
+			return Boolean.parseBoolean(paramerterValue);
+		} 
+		return false;
+	}
+	
+	public static boolean isBase64(HttpServletRequest request) {
+		String paramerterValue = (String)request.getAttribute(PARAM_BASE64);
 		if(paramerterValue != null) {
 			return Boolean.parseBoolean(paramerterValue);
 		} 

@@ -18,6 +18,29 @@ var local_success = false;
 var keystore_success = false;
 var place_on_new_page = false;
 
+function getArrayBuffer(data) {
+    if (typeof data !== 'string') {
+      return data;
+    }
+    var length = data.length;
+    var array = new Uint8Array(length);
+    for (var i = 0; i < length; i++) {
+      array[i] = data.charCodeAt(i) & 0xFF;
+    }
+    return array.buffer;
+}
+
+function getArrayBase64(base64) {
+	var raw = window.atob(base64);
+	var rawLength = raw.length;
+	var array = new Uint8Array(new ArrayBuffer(rawLength));
+
+	for (i = 0; i < rawLength; i++) {
+	    array[i] = raw.charCodeAt(i);
+	}
+	return array;
+}
+
 function registerEventListeners() {
 	var locale = "EN";
 	var connector = "mobilebku";
@@ -122,7 +145,22 @@ function registerEventListeners() {
 		$("#DownloadResultButton").attr("title", "The download is valid only once!");
 		$("#DownloadResultButton").css("pointer-events", "none");
 		
-		//window.open($("#DownloadResultButton").attr("href"));
+		/*
+		var isFileSaverSupported = false;
+		try {
+		    isFileSaverSupported = !!new XMLHttpRequest;
+		} catch (e) {}
+		
+		if(isFileSaverSupported) {
+			evt.preventDefault();
+			$.get( $("#DownloadResultButton").attr("href") + "?base64=true", function( data ) {
+				var array = getArrayBase64(data);
+				saveAs(new Blob([array], { type: "application/pdf" }), "signed.pdf");
+			});
+		}
+		*/
+		evt.preventDefault();
+		window.open($("#DownloadResultButton").attr("href"));
 		
 		//return false;
 	});
@@ -590,7 +628,7 @@ function toggleLanguage()
 	{
 		$("#LanguageDisplay").html
 		(
-				"<span class='label label-info'><span class='flag-icon flag-icon-de'></span> DE</span>"
+				"<span class='label label-info'><span class='flag-icon flag-icon-at'></span> AT</span>"
 		);
 		
 		default_language = "en";

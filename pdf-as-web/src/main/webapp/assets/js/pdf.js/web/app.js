@@ -458,8 +458,6 @@ function makeSignatureDraggable(signature) {
 //
 function updateSignaturePosition(signature) {
 	var page = signature.page;
-	var canvas_height = $("#page" + page.toString()).attr("height");
-	var current_scale = PDFViewerApplication.pdfViewer.currentScale;
 	var thisPos = $(signature.sig).position();
 	var x;
 	var y;
@@ -467,9 +465,10 @@ function updateSignaturePosition(signature) {
 	x = thisPos.left;
 	y = thisPos.top; 
 
+	var pdfPos = PDFViewerApplication.pdfViewer.pages[page-1].viewport.convertToPdfPoint(x, y);
 
-	signature.posx = Math.floor(x / current_scale / (4.0/3.0)).toString();
-	signature.posy = Math.floor((parseInt(canvas_height) - (y)) / current_scale / (4.0/3.0)).toString();
+	signature.posx = pdfPos[0];
+	signature.posy = pdfPos[1];
 		
 		
 	last_left = $("#img_signature").css("left");

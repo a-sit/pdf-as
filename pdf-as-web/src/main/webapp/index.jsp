@@ -10,6 +10,8 @@
 	<script src="assets/js/jquery.min.js"></script>
 	<script src="assets/js/jquery-ui.min.js"></script>
 	<script src="assets/js/pdf.js/build/pdf.js"></script>
+	<script src="assets/js/Blob.js"></script>
+	<script src="assets/js/FileSaver.min.js"></script>
 	<script src="assets/js/dragNdrop.js"></script>
 	<script src="assets/js/jquery-lang.js"></script>
 	<script src="assets/js/js.cookie.js"></script>
@@ -36,7 +38,7 @@
 	<!-- Header -->
 	<div class="row" id="LanguageSwitchContainer">
 	<h2 id="PageTitle" class="pull-left" lang="en">PDF-Signature Online</h2>
-	<h4 id="LanguageDisplay" class="pull-right"><span class="label label-info"><span class="flag-icon flag-icon-de"></span> DE</span></h4>
+	<h4 id="LanguageDisplay" class="pull-right"><span class="label label-info"><span class="flag-icon flag-icon-at"></span> AT</span></h4>
 	</div>
 <div class="row center">
 	  <div class="" id="navBar">

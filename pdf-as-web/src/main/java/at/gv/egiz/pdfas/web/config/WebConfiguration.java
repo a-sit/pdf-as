@@ -49,6 +49,7 @@ public class WebConfiguration implements IConfigurationConstants {
 	public static final String PDF_AS_WORK_DIR = "pdfas.dir";
 	public static final String STATISTIC_BACKEND_LIST = "statistic.backends";
 	public static final String ALLOW_EXT_OVERWRITE = "allow.ext.overwrite";
+	public static final String ACCESSCOUNT = "accesscount";
 	
 	public static final String ALLOW_EXT_WHITELIST_VALUE_PRE = "ext.overwrite.wl.";
 	
@@ -512,6 +513,19 @@ public class WebConfiguration implements IConfigurationConstants {
 			}
 		}
 		return false;
+	}
+	
+	public static int getAccessCount() {
+		String value = properties.getProperty(ACCESSCOUNT);
+		int ivalue = 1;
+		if (value != null) {
+			try {
+				ivalue = Integer.parseInt(value);
+			} catch(NumberFormatException e) {
+				logger.warn(ACCESSCOUNT + " not a number", e);
+			}
+		}
+		return ivalue;
 	}
 	
 	public static int getFilesizeThreshold() {

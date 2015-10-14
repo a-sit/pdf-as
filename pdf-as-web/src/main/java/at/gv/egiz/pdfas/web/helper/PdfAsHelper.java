@@ -127,6 +127,7 @@ public class PdfAsHelper {
 	private static final String PRE_PROCESSOR_MAP = "PREPROCMAP";
 	private static final String OVERWRITE_MAP = "OVERWRITEMAP";
 	private static final String KEYID = "KEYID";
+	private static final String SESSION_ACCESS = "SESSION_ACCESS";
 
 	private static final String POSITIONING_URL = "/assets/js/pdf.js/web/viewer.html";
 
@@ -1229,7 +1230,7 @@ public class PdfAsHelper {
 	}
 
 	public static void regenerateSession(HttpServletRequest request) {
-		request.getSession(false).invalidate();
+		request.getSession(true).invalidate();
 		request.getSession(true);
 	}
 
@@ -1538,6 +1539,25 @@ public class PdfAsHelper {
 			}
 		}
 		return false;
+	}
+	
+	public static boolean isSessionAccessCounter(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute(SESSION_ACCESS);
+		if (obj == null) {
+			Integer value = 0;
+			session.setAttribute(SESSION_ACCESS, value);
+			obj = value;
+		} 
+		
+		if (obj instanceof Integer) {
+			Integer count = (Integer) obj;
+			count++;
+			session.setAttribute(SESSION_ACCESS, count);
+			return (count < WebConfiguration.getAccessCount());
+		} else {
+			return false;
+		}
 	}
 
 	public static String getVersion() {

@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ public class PDFData extends HttpServlet {
 	protected void process(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		byte[] signedData = PdfAsHelper.getSignedPdf(request, response);
-
+		
 		StatisticEvent statisticEvent = PdfAsHelper.getStatisticEvent(request,
 				response);
 
@@ -126,13 +127,22 @@ public class PDFData extends HttpServlet {
 				response.setHeader("ValueCheckCode",
 						String.valueOf(resp.getValueCode()));
 			}
+			
+			//if(PdfAsParameterExtractor.isBase64(request)) {
+			//	signedData = Base64.encodeBase64(signedData);
+			//}
+			
+			response.setContentLength(signedData.length);
+			
 			response.setContentType("application/pdf");
 			OutputStream os = response.getOutputStream();
 			os.write(signedData);
 			os.close();
 
 			// When data is collected destroy session!
-			request.getSession().invalidate();
+			if(!PdfAsHelper.isSessionAccessCounter(request)) {
+				request.getSession().invalidate();
+			}
 		} else {
 			PdfAsHelper.setSessionException(request, response,
 					"No signed pdf document available.", null);

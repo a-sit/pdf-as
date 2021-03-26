@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
@@ -32,17 +32,17 @@ sourceSets{
 }
 			   
 dependencies {
-	compile project (':pdf-as-lib')
-	compile project (':signature-standards:sigs-pkcs7detached')
-	compile project (':signature-standards:sigs-pades')
-	compile project (':pdf-as-moa')
-	pdfBox1Compile project (':pdf-as-pdfbox')
-	pdfBox2Compile project (':pdf-as-pdfbox-2')
-    compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
-	compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
-	compile group: 'javax.activation', name: 'activation', version: '1.1.1'
-	compile 'ch.qos.logback:logback-classic:1.1.2'
-    testCompile group: 'junit', name: 'junit', version: '4.+'
+	implementation project (':pdf-as-lib')
+	implementation project (':signature-standards:sigs-pkcs7detached')
+	implementation project (':signature-standards:sigs-pades')
+	implementation project (':pdf-as-moa')
+	pdfBox1Implementation project (':pdf-as-pdfbox')
+	pdfBox2Implementation project (':pdf-as-pdfbox-2')
+    implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+	implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
+	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
+	implementation 'ch.qos.logback:logback-classic:1.1.2'
+    testImplementation group: 'junit', name: 'junit', version: '4.+'
 }
 
 
@@ -67,31 +67,29 @@ task pdfbox1Startscript(type: CreateStartScripts) {
 }
 
 distZip {
-	baseName = archivesBaseName
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    into("${baseName}-${version}/lib") {
+    into("${archiveBaseName}-${archiveVersion}/lib") {
         from startScripts.classpath
     }
-    into("${baseName}-${version}/lib") {
+    into("${archiveBaseName}-${archiveVersion}/lib") {
         from pdfbox1Startscript.classpath
     }
-    into("${baseName}-${version}/bin") {
+    into("${archiveBaseName}-${archiveVersion}/bin") {
         from pdfbox1Startscript
     }
 }
 
 distTar {
-    baseName = archivesBaseName
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    into("${baseName}-${version}/lib") {
+	
+    into("${archiveBaseName}-${archiveVersion}/lib") {
         from startScripts.classpath
     }
-    into("${baseName}-${version}/lib") {
+    into("${archiveBaseName}-${archiveVersion}/lib") {
         from pdfbox1Startscript.classpath
     }
-    into("${baseName}-${version}/bin") {
+    into("${archiveBaseName}-${archiveVersion}/bin") {
         from pdfbox1Startscript
     }
 }

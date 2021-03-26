@@ -50,7 +50,7 @@ dependencies {
 	api project (':pdf-as-moa')
 	api project (':signature-standards:sigs-pkcs7detached')
 	api project (':signature-standards:sigs-pades')
-	pdfbox1 project (':pdf-as-pdfbox')
+	// pdfbox1 project (':pdf-as-pdfbox')
 	api project (':pdf-as-web-status')
 	api project (':pdf-as-web-statistic-api')
 	api group: 'commons-fileupload', name: 'commons-fileupload', version: '1.3.1'

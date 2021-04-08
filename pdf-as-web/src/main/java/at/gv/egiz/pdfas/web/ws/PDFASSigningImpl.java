@@ -104,7 +104,7 @@ public class PDFASSigningImpl implements PDFASSigning {
 					|| request.getParameters().getConnector()
 							.equals(Connector.JKS)) {
 				// Plain server based signatures!!
-				response = PdfAsHelper.synchornousServerSignature(
+				response = PdfAsHelper.synchronousServerSignature(
 						request.getInputData(), request.getParameters());
 
 				VerifyResult verifyResult = null;
@@ -112,7 +112,7 @@ public class PDFASSigningImpl implements PDFASSigning {
 						request.getVerificationLevel().equals(
 						VerificationLevel.FULL_CERT_PATH)) {
 					List<VerifyResult> verResults = PdfAsHelper
-							.synchornousVerify(
+							.synchronousVerify(
 									response.getSignedPDF(),
 									-1,
 									SignatureVerificationLevel.FULL_VERIFICATION, 
@@ -125,7 +125,7 @@ public class PDFASSigningImpl implements PDFASSigning {
 					verifyResult = verResults.get(verResults.size() - 1);
 				} else {
 					List<VerifyResult> verResults = PdfAsHelper
-							.synchornousVerify(
+							.synchronousVerify(
 									response.getSignedPDF(),
 									-1,
 									SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION, 

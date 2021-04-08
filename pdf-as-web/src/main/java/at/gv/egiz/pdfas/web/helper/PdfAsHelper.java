@@ -301,7 +301,7 @@ public class PdfAsHelper {
 		return sb.toString();
 	}
 
-	public static List<VerifyResult> synchornousVerify(
+	public static List<VerifyResult> synchronousVerify(
 			HttpServletRequest request, HttpServletResponse response,
 			byte[] pdfData) throws Exception {
 		String signidxString = PdfAsParameterExtractor.getSigIdx(request);
@@ -332,9 +332,9 @@ public class PdfAsHelper {
 		return results;
 	}
 
-	public static List<VerifyResult> synchornousVerify(byte[] pdfData,
-			int signIdx, SignatureVerificationLevel lvl,
-			Map<String, String> preProcessor) throws Exception {
+	public static List<VerifyResult> synchronousVerify(byte[] pdfData,
+																										 int signIdx, SignatureVerificationLevel lvl,
+																										 Map<String, String> preProcessor) throws Exception {
 		logger.debug("Verifing Signature index: " + signIdx);
 
 		Configuration config = pdfAs.getConfiguration();
@@ -522,8 +522,8 @@ public class PdfAsHelper {
 	 * @return The signed pdf data
 	 * @throws Exception
 	 */
-	public static PDFASSignResponse synchornousServerSignature(byte[] pdfData,
-			PDFASSignParameters params) throws Exception {
+	public static PDFASSignResponse synchronousServerSignature(byte[] pdfData,
+																														 PDFASSignParameters params) throws Exception {
 		Configuration config = pdfAs.getConfiguration();
 
 		if (WebConfiguration.isAllowExtOverwrite() && params.getOverrides() != null) {
@@ -1283,7 +1283,7 @@ public class PdfAsHelper {
 			baos.close();
 
 			PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
-			List<VerifyResult> verResults = PdfAsHelper.synchornousVerify(
+			List<VerifyResult> verResults = PdfAsHelper.synchronousVerify(
 					baos.toByteArray(), -2,
 					PdfAsHelper.getVerificationLevel(request), null);
 

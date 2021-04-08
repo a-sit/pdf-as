@@ -1,9 +1,7 @@
 package at.gv.egiz.pdfas.web.servlets;
 
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters;
-import at.gv.egiz.pdfas.api.ws.PDFASSignRequest;
 import at.gv.egiz.pdfas.api.ws.PDFASSignResponse;
-import at.gv.egiz.pdfas.api.ws.VerificationLevel;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
@@ -15,10 +13,8 @@ import at.gv.egiz.pdfas.web.helper.JSONStartResponse;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
-import at.gv.egiz.pdfas.web.store.RequestStore;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.json.HTTP;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +23,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.WebServiceException;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Andreas Fitzek on 6/23/16.
@@ -142,13 +135,13 @@ public class JSONAPIServlet extends HttpServlet {
             if (PDFASSignParameters.Connector.MOA.equals(connectorEnum)
                     || PDFASSignParameters.Connector.JKS.equals(connectorEnum)) {
                 // Plain server based signatures!!
-                PDFASSignResponse pdfasSignResponse = PdfAsHelper.synchornousServerSignature(
+                PDFASSignResponse pdfasSignResponse = PdfAsHelper.synchronousServerSignature(
                         inputDocument, parameters);
 
                 VerifyResult verifyResult = null;
 
                 List<VerifyResult> verResults = PdfAsHelper
-                           .synchornousVerify(
+                           .synchronousVerify(
                                     pdfasSignResponse.getSignedPDF(),
                                     -1,
                                     VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION,

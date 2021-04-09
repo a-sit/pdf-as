@@ -37,7 +37,8 @@ dependencies {
 	implementation project (':signature-standards:sigs-pades')
 	implementation project (':pdf-as-moa')
 	//pdfBox1Implementation project (':pdf-as-pdfbox')
-	pdfBox2Implementation project (':pdf-as-pdfbox-2')
+	//pdfBox2Implementation project (':pdf-as-pdfbox-2')
+    implementation project (':pdf-as-pdfbox-2')
     implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
 	implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
 	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'

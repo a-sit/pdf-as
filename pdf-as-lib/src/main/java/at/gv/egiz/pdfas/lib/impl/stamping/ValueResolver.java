@@ -28,6 +28,7 @@ import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.lib.impl.status.ICertificateProvider;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
 
+import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,29 +61,18 @@ public class ValueResolver implements IProfileConstants, IResolver {
 	private static final Charset UTF_8 = Charset.forName("UTF-8");
 
 
-	private IResolver internalCertificateResolver;
-	private IResolver internalRequestParameterResolver;
+	private IResolver internalResolver;
 	public ValueResolver(ICertificateProvider certProvider, OperationStatus operationStatus) {
-		internalCertificateResolver = new CertificateResolver(
-				certProvider.getCertificate(), operationStatus);
-		Map<String, String> test = new HashMap<>();
-		test.put("schoolNameRand", RandomStringUtils.randomAlphabetic(5));
-		test.put("schoolName", "EGIZ testschule");
-
-		test.put("subject","bbbbb");
-		internalRequestParameterResolver = new RequestParameterResolver(test);
+//		Map<String, String> test = new HashMap<>();
+//		test.put("schoolNameRand", RandomStringUtils.randomAlphabetic(5));
+//		test.put("schoolName", "EGIZ testschule");
+//
+//		test.put("subject","bbBbb");
+//		internalRequestParameterResolver = new RequestParameterResolver(test);
+		internalResolver = new CertificateAndRequestParameterResolver(certProvider.getCertificate(),
+				operationStatus);
 	}
-	
-	public ValueResolver(OperationStatus operationStatus) {
-		Map<String, String> test = new HashMap<>();
-		test.put("schoolNameRand", RandomStringUtils.randomAlphabetic(5));
-		test.put("schoolName", "EGIZ testschule");
 
-		test.put("subject","bbbbb");
-		internalRequestParameterResolver = new RequestParameterResolver(test);
-
-	}
-	
 	public String resolve(String key, String value,
 			SignatureProfileSettings settings) {
 
@@ -126,13 +116,8 @@ public class ValueResolver implements IProfileConstants, IResolver {
 					result += tmp1;
 					curidx = idxe;
 					String tmpValue = matcher.group(1);
-					if(!tmpValue.contains(DYNAMIC_REQUEST_PARAMETERS)) {
-						String tmp = internalCertificateResolver.resolve(key, tmpValue, settings);
-						result += tmp;
-					}else {
-						String tmp2 = internalRequestParameterResolver.resolve(key, tmpValue, settings);
-						result += tmp2;
-					}
+					String tmp2 = internalResolver.resolve(key, tmpValue, settings);
+					result += tmp2;
 				} while (matcher.find());
 			} else {
 				result = value;

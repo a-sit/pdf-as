@@ -80,4 +80,12 @@ public interface PdfAsParameter {
 	 * @param map the map
 	 */
 	public void setPreprocessorArguments(Map<String, String> map);
+
+	/**
+	 * Sets the dynamic signatur block values.
+	 *
+	 * @param map the map
+	 */
+	public void setDynamicSignatureBlockArguments(Map<String, String> map);
+
 }

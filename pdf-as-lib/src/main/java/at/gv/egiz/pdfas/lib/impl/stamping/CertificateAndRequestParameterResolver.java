@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.stamping;
 
+import at.gv.egiz.pdfas.common.settings.IProfileConstants;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.common.utils.DNUtils;
 import at.gv.egiz.pdfas.common.utils.OgnlUtils;
@@ -30,26 +31,24 @@ import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
 import iaik.x509.X509Certificate;
 import ognl.AbstractMemberAccess;
 import ognl.MemberAccess;
-import ognl.Ognl;
 import ognl.OgnlContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.InvalidNameException;
-
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CertificateResolver implements IResolver {
+public class CertificateAndRequestParameterResolver implements IResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(CertificateResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(CertificateAndRequestParameterResolver.class);
 
     private OgnlContext ctx;
     private X509Certificate certificate;
 
-    public CertificateResolver(X509Certificate certificate, OperationStatus operationStatus) {
+    public CertificateAndRequestParameterResolver(X509Certificate certificate, OperationStatus operationStatus) {
         this.certificate = certificate;
 
         MemberAccess memberAccess = new AbstractMemberAccess() {
@@ -61,6 +60,9 @@ public class CertificateResolver implements IResolver {
         };
                 
         this.ctx = new OgnlContext(null, null, memberAccess);
+
+        this.ctx = new OgnlContext(null, null, memberAccess);
+        this.ctx.put(IProfileConstants.DYNAMIC_REQUEST_PARAMETERS, operationStatus.getRequestParameters());
 
         this.ctx.put("sn", this.certificate.getSerialNumber().toString());
         

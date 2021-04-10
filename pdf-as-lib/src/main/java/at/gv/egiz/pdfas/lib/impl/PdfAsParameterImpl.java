@@ -36,7 +36,7 @@ protected Configuration configuration;
 	protected DataSource dataSource;
 	protected String transactionId;
 	protected Map<String, String> preProcessorProps;
-	
+	protected Map<String, String> dynamicSignatureBlockArgumentsMap;
 	public PdfAsParameterImpl(Configuration configuration, 
 			DataSource dataSource) {
 		this.configuration = configuration;
@@ -76,5 +76,10 @@ protected Configuration configuration;
 	@Override
 	public void setPreprocessorArguments(Map<String, String> map) {
 		this.preProcessorProps = map;
+	}
+
+	@Override
+	public void setDynamicSignatureBlockArguments(Map<String, String> map) {
+		this.dynamicSignatureBlockArgumentsMap = map;
 	}
 }

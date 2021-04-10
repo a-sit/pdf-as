@@ -229,9 +229,8 @@ public class TableFactory implements IProfileConstants {
                         String value = profile.getValue(key);
                         //String caption = getSigCaption(key);
                         //String value = getSigValue(key);
-                        ValueResolver resolver = "req".equals(type) 
-                        		? new ValueResolver(operationStatus)
-                        		: new ValueResolver(certProvider, operationStatus);
+
+                        ValueResolver resolver = new ValueResolver(certProvider, operationStatus);
                                                 
                         if (value != null) {
                             Entry c_entry = new Entry(Entry.TYPE_CAPTION, caption, key);

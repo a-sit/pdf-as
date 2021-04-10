@@ -18,7 +18,6 @@ public class RequestParameterResolver implements IResolver {
 	
 	public RequestParameterResolver(Map<String, String> requestParameters) {
 
-//        this.ctx = new OgnlContext(memberAccess, null, null, requestParameters);
 		MemberAccess memberAccess = new AbstractMemberAccess() {
 			@Override
 			public boolean isAccessible(Map context, Object target, Member member, String propertyName) {
@@ -29,10 +28,6 @@ public class RequestParameterResolver implements IResolver {
 
 		this.ctx = new OgnlContext(null, null, memberAccess);
 		this.ctx.put(IProfileConstants.DYNAMIC_REQUEST_PARAMETERS, requestParameters);
-//		for(String key : requestParameters.keySet()) {
-//			this.ctx.put(key, requestParameters.get(key));
-//		}
-
 	}
 
 	@Override

@@ -26,8 +26,10 @@ package at.gv.egiz.pdfas.cli;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -431,6 +433,13 @@ public class Main {
 		signParameter.setSignatureProfileId(profilID);
 		System.out.println("Starting signature for " + pdfFile);
 		System.out.println("Selected signature Profile " + profilID);
+
+		//TODO get values from CLI
+		Map<String, String> test = new HashMap<>();
+		test.put("schoolName", "EGIZ testschule");
+
+		test.put("subject","bbDbb");
+		signParameter.setDynamicSignatureBlockArguments(test);
 
 		SignResult result = null;
 		try {

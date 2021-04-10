@@ -82,4 +82,9 @@ protected Configuration configuration;
 	public void setDynamicSignatureBlockArguments(Map<String, String> map) {
 		this.dynamicSignatureBlockArgumentsMap = map;
 	}
+
+	@Override
+	public Map<String, String> getDynamicSignatureBlockArguments() {
+		return this.dynamicSignatureBlockArgumentsMap;
+	}
 }

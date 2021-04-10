@@ -63,12 +63,6 @@ public class ValueResolver implements IProfileConstants, IResolver {
 
 	private IResolver internalResolver;
 	public ValueResolver(ICertificateProvider certProvider, OperationStatus operationStatus) {
-//		Map<String, String> test = new HashMap<>();
-//		test.put("schoolNameRand", RandomStringUtils.randomAlphabetic(5));
-//		test.put("schoolName", "EGIZ testschule");
-//
-//		test.put("subject","bbBbb");
-//		internalRequestParameterResolver = new RequestParameterResolver(test);
 		internalResolver = new CertificateAndRequestParameterResolver(certProvider.getCertificate(),
 				operationStatus);
 	}

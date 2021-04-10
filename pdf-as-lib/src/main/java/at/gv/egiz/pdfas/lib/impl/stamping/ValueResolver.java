@@ -126,7 +126,7 @@ public class ValueResolver implements IProfileConstants, IResolver {
 					result += tmp1;
 					curidx = idxe;
 					String tmpValue = matcher.group(1);
-					if(!tmpValue.contains("dynamic")) {
+					if(!tmpValue.contains(DYNAMIC_REQUEST_PARAMETERS)) {
 						String tmp = internalCertificateResolver.resolve(key, tmpValue, settings);
 						result += tmp;
 					}else {

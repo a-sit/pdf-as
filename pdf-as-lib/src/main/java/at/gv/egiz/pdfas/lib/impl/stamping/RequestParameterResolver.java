@@ -4,6 +4,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import at.gv.egiz.pdfas.common.settings.IProfileConstants;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.common.utils.OgnlUtils;
 import ognl.AbstractMemberAccess;
@@ -27,7 +28,7 @@ public class RequestParameterResolver implements IResolver {
 		};
 
 		this.ctx = new OgnlContext(null, null, memberAccess);
-		this.ctx.put("dynamic", requestParameters);
+		this.ctx.put(IProfileConstants.DYNAMIC_REQUEST_PARAMETERS, requestParameters);
 //		for(String key : requestParameters.keySet()) {
 //			this.ctx.put(key, requestParameters.get(key));
 //		}

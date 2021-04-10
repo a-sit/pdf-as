@@ -16,15 +16,22 @@ public class RequestParameterResolver implements IResolver {
 	private OgnlContext ctx;
 	
 	public RequestParameterResolver(Map<String, String> requestParameters) {
+
+//        this.ctx = new OgnlContext(memberAccess, null, null, requestParameters);
 		MemberAccess memberAccess = new AbstractMemberAccess() {
-            @Override
-            public boolean isAccessible(Map context, Object target, Member member, String propertyName) {
-                int modifiers = member.getModifiers();
-                return Modifier.isPublic(modifiers);
-            }
-        };
-                
-        this.ctx = new OgnlContext(memberAccess, null, null, requestParameters);
+			@Override
+			public boolean isAccessible(Map context, Object target, Member member, String propertyName) {
+				int modifiers = member.getModifiers();
+				return Modifier.isPublic(modifiers);
+			}
+		};
+
+		this.ctx = new OgnlContext(null, null, memberAccess);
+		this.ctx.put("dynamic", requestParameters);
+//		for(String key : requestParameters.keySet()) {
+//			this.ctx.put(key, requestParameters.get(key));
+//		}
+
 	}
 
 	@Override

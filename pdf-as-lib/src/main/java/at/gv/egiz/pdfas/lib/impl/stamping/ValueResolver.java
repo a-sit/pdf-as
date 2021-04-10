@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -61,19 +60,27 @@ public class ValueResolver implements IProfileConstants, IResolver {
 	private static final Charset UTF_8 = Charset.forName("UTF-8");
 
 
-	private IResolver internalResolver;
-	
+	private IResolver internalCertificateResolver;
+	private IResolver internalRequestParameterResolver;
 	public ValueResolver(ICertificateProvider certProvider, OperationStatus operationStatus) {
-		internalResolver = new CertificateResolver(
+		internalCertificateResolver = new CertificateResolver(
 				certProvider.getCertificate(), operationStatus);
+		Map<String, String> test = new HashMap<>();
+		test.put("schoolNameRand", RandomStringUtils.randomAlphabetic(5));
+		test.put("schoolName", "EGIZ testschule");
+
+		test.put("subject","bbbbb");
+		internalRequestParameterResolver = new RequestParameterResolver(test);
 	}
 	
 	public ValueResolver(OperationStatus operationStatus) {
 		Map<String, String> test = new HashMap<>();
 		test.put("schoolNameRand", RandomStringUtils.randomAlphabetic(5));
-		test.put("schoolName", "EGIZ testschule");		
-		internalResolver = new RequestParameterResolver(test);
-		
+		test.put("schoolName", "EGIZ testschule");
+
+		test.put("subject","bbbbb");
+		internalRequestParameterResolver = new RequestParameterResolver(test);
+
 	}
 	
 	public String resolve(String key, String value,
@@ -115,10 +122,17 @@ public class ValueResolver implements IProfileConstants, IResolver {
 				do {
 					int idx = matcher.start(0);
 					int idxe = matcher.end(0);
-					result += value.substring(curidx, idx);
+					String tmp1 = value.substring(curidx, idx);
+					result += tmp1;
 					curidx = idxe;
-					result += internalResolver.resolve(key,
-							matcher.group(1), settings);
+					String tmpValue = matcher.group(1);
+					if(!tmpValue.contains("dynamic")) {
+						String tmp = internalCertificateResolver.resolve(key, tmpValue, settings);
+						result += tmp;
+					}else {
+						String tmp2 = internalRequestParameterResolver.resolve(key, tmpValue, settings);
+						result += tmp2;
+					}
 				} while (matcher.find());
 			} else {
 				result = value;

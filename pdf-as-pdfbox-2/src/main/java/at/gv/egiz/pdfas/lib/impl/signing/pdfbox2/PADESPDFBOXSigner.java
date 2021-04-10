@@ -218,7 +218,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
                 //Run PreflightParser for checking conformity//
                 //runPDFAPreflight(origDoc);
             }
-
+//TODO Alex
 			ValueResolver resolver = new ValueResolver(requestedSignature, pdfObject.getStatus());
 			String signerName = resolver.resolve("SIG_SUBJECT", signatureProfileSettings.getValue("SIG_SUBJECT"),
 					signatureProfileSettings);

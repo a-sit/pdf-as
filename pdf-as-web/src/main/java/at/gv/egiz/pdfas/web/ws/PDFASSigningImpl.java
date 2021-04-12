@@ -104,8 +104,8 @@ public class PDFASSigningImpl implements PDFASSigning {
 					|| request.getParameters().getConnector()
 							.equals(Connector.JKS)) {
 				// Plain server based signatures!!
-				response = PdfAsHelper.synchornousServerSignature(
-						request.getInputData(), request.getParameters());
+				response = PdfAsHelper.synchronousServerSignature(
+						request.getInputData(), request.getParameters(), request.getSignatureBlockParameters());
 
 				VerifyResult verifyResult = null;
 				if (request.getVerificationLevel() != null && 

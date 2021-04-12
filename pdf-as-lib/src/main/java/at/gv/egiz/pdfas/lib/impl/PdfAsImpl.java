@@ -148,7 +148,8 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
 			PDFObject pdfObject = signer.buildPDFObject(status);
 			//TODO verify map???
-			pdfObject.getStatus().getRequestParameters().putAll(status.getSignParamter().getDynamicSignatureBlockArguments());
+
+//			pdfObject.getStatus().getRequestParameters().putAll(status.getSignParamter().getDynamicSignatureBlockArguments());
 			status.setPdfObject(pdfObject);
 
 			// set Original PDF Document Data

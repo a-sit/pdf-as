@@ -364,11 +364,13 @@ public class PdfAsHelper {
 	 *            The Web response
 	 * @param pdfData
 	 *            The pdf data
+	 * @param dynamicSignatureBlockArguments
 	 * @return The signed pdf data
 	 * @throws Exception
 	 */
-	public static byte[] synchornousSignature(HttpServletRequest request,
-			HttpServletResponse response, byte[] pdfData) throws Exception {
+	public static byte[] synchronousSignature(HttpServletRequest request,
+																						HttpServletResponse response, byte[] pdfData,
+																						Map<String, String> dynamicSignatureBlockArguments) throws Exception {
 		validatePdfSize(request, response, pdfData);
 
 		Configuration config = pdfAs.getConfiguration();
@@ -506,6 +508,8 @@ public class PdfAsHelper {
 		// set Signature Position
 		signParameter.setSignaturePosition(buildPosString(request, response));
 
+		//set signature block parameters
+		signParameter.getDynamicSignatureBlockArguments().putAll(dynamicSignatureBlockArguments);
 		@SuppressWarnings("unused")
 		SignResult result = pdfAs.sign(signParameter);
 
@@ -522,8 +526,8 @@ public class PdfAsHelper {
 	 * @return The signed pdf data
 	 * @throws Exception
 	 */
-	public static PDFASSignResponse synchornousServerSignature(byte[] pdfData,
-			PDFASSignParameters params) throws Exception {
+	public static PDFASSignResponse synchronousServerSignature(byte[] pdfData,
+																														 PDFASSignParameters params, Map<String, String> dynamicSignatureBlockArguments) throws Exception {
 		Configuration config = pdfAs.getConfiguration();
 
 		if (WebConfiguration.isAllowExtOverwrite() && params.getOverrides() != null) {
@@ -658,6 +662,8 @@ public class PdfAsHelper {
 			signParameter.setPreprocessorArguments(params.getPreprocessor()
 					.getMap());
 		}
+		//TODO alex
+		signParameter.getDynamicSignatureBlockArguments().putAll(dynamicSignatureBlockArguments);
 
 		SignResult signResult = pdfAs.sign(signParameter);
 
@@ -771,7 +777,7 @@ public class PdfAsHelper {
 			HttpServletResponse response, ServletContext context,
 			byte[] pdfData, String connector, String position,
 			String transactionId, String profile,
-			Map<String, String> preProcessor, Map<String, String> overwrite) throws Exception {
+			Map<String, String> preProcessor, Map<String, String> overwrite, Map<String, String> dynamicSignatureBlockArguments) throws Exception {
 
 		// TODO: Protect session so that only one PDF can be signed during one
 		// session
@@ -856,6 +862,7 @@ public class PdfAsHelper {
 		// set Signature Position
 		signParameter.setSignaturePosition(position);
 
+		signParameter.setDynamicSignatureBlockArguments(dynamicSignatureBlockArguments);
 		StatusRequest statusRequest = pdfAs.startSign(signParameter);
 		session.setAttribute(PDF_STATUS, statusRequest);
 

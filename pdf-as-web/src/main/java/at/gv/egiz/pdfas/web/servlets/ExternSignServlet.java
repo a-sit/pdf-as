@@ -27,7 +27,6 @@ import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsValidationException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.common.utils.StringUtils;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
@@ -57,6 +56,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Servlet implementation class Sign
@@ -366,7 +366,11 @@ public class ExternSignServlet extends HttpServlet {
 		
 		PdfAsHelper.setSignatureDataHash(request, pdfDataHash);
 		logger.debug("Storing signatures data hash: " + pdfDataHash);
-		
+
+		//TODO alex parse??
+		Map<String, String> dynamicSignatureBlockArguments = null;
+
+
 		logger.debug("Starting signature creation with: " + connector);
 		
 		//IPlainSigner signer;
@@ -396,11 +400,12 @@ public class ExternSignServlet extends HttpServlet {
 			}
 
 			PdfAsHelper.setStatisticEvent(request, response, statisticEvent);
-			
-			PdfAsHelper.startSignature(request, response, getServletContext(), pdfData, connector, 
+
+
+			PdfAsHelper.startSignature(request, response, getServletContext(), pdfData, connector,
 					PdfAsHelper.buildPosString(request, response), transactionId, PdfAsParameterExtractor
 					.getSigType(request), PdfAsParameterExtractor.getPreProcessorMap(request), 
-					PdfAsParameterExtractor.getOverwriteMap(request));
+					PdfAsParameterExtractor.getOverwriteMap(request), dynamicSignatureBlockArguments);
 			return;
 		} else if (connector.equals("jks") || connector.equals("moa")) {
 			// start synchronous siganture creation
@@ -432,8 +437,8 @@ public class ExternSignServlet extends HttpServlet {
 				}
 			}
 
-			byte[] pdfSignedData = PdfAsHelper.synchornousSignature(request,
-					response, pdfData);
+			byte[] pdfSignedData = PdfAsHelper.synchronousSignature(request,
+					response, pdfData, dynamicSignatureBlockArguments);
 			PdfAsHelper.setSignedPdf(request, response, pdfSignedData);
 			
 			statisticEvent.setStatus(Status.OK);

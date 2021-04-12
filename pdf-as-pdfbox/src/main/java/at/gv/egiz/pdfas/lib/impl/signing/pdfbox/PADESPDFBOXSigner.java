@@ -185,7 +185,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
 				SignatureProfileSettings signatureProfileSettings = TableFactory
 						.createProfile(requestedSignature.getSignatureProfileID(), pdfObject.getStatus().getSettings());
-				
+
 				ValueResolver resolver = new ValueResolver(requestedSignature, pdfObject.getStatus());
 				String signerName = resolver.resolve("SIG_SUBJECT", signatureProfileSettings.getValue("SIG_SUBJECT"),
 						signatureProfileSettings);

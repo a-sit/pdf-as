@@ -56,7 +56,7 @@ public class OperationStatus implements Serializable {
 	private PDFASBackend backend;
 	private Map<String, String> metaInformations = new HashMap<String, String>();
 
-	private HashMap<String, String> requestParameters = new HashMap<String, String>();
+//	private HashMap<String, String> requestParameters = new HashMap<String, String>();
 
 	public OperationStatus(ISettings configuration, SignParameter signParameter, PDFASBackend backend) {
 		this.configuration = configuration;
@@ -177,7 +177,7 @@ public class OperationStatus implements Serializable {
 		return metaInformations;
 	}
 
-	public HashMap<String, String> getRequestParameters() {
-		return requestParameters;
-	}
+//	public HashMap<String, String> getRequestParameters() {
+//		return requestParameters;
+//	}
 }

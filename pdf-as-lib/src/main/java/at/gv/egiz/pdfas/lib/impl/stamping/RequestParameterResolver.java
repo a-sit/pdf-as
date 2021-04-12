@@ -27,7 +27,7 @@ public class RequestParameterResolver implements IResolver {
 		};
 
 		this.ctx = new OgnlContext(null, null, memberAccess);
-		this.ctx.put(IProfileConstants.DYNAMIC_REQUEST_PARAMETERS, requestParameters);
+		this.ctx.put(IProfileConstants.SIGNATURE_BLOCK_PARAMETER, requestParameters);
 	}
 
 	@Override

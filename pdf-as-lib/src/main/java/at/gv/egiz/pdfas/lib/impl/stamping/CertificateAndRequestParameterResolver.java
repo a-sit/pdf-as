@@ -63,7 +63,6 @@ public class CertificateAndRequestParameterResolver implements IResolver {
 
         this.ctx = new OgnlContext(null, null, memberAccess);
         this.ctx.put(IProfileConstants.SIGNATURE_BLOCK_PARAMETER, operationStatus.getSignParamter().getDynamicSignatureBlockArguments());
-//        this.ctx.put(IProfileConstants.DYNAMIC_REQUEST_PARAMETERS, operationStatus.getRequestParameters());
 
         this.ctx.put("sn", this.certificate.getSerialNumber().toString());
         

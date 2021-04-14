@@ -23,11 +23,15 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.activation.DataSource;
 
+import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.common.utils.CheckSignatureBlockParameters;
 import at.gv.egiz.pdfas.lib.api.Configuration;
+import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.api.PdfAsParameter;
 
 public class PdfAsParameterImpl implements PdfAsParameter {
@@ -79,8 +83,16 @@ protected Configuration configuration;
 	}
 
 	@Override
-	public void setDynamicSignatureBlockArguments(Map<String, String> map) {
-		this.dynamicSignatureBlockArgumentsMap = map;
+	public void setDynamicSignatureBlockArguments(Map<String, String> map) throws PdfAsException {
+		Map<String, String> tmpMap = Collections.unmodifiableMap(map);
+		String keyRegex = configuration.getValue(IConfigurationConstants.SIG_BLOCK_PARAMETER_KEY_REGEX);
+		String valueRegex = configuration.getValue(IConfigurationConstants.SIG_BLOCK_PARAMETER_VALUE_REGEX);
+		if( CheckSignatureBlockParameters.checkSignatureBlockParameterMapIsValid(tmpMap, keyRegex, valueRegex) == true) {
+			this.dynamicSignatureBlockArgumentsMap = tmpMap;
+		}else{
+			throw new PdfAsException("Invalid signature block parameters");
+		}
+
 	}
 
 	@Override

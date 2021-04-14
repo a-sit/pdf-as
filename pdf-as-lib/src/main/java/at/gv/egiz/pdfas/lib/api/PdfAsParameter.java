@@ -23,6 +23,8 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.api;
 
+import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+
 import java.util.Map;
 
 import javax.activation.DataSource;
@@ -86,7 +88,7 @@ public interface PdfAsParameter {
 	 *
 	 * @param map the map
 	 */
-	public void setDynamicSignatureBlockArguments(Map<String, String> map);
+	public void setDynamicSignatureBlockArguments(Map<String, String> map) throws PdfAsException;
 
 	/**
 	 * Gets the dynamic signature-block values.

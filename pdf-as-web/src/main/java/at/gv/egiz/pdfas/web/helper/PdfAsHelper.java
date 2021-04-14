@@ -509,7 +509,7 @@ public class PdfAsHelper {
 		signParameter.setSignaturePosition(buildPosString(request, response));
 
 		//set signature block parameters
-		signParameter.getDynamicSignatureBlockArguments().putAll(dynamicSignatureBlockArguments);
+		signParameter.setDynamicSignatureBlockArguments(dynamicSignatureBlockArguments);
 		@SuppressWarnings("unused")
 		SignResult result = pdfAs.sign(signParameter);
 
@@ -663,7 +663,7 @@ public class PdfAsHelper {
 					.getMap());
 		}
 		//TODO alex
-		signParameter.getDynamicSignatureBlockArguments().putAll(dynamicSignatureBlockArguments);
+		signParameter.setDynamicSignatureBlockArguments(dynamicSignatureBlockArguments);
 
 		SignResult signResult = pdfAs.sign(signParameter);
 

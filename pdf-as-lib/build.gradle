@@ -14,12 +14,18 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies { classpath("commons-io:commons-io:2.8.0") }
+
 }
 
 sourceSets {
 	main {
 		java {
 			srcDirs = [ 'src/main/java', 'src/generated/java' ]
+		}
+	}
+	test {
+		java {
+			srcDirs = ["src/test/java"]
 		}
 	}
 }
@@ -78,6 +84,7 @@ dependencies {
 	api group: 'com.google.zxing', name: 'core', version: '3.4.1'
 	api group: 'com.google.zxing', name: 'javase', version: '3.4.1'
 	testImplementation group: 'junit', name: 'junit', version: '4.+'
+	testCompile "junit:junit:4.11"
 	ws group: 'org.apache.cxf', name: 'cxf-tools', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-databinding-jaxb', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-frontend-jaxws', version: cxfVersion

@@ -15,6 +15,7 @@ import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +45,7 @@ public class JSONAPIServlet extends HttpServlet {
     private static final String JSON_DATAURL = "dataUrl";
     private static final String JSON_BKUURL = "bkuUrl";
     private static final String JSON_SLREQUEST = "slRequest";
-
+    private static final String JSON_SBP = "sbp";
     private static final Logger logger = LoggerFactory.getLogger(JSONAPIServlet.class);
 
     @Override
@@ -133,15 +135,23 @@ public class JSONAPIServlet extends HttpServlet {
             parameters.setPosition(position);
             parameters.setProfile(profile);
 
-            //TODO alex fill here
-            Map<String, String> dynamicSignatureBlockArguments = null;
+            Map<String, String> signatureBlockParametersMap = new HashMap<>();
+            JSONArray jsonArray = jsonObject.getJSONArray(JSON_SBP);
+            for(int i=0; i<jsonArray.length();i++){
+                String s = jsonArray.getString(0);
+                if(!s.contains("=")) {//TODO or pass as map?
+                    throw new Exception("Invalid parameter: "+s);
+                }
+                String[] values = s.split("=", 2);
+                signatureBlockParametersMap.put(values[0], values[1]);
+            }
 
             if (PDFASSignParameters.Connector.MOA.equals(connectorEnum)
                     || PDFASSignParameters.Connector.JKS.equals(connectorEnum)) {
                 // Plain server based signatures!!
 
                 PDFASSignResponse pdfasSignResponse = PdfAsHelper.synchronousServerSignature(
-                        inputDocument, parameters, dynamicSignatureBlockArguments);
+                        inputDocument, parameters, signatureBlockParametersMap);
 
                 VerifyResult verifyResult = null;
 

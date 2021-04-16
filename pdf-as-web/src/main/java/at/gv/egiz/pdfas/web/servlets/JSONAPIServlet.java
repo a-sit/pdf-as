@@ -136,16 +136,21 @@ public class JSONAPIServlet extends HttpServlet {
             parameters.setProfile(profile);
 
             Map<String, String> signatureBlockParametersMap = new HashMap<>();
-            JSONArray jsonArray = jsonObject.getJSONArray(JSON_SBP);
-            for(int i=0; i<jsonArray.length();i++){
-                String s = jsonArray.getString(0);
-                if(!s.contains("=")) {//TODO or pass as map?
-                    throw new Exception("Invalid parameter: "+s);
+            try {
+                JSONArray jsonArray = jsonObject.getJSONArray(JSON_SBP);
+                if (jsonArray != null) {
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        String s = jsonArray.getString(0);
+                        if (!s.contains("=")) {//TODO or pass as map?
+                            throw new Exception("Invalid parameter: " + s);
+                        }
+                        String[] values = s.split("=", 2);
+                        signatureBlockParametersMap.put(values[0], values[1]);
+                    }
                 }
-                String[] values = s.split("=", 2);
-                signatureBlockParametersMap.put(values[0], values[1]);
+            }catch(Exception e){
+                e.printStackTrace();
             }
-
             if (PDFASSignParameters.Connector.MOA.equals(connectorEnum)
                     || PDFASSignParameters.Connector.JKS.equals(connectorEnum)) {
                 // Plain server based signatures!!

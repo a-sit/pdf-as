@@ -108,7 +108,6 @@ public class SignaturBlockParameterTest {
 
 		map = new HashMap<>();
 		map.put("subject", "TEST123");
-//		map.put("foo", "bar");
 		signParameter.setDynamicSignatureBlockArguments(map);
 		signParameter.setPlainSigner(signer);
 		signParameter.setSignatureProfileId(profile);
@@ -124,7 +123,6 @@ public class SignaturBlockParameterTest {
 		signParameter = PdfAsFactory.createSignParameter(
 				config, source, fos);
 		map = new HashMap<>();
-//		map.put("subject", "TEST123");
 		map.put("foo", "bar");
 		signParameter.setDynamicSignatureBlockArguments(map);
 		signParameter.setPlainSigner(signer);
@@ -138,10 +136,7 @@ public class SignaturBlockParameterTest {
 		fos = new FileOutputStream(outFile);
 		signParameter = PdfAsFactory.createSignParameter(
 				config, source, fos);
-//		map = new HashMap<>();
-//		map.put("subject", "TEST123");
-//		map.put("foo", "bar");
-//		signParameter.setDynamicSignatureBlockArguments(map);
+
 		signParameter.setPlainSigner(signer);
 		signParameter.setSignatureProfileId(profile);
 		result = pdfas.sign(signParameter);
@@ -190,32 +185,5 @@ public class SignaturBlockParameterTest {
     }
     return null;
   }
-//  public void getStringsFromPDF(String fileName) {
-////		PDFParser parser = null;
-//		PDDocument pdDoc = null;
-////		COSDocument cosDoc = null;
-//		PDFTextStripper pdfStripper;
-//
-//		String parsedText;
-//		try {
-//
-//			findExistingSignature(pdDoc,"PDF-AS Signatur1");
-//			pdfStripper = new PDFTextStripper();
-//
-//
-//			parsedText = pdfStripper.getText(pdDoc);
-//			System.out.println(parsedText.replaceAll("[^A-Za-z0-9. ]+", ""));
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			try {
-////				if (cosDoc != null)
-////					cosDoc.close();
-//				if (pdDoc != null)
-//					pdDoc.close();
-//			} catch (Exception e1) {
-//				e1.printStackTrace();
-//			}
-//
-//		}
-//	}
+
 }

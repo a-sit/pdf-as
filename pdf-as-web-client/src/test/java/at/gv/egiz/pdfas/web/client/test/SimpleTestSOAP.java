@@ -42,7 +42,7 @@ import at.gv.egiz.pdfas.api.ws.VerificationLevel;
 import at.gv.egiz.pdfas.web.client.RemotePDFSigner;
 import at.gv.egiz.pdfas.web.client.RemotePDFVerifier;
 
-public class SimpleTest1 {
+public class SimpleTestSOAP {
 
 	public static void main(String[] args) {
 		try {
@@ -73,11 +73,9 @@ public class SimpleTest1 {
 			//		"http://192.168.56.10/pdf-as-web/wssign?wsdl");
 
 			URL signEndpoint = new URL(baseUrl + "wssign?wsdl");
-			URL verifyEndpoint = new URL(baseUrl + "wsverify?wsdl");
-			
+
 			RemotePDFSigner signer = new RemotePDFSigner(signEndpoint, true);
-//			RemotePDFVerifier verifier = new RemotePDFVerifier(verifyEndpoint, true);
-			
+
 			PDFASSignRequest signrequest = new PDFASSignRequest();
 			signrequest.setInputData(inputData);
 			signrequest.setParameters(signParameters);
@@ -93,82 +91,10 @@ public class SimpleTest1 {
 				outputStream.write(response.getSignedPDF());
 			}
 
-			PDFASVerifyRequest verifyRequest = new PDFASVerifyRequest();
-			verifyRequest.setInputData(response.getSignedPDF());
-			verifyRequest.setVerificationLevel(VerificationLevel.INTEGRITY_ONLY);
-			
-//			PDFASVerifyResponse verifyResponse = verifier.verifyPDFDokument(verifyRequest);
-			
-//			List<PDFASVerifyResult> results = verifyResponse.getVerifyResults();
-//
-//			for(int i = 0; i < results.size(); i++) {
-//				PDFASVerifyResult result = results.get(i);
-//				printVerifyResult(result);
-//			}
-			
-			/*
-			 * System.out.println("Simple Request:"); byte[] outputFile =
-			 * signer.signPDFDokument(inputData, signParameters);
-			 * 
-			 * FileOutputStream fos = new FileOutputStream(
-			 * "/home/afitzek/simple_request_signed.pdf");
-			 * fos.write(outputFile); fos.close();
-			 * 
-			 * System.out.println("Simple Request Obj:"); PDFASSignResponse
-			 * response = signer.signPDFDokument(request);
-			 * 
-			 * if (response.getSignedPDF() != null) { FileOutputStream fos2 =
-			 * new FileOutputStream(
-			 * "/home/afitzek/simple_request_obj_signed.pdf");
-			 * fos2.write(response.getSignedPDF()); fos2.close(); }
-			 * 
-			 * if(response.getError() != null) { System.out.println("ERROR: " +
-			 * response.getError()); }
-			 */
-
-			/*
-			List<PDFASSignRequest> bulk = new ArrayList<PDFASSignRequest>();
-			for (int i = 0; i < 10; i++) {
-				bulk.add(request);
-			}
-
-			PDFASBulkSignRequest bulkRequest = new PDFASBulkSignRequest();
-			bulkRequest.setSignRequests(bulk);
-
-			for (int j = 0; j < 10; j++) {
-				System.out.println("Bulk Request:");
-				PDFASBulkSignResponse responses = signer
-						.signPDFDokument(bulkRequest);
-
-				for (int i = 0; i < responses.getSignResponses().size(); i++) {
-					PDFASSignResponse bulkresponse = responses
-							.getSignResponses().get(i);
-					System.out.println("ID: " + bulkresponse.getRequestID());
-
-					if (bulkresponse.getError() != null) {
-						System.out.println("ERROR: " + bulkresponse.getError());
-					} else {
-						System.out.println("OK");
-					}
-				}
-			}
-			*/
 			System.out.println("Done!");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private static void printVerifyResult(PDFASVerifyResult result) {
-		System.out.println(result.getSignatureIndex());
-		System.out.println("  Certificate: " + result.getCertificate());
-		System.out.println("  Cert Messag: " + result.getCertificateMessage());
-		System.out.println("  Cert Code  : " + result.getCertificateCode());
-		System.out.println("  Value Code : " + result.getValueCode());
-		System.out.println("  Value Messg: " + result.getValueMessage());
-		System.out.println("  SignedBy   : " + result.getSignedBy());
-		System.out.println("  Processed  : " + result.getProcessed());
-		System.out.println("  Signed Data: " + result.getSignedData());
 	}
 
 }

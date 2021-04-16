@@ -90,7 +90,7 @@ protected Configuration configuration;
 		if( CheckSignatureBlockParameters.checkSignatureBlockParameterMapIsValid(tmpMap, keyRegex, valueRegex) == true) {
 			this.dynamicSignatureBlockArgumentsMap = tmpMap;
 		}else{
-			throw new PdfAsException("Invalid signature block parameters");
+			throw new PdfAsException("error.invalid.signature.parameter.01");
 		}
 
 	}

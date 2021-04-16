@@ -23,26 +23,19 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.client.test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
 import at.gv.egiz.pdfas.api.ws.PDFASSignRequest;
 import at.gv.egiz.pdfas.api.ws.PDFASSignResponse;
-import at.gv.egiz.pdfas.api.ws.PDFASVerifyRequest;
-import at.gv.egiz.pdfas.api.ws.PDFASVerifyResponse;
-import at.gv.egiz.pdfas.api.ws.PDFASVerifyResult;
-import at.gv.egiz.pdfas.api.ws.VerificationLevel;
 import at.gv.egiz.pdfas.web.client.RemotePDFSigner;
-import at.gv.egiz.pdfas.web.client.RemotePDFVerifier;
+import org.apache.commons.io.IOUtils;
 
-public class SimpleTestSOAP {
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.URL;
+
+public class SimpleTestSOAPInvalidParameter {
 
 	public static void main(String[] args) {
 		try {
@@ -81,17 +74,14 @@ public class SimpleTestSOAP {
 			signrequest.setParameters(signParameters);
 			signParameters.setTransactionId("MYID ....");
 			signrequest.getSignatureBlockParameters().put("abc","SOAP Test 5555");
+			signrequest.getSignatureBlockParameters().put("way toooooooooooooo long","SOAP Test 5555");
 			System.out.println("Simple Request:"); 
 			PDFASSignResponse response = signer.signPDFDokument(signrequest);
 			
 			System.out.println("Sign Error: " + response.getError());
 			System.out.println("redirect url: " + response.getRedirectUrl());
-//			File outputFile = new File(file+"_signedSOAP.pdf");
-//			try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-//				outputStream.write(response.getSignedPDF());
-//			}
 
-			System.out.println("Done!");
+			System.out.println("Should see an error page...");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

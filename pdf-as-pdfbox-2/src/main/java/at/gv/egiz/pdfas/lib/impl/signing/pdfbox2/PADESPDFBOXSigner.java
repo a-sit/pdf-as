@@ -157,9 +157,11 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
 			signature.setFilter(COSName.getPDFName(signer.getPDFFilter()));
 			signature.setSubFilter(COSName.getPDFName(signer.getPDFSubFilter()));
-			SignaturePlaceholderData signaturePlaceholderDataInit = PlaceholderFilter.checkPlaceholderSignatureLocation(pdfObject.getStatus(), pdfObject.getStatus().getSettings(), placeholder_id);
+//			SignaturePlaceholderData signaturePlaceholderDataInit =
+			placeholders =PlaceholderFilter.checkPlaceholderSignatureLocationList(pdfObject.getStatus(),
+							pdfObject.getStatus().getSettings(), placeholder_id);
 
-            placeholders = SignaturePlaceholderExtractor.getPlaceholders();
+//            placeholders = SignaturePlaceholderExtractor.getPlaceholders();
             availablePlaceholders = listAvailablePlaceholders(placeholders, existingSignatureLocations(doc));
 
 
@@ -653,7 +655,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
             if (doc != null) {
                 try {
                     doc.close();
-					SignaturePlaceholderExtractor.getPlaceholders().clear();
+					//SignaturePlaceholderExtractor.getPlaceholders().clear();
                 } catch (IOException e) {
                     logger.debug("Failed to close COS Doc!", e);
                     // Ignore
@@ -936,7 +938,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
 	//find first placeholder_id
 	public List<SignaturePlaceholderData>  listAvailablePlaceholders(List<SignaturePlaceholderData> placeholders, List<String> existingPlaceholders) {
-		List<SignaturePlaceholderData> result = null;
+		List<SignaturePlaceholderData> result = new ArrayList<>();
 
 		if(placeholders!=null) {
 			for(int i = 0; i < placeholders.size(); ++i) {

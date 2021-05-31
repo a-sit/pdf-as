@@ -916,7 +916,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 		if(placeholders!=null) {
 		for(int i = 0; i < placeholders.size(); ++i) {
 			//take smallest id
-            if(!existingPlaceholders.contains(placeholders.get(i).getPlaceholderName())) {
+			if(!existingPlaceholders.contains(placeholders.get(i).getPlaceholderName())) {
 				SignaturePlaceholderData spd = placeholders.get(i);
 				if (spd.getId() != null) {
 					if(result == null) {
@@ -924,6 +924,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 					} else {
 						String currentID = result.getId();
 						String testID = spd.getId();
+						//TODO why compare as string?
 						if(testID.compareToIgnoreCase(currentID) < 0) {
 							result = spd;
 						}

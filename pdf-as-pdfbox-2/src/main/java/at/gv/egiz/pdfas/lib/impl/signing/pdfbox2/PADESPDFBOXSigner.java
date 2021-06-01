@@ -938,16 +938,25 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 		if(placeholders!=null) {
 		for(int i = 0; i < placeholders.size(); ++i) {
 			//take smallest id
-            if(!existingPlaceholders.contains(placeholders.get(i).getPlaceholderName())) {
+			if(!existingPlaceholders.contains(placeholders.get(i).getPlaceholderName())) {
 				SignaturePlaceholderData spd = placeholders.get(i);
 				if (spd.getId() != null) {
 					if(result == null) {
 						result = spd;
 					} else {
-						String currentID = result.getId();
-						String testID = spd.getId();
-						if(testID.compareToIgnoreCase(currentID) < 0) {
-							result = spd;
+						try{
+							int currentID = Integer.parseInt(result.getId());
+							int testID = Integer.parseInt(spd.getId());
+							if(testID < currentID) {
+								result = spd;
+							}
+						}catch(Exception e){
+							//fallback to string compare
+							String currentID = result.getId();
+							String testID = spd.getId();
+							if(testID.compareToIgnoreCase(currentID) < 0) {
+								result = spd;
+							}
 						}
 					}
 				}

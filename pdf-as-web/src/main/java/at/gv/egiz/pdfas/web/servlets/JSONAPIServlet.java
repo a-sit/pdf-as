@@ -154,14 +154,13 @@ public class JSONAPIServlet extends HttpServlet {
             if (PDFASSignParameters.Connector.MOA.equals(connectorEnum)
                     || PDFASSignParameters.Connector.JKS.equals(connectorEnum)) {
                 // Plain server based signatures!!
-
                 PDFASSignResponse pdfasSignResponse = PdfAsHelper.synchronousServerSignature(
                         inputDocument, parameters, signatureBlockParametersMap);
 
                 VerifyResult verifyResult = null;
 
                 List<VerifyResult> verResults = PdfAsHelper
-                           .synchornousVerify(
+                           .synchronousVerify(
                                     pdfasSignResponse.getSignedPDF(),
                                     -1,
                                     VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION,

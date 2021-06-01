@@ -24,6 +24,7 @@
 package at.gv.egiz.pdfas.lib.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.DataSource;
@@ -84,6 +85,8 @@ protected Configuration configuration;
 
 	@Override
 	public void setDynamicSignatureBlockArguments(Map<String, String> map) throws PdfAsException {
+		if(map == null)
+			map = new HashMap<String, String>();
 		Map<String, String> tmpMap = Collections.unmodifiableMap(map);
 		String keyRegex = configuration.getValue(IConfigurationConstants.SIG_BLOCK_PARAMETER_KEY_REGEX);
 		String valueRegex = configuration.getValue(IConfigurationConstants.SIG_BLOCK_PARAMETER_VALUE_REGEX);

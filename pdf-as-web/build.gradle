@@ -7,7 +7,7 @@ apply plugin: 'org.akhikhl.gretty'
 
 buildscript {
   repositories {
-    jcenter()
+	gradlePluginPortal()
     // enable this to use snapshot versions of Gretty:
     // maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
     maven {

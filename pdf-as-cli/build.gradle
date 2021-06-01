@@ -16,18 +16,13 @@ task releases(type: Copy) {
 }
 
 configurations { 
-	pdfBox2Compile 
-	pdfBox1Compile	
+	pdfBox2Compile
 }
 
 sourceSets{
 	pdfBox2{
 		compileClasspath = configurations.pdfBox2Compile
 		runtimeClasspath = configurations.pdfBox2Compile + main.runtimeClasspath
-	}
-	pdfBox1{
-		compileClasspath = configurations.pdfBox1Compile
-		runtimeClasspath = configurations.pdfBox1Compile + main.runtimeClasspath
 	}
 }
 			   
@@ -36,8 +31,6 @@ dependencies {
 	implementation project (':signature-standards:sigs-pkcs7detached')
 	implementation project (':signature-standards:sigs-pades')
 	implementation project (':pdf-as-moa')
-	//pdfBox1Implementation project (':pdf-as-pdfbox')
-	//pdfBox2Implementation project (':pdf-as-pdfbox-2')
     implementation project (':pdf-as-pdfbox-2')
     implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
 	implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
@@ -53,18 +46,7 @@ startScripts{
 
 compileJava{
     classpath=sourceSets.main.compileClasspath
-	classpath+=sourceSets.pdfBox1.compileClasspath
 	classpath+=sourceSets.pdfBox2.compileClasspath
-}
-
-
-task pdfbox1Startscript(type: CreateStartScripts) {
-    description "Creates OS specific scripts to call the 'other' entry point"
-
-    classpath = startScripts.classpath.minus(configurations.pdfBox2Compile) + sourceSets.pdfBox1.compileClasspath
-    outputDir = startScripts.outputDir
-    mainClassName = startScripts.mainClassName
-    applicationName = startScripts.applicationName+"-pdfbox1"
 }
 
 distZip {
@@ -72,12 +54,6 @@ distZip {
 
     into("${archiveBaseName}-${archiveVersion}/lib") {
         from startScripts.classpath
-    }
-    into("${archiveBaseName}-${archiveVersion}/lib") {
-        from pdfbox1Startscript.classpath
-    }
-    into("${archiveBaseName}-${archiveVersion}/bin") {
-        from pdfbox1Startscript
     }
 }
 
@@ -87,14 +63,8 @@ distTar {
     into("${archiveBaseName}-${archiveVersion}/lib") {
         from startScripts.classpath
     }
-    into("${archiveBaseName}-${archiveVersion}/lib") {
-        from pdfbox1Startscript.classpath
-    }
-    into("${archiveBaseName}-${archiveVersion}/bin") {
-        from pdfbox1Startscript
-    }
-}
 
+}
 
 releases.dependsOn jar
 releases.dependsOn sourcesJar
@@ -102,11 +72,8 @@ releases.dependsOn distZip
 releases.dependsOn distTar
 
 distZip.dependsOn startScripts
-startScripts.dependsOn pdfbox1Startscript
-
 
 
 test {
     systemProperties 'property': 'value'
 }
-

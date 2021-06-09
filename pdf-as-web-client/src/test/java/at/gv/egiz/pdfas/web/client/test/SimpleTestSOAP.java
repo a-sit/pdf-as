@@ -46,7 +46,8 @@ public class SimpleTestSOAP {
 
 	public static void main(String[] args) {
 		try {
-			String file = "/Users/amarsalek/Documents/pdf-as-4/unsigned.pdf";
+//			String file = "/Users/amarsalek/Documents/pdf-as-4/unsigned.pdf";
+			String file = "/Users/amarsalek/Downloads/qr2.pdf";
 			FileInputStream fis = new FileInputStream(file);
 			byte[] inputData = IOUtils.toByteArray(fis);
  

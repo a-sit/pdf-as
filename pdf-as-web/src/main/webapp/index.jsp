@@ -24,6 +24,9 @@
 		<img src="assets/img/localBKU.png" /> <button type="submit"
 			value="bku" name="connector" id="bku">Lokale BKU
 		</button>
+		<!--
+		<label for="sbp">SBP</label>
+		<input type="text" id="ab" name="sbp">-->
 		<%
 			}
 		%>

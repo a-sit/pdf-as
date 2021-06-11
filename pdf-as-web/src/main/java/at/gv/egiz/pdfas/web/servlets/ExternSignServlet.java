@@ -350,12 +350,10 @@ public class ExternSignServlet extends HttpServlet {
 				PlaceholderWebConfiguration.clear();
 			}
 
-
 		} catch(Exception e) {
 			logger.error(e.getLocalizedMessage());
 		}
 
-		
 		String filename = PdfAsParameterExtractor.getFilename(request);
 		if(filename != null) {
 			logger.debug("Setting Filename in session: " + filename);
@@ -367,9 +365,8 @@ public class ExternSignServlet extends HttpServlet {
 		PdfAsHelper.setSignatureDataHash(request, pdfDataHash);
 		logger.debug("Storing signatures data hash: " + pdfDataHash);
 
-		//TODO alex parse??
-		Map<String, String> dynamicSignatureBlockArguments = null;
-
+		Map<String, String> dynamicSignatureBlockArguments =
+				PdfAsParameterExtractor.getDynamicSignatureBlockParameters(request);
 
 		logger.debug("Starting signature creation with: " + connector);
 		

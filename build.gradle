@@ -12,7 +12,7 @@ buildscript {
 allprojects {
 	apply plugin: "com.github.ben-manes.versions"
 	repositories {  mavenCentral()  }
-	version = '4.1.7-RC-0.0.7'
+	version = '4.1.7-RC-0.0.8'
 }
 
 configurations {

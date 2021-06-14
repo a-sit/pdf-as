@@ -74,7 +74,7 @@ public class PdfAsParameterExtractor {
 	public static final String PARAM_PREPROCESSOR_PREFIX = "pp:";
 	public static final String PARAM_OVERWRITE_PREFIX = "ov:";
 	public static final String PARAM_QRCODE_CONTENT = "qrcontent";
-	public static final String PARAM_DYNAMIC_SIGNATURE_BLOCK_PARAMETER = "sbp";
+	public static final String PARAM_DYNAMIC_SIGNATURE_BLOCK_PARAMETER = "sbp:";
 
 	public static String getConnector(HttpServletRequest request) {
 		String connector = (String)request.getAttribute(PARAM_CONNECTOR);
@@ -86,18 +86,17 @@ public class PdfAsParameterExtractor {
 
 	public static Map<String,String> getDynamicSignatureBlockParameters(HttpServletRequest request) throws Exception {
 		HashMap<String, String> signatureBlockParametersMap = new HashMap<String, String>();
-		String sbpString = (String) request.getAttribute(PARAM_DYNAMIC_SIGNATURE_BLOCK_PARAMETER);
-//		Map<String, String[]> map = request.getParameterMap();
-		if(sbpString == null || sbpString.length() == 0)
-			return signatureBlockParametersMap;
-		for(String s : sbpString.split(";")){
-			if(!s.contains("=")) {
-				throw new Exception("Invalid parameter: "+s);
+
+		Enumeration<String> parameterNames = request.getAttributeNames();
+		while(parameterNames.hasMoreElements()) {
+			String parameterName = parameterNames.nextElement();
+			if (parameterName.startsWith(PARAM_DYNAMIC_SIGNATURE_BLOCK_PARAMETER)) {
+				String key = parameterName.substring(PARAM_DYNAMIC_SIGNATURE_BLOCK_PARAMETER.length());
+				String value = (String) request.getAttribute(parameterName);
+				signatureBlockParametersMap.put(key, value);
 			}
-			String[] values = s.split("=", 2);
-			signatureBlockParametersMap.put(values[0], values[1]);
 		}
-		return signatureBlockParametersMap;
+			return signatureBlockParametersMap;
 	}
 	public static String getQRCodeContent(HttpServletRequest request) {
 		String qrcodeContent = (String)request.getAttribute(PARAM_QRCODE_CONTENT);

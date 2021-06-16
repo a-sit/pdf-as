@@ -401,7 +401,6 @@ public class PdfAsFactory implements IConfigurationConstants {
 			jarAttributes = mainAttributes;
 			return mainAttributes;
 		} catch (Exception e) {
-			// handle
 			jarAttributes = new Attributes();
 		}
 		return null;

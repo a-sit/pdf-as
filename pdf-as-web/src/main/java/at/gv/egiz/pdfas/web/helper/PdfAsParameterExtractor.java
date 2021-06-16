@@ -93,7 +93,8 @@ public class PdfAsParameterExtractor {
 			if (parameterName.startsWith(PARAM_DYNAMIC_SIGNATURE_BLOCK_PARAMETER)) {
 				String key = parameterName.substring(PARAM_DYNAMIC_SIGNATURE_BLOCK_PARAMETER.length());
 				String value = (String) request.getAttribute(parameterName);
-				signatureBlockParametersMap.put(key, value);
+				if(value != null && !value.isEmpty())
+					signatureBlockParametersMap.put(key, value);
 			}
 		}
 			return signatureBlockParametersMap;

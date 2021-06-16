@@ -391,7 +391,7 @@ public class PdfAsFactory implements IConfigurationConstants {
 			while (urls.hasMoreElements()) {
 				URL tmp = urls.nextElement();
 				if (tmp.getFile().contains("pdf-as-lib")) {
-					System.out.println("Found:" + tmp);
+					//System.out.println("Found:" + tmp);
 					url = tmp;
 				}
 

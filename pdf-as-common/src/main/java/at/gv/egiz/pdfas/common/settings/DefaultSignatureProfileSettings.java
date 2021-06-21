@@ -66,7 +66,7 @@ public class DefaultSignatureProfileSettings {
 	public static final String VALUE_SIG_DATE_DEFAULT = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
 	public static final String SIG_BLOCK_PARAMETER_DEFAULT_KEY_REGEX = "^([A-za-z]){1,20}$";
-	public static final String SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX = "^([\\p{Print}]){1,100}$";
+	public static final String SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX = "^([\\p{Print}-_\u00e4\u00f6\u00fc\u00c4\u00d6\u00dc]){1,100}$";
 
 	static {
 

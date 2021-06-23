@@ -106,7 +106,6 @@ public class SignaturBlockParameterTest {
     PdfAs pdfas = PdfAsFactory.createPdfAs(new File(getPath("pdfas-config")));
     Configuration config = pdfas.getConfiguration();
 
-
     byte[] input = IOUtils.toByteArray(new FileInputStream(getPath("simple_rotated_0.pdf")));
 
     IPlainSigner signer = new PAdESSignerKeystore(getPath("test.p12"), KS_ALIAS, KS_PASS, KS_KEY_PASS, KS_TYPE);
@@ -196,6 +195,41 @@ public class SignaturBlockParameterTest {
 
 
 	}
+
+  @Test
+  public void testWithUmlaute() throws IOException, PDFASError, PdfAsException {
+
+    PdfAs pdfas = PdfAsFactory.createPdfAs(new File(getPath("pdfas-config")));
+    Configuration config = pdfas.getConfiguration();
+
+
+    byte[] input = IOUtils.toByteArray(new FileInputStream(getPath("simple_rotated_0.pdf")));
+
+    IPlainSigner signer = new PAdESSignerKeystore(getPath("test.p12"), KS_ALIAS, KS_PASS, KS_KEY_PASS, KS_TYPE);
+
+    String profile = "SIGNATURBLOCK_DE_NOTE_DYNAMIC";
+    System.out.println("Testing " + profile);
+
+    DataSource source = new ByteArrayDataSource(input);
+    String outFile = getPath("out") + "/" + profile + "-umlaute.pdf";
+    FileOutputStream fos = new FileOutputStream(outFile);
+    SignParameter signParameter = PdfAsFactory.createSignParameter(
+        config, source, fos);
+
+    Map<String, String> map = new HashMap<>();
+    map.put("subject", "TEST123");
+    map.put("foo", "baräöÜ");
+    signParameter.setDynamicSignatureBlockArguments(map);
+    signParameter.setPlainSigner(signer);
+    signParameter.setSignatureProfileId(profile);
+
+    SignResult result = pdfas.sign(signParameter);
+
+    fos.close();
+    String name = getName(outFile, "PDF-AS Signatur1");
+    Assert.assertEquals("TEST123 test baräöÜ 123 c TEST123 Andreas Fitzek ECC", name);
+    //expected:<TEST123 test bar[] 123 c TEST123 Andre...> but was:<TEST123 test bar[äöÜ] 123 c TEST123 Andre...>
+  }
 
   private String getName(String fileName, String sigFieldName) throws IOException {
     PDDocument pdDoc = PDDocument.load(new File(fileName));

@@ -57,6 +57,7 @@ public class SignatureBlockParameterTest {
     if(checkValid( "aauacnhuisdc Ä Ü Ö aaxsa ö aÜaÖa",
         DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
     if(checkValid( "NMS Güssing", DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+
   }
 
   public boolean checkValid(String s, String regex) {

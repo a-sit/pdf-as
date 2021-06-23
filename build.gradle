@@ -72,6 +72,8 @@ subprojects {
 	}
 
 	sourceCompatibility = 1.7
+	compileJava.options.encoding = "UTF-8"
+	compileTestJava.options.encoding = "UTF-8"
 	project.ext{
 		releaseRepoUrl = "file://${project(':').projectDir}/../mvn-repo/releases"
 		snapshotRepoUrl = "file://${project(':').projectDir}/../mvn-repo/snapshots"

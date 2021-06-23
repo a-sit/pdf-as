@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.test.mains;
 
+import at.gv.egiz.pdfas.common.settings.DefaultSignatureProfileSettings;
 import at.gv.egiz.pdfas.common.utils.CheckSignatureBlockParameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +45,18 @@ public class SignatureBlockParameterTest {
     if(checkValid("aaa"+(char) 13 +"aa", "^([\\p{Print}]){1,100}$") == true){assert(false);}
 
   }
-
+  @Test
+  public void testUmlauteValid() {
+    if(checkValid( "ä", DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+    if(checkValid( "ö", DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+    if(checkValid( "ü", DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+    if(checkValid( "Ä", DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+    if(checkValid( "Ö", DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+    if(checkValid( "Ü", DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+    if(checkValid( "ÄÖÜöäüjhsbdjej", DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+    if(checkValid( "aauacnhuisdc Ä Ü Ö aaxsa ö aÜaÖa",
+        DefaultSignatureProfileSettings.SIG_BLOCK_PARAMETER_DEFAULT_VALUE_REGEX) == false){assert(false);}
+  }
   public boolean checkValid(String s, String regex) {
     return CheckSignatureBlockParameters.isValid(s, regex);
   }

@@ -52,7 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SignaturBlockParameterTest {
+public class SignatureBlockParameterTest {
 
   public static final String KS_ALIAS = "ecc_test";
   public static final String KS_TYPE = "PKCS12";

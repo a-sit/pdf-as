@@ -113,6 +113,9 @@ public class ValueResolver implements IProfileConstants, IResolver {
 					String tmp2 = internalResolver.resolve(key, tmpValue, settings);
 					result += tmp2;
 				} while (matcher.find());
+				if(value.length() > curidx){
+					result += value.substring(curidx);
+				}
 			} else {
 				result = value;
 			}

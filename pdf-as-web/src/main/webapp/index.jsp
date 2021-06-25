@@ -2,17 +2,20 @@
 <%@page import="at.gv.egiz.pdfas.web.helper.PdfAsHelper"%>
 <html>
 <head>
-<title>PDF-Signatur</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>PDF-Signatur</title>
 </head>
 <body>
-	<form action="Sign" method="POST"
-		enctype="multipart/form-data">
+
+<form action="Sign" method="POST" enctype="multipart/form-data" >
+
+		<input name="utf8" type="hidden" value="&#x2713;" />
 		<input type="hidden" name="source" id="source" value="internal" /> 
 		<input type="file" name="pdf-file" id="pdf-file" accept="application/pdf">
 		<%
 			if (request.getAttribute("FILEERR") != null) {
 		%>
-		<p>Bitte die zu signierende PDF Datei angeben.</p>
+		<p>Bitte die zu signierende PDF Datei angeben. öäüÖÄÜ</p>
 		<%
 			}
 		%>

@@ -46,30 +46,22 @@ public class SimpleTestSOAP {
 
 	public static void main(String[] args) {
 		try {
-//			String file = "/Users/amarsalek/Documents/pdf-as-4/unsigned.pdf";
-			String file = "/Users/amarsalek/Downloads/qr2.pdf";
+			String file = "/Users/amarsalek/Documents/pdf-as-4/unsigned.pdf";
+//			String file = "/Users/amarsalek/Downloads/qr2.pdf";
 			FileInputStream fis = new FileInputStream(file);
 			byte[] inputData = IOUtils.toByteArray(fis);
  
 			PDFASSignParameters signParameters = new PDFASSignParameters();
-//			signParameters.setConnector(Connector.JKS);
-			signParameters.setConnector(Connector.BKU);
+			signParameters.setConnector(Connector.JKS);
+//			signParameters.setConnector(Connector.BKU);
 			signParameters.setPosition(null);
-			signParameters.setProfile("SIGNATURBLOCK_SMALL_DE1");
+//			signParameters.setProfile("SIGNATURBLOCK_SMALL_DE1");
+			signParameters.setProfile("SIGNATURBLOCK_DE_SCHOOL1");
 			signParameters.setQRCodeContent("TEST CONTENT");
 			//signParameters.setKeyIdentifier("test");
 
-			PDFASSignRequest request = new PDFASSignRequest();
-			request.setInputData(inputData);
-			request.setParameters(signParameters);
-			request.setRequestID("SOME TEST ID");
-			request.getSignatureBlockParameters().put("abc","SOAP Test");
-			//URL endpoint = new
-			//URL("http://demo.egiz.gv.at/demoportal-pdf_as/wssign?wsdl");
-			//URL endpoint = new
-			//		URL("http://www.buergerkarte.at/pdf-as-extern-4/wssign?wsdl");
-//			String baseUrl  = "http://demo.egiz.gv.at/demoportal-pdf_as/services/";
-			String baseUrl  = "http://localhost:8080/pdf-as-web/services/";
+//			String baseUrl  = "http://localhost:8080/pdf-as-web/services/";
+			String baseUrl  = "https://pdf.egiz.gv.at/pdf-as-extern-4/services/";
 			//URL endpoint = new URL(
 			//		"http://192.168.56.10/pdf-as-web/wssign?wsdl");
 
@@ -82,15 +74,16 @@ public class SimpleTestSOAP {
 			signrequest.setParameters(signParameters);
 			signParameters.setTransactionId("MYID ....");
 			signrequest.getSignatureBlockParameters().put("abc","SOAP Test 5555");
+			signrequest.getSignatureBlockParameters().put("school","SOAP Test äöüßÄÖÜ");
 			System.out.println("Simple Request:"); 
 			PDFASSignResponse response = signer.signPDFDokument(signrequest);
 			
 			System.out.println("Sign Error: " + response.getError());
 			System.out.println("redirect url: " + response.getRedirectUrl());
-//			File outputFile = new File(file+"_signedSOAP.pdf");
-//			try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-//				outputStream.write(response.getSignedPDF());
-//			}
+			File outputFile = new File(file+"_signedSOAP.pdf");
+			try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+				outputStream.write(response.getSignedPDF());
+			}
 
 			System.out.println("Done!");
 		} catch (Throwable e) {

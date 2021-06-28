@@ -49,22 +49,6 @@ compileJava{
 	classpath+=sourceSets.pdfBox2.compileClasspath
 }
 
-distZip {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    into("${archiveBaseName}-${archiveVersion}/lib") {
-        from startScripts.classpath
-    }
-}
-
-distTar {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	
-    into("${archiveBaseName}-${archiveVersion}/lib") {
-        from startScripts.classpath
-    }
-
-}
 
 releases.dependsOn jar
 releases.dependsOn sourcesJar

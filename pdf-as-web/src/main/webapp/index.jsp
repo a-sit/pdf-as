@@ -15,7 +15,7 @@
 		<%
 			if (request.getAttribute("FILEERR") != null) {
 		%>
-		<p>Bitte die zu signierende PDF Datei angeben. öäüÖÄÜ</p>
+		<p>Bitte die zu signierende PDF Datei angeben.</p>
 		<%
 			}
 		%>

@@ -56,7 +56,7 @@ public class SimpleTestSOAP {
 //			signParameters.setConnector(Connector.BKU);
 			signParameters.setPosition(null);
 //			signParameters.setProfile("SIGNATURBLOCK_SMALL_DE1");
-			signParameters.setProfile("SIGNATURBLOCK_DE_SCHOOL1");
+			signParameters.setProfile("SIGNATURBLOCK_DE_SCHOOL");
 			signParameters.setQRCodeContent("TEST CONTENT");
 			//signParameters.setKeyIdentifier("test");
 
@@ -75,6 +75,7 @@ public class SimpleTestSOAP {
 			signParameters.setTransactionId("MYID ....");
 			signrequest.getSignatureBlockParameters().put("abc","SOAP Test 5555");
 			signrequest.getSignatureBlockParameters().put("school","SOAP Test äöüßÄÖÜ");
+			signrequest.getSignatureBlockParameters().put("schule","SOAP Test äöüßÄÖÜ");
 			System.out.println("Simple Request:"); 
 			PDFASSignResponse response = signer.signPDFDokument(signrequest);
 			

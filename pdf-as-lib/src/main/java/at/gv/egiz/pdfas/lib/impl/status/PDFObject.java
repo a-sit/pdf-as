@@ -74,6 +74,5 @@ public abstract class PDFObject {
 
 	public Map<String, String> getRequestParameters() {
 		return status.getSignParamter().getDynamicSignatureBlockArguments();
-//		return status.getRequestParameters();//TODO alex
 	}
 }

@@ -50,14 +50,30 @@ public class CertificateAndRequestParameterResolver implements IResolver {
 
     public CertificateAndRequestParameterResolver(X509Certificate certificate, OperationStatus operationStatus) {
         this.certificate = certificate;
+        MemberAccess memberAccess = new MemberAccess() {
+            @Override
+            public Object setup(Map context, Object target, Member member, String propertyName) {
+                return null;
+            }
 
-        MemberAccess memberAccess = new AbstractMemberAccess() {
+            @Override
+            public void restore(Map context, Object target, Member member, String propertyName, Object state) {
+
+            }
+
             @Override
             public boolean isAccessible(Map context, Object target, Member member, String propertyName) {
                 int modifiers = member.getModifiers();
                 return Modifier.isPublic(modifiers);
             }
         };
+//        MemberAccess memberAccess = new AbstractMemberAccess() {
+//            @Override
+//            public boolean isAccessible(Map context, Object target, Member member, String propertyName) {
+//                int modifiers = member.getModifiers();
+//                return Modifier.isPublic(modifiers);
+//            }
+//        };
                 
         this.ctx = new OgnlContext(null, null, memberAccess);
 

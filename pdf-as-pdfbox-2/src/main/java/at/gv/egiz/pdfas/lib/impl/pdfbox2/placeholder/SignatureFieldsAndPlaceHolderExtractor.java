@@ -11,7 +11,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SignatureFieldsExtractor {
+public class SignatureFieldsAndPlaceHolderExtractor {
 
     //Search for empty signature fields
     public static List<String> findEmptySignatureFields(PDDocument doc)

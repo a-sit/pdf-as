@@ -12,7 +12,7 @@ buildscript {
 allprojects {
 	apply plugin: "com.github.ben-manes.versions"
 	repositories {  mavenCentral()  }
-	version = '4.2.0-signatureVerificationPortal'
+	version = '4.2.0-pdfOver'
 }
 
 configurations {
@@ -41,7 +41,6 @@ task checkCVE {
 		}
 	}
 }
-
 
 subprojects {
 	apply plugin: 'java-library'

@@ -184,7 +184,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 				g.drawString("placeholder for the", qrSize + ( 3 * border), start + lineSpace);
 				g.drawString("electronic signature", qrSize + ( 3 * border), start + (2 * lineSpace));
 			} else {
-				g.drawString("Platzhalter fuer die", qrSize + ( 3 * border), start + lineSpace);
+				g.drawString("Platzhalter für die", qrSize + ( 3 * border), start + lineSpace);
 				g.drawString("elektronische Signatur", qrSize + ( 3 * border), start + (2 * lineSpace));
 			}
 			if(id != null && !id.isEmpty()) {

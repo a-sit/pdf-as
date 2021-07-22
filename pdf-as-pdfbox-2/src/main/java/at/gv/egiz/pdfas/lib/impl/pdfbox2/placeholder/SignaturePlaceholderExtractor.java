@@ -126,11 +126,6 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
 		this.doc = doc;
 	}
 
-//	public static List<SignaturePlaceholderData> getPlaceholders() {
-//		return placeholders;
-//	}
-
-
 	/**
 	 * Search the document for placeholder images and possibly included
 	 * additional info.<br/>

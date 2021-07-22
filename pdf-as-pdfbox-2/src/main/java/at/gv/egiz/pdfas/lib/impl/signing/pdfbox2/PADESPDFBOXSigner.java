@@ -162,7 +162,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 			signature.setFilter(COSName.getPDFName(signer.getPDFFilter()));
 			signature.setSubFilter(COSName.getPDFName(signer.getPDFSubFilter()));
 //			SignaturePlaceholderData signaturePlaceholderDataInit =
-			placeholders =PlaceholderFilter.checkPlaceholderSignatureLocationList(pdfObject.getStatus(),
+			placeholders = PlaceholderFilter.checkPlaceholderSignatureLocationList(pdfObject.getStatus(),
 							pdfObject.getStatus().getSettings(), placeholder_id);
 
 //            placeholders = SignaturePlaceholderExtractor.getPlaceholders();

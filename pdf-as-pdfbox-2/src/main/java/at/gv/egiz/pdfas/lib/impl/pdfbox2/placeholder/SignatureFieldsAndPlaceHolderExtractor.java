@@ -8,6 +8,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +36,27 @@ public class SignatureFieldsAndPlaceHolderExtractor {
     /*
     Needed by PDF-OVER
      */
-    public static SignaturePlaceholderData getNextSignaturePlaceHolder(PDDocument doc) {
+
+    /**
+     * Returns the next unused signature placeholder
+     * @param doc The document to be searched for signature placeholders
+     * @return The next unused signature placeholder or null in case there is none
+     */
+    public static SignaturePlaceholderData getNextUnusedSignaturePlaceHolder(PDDocument doc) {
         try {
-            SignaturePlaceholderExtractor signaturePlaceholderExtractor = new SignaturePlaceholderExtractor("1",
-                PlaceholderExtractorConstants.PLACEHOLDER_MATCH_MODE_SORTED, doc);
-            return signaturePlaceholderExtractor.extract(doc, "1",
-                PlaceholderExtractorConstants.PLACEHOLDER_MATCH_MODE_SORTED);
+            String placeholderId = "1";
+            int mode = PlaceholderExtractorConstants.PLACEHOLDER_MATCH_MODE_SORTED;
+            SignaturePlaceholderExtractor signaturePlaceholderExtractor = new SignaturePlaceholderExtractor( placeholderId,
+                mode, doc);
+            List<SignaturePlaceholderData> results = signaturePlaceholderExtractor.extractList(doc, placeholderId,
+                mode);
+            List<String> used = getExistingSignatureLocations(doc);
+            //return first not used
+            for(SignaturePlaceholderData result : results) {
+                if(!used.contains(result.getPlaceholderName()))
+                    return result;
+            }
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -68,5 +84,20 @@ public class SignatureFieldsAndPlaceHolderExtractor {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static List<String> getExistingSignatureLocations(PDDocument doc) {
+        List<String> existingLocations = new ArrayList<>();
+        try {
+            List <PDSignature> pdSignatureList =  doc.getSignatureDictionaries();
+            if(pdSignatureList.size() != 0) {
+                for(PDSignature sig : pdSignatureList) {
+                    existingLocations.add(sig.getLocation());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return existingLocations;
     }
 }

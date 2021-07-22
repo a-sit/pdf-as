@@ -142,9 +142,20 @@ public class SignaturePlaceholderData {
       this.key = key;
    }
 
+   @Override
    public String toString() {
-      return getClass().toString() + ": profile=" + profile + "; type=" + type + "; sigKey=" + key + "; table pos=" + tablePos;
+      return "SignaturePlaceholderData{" +
+          "profile='" + profile + '\'' +
+          ", type='" + type + '\'' +
+          ", key='" + key + '\'' +
+          ", id='" + id + '\'' +
+          ", tablePos=" + tablePos +
+          ", placeholderName='" + placeholderName + '\'' +
+          '}';
    }
+//   public String toString() {
+//      return getClass().toString() + ": profile=" + profile + "; type=" + type + "; sigKey=" + key + "; table pos=" + tablePos;
+//   }
 
    public void setPlaceholderName(String name) {
       this.placeholderName = name;

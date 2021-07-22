@@ -75,6 +75,14 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 		if(id != null && !id.isEmpty()) {
 			id = id.replaceAll("[^0-9]", "");
 			if(id != null && !id.isEmpty()) {
+				try{
+					if(id.length()> 5)
+						id = id.substring(0,5);
+					int value = Integer.parseInt(id);
+					id = Integer.toString(value);//remove leading zeros
+				}catch(Exception e){
+
+				}
 				buildString = buildString + ";" + SignaturePlaceholderData.ID_KEY + "=" + id;
 				filename = filename + "_" + id;
 			}

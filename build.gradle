@@ -46,7 +46,7 @@ subprojects {
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven-publish'
-	//apply plugin: 'maven'
+	apply plugin: 'maven'
 	group = 'at.gv.egiz.pdfas'
 
 	configurations {
@@ -54,7 +54,22 @@ subprojects {
 		cveCheck
 	}
 	
-	repositories { mavenCentral() }
+	repositories { 
+    mavenCentral() 
+    
+    maven {
+       	url "https://apps.egiz.gv.at/maven/"     	
+       	mavenContent {
+           	releasesOnly()
+       	}
+    }
+    maven {
+       	url "https://apps.egiz.gv.at/maven-snapshot/"
+       	mavenContent {
+           	snapshotsOnly()
+       	}
+    }    
+  }
 
 	dependencies { 
 		testImplementation 'junit:junit:4.13.2' 
@@ -136,12 +151,25 @@ subprojects {
     	}
 	}	
 	
-//	uploadArchives {
-//		repositories.mavenDeployer {
-//			repository(url: project.releaseRepoUrl)
-//			snapshotRepository(url: project.snapshotRepoUrl)
-//		}
-//	}
+	dependencies {
+    	deployerJars "org.apache.maven.wagon:wagon-ssh:2.9"
+    	
+	}
+
+	uploadArchives {
+    	repositories.mavenDeployer {        	
+        	configuration = configurations.deployerJars        	        	
+        	repository(url: "sftp://apps.egiz.gv.at/maven") {
+            	authentication(userName: System.getenv("EGIZ_MAVEN_USER"), password: System.getenv("EGIZ_MAVEN_PASSWORD"))
+            	
+        	}
+        	snapshotRepository(url: "sftp://apps.egiz.gv.at/maven-snapshot") {
+            	authentication(userName: System.getenv("EGIZ_MAVEN_USER"), password: System.getenv("EGIZ_MAVEN_PASSWORD"))
+            	
+        	}
+    	}
+	}  
+	
 	
 	task(internalRelease) {
 		doLast {

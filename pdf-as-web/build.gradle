@@ -3,7 +3,7 @@ apply plugin: 'eclipse'
 apply plugin: 'eclipse-wtp'
 apply plugin: 'war'
 
-apply plugin: 'org.akhikhl.gretty'
+apply plugin: 'org.gretty'
 
 buildscript {
   repositories {
@@ -16,7 +16,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.akhikhl.gretty:gretty:+'
+    classpath 'org.gretty:gretty:3.0.7'
   }
 }
 
@@ -72,8 +72,8 @@ dependencies {
 
 gretty {
   // supported values:
-  // 'jetty7', 'jetty8', 'jetty9', 'tomcat7', 'tomcat8'
-  servletContainer = 'jetty9'
+  // 'jetty7', 'jetty8', 'jetty9', 'jetty9.3', 'jetty9.4', 'tomcat8.5', 'tomcat9'
+  servletContainer = 'jetty9.4'
   
   jvmArgs = [ '-Dpdf-as-web.conf=' + System.getProperty("user.home") + '/.pdfas/pdf-as-web.properties' ]
 }

@@ -97,8 +97,8 @@ subprojects {
 		//tomcatVersion = '7.0.54';
 		//tomcatVersion = '8.0.36';
 		tomcatVersion = '9.0.46';
-		slf4jVersion = '1.7.30'
-		cxfVersion = '3.0.1'
+		slf4jVersion = '1.7.32'
+		cxfVersion = '3.4.5'
 	  }
 	
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }

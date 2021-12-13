@@ -6,6 +6,7 @@ buildscript {
 	
 	dependencies {
 		 classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
+		 classpath "org.owasp:dependency-check-gradle:6.5.0.1"
 	}
 }
 
@@ -15,43 +16,16 @@ allprojects {
 	version = '4.2.1-SNAPSHOT'
 }
 
-configurations {
-	cveCheck
-}
-
-dependencies {
-	cveCheck 'org.owasp:dependency-check-ant:6.3.2'
-}
-
-task checkCVE {
-	doLast {
-		// Redefine checkCVEAnt Ant task, with the classpath property set to our newly defined
-		// cveCheck configuration classpath.
-		ant.taskdef(name: 'checkCVEAnt', classname: 'org.owasp.dependencycheck.taskdefs.DependencyCheckTask',
-			classpath: configurations.cveCheck.asPath)
-	
-		// executing checkCVEAnt Task
-		ant.checkCVEAnt(
-			applicationname: "PDF-AS",
-			reportoutputdirectory: (new File(rootDir, 'releases/cvecheck/' + project.name)).toString(),
-			reportformat: "ALL") {
-			fileset(dir: (new File(rootDir, 'build/alldependencies')).toString()) {
-				include(name: '**/**')
-			}
-		}
-	}
-}
-
 subprojects {
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven-publish'
 	apply plugin: 'maven'
+	apply plugin: 'org.owasp.dependencycheck'
 	group = 'at.gv.egiz.pdfas'
 
 	configurations {
 		deployerJars
-		cveCheck
 	}
 	
 	repositories { 
@@ -73,7 +47,6 @@ subprojects {
 
 	dependencies { 
 		testImplementation 'junit:junit:4.13.2' 
-		cveCheck 'org.owasp:dependency-check-ant:6.1.3'
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {
@@ -112,30 +85,7 @@ subprojects {
 		from configurations.runtime
 		into 'build/alldependencies'
 	}
-		
-	rootProject.checkCVE.dependsOn copyDeps
-	
-	task checkCVELocal {
-		doLast {
-			// Redefine checkCVEAnt Ant task, with the classpath property set to our newly defined
-			// cveCheck configuration classpath.
-			ant.taskdef(name: 'checkCVEAnt', classname: 'org.owasp.dependencycheck.taskdefs.DependencyCheckTask',
-				classpath: configurations.cveCheck.asPath)
-	
-			// executing checkCVEAnt Task
-			ant.checkCVEAnt(
-				applicationname: project.name,
-				reportoutputdirectory: (new File(rootDir, 'releases/' + version + '/cvecheck/' + project.name)).toString(),
-				reportformat: "ALL") {
-					fileset(dir: 'build/alldependencies') {
-					include(name: '**/**')
-				}
-			}
-		}
-	}
-	checkCVELocal.dependsOn copyDepsLocal
 
-	
 	publishing {
     	publications {
         	myLibrary(MavenPublication) {

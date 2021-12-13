@@ -20,7 +20,7 @@ configurations {
 }
 
 dependencies {
-	cveCheck 'org.owasp:dependency-check-ant:1.2.5'
+	cveCheck 'org.owasp:dependency-check-ant:6.3.2'
 }
 
 task checkCVE {

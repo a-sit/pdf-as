@@ -58,11 +58,11 @@ dependencies {
 	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
     api "commons-codec:commons-codec:1.15"
 	api 'org.apache.commons:commons-lang3:3.12.0'
-	api 'org.apache.cxf:cxf-rt-transports-http:3.4.1'
-	api 'org.apache.cxf:cxf-rt-frontend-jaxws:3.4.1'
-	api 'com.thetransactioncompany:cors-filter:2.9.1'
-	api 'ch.qos.logback:logback-classic:1.2.3'
-	api 'ch.qos.logback:logback-core:1.2.3'
+	api 'org.apache.cxf:cxf-rt-transports-http:3.4.5'
+	api 'org.apache.cxf:cxf-rt-frontend-jaxws:3.4.5'
+	api 'com.thetransactioncompany:cors-filter:2.10'
+	api 'ch.qos.logback:logback-classic:1.2.7'
+	api 'ch.qos.logback:logback-core:1.2.7'
 	api 'org.json:json:20210307'
 	api group: 'javax.jws', name: 'javax.jws-api', version: '1.1'
 	pdfbox2 project (':pdf-as-pdfbox-2')

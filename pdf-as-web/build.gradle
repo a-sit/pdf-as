@@ -72,8 +72,8 @@ dependencies {
 
 gretty {
   // supported values:
-  // 'jetty7', 'jetty8', 'jetty9', 'jetty9.3', 'jetty9.4', 'tomcat8.5', 'tomcat9'
-  servletContainer = 'jetty9.4'
+  // 'jetty7', 'jetty8', 'jetty9', 'jetty9.3', 'jetty9.4', 'tomcat85', 'tomcat9'
+  servletContainer = 'tomcat85'
   
   jvmArgs = [ '-Dpdf-as-web.conf=' + System.getProperty("user.home") + '/.pdfas/pdf-as-web.properties' ]
 }

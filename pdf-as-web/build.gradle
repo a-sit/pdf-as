@@ -52,6 +52,8 @@ dependencies {
 	api project (':pdf-as-web-status')
 	api project (':pdf-as-web-statistic-api')
 	api group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+	// Upgrade dependency of commons-fileupload from 2.2 to 2.8.0 to avoid CVE-2021-29425
+	api group: 'commons-io', name: 'commons-io', version: '2.8.0'
 	api group: 'opensymphony', name: 'sitemesh', version: '2.4.2'
 	api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     api group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'

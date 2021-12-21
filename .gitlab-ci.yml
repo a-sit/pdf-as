@@ -48,6 +48,8 @@ release_packaging:
     - docker    
   except:
     - tags  
+    - /^feature/.*$/i
+    - /^issue.*$/i
   before_script:
     - mkdir -p ~/.ssh
     - ssh-keyscan apps.egiz.gv.at >> ~/.ssh/known_hosts

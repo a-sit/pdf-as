@@ -10,7 +10,7 @@ To add contribution on Joinup page, both release folder and maven repository are
 
 Create release folder by running:
 
-`./gradle jar sourcesJar war distZip distTar releases`
+`./gradlew jar sourcesJar war distZip distTar releases`
 
 With this command, a release folder is created. 
 
@@ -20,7 +20,7 @@ Release folder needs to be uploaded to https://apps.egiz.gv.at/releases/pdf-as/r
 
 Create mvn repo folder by running:
 
-`./gradle uploadArchives`
+`./gradlew uploadArchives`
 
 The generated mvn repo needs to be uploaded to https://apps.egiz.gv.at/maven/at/gv/egiz/pdfas/
 

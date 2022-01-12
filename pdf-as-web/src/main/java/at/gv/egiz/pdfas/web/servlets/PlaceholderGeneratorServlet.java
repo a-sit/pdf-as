@@ -159,9 +159,8 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 					                    BufferedImage.TYPE_INT_RGB); //use TYPE_INT_ARGB for png, TYPE_INT_RGB for jpg
 			
 			Graphics g = off_Image.getGraphics();
-			g.setColor(new Color(255,255,255,1));
-			g.fillRect(0, 0, width, height);
 			g.setColor(Color.WHITE);
+			g.fillRect(0, 0, width, height);
 			g.fillRect(border, border, width - (2 * border), height - (2 * border));
 			//g.drawImage(base, 0, 0, 250, 98, 0, 0, base.getWidth(), base.getHeight(), null);
 			g.drawImage(qr, border, border, qrSize + border, qrSize + border, 0, 0, qr.getWidth(), qr.getHeight(), null);

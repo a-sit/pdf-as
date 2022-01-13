@@ -74,10 +74,10 @@ dependencies {
 	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
 	api 'org.apache.commons:commons-collections4:4.4'
 	api group: 'ognl', name: 'ognl', version: '3.2.19'
-	api files('libs/iaik_eccelerate_cms.jar')
-	api files('libs/iaik_eccelerate.jar')
-	api files('libs/iaik_jce_full.jar')
-	api files('libs/iaik_cms.jar')
+	api files('libs/iaik_eccelerate_cms-6.02.jar')
+	api files('libs/iaik_eccelerate-6.02.jar')
+	api files('libs/iaik_jce_full-5.62_moa.jar')
+	api files('libs/iaik_cms-5.1.1.jar')
 	api group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 	api group: 'org.slf4j', name: 'jcl-over-slf4j', version: slf4jVersion
 	

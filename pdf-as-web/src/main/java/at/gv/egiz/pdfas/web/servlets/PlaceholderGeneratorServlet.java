@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +28,6 @@ import at.gv.egiz.pdfas.web.helper.QRCodeGenerator;
 
 public class PlaceholderGeneratorServlet extends HttpServlet implements PlaceholderExtractorConstants {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5854130802422496977L;
 
 	public static final String PARAM_ID = "id";
@@ -55,10 +51,9 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 		this.doProcess(req, resp);
 	}
 	
-	protected void doProcess(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
+	protected void doProcess(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		if(!WebConfiguration.isQRPlaceholderGenerator()) {
-			logger.info("QR Placeholder is disabled by configuration (see {})" + WebConfiguration.PLACEHOLDER_GENERATOR_ENABLED);
+			logger.info("QR Placeholder is disabled by configuration (see {})", WebConfiguration.PLACEHOLDER_GENERATOR_ENABLED);
 			resp.sendError(HttpStatus.SC_NOT_FOUND);
 			return;
 		}
@@ -74,7 +69,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 		
 		if(id != null && !id.isEmpty()) {
 			id = id.replaceAll("[^0-9]", "");
-			if(id != null && !id.isEmpty()) {
+			if(!id.isEmpty()) {
 				try{
 					if(id.length()> 5)
 						id = id.substring(0,5);
@@ -99,9 +94,9 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			}
 		}
 		
-		filename = filename + ".png";
+		filename = filename + ".jpg";
 		
-		logger.info("generating qr placeholder for '{}' as {}", buildString, filename);
+		logger.info("Generating QR placeholder for '{}' as {}", buildString, filename);
 		
 		//if(id != null || profile != null) {
 			// We need to generate the image
@@ -152,7 +147,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			try {
 				QRCodeGenerator.generateQRCode(buildString, baos, qrSize);
 			} catch (WriterException e) {
-				logger.warn("Failed to generate QR Code for placeholder generationg", e);
+				logger.warn("Failed to generate QR Code for placeholder generation", e);
 				resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 				return;
 			}
@@ -160,14 +155,12 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			baos.close();
 			BufferedImage qr = ImageIO.read(new ByteArrayInputStream(baos.toByteArray()));
 			
-			BufferedImage off_Image =
-					  new BufferedImage(width, height,
-					                    BufferedImage.TYPE_INT_ARGB);
+			BufferedImage off_Image = new BufferedImage(width, height,
+					                    BufferedImage.TYPE_INT_RGB); //use TYPE_INT_ARGB for png, TYPE_INT_RGB for jpg
 			
 			Graphics g = off_Image.getGraphics();
-			g.setColor(new Color(255,255,255,1));
-			g.fillRect(0, 0, width, height);
 			g.setColor(Color.WHITE);
+			g.fillRect(0, 0, width, height);
 			g.fillRect(border, border, width - (2 * border), height - (2 * border));
 			//g.drawImage(base, 0, 0, 250, 98, 0, 0, base.getWidth(), base.getHeight(), null);
 			g.drawImage(qr, border, border, qrSize + border, qrSize + border, 0, 0, qr.getWidth(), qr.getHeight(), null);
@@ -188,7 +181,6 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			int start = (height - textHeight) / 2; 
 			
 			if(profile != null && profile.endsWith("_EN")) {
-				
 				g.drawString("placeholder for the", qrSize + ( 3 * border), start + lineSpace);
 				g.drawString("electronic signature", qrSize + ( 3 * border), start + (2 * lineSpace));
 			} else {
@@ -196,7 +188,6 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 				g.drawString("elektronische Signatur", qrSize + ( 3 * border), start + (2 * lineSpace));
 			}
 			if(id != null && !id.isEmpty()) {
-				
 				Font nrFont = new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC, 10);
 				g.setFont(nrFont);
 				
@@ -204,12 +195,13 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			}
 			
 			logger.info("serving qr placeholder for '{}'", buildString);
-			resp.setContentType("image/png");
+			resp.setContentType("image/jpeg");
 			resp.setHeader("Cache-Control", "private, no-store, no-cache, must-revalidate");
 			resp.setHeader("Pragma", "no-cache");
 			resp.setHeader ("Content-Disposition", "attachment; filename=\""+filename+"\""); 
 
-			ImageIO.write(off_Image, "PNG", resp.getOutputStream());
+			// Use JPG (instead of PNG) as output format to avoid placeholder being not recognised after printing to PDF in Microsoft Word
+			ImageIO.write(off_Image, "JPG", resp.getOutputStream());
 			return;
 		/*} else {
 			// just use the template

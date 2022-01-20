@@ -6,6 +6,7 @@ buildscript {
 	
 	dependencies {
 		 classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
+		 classpath "org.owasp:dependency-check-gradle:6.5.0.1"
 	}
 }
 
@@ -15,50 +16,37 @@ allprojects {
 	version = '4.2.1-SNAPSHOT'
 }
 
-configurations {
-	cveCheck
-}
-
-dependencies {
-	cveCheck 'org.owasp:dependency-check-ant:1.2.5'
-}
-
-task checkCVE {
-	doLast {
-		// Redefine checkCVEAnt Ant task, with the classpath property set to our newly defined
-		// cveCheck configuration classpath.
-		ant.taskdef(name: 'checkCVEAnt', classname: 'org.owasp.dependencycheck.taskdefs.DependencyCheckTask',
-			classpath: configurations.cveCheck.asPath)
-	
-		// executing checkCVEAnt Task
-		ant.checkCVEAnt(
-			applicationname: "PDF-AS",
-			reportoutputdirectory: (new File(rootDir, 'releases/cvecheck/' + project.name)).toString(),
-			reportformat: "ALL") {
-			fileset(dir: (new File(rootDir, 'build/alldependencies')).toString()) {
-				include(name: '**/**')
-			}
-		}
-	}
-}
-
 subprojects {
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven-publish'
-	//apply plugin: 'maven'
+	apply plugin: 'maven'
+	apply plugin: 'org.owasp.dependencycheck'
 	group = 'at.gv.egiz.pdfas'
 
 	configurations {
 		deployerJars
-		cveCheck
 	}
 	
-	repositories { mavenCentral() }
+	repositories { 
+    mavenCentral() 
+    
+    maven {
+       	url "https://apps.egiz.gv.at/maven/"     	
+       	mavenContent {
+           	releasesOnly()
+       	}
+    }
+    maven {
+       	url "https://apps.egiz.gv.at/maven-snapshot/"
+       	mavenContent {
+           	snapshotsOnly()
+       	}
+    }    
+  }
 
 	dependencies { 
 		testImplementation 'junit:junit:4.13.2' 
-		cveCheck 'org.owasp:dependency-check-ant:6.1.3'
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {
@@ -82,8 +70,8 @@ subprojects {
 		//tomcatVersion = '7.0.54';
 		//tomcatVersion = '8.0.36';
 		tomcatVersion = '9.0.46';
-		slf4jVersion = '1.7.30'
-		cxfVersion = '3.0.1'
+		slf4jVersion = '1.7.32'
+		cxfVersion = '3.4.5'
 	  }
 	
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }
@@ -97,30 +85,7 @@ subprojects {
 		from configurations.runtime
 		into 'build/alldependencies'
 	}
-		
-	rootProject.checkCVE.dependsOn copyDeps
-	
-	task checkCVELocal {
-		doLast {
-			// Redefine checkCVEAnt Ant task, with the classpath property set to our newly defined
-			// cveCheck configuration classpath.
-			ant.taskdef(name: 'checkCVEAnt', classname: 'org.owasp.dependencycheck.taskdefs.DependencyCheckTask',
-				classpath: configurations.cveCheck.asPath)
-	
-			// executing checkCVEAnt Task
-			ant.checkCVEAnt(
-				applicationname: project.name,
-				reportoutputdirectory: (new File(rootDir, 'releases/' + version + '/cvecheck/' + project.name)).toString(),
-				reportformat: "ALL") {
-					fileset(dir: 'build/alldependencies') {
-					include(name: '**/**')
-				}
-			}
-		}
-	}
-	checkCVELocal.dependsOn copyDepsLocal
 
-	
 	publishing {
     	publications {
         	myLibrary(MavenPublication) {
@@ -136,12 +101,25 @@ subprojects {
     	}
 	}	
 	
-//	uploadArchives {
-//		repositories.mavenDeployer {
-//			repository(url: project.releaseRepoUrl)
-//			snapshotRepository(url: project.snapshotRepoUrl)
-//		}
-//	}
+	dependencies {
+    	deployerJars "org.apache.maven.wagon:wagon-ssh:3.4.3"
+    	
+	}
+
+	uploadArchives {
+    	repositories.mavenDeployer {        	
+        	configuration = configurations.deployerJars        	        	
+        	repository(url: "sftp://apps.egiz.gv.at/maven") {
+            	authentication(userName: System.getenv("EGIZ_MAVEN_USER"), password: System.getenv("EGIZ_MAVEN_PASSWORD"))
+            	
+        	}
+        	snapshotRepository(url: "sftp://apps.egiz.gv.at/maven-snapshot") {
+            	authentication(userName: System.getenv("EGIZ_MAVEN_USER"), password: System.getenv("EGIZ_MAVEN_PASSWORD"))
+            	
+        	}
+    	}
+	}  
+	
 	
 	task(internalRelease) {
 		doLast {

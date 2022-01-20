@@ -1,0 +1,86 @@
+image: gradle:6.8.3-jdk11
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+  LANGUAGE: "en_US"
+  LIB_NAME: "PDF-AS 4"
+  GIT_DEPTH: "2"
+  SECURE_LOG_LEVEL: "debug"  
+  
+include:
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Secret-Detection.gitlab-ci.yml
+
+default:
+  tags:
+    - docker
+    
+stages:
+  - assemble
+  - test
+  - package
+  - release
+
+cache:
+  paths:
+    - .m2/repository
+    - .gradle/wrapper
+    - .gradle/caches
+
+assemble:
+  stage: assemble
+  tags:
+    - docker    
+  except:
+    - tags  
+  script: |
+    ./gradlew --warning-mode all -x test clean build 
+  artifacts:
+    when: always
+    reports:
+      junit: "**/build/test-results/test/**/TEST-*.xml"
+
+release_packaging:
+  stage: package
+  tags:
+    - docker    
+  except:
+    - tags  
+    - /^feature/.*$/i
+    - /^issue.*$/i
+  before_script:
+    - mkdir -p ~/.ssh
+    - ssh-keyscan apps.egiz.gv.at >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts      
+  script: |
+    ./gradlew --stacktrace -x test assemble uploadArchives
+  artifacts:
+    when: always
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"  
+    reports:
+      dotenv: variables.env    
+    
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  tags:
+    - docker   
+  needs:
+    - job: assemble
+      artifacts: true
+  when: manual
+  only:
+    - master
+  script: |
+    echo "Releasing version $VERSION of $LIB_NAME"
+    echo "Publishing version $VERSION to public EGIZ maven"
+    cd ./moaSig
+    ./gradlew release
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-release"
+    expire_in: never
+    paths:
+      - "../release/${VERSION}/pdf-as-web-${VERSION}.war"
+      - "../release/${VERSION}/pdf-as-lib-${VERSION}.zip"

@@ -50,6 +50,9 @@ public class SignatureFieldsAndPlaceHolderExtractor {
                 mode, doc);
             List<SignaturePlaceholderData> results = signaturePlaceholderExtractor.extractList(doc, placeholderId,
                 mode);
+            if (results == null) {
+                return null;
+            }
             List<String> used = getExistingSignatureLocations(doc);
             //return first not used
             for(SignaturePlaceholderData result : results) {

@@ -191,7 +191,7 @@ public class KeyStoreUtils {
 	
 	/**
 	 * Loads a keyStore without knowing the keyStore type
-	 * @param in input stream
+	 * @param is input stream
 	 * @param password Password protecting the keyStore
 	 * @return keyStore loaded
 	 * @throws KeyStoreException thrown if keyStore cannot be loaded

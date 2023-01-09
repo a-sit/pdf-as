@@ -12,7 +12,12 @@ buildscript {
 
 allprojects {
 	apply plugin: "com.github.ben-manes.versions"
-	repositories {  mavenCentral()  }
+	repositories {  
+		mavenCentral()
+		maven {
+        	url "https://repo.spring.io/milestone/"
+    	}  
+    }
 	version = '4.2.1-SNAPSHOT'
 }
 
@@ -30,7 +35,14 @@ subprojects {
 	
 	repositories { 
     mavenCentral() 
+    mavenLocal()
     
+    maven {
+       	url "https://repo.spring.io/milestone/"
+       	mavenContent {
+           	releasesOnly()
+       	}
+    }      
     maven {
        	url "https://apps.egiz.gv.at/maven/"     	
        	mavenContent {
@@ -46,7 +58,7 @@ subprojects {
   }
 
 	dependencies { 
-		testImplementation 'junit:junit:4.13.2' 
+		testImplementation 'junit:junit:4.13.2'
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {

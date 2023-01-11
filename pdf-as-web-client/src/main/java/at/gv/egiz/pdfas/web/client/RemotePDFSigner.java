@@ -35,6 +35,9 @@ import at.gv.egiz.pdfas.api.ws.PDFASBulkSignResponse;
 import at.gv.egiz.pdfas.api.ws.PDFASSignRequest;
 import at.gv.egiz.pdfas.api.ws.PDFASSignResponse;
 import at.gv.egiz.pdfas.api.ws.PDFASSigning;
+import at.gv.egiz.pdfas.api.ws.PdfasGetMultipleRequest;
+import at.gv.egiz.pdfas.api.ws.PdfasSignMultipleRequest;
+import at.gv.egiz.pdfas.api.ws.PdfasSignMultipleResponse;
 
 public class RemotePDFSigner implements PDFASSigning {
 
@@ -60,5 +63,16 @@ public class RemotePDFSigner implements PDFASSigning {
 	public PDFASBulkSignResponse signPDFDokument(PDFASBulkSignRequest request) {
 		return proxy.signPDFDokument(request);
 	}
+
+  @Override
+  public PdfasSignMultipleResponse signPDFDokument(PdfasSignMultipleRequest request) {
+    return proxy.signPDFDokument(request);
+  }
+
+  @Override
+  public PdfasSignMultipleResponse getSignedDokument(PdfasGetMultipleRequest request) {
+    return proxy.getSignedDokument(request);
+    
+  }
 
 }

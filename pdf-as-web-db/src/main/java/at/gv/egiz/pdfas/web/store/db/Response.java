@@ -10,15 +10,15 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
+import at.gv.egiz.pdfas.api.processing.PdfasSignResponse;
 
 @Entity
-@Table(name = "requests")
-public class Request {
+@Table(name = "response")
+public class Response {
 
 	private String uuid;	
 	private Date created;
-	private PdfasSignRequest signRequest;
+	private PdfasSignResponse signResponse;
 	
 	@Id
 	@GeneratedValue(generator = "uuid")
@@ -41,13 +41,13 @@ public class Request {
 		this.created = created;
 	}
 	
-	@Column(name = "signRequest", nullable = false, length = 52428800)
-	public PdfasSignRequest getSignRequest() {
-		return this.signRequest;
+	@Column(name = "signedResponse", nullable = false, length = 52428800)
+	public PdfasSignResponse getSignedResponse() {
+		return this.signResponse;
 	}
 
-	public void setSignRequest(PdfasSignRequest signRequest) {
-		this.signRequest = signRequest;
+	public void setSignedResponse(PdfasSignResponse signResponse) {
+		this.signResponse = signResponse;
 	}
 	
 	

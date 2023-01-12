@@ -844,9 +844,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       synchronized (PDDocument.class) {
         visualDoc = PDDocument.load(properties.getVisibleSignature());
       }
-      // PDPageable pageable = new PDPageable(visualDoc);
 
-      final PDPage firstPage = visualDoc.getDocumentCatalog().getPages().get(0);
 
       final float stdRes = 72;
       final float targetRes = resolution;
@@ -860,17 +858,21 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       visualDoc.close();
       pdfRenderer = null;
       
-      final BufferedImage cutOut = new BufferedImage((int) (position.getWidth() * factor),
-          (int) (position.getHeight() * factor), BufferedImage.TYPE_4BYTE_ABGR);
+      final BufferedImage cutOut = new BufferedImage(
+          (int) (position.getWidth() * factor),
+          (int) (position.getHeight() * factor), 
+          BufferedImage.TYPE_4BYTE_ABGR);
 
       final Graphics2D graphics = (Graphics2D) cutOut.getGraphics();
 
-      graphics.drawImage(outputImage, 0, 0, cutOut.getWidth(), cutOut.getHeight(), (int) (1 * factor),
+      graphics.drawImage(outputImage, 0, 0, cutOut.getWidth(), cutOut.getHeight(), 
+          (int) (0 * factor),
           (int) (outputImage.getHeight() - (position.getHeight() + 1) * factor),
-          (int) ((1 + position.getWidth()) * factor), (int) (outputImage.getHeight()
-              - (position.getHeight() + 1) * factor + position.getHeight() * factor),
+          (int) ((position.getWidth() + 2) * factor), 
+          (int) (outputImage.getHeight() - (position.getHeight()) * factor + position.getHeight() * factor),
           null);
       return cutOut;
+      
     } catch (final PdfAsException e) {
       logger.warn("PDF-AS  Exception", e);
       throw ErrorExtractor.searchPdfAsError(e, status);

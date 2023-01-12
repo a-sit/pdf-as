@@ -847,6 +847,9 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
             //BufferedImage outputImage = firstPage.convertToImage(BufferedImage.TYPE_4BYTE_ABGR, (int) targetRes);
 
+            visualDoc.close();
+            pdfRenderer = null;
+
             BufferedImage cutOut = new BufferedImage((int) (position.getWidth() * factor),
                     (int) (position.getHeight() * factor), BufferedImage.TYPE_4BYTE_ABGR);
 

@@ -26,32 +26,31 @@ package at.gv.egiz.pdfas.web.servlets;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.html.HTML;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.codehaus.stax2.io.EscapingWriterFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import at.gv.egiz.pdfas.api.processing.SignedDocument;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
+import at.gv.egiz.pdfas.web.exception.PdfAsStoreException;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.helper.UrlParameterExtractor;
+import at.gv.egiz.pdfas.web.store.RequestStore;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Servlet implementation class ProvidePDF
  */
+@Slf4j
 public class ProvidePDFServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(ProvidePDFServlet.class);
 	
 	private static final String PDF_DATA_URL = "##PDFDATAURL##";
 	
@@ -88,7 +87,7 @@ public class ProvidePDFServlet extends HttpServlet {
 			if (invokeURL == null || !WebConfiguration.isProvidePdfURLinWhitelist(invokeURL)) {
 				
 				if(invokeURL != null) {
-					logger.warn(invokeURL + " is not allowed by whitelist");
+					log.warn(invokeURL + " is not allowed by whitelist");
 				}
 				
 				if (PdfAsHelper.getResponseMode(request, response).equals(PdfAsHelper.PDF_RESPONSE_MODES.htmlform)) {								
@@ -100,60 +99,126 @@ public class ProvidePDFServlet extends HttpServlet {
 					response.getWriter().close();
 					
 				} else {
-					logger.debug("PDFResult directMode: Forward to PDFData Servlet directly");
+					log.debug("PDFResult directMode: Forward to PDFData Servlet directly");
 					RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/PDFData");
 					dispatcher.forward(request, response);
 								
 				}
 					
-			} else {
-				// Redirect Browser
-				String template = PdfAsHelper.getInvokeRedirectTemplateSL();
-				
-				URL url = new URL(invokeURL);
-				int p=url.getPort();
-				//no port, but http or https --> use default port
-				if((url.getProtocol().equalsIgnoreCase("https") || url.getProtocol().equalsIgnoreCase("http")) && p == -1){
-					p=url.getDefaultPort();
-				}
-				String invokeUrlProcessed = url.getProtocol() + "://" +   // "http" + "://
-						url.getHost() +       // "myhost"
-			             ":" +                           // ":"
-			             p +       // "8080"
-			             url.getPath();  
-				
-				template = template.replace("##INVOKE_URL##", invokeUrlProcessed);
-				
-				String extraParams = UrlParameterExtractor.buildParameterFormString(url);
-				template = template.replace("##ADD_PARAMS##", extraParams);
-				
-				byte[] signedData = PdfAsHelper.getSignedPdf(request, response);
-				if (signedData != null) {
-					template = template.replace("##PDFLENGTH##",
-							String.valueOf(signedData.length));
-				} else {
-					throw new PdfAsException("No Signature data available");
-				}
-
-				String target = PdfAsHelper.getInvokeTarget(request, response);
-				
-				if(target == null) {
-					target = "_self";
-				}
-				
-				template = template.replace("##TARGET##", StringEscapeUtils.escapeHtml4(target));
-				
-				template = template.replace("##PDFURL##",
-						URLEncoder.encode(PdfAsHelper.generatePdfURL(request, response), 
-								"UTF-8"));
-				response.setContentType("text/html");
-				response.getWriter().write(template);
-				response.getWriter().close();
+			} else {			  
+			  List<SignedDocument> signedPdfs = PdfAsHelper.getPdfSigningResponse(request).getSignedPdfs();
+			  
+			  if (signedPdfs.isEmpty()) {
+			    log.info("No signed pdf document available.");
+		      PdfAsHelper.setSessionException(request, response,
+		          "No signed pdf document available.", null);
+		      PdfAsHelper.gotoError(getServletContext(), request, response);  
+			    
+			  } else if (signedPdfs.size() == 1) {
+			    provideSingleFile(request, response, signedPdfs.get(0), invokeURL);
+			    
+			    
+			  } else {
+			    provideTokenToGetMultipleFiles(request, response, invokeURL);
+			    
+			  }			 
 			}
+			
 		} catch (Exception e) {
-			PdfAsHelper.setSessionException(request, response, e.getMessage(),
-					e);
+			PdfAsHelper.setSessionException(request, response, e.getMessage(), e);
 			PdfAsHelper.gotoError(getServletContext(), request, response);
+			
 		}
 	}
+
+  private void provideTokenToGetMultipleFiles(HttpServletRequest request, HttpServletResponse response,
+      String invokeURL) throws IOException, PdfAsStoreException {
+
+    String template = PdfAsHelper.getInvokeRedirectTemplateMoreFiles();
+    
+    URL url = new URL(invokeURL);
+    int p=url.getPort();
+    //no port, but http or https --> use default port
+    if((url.getProtocol().equalsIgnoreCase("https") || url.getProtocol().equalsIgnoreCase("http")) && p == -1){
+      p=url.getDefaultPort();
+    }
+    String invokeUrlProcessed = url.getProtocol() + "://" +   // "http" + "://
+        url.getHost() +       // "myhost"
+               ":" +                           // ":"
+               p +       // "8080"
+               url.getPath();  
+    
+    template = template.replace("##INVOKE_URL##", invokeUrlProcessed);
+    
+    String extraParams = UrlParameterExtractor.buildParameterFormString(url);
+    template = template.replace("##ADD_PARAMS##", extraParams);
+
+    
+    String target = PdfAsHelper.getInvokeTarget(request, response);    
+    if(target == null) {
+      target = "_self";
+      
+    }    
+    template = template.replace("##TARGET##", StringEscapeUtils.escapeHtml4(target));
+    
+    String accessToken = RequestStore.getInstance().createNewResponseEntry(PdfAsHelper.getPdfSigningResponse(request));                
+    template = template.replace("##RESPONSETOKEN##", accessToken);
+    
+    response.setContentType("text/html");
+    response.getWriter().write(template);
+    response.getWriter().close();
+    
+    
+    
+        
+    
+  }
+
+  private void provideSingleFile(HttpServletRequest request, HttpServletResponse response, SignedDocument signedDocument, String invokeURL) throws IOException, PdfAsException {
+    // Redirect Browser
+    String template = PdfAsHelper.getInvokeRedirectTemplateSL();
+    
+    URL url = new URL(invokeURL);
+    int p=url.getPort();
+    //no port, but http or https --> use default port
+    if((url.getProtocol().equalsIgnoreCase("https") || url.getProtocol().equalsIgnoreCase("http")) && p == -1){
+      p=url.getDefaultPort();
+    }
+    String invokeUrlProcessed = url.getProtocol() + "://" +   // "http" + "://
+        url.getHost() +       // "myhost"
+               ":" +                           // ":"
+               p +       // "8080"
+               url.getPath();  
+    
+    template = template.replace("##INVOKE_URL##", invokeUrlProcessed);
+    
+    String extraParams = UrlParameterExtractor.buildParameterFormString(url);
+    template = template.replace("##ADD_PARAMS##", extraParams);
+    
+    
+    //TODO: implement use-case if result contains more than one file
+    byte[] signedData = PdfAsHelper.getPdfSigningResponse(request).getSignedPdfs().get(0).getOutputData();
+    if (signedData != null) {
+      template = template.replace("##PDFLENGTH##",
+          String.valueOf(signedData.length));
+    } else {      
+      throw new PdfAsException("No Signature data available");
+    }
+
+    String target = PdfAsHelper.getInvokeTarget(request, response);
+    
+    if(target == null) {
+      target = "_self";
+    }
+    
+    template = template.replace("##TARGET##", StringEscapeUtils.escapeHtml4(target));
+    
+    template = template.replace("##PDFURL##",
+        URLEncoder.encode(PdfAsHelper.generatePdfURL(request, response), 
+            "UTF-8"));
+    response.setContentType("text/html");
+    response.getWriter().write(template);
+    response.getWriter().close();
+    
+  }
 }

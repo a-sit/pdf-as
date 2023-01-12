@@ -23,6 +23,7 @@ public class StatisticEvent {
 
 	public enum Operation {
 		SIGN("sign"),
+		SIGNBULK("signBulk"),
 		VERIFY("verify");
 		
 		private String name;

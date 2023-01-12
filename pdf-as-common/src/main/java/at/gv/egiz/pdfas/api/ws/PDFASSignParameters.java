@@ -23,11 +23,8 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.api.ws;
 
-import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
+import java.util.Arrays;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlEnumValue;
@@ -71,6 +68,15 @@ public class PDFASSignParameters implements Serializable {
 	    public String toString(){
 	       return name;
 	    }
+	    
+	    public static Connector fromString(String value) {
+	      return Arrays.asList(Connector.values()).stream()
+	        .filter(el -> el.toString().equalsIgnoreCase(value))
+	        .findFirst()
+	        .get();
+	      
+	    }
+	    
 	}
 	
 	

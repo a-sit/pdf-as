@@ -23,11 +23,16 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.store;
 
-import at.gv.egiz.pdfas.api.ws.PDFASSignRequest;
+import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
+import at.gv.egiz.pdfas.api.processing.PdfasSignResponse;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 
 public interface IRequestStore {
 	public StatisticEvent fetchStatisticEntry(String id);
-	public String createNewStoreEntry(PDFASSignRequest request, StatisticEvent event);
-	public PDFASSignRequest fetchStoreEntry(String id);
+	public String createNewStoreEntry(PdfasSignRequest request, StatisticEvent event);
+	public PdfasSignRequest fetchStoreEntry(String id);
+	
+	public String createNewResponseEntry(PdfasSignResponse response);
+	public PdfasSignResponse fetchStoreResponse(String id);
+	
 }

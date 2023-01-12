@@ -44,4 +44,14 @@ public interface PDFASSigning {
 	@WebMethod(operationName = "signBulk")
 	@WebResult(name="bulkResponse")
 	public PDFASBulkSignResponse signPDFDokument(@WebParam(name = "signBulkRequest") PDFASBulkSignRequest request);
+	
+	@WebMethod(operationName = "signMultiple")
+	@WebResult(name="signMultipleResponse")
+	public PdfasSignMultipleResponse signPDFDokument(@WebParam(name = "signMultipleRequest") PdfasSignMultipleRequest request);
+	
+  @WebMethod(operationName = "getMultiple")
+  @WebResult(name="getMultipleResponse")
+  public PdfasSignMultipleResponse getSignedDokument(@WebParam(name = "getMultipleRequest") PdfasGetMultipleRequest request);
+
+
 }

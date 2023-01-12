@@ -12,8 +12,13 @@ buildscript {
 
 allprojects {
 	apply plugin: "com.github.ben-manes.versions"
-	repositories {  mavenCentral()  }
-	version = '4.2.1-SNAPSHOT'
+	repositories {  
+		mavenCentral()
+		maven {
+        	url "https://repo.spring.io/milestone/"
+    	}  
+    }
+	version = '4.3.0-SNAPSHOT'
 }
 
 subprojects {
@@ -30,7 +35,14 @@ subprojects {
 	
 	repositories { 
     mavenCentral() 
+    mavenLocal()
     
+    maven {
+       	url "https://repo.spring.io/milestone/"
+       	mavenContent {
+           	releasesOnly()
+       	}
+    }      
     maven {
        	url "https://apps.egiz.gv.at/maven/"     	
        	mavenContent {
@@ -46,7 +58,9 @@ subprojects {
   }
 
 	dependencies { 
-		testImplementation 'junit:junit:4.13.2' 
+		compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'    
+		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+		testImplementation 'junit:junit:4.13.2'		
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {
@@ -58,7 +72,7 @@ subprojects {
 	    archives sourcesJar
 	}
 
-	sourceCompatibility = 1.7
+	sourceCompatibility = 1.8
 	compileJava.options.encoding = "UTF-8"
 	compileTestJava.options.encoding = "UTF-8"
 	project.ext{
@@ -70,8 +84,8 @@ subprojects {
 		//tomcatVersion = '7.0.54';
 		//tomcatVersion = '8.0.36';
 		tomcatVersion = '9.0.46';
-		slf4jVersion = '1.7.32'
-		cxfVersion = '3.4.5'
+		slf4jVersion = '1.7.36'
+		cxfVersion = '3.5.5'
 	  }
 	
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }

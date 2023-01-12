@@ -24,18 +24,14 @@
 package at.gv.egiz.pdfas.web.servlets;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
-import at.gv.egiz.pdfas.api.ws.PDFASSignRequest;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
@@ -45,14 +41,13 @@ import at.gv.egiz.pdfas.web.helper.DigestHelper;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.store.RequestStore;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class UIEntryPointServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	public static final String REQUEST_ID_PARAM = "reqId";
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(UIEntryPointServlet.class);
 
 	public UIEntryPointServlet() {
 	}
@@ -72,13 +67,16 @@ public class UIEntryPointServlet extends HttpServlet {
 	protected void doProcess(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
+		  // invalidate existing http sessions at first
+	    req.getSession().invalidate();
+		  
 			String storeId = req.getParameter(REQUEST_ID_PARAM);
 
 			if (storeId == null) {
 				throw new PdfAsStoreException("Wrong Parameters");
 			}
 
-			PDFASSignRequest pdfAsRequest = RequestStore.getInstance()
+			PdfasSignRequest pdfAsRequest = RequestStore.getInstance()
 					.fetchStoreEntry(storeId);
 
 			if (pdfAsRequest == null) {
@@ -91,16 +89,15 @@ public class UIEntryPointServlet extends HttpServlet {
 
 			PdfAsHelper.setStatisticEvent(req, resp, statisticEvent);
 			
-			Connector connector = pdfAsRequest.getParameters().getConnector();
+			Connector connector = pdfAsRequest.getCoreParams().getConnector();
 
-			String invokeUrl = pdfAsRequest.getParameters().getInvokeURL();
+			String invokeUrl = pdfAsRequest.getCoreParams().getInvokeUrl();
 			PdfAsHelper.setInvokeURL(req, resp, invokeUrl);
 
-			String invokeTarget = pdfAsRequest.getParameters()
-					.getInvokeTarget();
+			String invokeTarget = pdfAsRequest.getCoreParams().getInvokeTarget();
 			PdfAsHelper.setInvokeTarget(req, resp, invokeTarget);
 
-			String errorUrl = pdfAsRequest.getParameters().getInvokeErrorURL();
+			String errorUrl = pdfAsRequest.getCoreParams().getInvokeErrorUrl();
 			PdfAsHelper.setErrorURL(req, resp, errorUrl);
 
 			SignatureVerificationLevel lvl = SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION;
@@ -116,17 +113,16 @@ public class UIEntryPointServlet extends HttpServlet {
 			}
 			PdfAsHelper.setVerificationLevel(req, lvl);
 
-			if (pdfAsRequest.getInputData() == null) {
+			if (pdfAsRequest.hasNext() && pdfAsRequest.getInput().get(0).getInputData() == null) {
 				throw new PdfAsException("No Signature data available");
 			}
 
-			String pdfDataHash = DigestHelper.getHexEncodedHash(pdfAsRequest
-					.getInputData());
+			String pdfDataHash = DigestHelper.getHexEncodedHash(pdfAsRequest.getInput().get(0).getInputData());
 
 			PdfAsHelper.setSignatureDataHash(req, pdfDataHash);
-			logger.debug("Storing signatures data hash: " + pdfDataHash);
+			log.debug("Storing signatures data hash: " + pdfDataHash);
 
-			logger.debug("Starting signature creation with: " + connector);
+			log.debug("Starting signature creation with: " + connector);
 
 			// IPlainSigner signer;
 			if (connector.equals(Connector.BKU)
@@ -163,26 +159,8 @@ public class UIEntryPointServlet extends HttpServlet {
 					}
 				}
 				
-				Map<String, String> map = null;
-				if (pdfAsRequest.getParameters().getPreprocessor() != null) {
-					map = pdfAsRequest.getParameters().getPreprocessor()
-							.getMap();
-				}
+				PdfAsHelper.startSignature(req, resp, getServletContext(), connector.toString(), pdfAsRequest);
 				
-				Map<String, String> overwrite = null;
-				if (pdfAsRequest.getParameters().getOverrides() != null) {
-					overwrite = pdfAsRequest.getParameters().getOverrides()
-							.getMap();
-				}
-				//TODO alex
-				Map<String, String> dynamicSignatureBlockArguments = pdfAsRequest.getSignatureBlockParameters();
-
-				PdfAsHelper.startSignature(req, resp, getServletContext(),
-						pdfAsRequest.getInputData(), connector.toString(),
-						pdfAsRequest.getParameters().getPosition(),
-						pdfAsRequest.getParameters().getTransactionId(),
-						pdfAsRequest.getParameters().getProfile(), map, 
-						overwrite, dynamicSignatureBlockArguments);
 			} else {
 				throw new PdfAsWebException("Invalid connector ("
 						+ Connector.BKU + " | " + Connector.ONLINEBKU + " | "
@@ -190,7 +168,7 @@ public class UIEntryPointServlet extends HttpServlet {
 			}
 
 		} catch (Throwable e) {
-			logger.warn("Failed to process Request: ", e);
+			log.warn("Failed to process Request: ", e);
 			PdfAsHelper.setSessionException(req, resp, e.getMessage(), e);
 			PdfAsHelper.gotoError(getServletContext(), req, resp);
 		}

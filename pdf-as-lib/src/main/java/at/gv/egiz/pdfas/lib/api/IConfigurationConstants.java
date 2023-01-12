@@ -110,6 +110,8 @@ public interface IConfigurationConstants {
 	/**
 	 * Visual Signature placement
 	 */
+	
+	public static final String SIG_BLOCK_LESS_SPACE_STOPPING_WITH_ERROR = "sigblock.placement.less.space.failing";
 	public static final String BG_COLOR_DETECTION = "sigblock.placement.bgcolor.detection.enabled";
 	public static final String SIG_PLACEMENT_DEBUG_OUTPUT = "sigblock.placement.debug.file";
 

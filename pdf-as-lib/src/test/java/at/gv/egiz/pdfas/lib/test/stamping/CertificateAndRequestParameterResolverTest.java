@@ -12,19 +12,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.google.gson.annotations.SerializedName;
-
-import at.gv.egiz.pdfas.common.settings.DefaultSignatureProfileSettings;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.impl.SignParameterImpl;
-import at.gv.egiz.pdfas.lib.impl.stamping.CertificateAndRequestParameterResolver;
 import at.gv.egiz.pdfas.lib.impl.stamping.ValueResolver;
 import at.gv.egiz.pdfas.lib.impl.status.ICertificateProvider;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
 import iaik.x509.X509Certificate;
-
+ 
 @RunWith(JUnit4.class)
 public class CertificateAndRequestParameterResolverTest {
 
@@ -50,7 +46,7 @@ public class CertificateAndRequestParameterResolverTest {
 		String result = resolver.resolve("", 
 				"${subject.T != null ? (subject.T + \" \") : \"\"}${subject.CN}", 
 				sigProfileSetting);						
-		assertEquals("wrong signer Name", "Hermann Peyerl", result);
+		assertEquals("wrong signer Name", "A.Univ.Prof.DDr. Hermann Peyerl", result);
 		
 	}
 	

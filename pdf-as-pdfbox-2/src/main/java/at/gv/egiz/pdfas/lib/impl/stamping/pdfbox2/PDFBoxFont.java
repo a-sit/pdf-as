@@ -218,7 +218,7 @@ public class PDFBoxFont {
 			PDFont font = pdfObject.getSigBlockFontCache().getFont(fontDesc);
 			if (font == null) {
 				pdfObject.getSigBlockFontCache().showAvailableFonts();
-				throw new IOException("Invalid font descriptor");
+				throw new IOException("Invalid font descriptor \"" + fontDesc + "\"");
 			}
 			return font;
 		}

@@ -685,11 +685,9 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       final Map<Integer, COSObjectable> destNumberTreeAsMap = getNumberTreeAsMap(structureTreeRoot
           .getParentTree());
       if (destNumberTreeAsMap.isEmpty()) {
-        nextKey = 0;
-
+        nextKey = 0;      
       } else {
         nextKey = Collections.max(destNumberTreeAsMap.keySet()) + 1;
-
       }
     }
 
@@ -860,6 +858,9 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       // BufferedImage outputImage =
       // firstPage.convertToImage(BufferedImage.TYPE_4BYTE_ABGR, (int) targetRes);
 
+      visualDoc.close();
+      pdfRenderer = null;
+
       final BufferedImage cutOut = new BufferedImage((int) (position.getWidth() * factor),
           (int) (position.getHeight() * factor), BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -976,6 +977,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
       }
     }
+<<<<<<< pdf-as-pdfbox-2/src/main/java/at/gv/egiz/pdfas/lib/impl/signing/pdfbox2/PADESPDFBOXSigner.java
     return result;
   }
 
@@ -1014,3 +1016,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
   }
 
 }
+=======
+	
+}
+>>>>>>> pdf-as-pdfbox-2/src/main/java/at/gv/egiz/pdfas/lib/impl/signing/pdfbox2/PADESPDFBOXSigner.java

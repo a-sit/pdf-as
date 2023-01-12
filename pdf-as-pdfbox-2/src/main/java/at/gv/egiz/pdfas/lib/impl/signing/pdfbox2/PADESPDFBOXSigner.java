@@ -40,9 +40,7 @@ import javax.activation.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.cos.COSArray;
-import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
-import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSString;
@@ -148,8 +146,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
     String pdfaVersion = null;
 
     PDDocument doc = null;
-    final SignatureOptions options = new SignatureOptions();
-    COSDocument visualSignatureDocumentGuard = null;
+    SignatureOptions options = new SignatureOptions();
     try {
 
       doc = pdfObject.getDocument();
@@ -221,8 +218,8 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
           logger.debug("Placeholder Position set to: " + tablePos.toString());
         }
       }
-      final SignatureProfileSettings signatureProfileSettings = TableFactory
-          .createProfile(requestedSignature.getSignatureProfileID(), pdfObject.getStatus().getSettings());
+      final SignatureProfileSettings signatureProfileSettings = TableFactory.createProfile(
+          requestedSignature.getSignatureProfileID(), pdfObject.getStatus().getSettings());
 
       // Check if input document is PDF-A conform
       if (signatureProfileSettings.isPDFA()) {
@@ -404,7 +401,6 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
         if (signatureProfileSettings.isPDFA() || signatureProfileSettings.isPDFA3()) {
           final PDDocumentCatalog root = doc.getDocumentCatalog();
-          final COSBase base = root.getCOSObject().getItem(COSName.OUTPUT_INTENTS);
 
           InputStream colorProfile = null;
           // colorProfile = this.getClass().getResourceAsStream("/icm/sRGB.icm");
@@ -433,8 +429,6 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         options.setPage(positioningInstruction.getPage() - 1);
         options.setVisualSignature(properties.getVisibleSignature());
       }
-
-      visualSignatureDocumentGuard = options.getVisualSignature();
 
       doc.addSignature(signature, signer, options);
 
@@ -648,17 +642,10 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
 
       } catch (final IOException e1) {
-        e1.printStackTrace();
-      }
+        logger.error("Can not save incremental update", e1);
 
-      finally {
-        if (options != null) {
-          if (options.getVisualSignature() != null) {
-            options.getVisualSignature().close();
-          }
-        }
       }
-
+      
       System.gc();
       logger.debug("Signature done!");
       
@@ -666,7 +653,22 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       logger.warn(MessageResolver.resolveMessage("error.pdf.sig.01"), e);
       throw new PdfAsException("error.pdf.sig.01", e);
     
+    } catch (PDFASError e2) {
+      logger.warn(e2.getInfo());
+      throw new PdfAsException("error.pdf.sig.01", e2);
+      
     } finally {
+      if (options != null) {
+        if (options.getVisualSignature() != null) {
+          try {
+            options.getVisualSignature().close();
+            options.close();
+          } catch (IOException e) {
+            logger.debug("Failed to close VisualSignature!", e);
+          }
+        }
+      }
+      
       if (doc != null) {
         try {
           doc.close();

@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
@@ -28,7 +29,7 @@ public class CertificateAndRequestParameterResolverTest {
 	private SignatureProfileSettings sigProfileSetting;
 	
 	@Before
-	public void initialize() {
+	public void initialize() throws PDFASError {
 		SignParameter signParams = new SignParameterImpl(null, null, null);
 		opStatus = new OperationStatus(buildDummySettings(), signParams , null);
 		

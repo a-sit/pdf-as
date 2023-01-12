@@ -34,6 +34,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
 import at.gv.egiz.pdfas.common.settings.IProfileConstants;
 import at.gv.egiz.pdfas.common.settings.ISettings;
@@ -270,7 +271,7 @@ public class TableFactory implements IProfileConstants {
         return sig_table;
     }
 
-    public static SignatureProfileSettings createProfile(String profileID, ISettings configuration) {
+    public static SignatureProfileSettings createProfile(String profileID, ISettings configuration) throws PDFASError {
         return new SignatureProfileSettings(profileID, configuration);
     }
 

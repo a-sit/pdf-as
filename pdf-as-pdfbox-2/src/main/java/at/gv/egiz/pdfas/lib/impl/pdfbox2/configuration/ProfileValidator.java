@@ -1,5 +1,20 @@
 package at.gv.egiz.pdfas.lib.impl.pdfbox2.configuration;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsValidationException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
@@ -11,19 +26,6 @@ import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
 import iaik.asn1.ObjectID;
 import iaik.asn1.structures.Name;
 import iaik.x509.X509Certificate;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public class ProfileValidator implements ConfigurationValidator{
 
@@ -82,23 +84,20 @@ public class ProfileValidator implements ConfigurationValidator{
 		}
 
 
-		for(String id:profileIds){
-			SignatureProfileSettings profileSetting = new SignatureProfileSettings(id, settings);
-			profileSettings.add(profileSetting);
-			if(profileSetting.getValue("isvisible")!=null){
-				if(profileSetting.getValue("isvisible").equals("false")){
-					continue;
-				}
-			}
-			/*Table t;
-			try {
-				t = TableFactory.createSigTable(profileSetting, "main", opState, certProvider);
-				new PDFBoxTable(t, null, settings, pdfBoxObject);
-			} catch (Exception e) {
-				logger.info("Configuration Validation for profile "+id+" failed!");
-				throw new PdfAsSettingsValidationException("Configuration Validation for profile "+id+" failed!", e);
-			}*/
-		}
+ 		for(String id:profileIds){
+ 	    try {
+ 	      SignatureProfileSettings profileSetting = new SignatureProfileSettings(id, settings);
+  			profileSettings.add(profileSetting);
+  			if(profileSetting.getValue("isvisible")!=null){
+  				if(profileSetting.getValue("isvisible").equals("false")){
+  					continue;
+  				}
+  			}
+ 	    } catch (PDFASError e) {
+ 	      logger.error("Find suspect signature-profile configuration. Ignore it", e);
+ 	      
+ 	    }
+  	}					
 	}
 
 	@Override

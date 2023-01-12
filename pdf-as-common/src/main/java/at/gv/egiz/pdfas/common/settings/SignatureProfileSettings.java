@@ -23,10 +23,15 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.settings;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 
 public class SignatureProfileSettings implements IProfileConstants {
 
@@ -43,8 +48,15 @@ public class SignatureProfileSettings implements IProfileConstants {
 
 	private ISettings configuration;
 
-	public SignatureProfileSettings(String profileID, ISettings configuration) {
-		this.profileID = profileID;
+	public SignatureProfileSettings(String profileID, ISettings configuration) throws PDFASError {
+		
+	  if (!configuration.hasPrefix(SIG_OBJ + profileID)) {
+      throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_PROFILE,
+          PDFASError.buildInfoString(ErrorConstants.ERROR_SIG_INVALID_PROFILE,
+              profileID));
+    }
+	  
+	  this.profileID = profileID;
 		String profilePrefix = SIG_OBJ + profileID + KEY_SEPARATOR;
 		String keysPrefix = profilePrefix + PROFILE_KEY;
 		String valuesPrefix = profilePrefix + PROFILE_VALUE;

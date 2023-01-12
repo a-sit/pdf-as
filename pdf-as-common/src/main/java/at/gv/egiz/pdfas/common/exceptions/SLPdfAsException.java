@@ -28,7 +28,7 @@ import java.util.List;
 
 public class SLPdfAsException extends PdfAsException {
 
-  private static final List<Integer> ERRORCODES_ON_INFO_LEVEL = Arrays.asList(6001); 
+  private static final List<Integer> ERRORCODES_ON_INFO_LEVEL = Arrays.asList(6001, 6002); 
   
 	/**
 	 * 

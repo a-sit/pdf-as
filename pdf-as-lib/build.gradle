@@ -80,8 +80,8 @@ dependencies {
 	api files('libs/iaik_cms-5.1.1.jar')
 	api group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 	api group: 'org.slf4j', name: 'jcl-over-slf4j', version: slf4jVersion	
-	api group: 'com.google.zxing', name: 'core', version: '3.5.1'
-	api group: 'com.google.zxing', name: 'javase', version: '3.5.1'
+	api group: 'com.google.zxing', name: 'core', version: '3.4.1'
+	api group: 'com.google.zxing', name: 'javase', version: '3.4.1'
 	
 	ws group: 'org.apache.cxf', name: 'cxf-tools', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-databinding-jaxb', version: cxfVersion

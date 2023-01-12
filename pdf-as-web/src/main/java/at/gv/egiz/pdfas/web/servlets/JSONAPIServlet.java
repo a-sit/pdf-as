@@ -1,7 +1,28 @@
 package at.gv.egiz.pdfas.web.servlets;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import at.gv.egiz.pdfas.api.processing.CoreSignParams;
+import at.gv.egiz.pdfas.api.processing.DocumentToSign;
+import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
+import at.gv.egiz.pdfas.api.processing.PdfasSignResponse;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters;
-import at.gv.egiz.pdfas.api.ws.PDFASSignResponse;
+import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
@@ -13,27 +34,13 @@ import at.gv.egiz.pdfas.web.helper.JSONStartResponse;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Andreas Fitzek on 6/23/16.
  */
 public class JSONAPIServlet extends HttpServlet {
 
+  private static final long serialVersionUID = -2319338922500393376L;
     private static final String JSON_PROFILE = "profile";
     private static final String JSON_POSITION = "position";
     private static final String JSON_CONNECTOR = "connector";
@@ -151,17 +158,39 @@ public class JSONAPIServlet extends HttpServlet {
             }catch(Exception e){
                 e.printStackTrace();
             }
+            
+            
+            PdfasSignRequest data = new PdfasSignRequest();
+            
+            data.setRequestID(requestID);
+            
+            CoreSignParams coreParams = new CoreSignParams();                   
+            coreParams.setSignatureBlockParameters(signatureBlockParametersMap);    
+            coreParams.setConnector(Connector.fromString(connector));
+            data.setCoreParams(coreParams);
+
+            DocumentToSign document = new DocumentToSign();
+            document.setInputData(inputDocument);
+            document.setPosition(position);
+            document.setProfile(profile);    
+            data.addDocumentToSign(document);
+            
+            
+            
             if (PDFASSignParameters.Connector.MOA.equals(connectorEnum)
                     || PDFASSignParameters.Connector.JKS.equals(connectorEnum)) {
                 // Plain server based signatures!!
-                PDFASSignResponse pdfasSignResponse = PdfAsHelper.synchronousServerSignature(
-                        inputDocument, parameters, signatureBlockParametersMap);
-
+              
+                                                                  
+                //TODO: update implementation to support more than one file!!!!
+                
+                PdfasSignResponse pdfasSignResponse = PdfAsHelper.synchronousServerSignature(data);
+                                
                 VerifyResult verifyResult = null;
 
                 List<VerifyResult> verResults = PdfAsHelper
                            .synchronousVerify(
-                                    pdfasSignResponse.getSignedPDF(),
+                                    pdfasSignResponse.getSignedPdfs().get(0).getOutputData(),
                                     -1,
                                     VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION,
                                     null);
@@ -187,7 +216,7 @@ public class JSONAPIServlet extends HttpServlet {
                     statisticEvent.setLogged(true);
                 }
 
-                jsonResponse.put(JSON_OUTPUT, Base64.encodeBase64String(pdfasSignResponse.getSignedPDF()));
+                jsonResponse.put(JSON_OUTPUT, Base64.encodeBase64String(pdfasSignResponse.getSignedPdfs().get(0).getOutputData()));
                 jsonResponse.put(JSON_OUTPUT_SIG, verifyResult.getValueCheckCode().getCode());
                 jsonResponse.put(JSON_OUTPUT_CER, verifyResult.getCertificateCheck().getCode());
 
@@ -234,13 +263,8 @@ public class JSONAPIServlet extends HttpServlet {
                         }
                     }
 
-
                     PdfAsHelper.startSignatureJson(request, response, getServletContext(),
-                            inputDocument, connectorEnum.toString(),
-                            position,
-                            null,
-                            profile, null,
-                            null);
+                        connectorEnum.toString(), data);
 
                 JSONStartResponse jsonStartResponse = PdfAsHelper.startJsonProcess(request, response, getServletContext());
 

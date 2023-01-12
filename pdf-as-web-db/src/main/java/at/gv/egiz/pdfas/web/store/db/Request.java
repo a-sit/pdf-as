@@ -10,8 +10,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import at.gv.egiz.pdfas.api.ws.PDFASSignRequest;
-import at.gv.egiz.pdfas.web.stats.StatisticEvent;
+import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 
 @Entity
 @Table(name = "requests")
@@ -19,7 +18,7 @@ public class Request {
 
 	private String uuid;	
 	private Date created;
-	private PDFASSignRequest signRequest;
+	private PdfasSignRequest signRequest;
 	
 	@Id
 	@GeneratedValue(generator = "uuid")
@@ -43,11 +42,11 @@ public class Request {
 	}
 	
 	@Column(name = "signRequest", nullable = false, length = 52428800)
-	public PDFASSignRequest getSignRequest() {
+	public PdfasSignRequest getSignRequest() {
 		return this.signRequest;
 	}
 
-	public void setSignRequest(PDFASSignRequest signRequest) {
+	public void setSignRequest(PdfasSignRequest signRequest) {
 		this.signRequest = signRequest;
 	}
 	

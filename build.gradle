@@ -12,8 +12,13 @@ buildscript {
 
 allprojects {
 	apply plugin: "com.github.ben-manes.versions"
-	repositories {  mavenCentral()  }
-	version = '4.2.1-SNAPSHOT'
+	repositories {  
+		mavenCentral()
+		maven {
+        	url "https://repo.spring.io/milestone/"
+    	}  
+    }
+	version = '4.3.0-SNAPSHOT'
 }
 
 subprojects {
@@ -30,7 +35,14 @@ subprojects {
 	
 	repositories { 
     mavenCentral() 
+    mavenLocal()
     
+    maven {
+       	url "https://repo.spring.io/milestone/"
+       	mavenContent {
+           	releasesOnly()
+       	}
+    }      
     maven {
        	url "https://apps.egiz.gv.at/maven/"     	
        	mavenContent {
@@ -72,8 +84,8 @@ subprojects {
 		//tomcatVersion = '7.0.54';
 		//tomcatVersion = '8.0.36';
 		tomcatVersion = '9.0.46';
-		slf4jVersion = '1.7.32'
-		cxfVersion = '3.4.5'
+		slf4jVersion = '1.7.36'
+		cxfVersion = '3.5.5'
 	  }
 	
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }

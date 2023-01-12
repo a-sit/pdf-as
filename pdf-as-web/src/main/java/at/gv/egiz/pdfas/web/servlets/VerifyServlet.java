@@ -50,10 +50,10 @@ import at.gv.egiz.pdfas.web.helper.RemotePDFFetcher;
 import at.gv.egiz.pdfas.web.helper.VerifyEncoder;
 import at.gv.egiz.pdfas.web.helper.VerifyResultEncoder;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
-import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Operation;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Source;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Status;
+import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
 
 /**
  * Servlet implementation class VerifyServlet
@@ -84,6 +84,9 @@ public class VerifyServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
+	  // invalidate existing http sessions at first
+    request.getSession().invalidate();
+	  
 		logger.info("Get verify request");
 
 		String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);
@@ -138,6 +141,9 @@ public class VerifyServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
+	  // invalidate existing http sessions at first
+    request.getSession().invalidate();
+	  
 		logger.info("Post verify request");
 
 		String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);

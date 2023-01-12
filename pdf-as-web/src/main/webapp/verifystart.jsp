@@ -10,6 +10,13 @@
 		<option>json</option>
 	</select>
 
+	<select name="verify-level">
+		<option selected="selected">intOnly</option>
+		<option>full</option>
+	</select>
+
+
+
 	<input type="file" name="pdf-file" />
 
 	<input type="submit" value="Verfiy">

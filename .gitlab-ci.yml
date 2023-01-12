@@ -13,6 +13,17 @@ include:
   - template: Security/SAST.gitlab-ci.yml
   - template: Secret-Detection.gitlab-ci.yml
 
+## skip jUnit tests in Test jobs to speed-up build time
+dependency_scanning:
+  variables:
+    MAVEN_CLI_OPTS: "-DskipTests --settings ${CI_PROJECT_DIR}/.cisettings.xml"
+    DS_JAVA_VERSION: 11
+  
+spotbugs-sast:
+  variables:
+    MAVEN_CLI_OPTS: "-DskipTests --settings ${CI_PROJECT_DIR}/.cisettings.xml" 
+    SAST_JAVA_VERSION: 11    
+  
 default:
   tags:
     - docker

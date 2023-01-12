@@ -23,26 +23,35 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.store;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-import at.gv.egiz.pdfas.api.ws.PDFASSignRequest;
+import org.apache.commons.collections4.map.PassiveExpiringMap;
+
+import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
+import at.gv.egiz.pdfas.api.processing.PdfasSignResponse;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 
 public class InMemoryRequestStore implements IRequestStore {
 
+  // expires after 10 minutes
+  private static final long DEFAULT_EXPIRATION = 10 * 60 * 1000;
+  
+  private Map<String, PdfasSignRequest> reqStore = new PassiveExpiringMap<>(DEFAULT_EXPIRATION);
+  private Map<String, PdfasSignResponse> respStore = new PassiveExpiringMap<>(DEFAULT_EXPIRATION);
+  private Map<String, StatisticEvent> statEvents = new PassiveExpiringMap<>(DEFAULT_EXPIRATION);
+  
 	public InMemoryRequestStore() {
+		  
 	}
 	
-	private HashMap<String, PDFASSignRequest> store = new HashMap<String, PDFASSignRequest>();
-	private HashMap<String, StatisticEvent> statEvents = new HashMap<String, StatisticEvent>();
-	
-	public String createNewStoreEntry(PDFASSignRequest request, StatisticEvent event) {
+	public String createNewStoreEntry(PdfasSignRequest request, StatisticEvent event) {
 		UUID id = UUID.randomUUID();
 		String sid = id.toString();
-		this.store.put(sid, request);
+		this.reqStore.put(sid, request);
 		this.statEvents.put(sid, event);
 		return sid;
+		 	
 	}
 
 	public StatisticEvent fetchStatisticEntry(String id) {
@@ -50,17 +59,41 @@ public class InMemoryRequestStore implements IRequestStore {
 			StatisticEvent event = statEvents.get(id);
 			statEvents.remove(id);
 			return event;
+			
 		}
+		
 		return null;
 	}
 	
-	public PDFASSignRequest fetchStoreEntry(String id) {
-		if(store.containsKey(id)) {
-			PDFASSignRequest request = store.get(id);
-			store.remove(id);
+	public PdfasSignRequest fetchStoreEntry(String id) {
+		if(reqStore.containsKey(id)) {
+			PdfasSignRequest request = reqStore.get(id);
+			reqStore.remove(id);
 			return request;
+			
 		}
+		
 		return null;
 	}
+
+  @Override
+  public String createNewResponseEntry(PdfasSignResponse response) {
+    String sid = UUID.randomUUID().toString();
+    this.respStore.put(sid, response);
+    return sid;
+    
+  }
+
+  @Override
+  public PdfasSignResponse fetchStoreResponse(String id) {
+    if (respStore.containsKey(id)) {
+      PdfasSignResponse response = respStore.get(id);
+      respStore.remove(id);
+      return response;
+      
+    }
+    
+    return null;
+  }
 
 }

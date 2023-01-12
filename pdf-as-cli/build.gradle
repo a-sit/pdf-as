@@ -35,7 +35,7 @@ dependencies {
     implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
 	implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
 	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
-	implementation 'ch.qos.logback:logback-classic:1.2.10'
+	implementation 'ch.qos.logback:logback-classic:1.2.11'
     testImplementation group: 'junit', name: 'junit', version: '4.+'
 }
 

@@ -20,6 +20,8 @@ pdf-as-tests/src/test/test-suites/**/index.html
 pdf-as-tests/src/test/test-suites/**/test_result.html
 pdf-as-tests/src/test/test-suites/**/out
 
+**/generated/**
+
 # for eclipse
 *.pydevproject
 .project

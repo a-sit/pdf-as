@@ -23,8 +23,13 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.exceptions;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class SLPdfAsException extends PdfAsException {
 
+  private static final List<Integer> ERRORCODES_ON_INFO_LEVEL = Arrays.asList(6001); 
+  
 	/**
 	 * 
 	 */
@@ -47,6 +52,16 @@ public class SLPdfAsException extends PdfAsException {
 		return info;
 	}
 
+	/**
+	 * Classify SL error between critical and non-critical types.
+	 * 
+	 * @return <code>true</code> in case of a critical error, otherwise <code>false</code>
+	 */
+	public boolean isCriticalError() {
+	  return !ERRORCODES_ON_INFO_LEVEL.contains(code);
+	  
+	}
+	
 	protected String localizeMessage(String msgId) {
 		return String.format("%d : %s", code, info);
 	}

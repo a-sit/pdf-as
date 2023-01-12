@@ -67,7 +67,7 @@ task wsdl2Java() {
 				argsin.add(argsin.size - 1, '-d')
 				argsin.add(argsin.size - 1, generatedWsdlDir)
 				argsin.add(argsin.size - 1, '-wsdlLocation')
-				argsin.add(argsin.size - 1, '/wsdl/MOA-SPSS-1.5.2.wsdl')
+				argsin.add(argsin.size - 1, '/wsdl/MOA-SPSS-2.0.0.wsdl')
 				javaexec {
 					classpath configurations.ws
 					main = 'org.apache.cxf.tools.wsdlto.WSDLToJava'

@@ -16,7 +16,6 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'
 	implementation project (':pdf-as-common')
-    testImplementation group: 'junit', name: 'junit', version: '4.+'
 }
 
 test {

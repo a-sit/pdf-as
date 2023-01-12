@@ -37,9 +37,7 @@ dependencies {
 	api group: 'org.apache.pdfbox', name: 'pdfbox-tools', version: '2.0.27'
 	api group: 'org.apache.pdfbox', name: 'preflight', version: '2.0.27'
 	implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-	implementation group: 'ognl', name: 'ognl', version: '3.3.4'
-	testImplementation group: 'junit', name: 'junit', version: '4.+'
-	
+	implementation group: 'ognl', name: 'ognl', version: '3.3.4'	
 	api group: 'com.github.jai-imageio', name: 'jai-imageio-jpeg2000', version: '1.4.0'
 	api group: 'com.github.jai-imageio', name: 'jai-imageio-core', version: '1.4.0'
 	api group: 'com.levigo.jbig2', name: 'levigo-jbig2-imageio', version: '2.0'

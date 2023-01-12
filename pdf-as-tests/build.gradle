@@ -36,7 +36,6 @@ dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
 	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
 
-	testImplementation group: 'junit', name: 'junit', version: '4.12'
 	testImplementation group: 'org.icepdf.os', name: 'icepdf-core', version: '6.1.1'
 
 	implementation project (':pdf-as-pdfbox-2')

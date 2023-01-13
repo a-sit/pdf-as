@@ -23,11 +23,11 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.stamping.pdfbox2;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
-import at.gv.egiz.pdfas.lib.impl.stamping.TableFactory;
-import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 
 public class PDFAsTemplateCreator extends PDFTemplateCreator {
 
@@ -54,7 +55,7 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
 	}
 
 	
-	public InputStream buildPDF(PDFAsVisualSignatureDesigner properties, PDDocument originalDocument)
+	public InputStream buildPDF(PDFAsVisualSignatureDesigner properties, PDDocument originalDocument, boolean buildPreviewOnly)
 			throws IOException, PdfAsException {
 		logger.debug("pdf building has been started");
         PDFTemplateStructure pdfStructure = pdfBuilder.getStructure();
@@ -80,7 +81,7 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
         
         // create signature
         this.pdfBuilder.createSignature(pdSignatureField, page, properties.getSignatureFieldName());
-       
+               
         // that is /AcroForm/DR entry
         this.pdfBuilder.createAcroFormDictionary(acroForm, pdSignatureField);
         
@@ -92,6 +93,8 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
         this.pdfBuilder.createSignatureRectangle(pdSignatureField, properties, properties.getRotation() + properties.getPageRotation());
         this.pdfBuilder.createFormaterRectangle(properties.getFormaterRectangleParams());
         PDRectangle formater = pdfStructure.getFormatterRectangle();
+       
+        
         
         //this.pdfBuilder.createSignatureImage(template, properties.getImageStream());
 
@@ -108,11 +111,13 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
         
         // inner formstream, form and resource (hlder form containts inner form)
         this.pdfBuilder.createInnerFormStreamPdfAs(template, originalDocument);
+        
         this.pdfBuilder.createInnerFormResource();
         PDResources innerFormResource = pdfStructure.getInnerFormResources();
+        
         this.pdfBuilder.createInnerForm(innerFormResource, pdfStructure.getInnerFormStream(), formater);
         PDFormXObject innerForm = pdfStructure.getInnerForm();
-       
+        
         // inner form must be in the holder form as we wrote
         this.pdfBuilder.insertInnerFormToHolerResources(innerForm, holderFormResources);
         
@@ -127,10 +132,10 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
         // now inject procSetArray
         /*this.pdfBuilder.injectProcSetArray(innerForm, page, innerFormResource, imageFormResources, holderFormResources,
                 pdfStructure.getProcSet());*/
+        
         this.pdfBuilder.injectProcSetArray(innerForm, page, innerFormResource, null, holderFormResources,
                 pdfStructure.getProcSet());
         
-
         /*String imgFormName = pdfStructure.getImageFormName();
         String imgName = pdfStructure.getImageName();*/
         String innerFormName = pdfStructure.getInnerFormName().getName();
@@ -138,12 +143,15 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
         // now create Streams of AP
         /*this.pdfBuilder.injectAppearanceStreams(holderFormStream, imageFormStream, imageFormStream, imgFormName,
                 imgName, innerFormName, properties);*/
-        this.pdfBuilder.injectAppearanceStreams(holderFormStream, null, null, null,
-        		null, innerFormName, properties);
+        
+        if (!buildPreviewOnly) {        
+          this.pdfBuilder.injectAppearanceStreams(holderFormStream, null, null, null,
+              null, innerFormName, properties);
+          
+        }
+        
         this.pdfBuilder.createVisualSignature(template);
         this.pdfBuilder.createWidgetDictionary(pdSignatureField, holderFormResources);
-
-
 
         ByteArrayInputStream in = null;
     
@@ -152,8 +160,8 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
             //in = pdfStructure.getTemplateAppearanceStream();
         	ByteArrayOutputStream baos = new ByteArrayOutputStream();
         	template.save(baos);
-        	baos.close();
-
+        	baos.close();                    
+        	
         SignatureProfileSettings signatureProfileSettings =
                 this.pdfBuilder.signatureProfileSettings;
 
@@ -188,4 +196,17 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
         // return result of the stream 
         return in;
 	}
+	
+//	@SneakyThrows
+//	private void saveDebuggingSnapshot(PDDocument template, String fileName) {
+//	  ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//    template.save(baos);
+//    baos.close();
+//
+//    FileOutputStream fos = new FileOutputStream("/home/tlenz/Projekte/pdfas4/source/pdf-as-cli/build/" + fileName + ".pdf");
+//    fos.write(baos.toByteArray());
+//    fos.close();  
+//	  
+//	}
+	
 }

@@ -1,16 +1,20 @@
 package at.gv.egiz.pdfas.lib.testpdfbox;
 
-import at.gv.egiz.pdfas.lib.impl.pdfbox2.placeholder.SignatureFieldsAndPlaceHolderExtractor;
-import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderData;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+import at.gv.egiz.pdfas.lib.impl.pdfbox2.placeholder.SignatureFieldsAndPlaceHolderExtractor;
+import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderData;
+
+@RunWith(JUnit4.class)
 public class SignatureFieldsAndPlaceHolderExtractorTest {
 
   public String getPath(String resourceName) {

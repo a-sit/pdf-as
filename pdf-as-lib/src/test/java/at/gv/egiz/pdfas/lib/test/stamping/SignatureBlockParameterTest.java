@@ -1,4 +1,4 @@
-package at.gv.egiz.pdfas.lib.test.mains;
+package at.gv.egiz.pdfas.lib.test.stamping;
 
 import at.gv.egiz.pdfas.common.settings.DefaultSignatureProfileSettings;
 import at.gv.egiz.pdfas.common.utils.CheckSignatureBlockParameters;

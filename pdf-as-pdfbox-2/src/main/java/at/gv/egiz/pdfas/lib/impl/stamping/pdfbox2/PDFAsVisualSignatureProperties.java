@@ -23,12 +23,8 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.stamping.pdfbox2;
 
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException;
-import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
-import at.gv.egiz.pdfas.lib.impl.pdfbox2.PDFBOXObject;
-import at.knowcenter.wag.egov.egiz.pdf.PositioningInstruction;
+import java.io.IOException;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
@@ -36,7 +32,12 @@ import org.apache.pdfbox.pdmodel.interactive.digitalsignature.visible.PDVisibleS
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException;
+import at.gv.egiz.pdfas.common.settings.ISettings;
+import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
+import at.gv.egiz.pdfas.lib.impl.pdfbox2.PDFBOXObject;
+import at.knowcenter.wag.egov.egiz.pdf.PositioningInstruction;
 
 public class PDFAsVisualSignatureProperties extends PDVisibleSigProperties {
 
@@ -56,9 +57,13 @@ public class PDFAsVisualSignatureProperties extends PDVisibleSigProperties {
 
 	private String alternativeTableCaption="";
 
+  private boolean buildPreviewOnly;
+
 	public PDFAsVisualSignatureProperties(ISettings settings, PDFBOXObject object, 
-			PdfBoxVisualObject visObj, PositioningInstruction pos, SignatureProfileSettings signatureProfileSettings) {
-		this.settings = settings;
+			PdfBoxVisualObject visObj, PositioningInstruction pos, SignatureProfileSettings signatureProfileSettings, 
+			boolean buildPreviewOnly) {
+		this.buildPreviewOnly = buildPreviewOnly;
+	  this.settings = settings;
 		this.signatureProfileSettings = signatureProfileSettings;
 		try {
 			main = visObj.getTable();
@@ -113,7 +118,7 @@ public class PDFAsVisualSignatureProperties extends PDVisibleSigProperties {
 		PDFAsVisualSignatureBuilder builder = new PDFAsVisualSignatureBuilder(this, this.settings, designer, this.signatureProfileSettings);
 		PDFAsTemplateCreator creator = new PDFAsTemplateCreator(builder);
 		try {
-			setVisibleSignature(creator.buildPDF(designer, this.origDoc));
+			setVisibleSignature(creator.buildPDF(designer, this.origDoc, buildPreviewOnly));
 		} catch (PdfAsException e) {
 			throw new PdfAsWrappedIOException(e);
 		}

@@ -32,7 +32,9 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.common.settings.IProfileConstants;
 import at.gv.egiz.pdfas.common.settings.ISettings;
+import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.impl.pdfbox2.utils.PdfBoxUtils;
 import at.gv.egiz.pdfas.lib.impl.stamping.IPDFVisualObject;
@@ -68,14 +70,15 @@ public class Positioning {
    * @param pdfDataSource  The pdf.
    * @param pdf_table      The pdf table to be written.
    * @param settings
+   * @param signatureProfileSettings  Signature-block settings
    * @return Returns the PositioningInformation.
    * @throws PdfAsException F.e.
    */
   public static PositioningInstruction determineTablePositioning(
       TablePos pos, String signature_type, PDDocument pdfDataSource,
-      IPDFVisualObject pdf_table, ISettings settings) throws PdfAsException {
+      IPDFVisualObject pdf_table, ISettings settings, SignatureProfileSettings signatureProfileSettings) throws PdfAsException {
     return adjustSignatureTableandCalculatePosition(pdfDataSource,
-        pdf_table, pos, settings);
+        pdf_table, pos, settings, signatureProfileSettings);
   }
 
   /**
@@ -85,12 +88,13 @@ public class Positioning {
    * @param pdfDataSource The PDF document.
    * @param pdf_table     The PDFPTable to be placed.
    * @param settings
+   * @param profilConfig  Signature-profile configuration
    * @return Returns the position where the PDFPTable should be placed.
    * @throws PdfAsException F.e.
    */
   public static PositioningInstruction adjustSignatureTableandCalculatePosition(
       final PDDocument pdfDataSource, IPDFVisualObject pdf_table,
-      TablePos pos, ISettings settings) throws PdfAsException {
+      TablePos pos, ISettings settings, SignatureProfileSettings profilConfig) throws PdfAsException {
     PdfBoxUtils.checkPDFPermissions(pdfDataSource);
     final long numberOfExistingSignatures = getNumberOfExistingSignatures(pdfDataSource);
 
@@ -111,7 +115,7 @@ public class Positioning {
       }
     }
 
-    make_new_page = checkIfNewPageIsAllowed(make_new_page, numberOfExistingSignatures, settings);
+    make_new_page = checkIfNewPageIsAllowed(make_new_page, numberOfExistingSignatures, settings, profilConfig);
     
     
     if(make_new_page && numberOfExistingSignatures!=0) {
@@ -216,13 +220,13 @@ public class Positioning {
       // we do have an empty page or nothing in area above footerline     
       pos_y = page_height - SIGNATURE_MARGIN_VERTICAL;      
       return buildPostitionInfoOnSubpage(pdfDataSource, make_new_page, page, pos_x, pos_y, pos.rotation, 
-          pos.getFooterLine(), table_height, pos, page_height, numberOfExistingSignatures, settings);
+          pos.getFooterLine(), table_height, pos, page_height, numberOfExistingSignatures, settings, profilConfig);
            
     } else {    
       // we do have text take SIGNATURE_MARGIN
       pos_y = page_height - pre_page_length - SIGNATURE_MARGIN_VERTICAL;
       return buildPostitionInfoOnSubpage(pdfDataSource, make_new_page, page, pos_x, pos_y, pos.rotation, 
-          pos.getFooterLine(), table_height, pos, page_height, numberOfExistingSignatures, settings);
+          pos.getFooterLine(), table_height, pos, page_height, numberOfExistingSignatures, settings, profilConfig);
     
     }  
   }
@@ -245,11 +249,22 @@ public class Positioning {
     
   }
   
-  private static boolean checkIfNewPageIsAllowed(boolean make_new_page, long numberOfExistingSignatures, ISettings settings) throws PdfAsException {
+  private static boolean isNewPageOnSignedDocumentsEnabled(SignatureProfileSettings profilConfig) {
+    String value = profilConfig.getValue(IProfileConstants.SIG_NEWPAGE_FORCE);
+    return Boolean.valueOf(value);
+
+  }
+  
+  private static boolean checkIfNewPageIsAllowed(boolean make_new_page, long numberOfExistingSignatures, ISettings settings, 
+      SignatureProfileSettings profilConfig) throws PdfAsException {
     if(make_new_page && numberOfExistingSignatures!=0) {
-      log.info("Signature-block would be need a new page, but new pages are not allowed on already signed documents.");
+      log.debug("Signature-block would be need a new page, but new pages are not allowed on already signed documents.");
       if (isFailOnLessSpaceEnabled(settings)) {
         throw new PdfAsException("error.pdf.stamp.12");
+        
+      } else if (isNewPageOnSignedDocumentsEnabled(profilConfig)) {
+        log.info("New pages not allowed on already signed documents, but force new page by configuration");
+        return make_new_page;
         
       } else {
         log.info("Placing signature-block on last page without free-space checks ... ");
@@ -265,10 +280,10 @@ public class Positioning {
   
   private static PositioningInstruction buildPostitionInfoOnSubpage(PDDocument pdfDataSource, boolean make_new_page, int page, float pos_x, 
       float pos_y, float rotation, float footer_line, float table_height, TablePos pos, float page_height, 
-      long numberOfExistingSignatures, ISettings settings) throws PdfAsException {
+      long numberOfExistingSignatures, ISettings settings, SignatureProfileSettings profilConfig) throws PdfAsException {
     if (pos_y - footer_line <= table_height) {
       
-      make_new_page = checkIfNewPageIsAllowed(true, numberOfExistingSignatures, settings);
+      make_new_page = checkIfNewPageIsAllowed(true, numberOfExistingSignatures, settings, profilConfig);
       if (make_new_page) {        
         page++;
         

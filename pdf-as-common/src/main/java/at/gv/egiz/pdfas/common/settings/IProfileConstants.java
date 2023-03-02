@@ -94,6 +94,7 @@ public interface IProfileConstants {
     public final static String SIG_PDFA1B_VALID = "SIG_PDFA1B_VALID";
     public final static String SIG_PDFA_VALID = "SIG_PDFA_VALID";
     public final static String SIG_PDFUA_FORCE = "SIG_PDFUA_FORCE";
+    public final static String SIG_NEWPAGE_FORCE = "SIGNED_NEWPAGE_FORCE";
     public final static String LATIN1_ENCODING = "latin1_encoding";
 
     public final static String SIGNATURE_BLOCK_PARAMETER = "sbp";

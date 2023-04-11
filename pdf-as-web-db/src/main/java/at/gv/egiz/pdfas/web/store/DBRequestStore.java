@@ -47,7 +47,7 @@ public class DBRequestStore implements IRequestStore {
     final Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.SECOND, -1 * seconds);
     final Date date = calendar.getTime();
-    final SimpleDateFormat dt = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+    final SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     logger.info("Clearing Entries before: " + dt.format(date));
     Session session = null;
     Transaction tx = null;
@@ -73,7 +73,7 @@ public class DBRequestStore implements IRequestStore {
     final Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.SECOND, -1 * seconds);
     final Date date = calendar.getTime();
-    final SimpleDateFormat dt = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+    final SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     logger.info("Clearing Entries before: " + dt.format(date));
     Session session = null;
     try {

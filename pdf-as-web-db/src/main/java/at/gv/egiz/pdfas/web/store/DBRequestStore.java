@@ -4,12 +4,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.imageio.spi.ServiceRegistry;
-import javax.transaction.Transaction;
-
-import org.apache.cxf.service.invoker.SessionFactory;
-import org.apache.cxf.transport.Session;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+import org.hibernate.service.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,7 @@ public class DBRequestStore implements IRequestStore {
           + " where req.created < :date");
       query.setCalendar("date", calendar);
       query.executeUpdate();
+      tx.commit();
     } catch (final Throwable e) {
       logger.error("Failed to save Request", e);
       tx.rollback();
@@ -92,7 +94,7 @@ public class DBRequestStore implements IRequestStore {
           + " where req.created < :date");
       queryResponse.setCalendar("date", calendar);
       queryResponse.executeUpdate();
-
+      
     } finally {
       if (session != null) {
         session.close();

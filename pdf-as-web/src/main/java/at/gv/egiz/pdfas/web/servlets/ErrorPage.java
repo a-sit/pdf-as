@@ -42,8 +42,8 @@ import at.gv.egiz.pdfas.web.helper.HTMLFormater;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.helper.UrlParameterExtractor;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
-import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Status;
+import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
 
 /**
  * Servlet implementation class ErrorPage
@@ -116,11 +116,14 @@ public class ErrorPage extends HttpServlet {
 				String template = PdfAsHelper.getErrorRedirectTemplateSL();
 				
 				URL url = new URL(errorURL);
-				String errorURLProcessed = url.getProtocol() + "://" +   // "http" + "://
-						url.getHost() +       // "myhost"
-			             ":" +                           // ":"
-			             url.getPort() +       // "8080"
-			             url.getPath();  
+				String errorURLProcessed = url.getProtocol() + "://" + url.getHost();
+        if (url.getPort() != -1) {
+          errorURLProcessed += ":" + url.getPort();
+          
+        }
+        
+        errorURLProcessed += url.getPath();
+ 
 				
 				template = template.replace("##ERROR_URL##", errorURLProcessed);
 				

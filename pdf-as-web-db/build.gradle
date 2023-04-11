@@ -19,7 +19,7 @@ dependencies {
 	implementation project (':pdf-as-web-statistic-api')
 	api "org.hibernate:hibernate-core:5.6.15.Final"
 	api "org.hibernate:hibernate-entitymanager:5.6.15.Final"
-	implementation 'ch.qos.logback:logback-classic:1.2.11'
+	implementation 'ch.qos.logback:logback-classic:1.2.12'
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 }
 

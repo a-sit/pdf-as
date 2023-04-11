@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.api.ws;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,8 +12,10 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name="PropertyMap")
-public class PDFASPropertyMap {
-	List<PDFASPropertyEntry> propertyEntries;
+public class PDFASPropertyMap implements Serializable {	
+  private static final long serialVersionUID = -8099703140108251423L;
+  
+  List<PDFASPropertyEntry> propertyEntries;
 	
 	@XmlElement(required = true, nillable = false, name="propertyEntries")
 	public List<PDFASPropertyEntry> getPropertyEntries() {

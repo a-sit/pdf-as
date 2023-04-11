@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
+import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsMOAException;
 import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
@@ -42,6 +43,10 @@ public class ErrorExtractor implements ErrorConstants {
 			} else {
 				return new PDFASError(code, e);
 			}
+			
+		} else if(e instanceof PdfAsException) {
+		  return new PDFASError(11020, e.getMessage(), e);
+		  
 		}
 		
 		// TODO: Handle more exceptions

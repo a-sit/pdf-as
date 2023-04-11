@@ -400,6 +400,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       } catch (final Throwable e) {
         logger.warn("process", e);
         throw ErrorExtractor.searchPdfAsError(e, status);
+        
       }
     } else if (request.needSignature()) {
       request.setNeedSignature(false);

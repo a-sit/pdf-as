@@ -35,7 +35,7 @@ project.ext {
 	generatedWsdlDir = file("src/generated/java")
 	wsdlsToGenerate = [
 			   ['-xjc', 
-				    "$wsdlDir/MOA-SPSS-1.5.2.wsdl"],
+				    "$wsdlDir/MOA-SPSS-2.0.0.wsdl"],
 	 ]
 }
 

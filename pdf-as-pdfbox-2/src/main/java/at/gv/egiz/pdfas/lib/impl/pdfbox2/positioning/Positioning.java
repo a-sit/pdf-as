@@ -259,13 +259,13 @@ public class Positioning {
       SignatureProfileSettings profilConfig) throws PdfAsException {
     if(make_new_page && numberOfExistingSignatures!=0) {
       log.debug("Signature-block would be need a new page, but new pages are not allowed on already signed documents.");
-      if (isFailOnLessSpaceEnabled(settings)) {
-        throw new PdfAsException("error.pdf.stamp.12");
-        
-      } else if (isNewPageOnSignedDocumentsEnabled(profilConfig)) {
+      if (isNewPageOnSignedDocumentsEnabled(profilConfig)) {
         log.info("New pages not allowed on already signed documents, but force new page by configuration");
         return make_new_page;
         
+      } else if (isFailOnLessSpaceEnabled(settings)) {
+        throw new PdfAsException("error.pdf.stamp.12");
+                
       } else {
         log.info("Placing signature-block on last page without free-space checks ... ");
         return false;

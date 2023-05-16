@@ -32,6 +32,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_PROFILE = "profile";
+	public static final String PARAM_LANG = "lang";
 	public static final String PARAM_WIDTH = "w";
 	public static final String PARAM_HEIGHT = "h";
 	public static final String PARAM_BORDER = "b";
@@ -62,6 +63,8 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 		
 		String id = req.getParameter(PARAM_ID);
 		String profile = req.getParameter(PARAM_PROFILE);
+		String lang = req.getParameter(PARAM_LANG) != null ? req.getParameter(PARAM_LANG) : "DE";  
+		
 		
 		String buildString = QR_PLACEHOLDER_IDENTIFIER;
 		
@@ -86,7 +89,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 		if(profile != null && !profile.isEmpty()) {
 			buildString = buildString + ";" + SignaturePlaceholderData.PROFILE_KEY + "=" + profile;
 			
-			if(profile.endsWith("_EN")) {
+			if(lang.equalsIgnoreCase("EN")) {
 				baseImage = "/img/PLACEHOLDER-SIG_EN.png";
 				filename = filename + "_en";
 			} else {
@@ -103,7 +106,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 		// default values set for pdf-as wai on buergerkarte.at
 		int height = 60;
 		int width = 300;
-		int border = 2;
+		int border = 1;
 		
 		if(req.getParameter(PARAM_HEIGHT) != null) {
 			try {
@@ -132,7 +135,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			}
 		}
 		
-		int qrSize = height - ( 2 * border);
+		int qrSize = height - (border);
 		
 			InputStream is = this.getClass().getClassLoader().getResourceAsStream(baseImage);
 			if(is == null) {
@@ -146,6 +149,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			// generate QR code
 			try {
 				QRCodeGenerator.generateQRCode(buildString, baos, qrSize);
+				
 			} catch (WriterException e) {
 				logger.warn("Failed to generate QR Code for placeholder generation", e);
 				resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -161,7 +165,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			Graphics g = off_Image.getGraphics();
 			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, width, height);
-			g.fillRect(border, border, width - (2 * border), height - (2 * border));
+			//g.fillRect(border, border, width - (2 * border), height - (2 * border));
 			//g.drawImage(base, 0, 0, 250, 98, 0, 0, base.getWidth(), base.getHeight(), null);
 			g.drawImage(qr, border, border, qrSize + border, qrSize + border, 0, 0, qr.getWidth(), qr.getHeight(), null);
 			
@@ -180,7 +184,7 @@ public class PlaceholderGeneratorServlet extends HttpServlet implements Placehol
 			
 			int start = (height - textHeight) / 2; 
 			
-			if(profile != null && profile.endsWith("_EN")) {
+			if(lang.equalsIgnoreCase("EN")) {
 				g.drawString("placeholder for the", qrSize + ( 3 * border), start + lineSpace);
 				g.drawString("electronic signature", qrSize + ( 3 * border), start + (2 * lineSpace));
 			} else {

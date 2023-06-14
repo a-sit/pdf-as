@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import at.gv.egiz.pdfas.api.processing.PdfasSignResponse;
 import at.gv.egiz.pdfas.api.processing.SignedDocument;
 import at.gv.egiz.pdfas.api.ws.PDFASVerificationResponse;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
@@ -85,7 +86,15 @@ public class PDFData extends HttpServlet {
   protected void process(HttpServletRequest request,
       HttpServletResponse response) throws ServletException, IOException {
 
-    if (PdfAsHelper.getPdfSigningResponse(request).getSignedPdfs().isEmpty()) {
+    PdfasSignResponse resultObject = PdfAsHelper.getPdfSigningResponse(request);
+    
+    if (resultObject == null) {
+      log.warn("No data for session with Id: {}", request.getSession().getId());
+      PdfAsHelper.setSessionException(request, response,
+          "No signed pdf document available.", null);
+      PdfAsHelper.gotoError(getServletContext(), request, response);
+      
+    } else if (resultObject.getSignedPdfs().isEmpty()) {
       log.info("No signed pdf document available.");
       PdfAsHelper.setSessionException(request, response,
           "No signed pdf document available.", null);

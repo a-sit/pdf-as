@@ -24,7 +24,9 @@
 package at.gv.egiz.pdfas.web.filter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -34,26 +36,47 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
+import com.beust.jcommander.Strings;
+import com.beust.jcommander.internal.Lists;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Servlet Filter implementation class ExceptionCatchFilter
  */
+@Slf4j
 public class ExceptionCatchFilter implements Filter {
 
-	private static final Logger logger = LoggerFactory.getLogger(ExceptionCatchFilter.class);
-
+  List<String> statelessPaths;
+  
 	/**
 	 * Default constructor.
 	 */
 	public ExceptionCatchFilter() {
 	}
 
+	 /**
+   * @see Filter#init(FilterConfig)
+   */
+  public void init(FilterConfig fConfig) throws ServletException {    
+    String statelessConfigStrings = fConfig.getInitParameter("statelessServlets");
+    if (statelessConfigStrings != null) {
+      statelessPaths = Lists.newArrayList(StringUtils.split(statelessConfigStrings, ","));
+      
+    } else {
+      statelessPaths = Collections.emptyList();
+      
+    }    
+    log.info("Stateless paths set to: {}", Strings.join(", ", statelessPaths));
+    
+  }
+
+	
 	/**
 	 * @see Filter#destroy()
 	 */
@@ -68,12 +91,15 @@ public class ExceptionCatchFilter implements Filter {
 		try {
 
 			if (request instanceof HttpServletRequest) {
-				HttpServletRequest httpRequest = (HttpServletRequest) request;
-				MDC.put("SESSION_ID", httpRequest.getSession().getId());
-				logger.debug("Processing Parameters into Attributes");
-				logger.warn("Access from IP {}", getClientIpAddr(httpRequest));
-
-				PdfAsHelper.logAccess(httpRequest);
+				HttpServletRequest httpRequest = (HttpServletRequest) request;				
+				
+				HttpSession session = httpRequest.getSession(isStatefull(httpRequest.getServletPath()));
+				String sessionId = session != null ? session.getId() : "-";												
+				MDC.put("SESSION_ID", sessionId);				  
+				log.info("Access from IP: {}", getClientIpAddr(httpRequest));
+				log.info("Access to: {} in Session: {}", httpRequest.getServletPath(), sessionId);
+				
+				log.debug("Processing Parameters into Attributes");
 				@SuppressWarnings("unchecked")
 				Enumeration<String> parameterNames = httpRequest.getParameterNames();
 				while (parameterNames.hasMoreElements()) {
@@ -85,33 +111,41 @@ public class ExceptionCatchFilter implements Filter {
 
 			try {
 				chain.doFilter(request, response);
+				
 			} finally {
-				if (response != null) {
-					if (response instanceof HttpServletResponse) {
-						HttpServletResponse resp = (HttpServletResponse) response;
-						logger.debug("Got response status: {}", resp.getStatus());
-					} else {
-						logger.warn("Response is not a HttpServletResponse!");
-					}
-				} else {
-					logger.warn("Response is not a HttpServletResponse!");
+  			if (response instanceof HttpServletResponse) {
+	  			HttpServletResponse resp = (HttpServletResponse) response;
+		  		log.debug("Got response status: {}", resp.getStatus());
+		  		
+			  } else {
+				  log.warn("Response is not a HttpServletResponse!");
+				  
 				}
 			}
 		} catch (Throwable e) {
-			logger.error("Unhandled exception found", e);
+			log.error("Unhandled exception found", e);
 			throw new ServletException(e.getMessage());
+			
 		} finally {
 			MDC.remove("SESSION_ID");
+			
 		}
 		/*
 		 * } catch(Throwable e) {
 		 * System.err.println("Unhandled Exception found!");
 		 * e.printStackTrace(System.err);
-		 * logger.error("Unhandled Exception found!", e); }
+		 * log.error("Unhandled Exception found!", e); }
 		 */
 	}
 
-	public static String getClientIpAddr(HttpServletRequest request) {
+	private boolean isStatefull(String contextPath) {
+	  boolean statefull = !statelessPaths.contains(contextPath);
+	  log.trace("ServletPath: {} is marked as {}", contextPath, statefull ? "statefull" : "stateless");	  
+    return statefull;
+    
+  }
+
+  public static String getClientIpAddr(HttpServletRequest request) {
 		String ip = request.getHeader("X-Forwarded-For");
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("Proxy-Client-IP");
@@ -129,12 +163,6 @@ public class ExceptionCatchFilter implements Filter {
 			ip = request.getRemoteAddr();
 		}
 		return ip;
-	}
-
-	/**
-	 * @see Filter#init(FilterConfig)
-	 */
-	public void init(FilterConfig fConfig) throws ServletException {
 	}
 
 }

@@ -12,6 +12,10 @@
 		<display-name>ExceptionCatchFilter</display-name>
 		<description></description>
 		<filter-class>at.gv.egiz.pdfas.web.filter.ExceptionCatchFilter</filter-class>
+		<init-param>
+			<param-name>statelessServlets</param-name>
+			<param-value>/placeholder,/visblock</param-value>
+		</init-param>
 	</filter>
 	<filter>
 		<filter-name>UserAgentFilter</filter-name>

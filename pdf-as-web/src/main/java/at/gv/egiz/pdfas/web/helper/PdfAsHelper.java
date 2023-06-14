@@ -787,12 +787,6 @@ public class PdfAsHelper {
 		PdfAsHelper.process(request, response, context);
 	}
 
-	public static void logAccess(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		log.info("Access to " + request.getServletPath() + " in Session: "
-				+ session.getId());
-	}
-
 	public static JSONStartResponse startJsonProcess(HttpServletRequest request,
 										HttpServletResponse response, ServletContext context)
 			throws Exception {

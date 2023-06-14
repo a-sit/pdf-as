@@ -5,20 +5,12 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.feature.LoggingFeature;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.web.ws.PDFASSigningImpl;
 import at.gv.egiz.pdfas.web.ws.PDFASVerificationImpl;
 
 public class SoapServiceServlet extends CXFNonSpringServlet {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(SoapServiceServlet.class);
 	
 	/**
 	 * 

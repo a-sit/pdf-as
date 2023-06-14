@@ -10,13 +10,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class UserAgentFilter implements Filter {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(UserAgentFilter.class);
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -37,7 +34,7 @@ public class UserAgentFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		if(request instanceof HttpServletRequest) {
-			logger.debug("Processing Parameters into Attributes");
+			log.debug("Processing Parameters into Attributes");
 			HttpServletRequest httpRequest = (HttpServletRequest)request;
 			requestUserAgent.set(httpRequest.getHeader("User-Agent"));
 		}

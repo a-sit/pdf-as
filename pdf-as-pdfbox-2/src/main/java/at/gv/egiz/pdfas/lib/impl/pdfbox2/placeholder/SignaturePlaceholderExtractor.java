@@ -50,10 +50,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-
-import javassist.bytecode.stackmap.TypeData.ClassName;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
 
 import org.apache.pdfbox.contentstream.PDFStreamEngine;
 import org.apache.pdfbox.contentstream.operator.Operator;
@@ -71,14 +76,6 @@ import org.apache.pdfbox.util.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.gv.egiz.pdfas.common.exceptions.PDFIOException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PlaceholderExtractionException;
-import at.gv.egiz.pdfas.lib.impl.placeholder.PlaceholderExtractorConstants;
-import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderContext;
-import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderData;
-import at.knowcenter.wag.egov.egiz.pdf.TablePos;
-
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
@@ -89,6 +86,15 @@ import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+
+import at.gv.egiz.pdfas.common.exceptions.PDFIOException;
+import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.common.exceptions.PlaceholderExtractionException;
+import at.gv.egiz.pdfas.lib.impl.placeholder.PlaceholderExtractorConstants;
+import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderContext;
+import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderData;
+import at.knowcenter.wag.egov.egiz.pdf.TablePos;
+import javassist.bytecode.stackmap.TypeData.ClassName;
 
 /**
  * Extract all relevant information from a placeholder image.
@@ -355,8 +361,12 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
 							x = page.getCropBox().getHeight() + x;
 						}
 						
-						String posString = "p:" + currentPage + ";x:" + x
-								+ ";y:" + y + ";w:" + w;
+						
+
+						
+						
+						String posString = "p:" + currentPage + ";x:" + Math.floor(x)
+								+ ";y:" + Math.ceil(y) + ";w:" + Math.ceil(w);
 
 						logger.debug("Found Placeholder at: {}", posString);
 						try {

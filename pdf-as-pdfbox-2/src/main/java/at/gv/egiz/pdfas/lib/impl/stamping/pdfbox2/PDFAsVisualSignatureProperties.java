@@ -23,12 +23,8 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.stamping.pdfbox2;
 
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException;
-import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
-import at.gv.egiz.pdfas.lib.impl.pdfbox2.PDFBOXObject;
-import at.knowcenter.wag.egov.egiz.pdf.PositioningInstruction;
+import java.io.IOException;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
@@ -36,7 +32,12 @@ import org.apache.pdfbox.pdmodel.interactive.digitalsignature.visible.PDVisibleS
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException;
+import at.gv.egiz.pdfas.common.settings.ISettings;
+import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
+import at.gv.egiz.pdfas.lib.impl.pdfbox2.PDFBOXObject;
+import at.knowcenter.wag.egov.egiz.pdf.PositioningInstruction;
 
 public class PDFAsVisualSignatureProperties extends PDVisibleSigProperties {
 
@@ -99,7 +100,7 @@ public class PDFAsVisualSignatureProperties extends PDVisibleSigProperties {
 			logger.debug("ROT {}", rot);
 			logger.debug("COORD X {} Y {}", posx, posy);
 			designer.coordinates(posx, posy);
-			float[] form_rect = new float[] {0,0, main.getWidth() + 2, main.getHeight() + 2};
+			float[] form_rect = new float[] {0,0, main.getWidth() + 1, main.getHeight() + 1};
 			logger.debug("AP Rect: {} {} {} {}", form_rect[0], form_rect[1], form_rect[2], form_rect[3]);
 			designer.formaterRectangleParams(form_rect);
 			//this.setPdVisibleSignature(designer);

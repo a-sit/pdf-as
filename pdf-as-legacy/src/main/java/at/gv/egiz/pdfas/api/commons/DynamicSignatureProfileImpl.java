@@ -186,19 +186,7 @@ public class DynamicSignatureProfileImpl implements DynamicSignatureProfile {
 
          cfg = (ISettings)configuration;         
          String parentKey = "sig_obj." + parentProfile + ".";
-         Map<String, String> properties = cfg.getValuesPrefix(parentKey);
-         //Properties props = cfg.getProperties();
-         // DTI: props.keys() does not support default properties, therefore we should better use props.propertyNames()
-//         for (Enumeration e = props.keys(); e.hasMoreElements();) {
-         /*for (Enumeration e = props.propertyNames(); e.hasMoreElements();) {
-            String oldKey = (String) e.nextElement();
-            if (oldKey.startsWith("sig_obj." + parentProfile + ".")) {
-               String newKey = StringUtils.replace(oldKey, parentProfile, name);
-               String val = props.getProperty(oldKey);
-               this.newProps.put(newKey, val);
-            }
-         }*/
-         
+         Map<String, String> properties = cfg.getValuesPrefix(parentKey);         
          Iterator<String> keyIt = properties.keySet().iterator();
          
          while(keyIt.hasNext()) {

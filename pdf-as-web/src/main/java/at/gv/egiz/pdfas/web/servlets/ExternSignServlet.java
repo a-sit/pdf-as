@@ -46,10 +46,8 @@ import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsValidationException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
-import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderWebConfiguration;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.exception.PdfAsWebException;
 import at.gv.egiz.pdfas.web.filter.UserAgentFilter;
@@ -346,20 +344,6 @@ public class ExternSignServlet extends HttpServlet {
 		String responseMode = PdfAsParameterExtractor.getResonseMode(request);
 		PdfAsHelper.setResponseMode(request, response, responseMode);
 		
-		
-		//read and set placholder web id
-		try{
-			String placeholder_id = PdfAsParameterExtractor.getPlaceholderId(request);
-			if(org.apache.commons.lang3.StringUtils.isNotEmpty(placeholder_id)) {
-				PlaceholderWebConfiguration.setValue(IConfigurationConstants.PLACEHOLDER_WEB_ID, placeholder_id);
-			} else {
-				PlaceholderWebConfiguration.clear();
-			}
-
-		} catch(Exception e) {
-			log.error(e.getLocalizedMessage());
-		}
-
 		String filename = PdfAsParameterExtractor.getFilename(request);
 		if(filename != null) {
 			log.debug("Setting Filename in session: " + filename);
@@ -395,6 +379,7 @@ public class ExternSignServlet extends HttpServlet {
     document.setInputData(pdfData);
     document.setPosition(PdfAsHelper.buildPosString(request, response));
     document.setProfile(PdfAsParameterExtractor.getSigType(request));
+    document.setPlaceHolderId(PdfAsParameterExtractor.getPlaceholderId(request));
     document.setQrCodeContent(qrcodeContent);
     document.setFileName(PdfAsHelper.getPDFFileName(request)); 
     data.addDocumentToSign(document);

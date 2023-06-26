@@ -25,9 +25,7 @@ package at.gv.egiz.pdfas.lib.impl;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.activation.DataSource;
 
@@ -35,10 +33,17 @@ import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.sl.util.BKUHeader;
+import lombok.Getter;
+import lombok.Setter;
 
 public class SignParameterImpl extends PdfAsParameterImpl implements SignParameter, BKUHeaderHolder {
 	protected String signatureProfileId = null;
 	protected String signaturePosition = null;
+	
+	@Getter
+	@Setter
+	protected String placeHolderId;
+	
 	protected DataSource output = null;
 	protected IPlainSigner signer = null;
 	protected OutputStream outputStream = null;

@@ -536,7 +536,8 @@ public class PdfAsHelper {
 
 		// set Signature Position
 		signParameter.setSignaturePosition(documentToSign.getPosition());
-
+		signParameter.setPlaceHolderId(documentToSign.getPlaceHolderId());
+		
 		// Set Preprocessor
 		if (coreParams.getPreprocessor() != null) {
 			signParameter.setPreprocessorArguments(coreParams.getPreprocessor());
@@ -660,7 +661,8 @@ public class PdfAsHelper {
 
     // set Signature Position
     signParameter.setSignaturePosition(pdfToSign.getPosition());
-
+    signParameter.setPlaceHolderId(pdfToSign.getPlaceHolderId());
+   
     signParameter.setDynamicSignatureBlockArguments(coreSignParams.getSignatureBlockParameters());
         
     return pdfAs.startSign(signParameter);

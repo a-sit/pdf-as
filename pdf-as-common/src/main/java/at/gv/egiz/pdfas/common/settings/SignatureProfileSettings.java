@@ -3,19 +3,19 @@
  * PDF-AS has been contracted by the E-Government Innovation Center EGIZ, a
  * joint initiative of the Federal Chancellery Austria and Graz University of
  * Technology.
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
  * http://www.osor.eu/eupl/
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
- * 
+ *
  * This product combines work with different licenses. See the "NOTICE" text
  * file for details on the various modules and licenses.
  * The "NOTICE" text file is part of the distribution. Any derivative works
@@ -24,7 +24,6 @@
 package at.gv.egiz.pdfas.common.settings;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -35,241 +34,222 @@ import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 
 public class SignatureProfileSettings implements IProfileConstants {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SignatureProfileSettings.class);
+  private static final Logger logger = LoggerFactory
+      .getLogger(SignatureProfileSettings.class);
 
-	private Map<String, SignatureProfileEntry> profileInformations = new HashMap<String, SignatureProfileEntry>();
+  private final Map<String, SignatureProfileEntry> profileInformations =
+      new HashMap<>();
 
-	private Map<String, String> profileSettings = new HashMap<String, String>();
+  private final Map<String, String> profileSettings = new HashMap<>();
 
-	private String profileID;
+  private final String profileID;
 
-	private String pdfAVersion = null;
+  private String pdfAVersion = null;
 
-	private ISettings configuration;
+  private final ISettings configuration;
 
-	public SignatureProfileSettings(String profileID, ISettings configuration) throws PDFASError {
-		
-	  if (!configuration.hasPrefix(SIG_OBJ + profileID)) {
+  public SignatureProfileSettings(String profileID, ISettings configuration) throws PDFASError {
+
+    if (!configuration.hasPrefix(SIG_OBJ + profileID)) {
       throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_PROFILE,
           PDFASError.buildInfoString(ErrorConstants.ERROR_SIG_INVALID_PROFILE,
               profileID));
     }
-	  
-	  this.profileID = profileID;
-		String profilePrefix = SIG_OBJ + profileID + KEY_SEPARATOR;
-		String keysPrefix = profilePrefix + PROFILE_KEY;
-		String valuesPrefix = profilePrefix + PROFILE_VALUE;
-		String tablePrefix = profilePrefix + TABLE;
-		this.configuration = configuration;
 
-		logger.debug("Reading Profile: " + profileID);
-		logger.debug("Keys Prefix: " + keysPrefix);
-		logger.debug("Values Prefix: " + valuesPrefix);
-		logger.debug("Table Prefix: " + tablePrefix);
+    this.profileID = profileID;
+    final String profilePrefix = SIG_OBJ + profileID + KEY_SEPARATOR;
+    final String keysPrefix = profilePrefix + PROFILE_KEY;
+    final String valuesPrefix = profilePrefix + PROFILE_VALUE;
+    final String tablePrefix = profilePrefix + TABLE;
+    this.configuration = configuration;
 
-		Map<String, String> keys = configuration.getValuesPrefix(keysPrefix);
-		Map<String, String> values = configuration.getValuesPrefix(valuesPrefix);
+    logger.debug("Reading Profile: " + profileID);
+    logger.debug("Keys Prefix: " + keysPrefix);
+    logger.debug("Values Prefix: " + valuesPrefix);
+    logger.debug("Table Prefix: " + tablePrefix);
 
-		if (keys != null) {
-			Iterator<String> keyIterator = keys.keySet().iterator();
+    final Map<String, String> keys = configuration.getValuesPrefix(keysPrefix);
+    final Map<String, String> values = configuration.getValuesPrefix(valuesPrefix);
 
-			while (keyIterator.hasNext()) {
-				String key = keyIterator.next();
-				key = key.substring(key.lastIndexOf('.') + 1);
-				String valueKey = keys.get(keysPrefix + KEY_SEPARATOR + key);
+    for (String key : keys.keySet()) {
+      key = key.substring(key.lastIndexOf('.') + 1);
+      String valueKey = keys.get(keysPrefix + KEY_SEPARATOR + key);
 
-				String valueValue = values.get(valuesPrefix + KEY_SEPARATOR
-						+ key);
+      String valueValue = values.get(valuesPrefix + KEY_SEPARATOR
+          + key);
 
-				// Lookup default values
-				if(valueKey == null) {
-					valueKey = DefaultSignatureProfileSettings.getDefaultKeyCaption(key);
-				}
-				
-				if(valueValue == null) {
-					valueValue = DefaultSignatureProfileSettings.getDefaultKeyValue(key);
-				}
-				
-				SignatureProfileEntry entry = new SignatureProfileEntry();
-				entry.setKey(key);
-				entry.setCaption(valueKey);
-				entry.setValue(valueValue);
-				profileInformations.put(key, entry);
-				logger.debug("   " + entry.toString());
-			}
-		}
+      // Lookup default values
+      if (valueKey == null) {
+        valueKey = DefaultSignatureProfileSettings.getDefaultKeyCaption(key);
+      }
 
-		if (values != null) {
-			// Find entries where only values exists
-			Iterator<String> valuesIterator = values.keySet().iterator();
+      if (valueValue == null) {
+        valueValue = DefaultSignatureProfileSettings.getDefaultKeyValue(key);
+      }
 
-			while (valuesIterator.hasNext()) {
-				String key = valuesIterator.next();
-				key = key.substring(key.lastIndexOf('.') + 1);
+      final SignatureProfileEntry entry = new SignatureProfileEntry();
+      entry.setKey(key);
+      entry.setCaption(valueKey);
+      entry.setValue(valueValue);
+      profileInformations.put(key, entry);
+      logger.debug("   " + entry.toString());
+    }
 
-				String valueValue = values.get(valuesPrefix + KEY_SEPARATOR
-						+ key);
+    for (String key : values.keySet()) {
+      key = key.substring(key.lastIndexOf('.') + 1);
 
-				// Lookup default values			
-				if(valueValue == null) {
-					valueValue = DefaultSignatureProfileSettings.getDefaultKeyValue(key);
-				}
-				
-				SignatureProfileEntry entry = profileInformations.get(key);
-				if (entry == null) {
-					entry = new SignatureProfileEntry();
-					entry.setKey(key);
-					entry.setCaption(null);
-					entry.setValue(valueValue);
-					profileInformations.put(key, entry);
-				}
+      String valueValue = values.get(valuesPrefix + KEY_SEPARATOR
+          + key);
 
-				logger.debug("   " + entry.toString());
-			}
-		}
+      // Lookup default values
+      if (valueValue == null) {
+        valueValue = DefaultSignatureProfileSettings.getDefaultKeyValue(key);
+      }
 
-		Map<String, String> others = configuration
-				.getValuesPrefix(profilePrefix);
+      SignatureProfileEntry entry = profileInformations.get(key);
+      if (entry == null) {
+        entry = new SignatureProfileEntry();
+        entry.setKey(key);
+        entry.setCaption(null);
+        entry.setValue(valueValue);
+        profileInformations.put(key, entry);
+      }
 
-		if(others != null) {
-		Iterator<String> otherIterator = others.keySet().iterator();
+      logger.debug("   " + entry.toString());
+    }
 
-		while (otherIterator.hasNext()) {
-			String key = otherIterator.next();
+    final Map<String, String> others = configuration
+        .getValuesPrefix(profilePrefix);
 
-			logger.trace("Checking key " + key);
-			if (key.startsWith(keysPrefix) || key.startsWith(valuesPrefix)
-					|| key.startsWith(tablePrefix)) {
-				continue;
-			}
+    if (others != null) {
+      for (String key : others.keySet()) {
+        logger.trace("Checking key " + key);
+        if (key.startsWith(keysPrefix) || key.startsWith(valuesPrefix)
+            || key.startsWith(tablePrefix)) {
+          continue;
+        }
 
-			String value = others.get(key);
-			key = key.substring(key.lastIndexOf('.') + 1);
+        final String value = others.get(key);
+        key = key.substring(key.lastIndexOf('.') + 1);
 
-			profileSettings.put(key, value);
+        profileSettings.put(key, value);
 
-			logger.debug("   Settings: " + key + " : " + value);
-		}
-		}
-		
-		Iterator<SignatureProfileEntry> dumpIterator = 
-				profileInformations.values().iterator();
-		
-		logger.debug("Settings for profile {}", profileID);
-		while(dumpIterator.hasNext()) {
-			SignatureProfileEntry entry = dumpIterator.next();
-			logger.debug("  " + entry.toString());
-		}
-	}
+        logger.debug("   Settings: " + key + " : " + value);
+      }
+    }
 
-	public String getCaption(String key) {
-		SignatureProfileEntry entry = profileInformations.get(key);
-		if (entry != null) {
-			return entry.getCaption();
-		}
-		return null;
-	}
+    logger.debug("Settings for profile {}", profileID);
+    for (final SignatureProfileEntry entry : profileInformations.values()) {
+      logger.debug("  " + entry.toString());
+    }
+  }
 
-	protected String getDefaultValue(String key) {
-		String profilePrefix = SIG_OBJ + profileID + KEY_SEPARATOR;
-		logger.debug("Searching default value for: " + key);
-		if (key.startsWith(profilePrefix)) {
-			key = key.substring(profilePrefix.length());
-		}
-		key = "default." + key;
-		logger.debug("Searching default value for: " + key);
-		return this.configuration.getValue(key);
-	}
+  public String getCaption(String key) {
+    final SignatureProfileEntry entry = profileInformations.get(key);
+    if (entry != null) {
+      return entry.getCaption();
+    }
+    return null;
+  }
 
-	public String getValue(String key) {
-		logger.debug("Searching: " + key);
-		SignatureProfileEntry entry = profileInformations.get(key);
-		if (entry != null) {
-			String value = entry.getValue();
+  protected String getDefaultValue(String key) {
+    final String profilePrefix = SIG_OBJ + profileID + KEY_SEPARATOR;
+    logger.debug("Searching default value for: " + key);
+    if (key.startsWith(profilePrefix)) {
+      key = key.substring(profilePrefix.length());
+    }
+    key = "default." + key;
+    logger.debug("Searching default value for: " + key);
+    return this.configuration.getValue(key);
+  }
 
-			if (value == null) {
-				return getDefaultValue(key);
-			}
+  public String getValue(String key) {
+    logger.debug("Searching: " + key);
+    final SignatureProfileEntry entry = profileInformations.get(key);
+    if (entry != null) {
+      final String value = entry.getValue();
 
-			return value;
-		}
-		String v = profileSettings.get(key);
-		if (v != null) {
-			return v;
-		}
-		return getDefaultValue(key);
-	}
+      if (value == null) {
+        return getDefaultValue(key);
+      }
 
-	public String getProfileID() {
-		return profileID;
-	}
+      return value;
+    }
+    final String v = profileSettings.get(key);
+    if (v != null) {
+      return v;
+    }
+    return getDefaultValue(key);
+  }
 
-	public String getSigningReason() {
-		return this.getValue(SIGNING_REASON);
-	}
-	
-	public String getSignFieldValue() {
-		return this.getValue(SIGNFIELD_VALUE);
-	}
-	
-	public String getProfileTimeZone() {
-		return this.getValue(TIMEZONE_BASE);
-	}
+  public String getProfileID() {
+    return profileID;
+  }
 
-	public void setPDFAVersion(String version) {
-		this.pdfAVersion = version;
-	}
+  public String getSigningReason() {
+    return this.getValue(SIGNING_REASON);
+  }
 
-	public boolean isPDFA() {
+  public String getSignFieldValue() {
+    return this.getValue(SIGNFIELD_VALUE);
+  }
 
-		if(this.pdfAVersion != null) {
-			return "1".equals(this.pdfAVersion);
-		}
+  public String getProfileTimeZone() {
+    return this.getValue(TIMEZONE_BASE);
+  }
 
-		SignatureProfileEntry entry = profileInformations.get(SIG_PDFA_VALID);
-		if (entry != null) {
-			String value = entry.getCaption();
-			return "true".equals(value);
-		}
+  public void setPDFAVersion(String version) {
+    this.pdfAVersion = version;
+  }
 
-		entry = profileInformations.get(SIG_PDFA1B_VALID);
-		if (entry != null) {
-			String value = entry.getCaption();
-			return "true".equals(value);
-		}
-		return false;
-	}
+  public boolean isPDFA() {
 
-	public boolean isPDFUA() {
-		SignatureProfileEntry entry = profileInformations.get(SIG_PDFUA_FORCE);
-		if (entry != null) {
-			String value = entry.getCaption();
-			return "true".equals(value);
-		}
-		return false;
-	}
+    if (this.pdfAVersion != null) {
+      return "1".equals(this.pdfAVersion);
+    }
 
+    SignatureProfileEntry entry = profileInformations.get(SIG_PDFA_VALID);
+    if (entry != null) {
+      final String value = entry.getCaption();
+      return "true".equals(value);
+    }
 
-	public boolean isLatin1Encoding() {
-		SignatureProfileEntry entry = profileInformations.get(LATIN1_ENCODING);
-		if (entry != null) {
-			String value = entry.getCaption();
-			return "true".equals(value);
-		}
-		return false;
-	}
+    entry = profileInformations.get(SIG_PDFA1B_VALID);
+    if (entry != null) {
+      final String value = entry.getCaption();
+      return "true".equals(value);
+    }
+    return false;
+  }
 
-	public boolean isPDFA3() {
-		if(this.pdfAVersion != null) {
-			return "3".equals(this.pdfAVersion);
-		}
+  public boolean isPDFUA() {
+    final SignatureProfileEntry entry = profileInformations.get(SIG_PDFUA_FORCE);
+    if (entry != null) {
+      final String value = entry.getCaption();
+      return "true".equals(value);
+    }
+    return false;
+  }
 
-		SignatureProfileEntry entry = profileInformations.get(SIG_PDFA_VALID);
-		if (entry != null) {
-			String value = entry.getCaption();
-			return "true".equals(value);
-		}
-		return false;
-	}
+  public boolean isLatin1Encoding() {
+    final SignatureProfileEntry entry = profileInformations.get(LATIN1_ENCODING);
+    if (entry != null) {
+      final String value = entry.getCaption();
+      return "true".equals(value);
+    }
+    return false;
+  }
+
+  public boolean isPDFA3() {
+    if (this.pdfAVersion != null) {
+      return "3".equals(this.pdfAVersion);
+    }
+
+    final SignatureProfileEntry entry = profileInformations.get(SIG_PDFA_VALID);
+    if (entry != null) {
+      final String value = entry.getCaption();
+      return "true".equals(value);
+    }
+    return false;
+  }
 }

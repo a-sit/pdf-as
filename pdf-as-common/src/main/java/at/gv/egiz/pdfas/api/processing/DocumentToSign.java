@@ -18,5 +18,7 @@ public class DocumentToSign implements Serializable {
   String qrCodeContent;
 
   String profile;
+  
+  String placeHolderId;
 
 }

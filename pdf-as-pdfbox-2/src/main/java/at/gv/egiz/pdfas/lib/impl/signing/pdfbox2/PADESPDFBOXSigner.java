@@ -70,8 +70,6 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.PDFAIdentificationSchema;
 import org.apache.xmpbox.xml.DomXmpParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
@@ -83,7 +81,6 @@ import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.impl.ErrorExtractor;
 import at.gv.egiz.pdfas.lib.impl.SignaturePositionImpl;
-import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderWebConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
 import at.gv.egiz.pdfas.lib.impl.pdfbox2.PDFBOXObject;
 import at.gv.egiz.pdfas.lib.impl.pdfbox2.positioning.Positioning;
@@ -107,40 +104,32 @@ import at.knowcenter.wag.egov.egiz.pdf.PositioningInstruction;
 import at.knowcenter.wag.egov.egiz.pdf.TablePos;
 import at.knowcenter.wag.egov.egiz.table.Table;
 import iaik.x509.X509Certificate;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
-  private static final Logger logger = LoggerFactory.getLogger(PADESPDFBOXSigner.class);
-  private boolean isAdobeSigForm = false;
+
 
   @Override
   public void signPDF(PDFObject genericPdfObject, RequestedSignature requestedSignature,
       PDFASSignatureInterface genericSigner) throws PdfAsException {
 
     PDFAsVisualSignatureProperties properties = null;
-    List<SignaturePlaceholderData> placeholders;
-    List<SignaturePlaceholderData> availablePlaceholders;
-    SignaturePlaceholderData signaturePlaceholderData = null;
-
-    String placeholder_id = "";
-
-    if (PlaceholderWebConfiguration.getValue(PLACEHOLDER_WEB_ID) != null && !PlaceholderWebConfiguration
-        .getValue(PLACEHOLDER_WEB_ID).equalsIgnoreCase("")) {
-      placeholder_id = PlaceholderWebConfiguration.getValue(PLACEHOLDER_WEB_ID);
-    }
-
+    
+    boolean isAdobeSigForm = false;
+    
     if (!(genericPdfObject instanceof PDFBOXObject)) {
-      // tODO:
-      throw new PdfAsException();
+      throw new PdfAsException("PDF to signObject is of wrong type: " + genericPdfObject.getClass().getName());
+      
     }
-
-    final PDFBOXObject pdfObject = (PDFBOXObject) genericPdfObject;
 
     if (!(genericSigner instanceof PDFASPDFBOXSignatureInterface)) {
-      // tODO:
-      throw new PdfAsException();
+      throw new PdfAsException("PDF signerObject is of wrong type:" + genericSigner.getClass().getName());
+      
     }
-
+    
+    final PDFBOXObject pdfObject = (PDFBOXObject) genericPdfObject;
     final PDFASPDFBOXSignatureInterface signer = (PDFASPDFBOXSignatureInterface) genericSigner;
 
     String pdfaVersion = null;
@@ -148,76 +137,42 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
     PDDocument doc = null;
     SignatureOptions options = new SignatureOptions();
     try {
-
       doc = pdfObject.getDocument();
-      // if signature already exists dont create new page
-      final List<PDSignatureField> pdSignatureFieldList = doc.getSignatureFields();
-      PDSignature signature;
+      
 
       // sign a PDF with an existing empty signature, as created by the
       // CreateEmptySignatureForm example.
-      String sigFieldName = pdfObject.getStatus().getSettings().getValue(SIGNATURE_FIELD_NAME);
-      signature = findExistingSignature(doc, sigFieldName);
+      PDSignature signature = findExistingSignature(doc, getSignatureFieldNameConfig(pdfObject)); 
       if (signature == null) {
         // create signature dictionary
         signature = new PDSignature();
+        
       } else {
         isAdobeSigForm = true;
+        
       }
 
       signature.setFilter(COSName.getPDFName(signer.getPDFFilter()));
       signature.setSubFilter(COSName.getPDFName(signer.getPDFSubFilter()));
-//			SignaturePlaceholderData signaturePlaceholderDataInit =
-      placeholders = PlaceholderFilter.checkPlaceholderSignatureLocationList(pdfObject.getStatus(),
-          pdfObject.getStatus().getSettings(), placeholder_id);
+      
+      
+      String placeholder_id = pdfObject.getStatus().getSignParamter().getPlaceHolderId();      
+      
+      SignaturePlaceholderData nextPlaceholderData = PlaceholderFilter.checkPlaceholderSignatureLocation(
+          pdfObject.getStatus(), pdfObject.getStatus().getSettings(), placeholder_id);
 
-//            placeholders = SignaturePlaceholderExtractor.getPlaceholders();
-      availablePlaceholders = listAvailablePlaceholders(placeholders, existingSignatureLocations(doc));
-
-      if (placeholder_id.equalsIgnoreCase("")) {
-        if (checkAvailablePlaceholders(placeholders, existingSignatureLocations(doc)) != null) {
-          placeholder_id = checkAvailablePlaceholders(placeholders, existingSignatureLocations(doc)).getId();
+      if (nextPlaceholderData != null) {
+        log.info("Placeholder data found.");
+        signature.setLocation(nextPlaceholderData.getPlaceholderName());
+                        
+        if (nextPlaceholderData.getProfile() != null) {                    
+          log.debug("Placeholder Profile set to: {}", nextPlaceholderData.getProfile());
+          requestedSignature.setSignatureProfileID(nextPlaceholderData.getProfile());
+          
         }
       }
-
-      if (availablePlaceholders != null) {
-        signaturePlaceholderData = PlaceholderFilter
-            .checkPlaceholderSignatureLocation(pdfObject.getStatus(), pdfObject.getStatus().getSettings(),
-                placeholder_id);
-      }
-
-      TablePos tablePos = null;
-
-      if (signaturePlaceholderData != null) {
-        signature.setLocation(signaturePlaceholderData.getPlaceholderName());
-      }
-
-      if (signaturePlaceholderData != null) {
-        // Placeholder found!
-        placeholders.clear();
-        logger.info("Placeholder data found.");
-        if (signaturePlaceholderData.getProfile() != null) {
-          logger.debug("Placeholder Profile set to: " + signaturePlaceholderData.getProfile());
-          requestedSignature.setSignatureProfileID(signaturePlaceholderData.getProfile());
-        }
-
-        tablePos = signaturePlaceholderData.getTablePos();
-        if (tablePos != null) {
-
-          final SignatureProfileConfiguration signatureProfileConfiguration = pdfObject.getStatus()
-              .getSignatureProfileConfiguration(requestedSignature.getSignatureProfileID());
-
-          final float minWidth = signatureProfileConfiguration.getMinWidth();
-
-          if (minWidth > 0) {
-            if (tablePos.getWidth() < minWidth) {
-              tablePos.width = minWidth;
-              logger.debug("Correcting placeholder with to minimum width {}", minWidth);
-            }
-          }
-          logger.debug("Placeholder Position set to: " + tablePos.toString());
-        }
-      }
+      
+                
       final SignatureProfileSettings signatureProfileSettings = TableFactory.createProfile(
           requestedSignature.getSignatureProfileID(), pdfObject.getStatus().getSettings());
 
@@ -243,9 +198,11 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       }
 
       signature.setReason(signerReason);
-      logger.debug("Signing reason: " + signerReason);
+      log.debug("Signing reason: " + signerReason);
 
-      logger.debug("Signing @ " + signer.getSigningDate().getTime().toString());
+      
+      
+      log.debug("Signing @ " + signer.getSigningDate().getTime().toString());
       // the signing date, needed for valid signature
       // signature.setSignDate(signer.getSigningDate());
 
@@ -257,9 +214,9 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         if (reservedSignatureSizeString != null) {
           signatureSize = Integer.parseInt(reservedSignatureSizeString);
         }
-        logger.debug("Reserving {} bytes for signature", signatureSize);
+        log.debug("Reserving {} bytes for signature", signatureSize);
       } catch (final NumberFormatException e) {
-        logger.warn("Invalid configuration value: {} should be a number using 0x1000", SIG_RESERVED_SIZE);
+        log.warn("Invalid configuration value: {} should be a number using 0x1000", SIG_RESERVED_SIZE);
       }
       options.setPreferredSignatureSize(signatureSize);
 
@@ -269,44 +226,15 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       }
 
       // Is visible Signature
-      if (requestedSignature.isVisual()) {
-        logger.info("Creating visual siganture block");
-
-        final SignatureProfileConfiguration signatureProfileConfiguration = pdfObject.getStatus()
-            .getSignatureProfileConfiguration(requestedSignature.getSignatureProfileID());
-
-        if (tablePos == null) {
-          // ================================================================
-          // PositioningStage (visual) -> find position or use
-          // fixed
-          // position
-
-          final String posString = pdfObject.getStatus().getSignParamter().getSignaturePosition();
-
-          TablePos signaturePos = null;
-
-          final String signaturePosString = signatureProfileConfiguration.getDefaultPositioning();
-
-          if (signaturePosString != null) {
-            logger.debug("using signature Positioning: " + signaturePos);
-            signaturePos = new TablePos(signaturePosString);
-          }
-
-          logger.debug("using Positioning: " + posString);
-
-          if (posString != null) {
-            // Merge Signature Position
-            tablePos = new TablePos(posString, signaturePos);
-          } else {
-            // Fallback to signature Position!
-            tablePos = signaturePos;
-          }
-
-          if (tablePos == null) {
-            // Last Fallback default position
-            tablePos = new TablePos();
-          }
-        }
+      if (requestedSignature.isVisual()) {                
+        log.info("Creating visual siganture block");
+        
+        final SignatureProfileConfiguration signatureProfileConfiguration = 
+            pdfObject.getStatus().getSignatureProfileConfiguration(requestedSignature.getSignatureProfileID());
+        TablePos tablePos = prepareTablePosition(nextPlaceholderData, signatureProfileConfiguration,
+            pdfObject.getStatus().getSignParamter().getSignaturePosition());
+        
+        
 
         // Legacy Modes not supported with pdfbox2 anymore
 //				boolean legacy32Position = signatureProfileConfiguration.getLegacy32Positioning();
@@ -331,7 +259,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
             "",
             doc, visualObject, pdfObject.getStatus().getSettings(), signatureProfileSettings);
 
-        logger.debug("Positioning: {}", positioningInstruction.toString());
+        log.debug("Positioning: {}", positioningInstruction.toString());
 
         if (!isAdobeSigForm) {
           if (positioningInstruction.isMakeNewPage()) {
@@ -347,11 +275,11 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
           // handle rotated page
           final int targetPageNumber = positioningInstruction.getPage();
-          logger.debug("Target Page: " + targetPageNumber);
+          log.debug("Target Page: " + targetPageNumber);
           final PDPage targetPage = doc.getPages().get(targetPageNumber - 1);
           final int rot = targetPage.getRotation();
-          logger.debug("Page rotation: " + rot);
-          logger.debug("resulting Sign rotation: " + positioningInstruction.getRotation());
+          log.debug("Page rotation: " + rot);
+          log.debug("resulting Sign rotation: " + positioningInstruction.getRotation());
 
           final SignaturePositionImpl position = new SignaturePositionImpl();
           position.setX(positioningInstruction.getX());
@@ -386,7 +314,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
          * int pageNumber = positioningInstruction.getPage(); PDPage page =
          * doc.getPages().get(pageNumber - 1);
          * 
-         * logger.info("Placeholder name: " +
+         * log.info("Placeholder name: " +
          * signaturePlaceholderData.getPlaceholderName()); COSDictionary
          * xobjectsDictionary = (COSDictionary) page.getResources().getCOSObject()
          * .getDictionaryObject(COSName.XOBJECT);
@@ -395,7 +323,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
          * xobjectsDictionary.setItem(signaturePlaceholderData.getPlaceholderName(),
          * img); xobjectsDictionary.setNeedToBeUpdated(true);
          * page.getResources().getCOSObject().setNeedToBeUpdated(true);
-         * logger.info("Placeholder name: " +
+         * log.info("Placeholder name: " +
          * signaturePlaceholderData.getPlaceholderName()); }
          */
 
@@ -418,7 +346,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
             root.setOutputIntents(oi);
             root.getCOSObject().setNeedToBeUpdated(true);
 
-            logger.info("added Output Intent");
+            log.info("added Output Intent");
           } catch (final Throwable e) {
             e.printStackTrace();
             throw new PdfAsException("Failed to add Output Intent", e);
@@ -432,6 +360,8 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
       doc.addSignature(signature, signer, options);
 
+      String sigFieldName = getSignatureFieldNameConfig(pdfObject);
+      
       if (sigFieldName == null) {
         sigFieldName = "PDF-AS Signatur";
       }
@@ -473,7 +403,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
               }
             }
           } else {
-            logger.warn("Failed to name Signature Field! [Cannot find Field list in acroForm!]");
+            log.warn("Failed to name Signature Field! [Cannot find Field list in acroForm!]");
           }
 
           if (signatureField != null) {
@@ -485,7 +415,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
             signatureField.setAlternateFieldName(sigFieldName);
           }
         } else {
-          logger.warn("Failed to name Signature Field! [Cannot find acroForm!]");
+          log.warn("Failed to name Signature Field! [Cannot find acroForm!]");
         }
       }
 
@@ -496,16 +426,16 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       }
 
       // PDF-UA
-      logger.info("Adding pdf/ua content.");
+      log.info("Adding pdf/ua content.");
       try {
         final PDDocumentCatalog root = doc.getDocumentCatalog();
         final PDStructureTreeRoot structureTreeRoot = root.getStructureTreeRoot();
         if (structureTreeRoot != null) {
-          logger.info("Tree Root: {}", structureTreeRoot.toString());
+          log.info("Tree Root: {}", structureTreeRoot.toString());
           final List<Object> kids = structureTreeRoot.getKids();
 
           if (kids == null) {
-            logger.info("No kid-elements in structure tree Root, maybe not PDF/UA document");
+            log.info("No kid-elements in structure tree Root, maybe not PDF/UA document");
           }
 
           PDStructureElement docElement = null;
@@ -549,7 +479,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
           PDNumberTreeNode ntn = structureTreeRoot.getParentTree();
           if (ntn == null) {
             ntn = new PDNumberTreeNode(objectDic, null);
-            logger.info("No number-tree-node found!");
+            log.info("No number-tree-node found!");
           }
 
           final COSArray ntnKids = (COSArray) ntn.getCOSObject().getDictionaryObject(COSName.KIDS);
@@ -622,10 +552,10 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
       } catch (final Throwable e) {
         if (signatureProfileSettings.isPDFUA() == true) {
-          logger.error("Could not create PDF-UA conform document!");
+          log.error("Could not create PDF-UA conform document!");
           throw new PdfAsException("error.pdf.sig.pdfua.1", e);
         } else {
-          logger.info("Could not create PDF-UA conform signature");
+          log.info("Could not create PDF-UA conform signature");
         }
       }
 
@@ -642,19 +572,19 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
 
       } catch (final IOException e1) {
-        logger.error("Can not save incremental update", e1);
+        log.error("Can not save incremental update", e1);
 
       }
       
       System.gc();
-      logger.debug("Signature done!");
+      log.debug("Signature done!");
       
     } catch (final IOException e) {
-      logger.warn(MessageResolver.resolveMessage("error.pdf.sig.01"), e);
+      log.warn(MessageResolver.resolveMessage("error.pdf.sig.01"), e);
       throw new PdfAsException("error.pdf.sig.01", e);
     
     } catch (PDFASError e2) {
-      logger.warn(e2.getInfo());
+      log.warn(e2.getInfo());
       throw new PdfAsException("error.pdf.sig.01", e2);
       
     } finally {
@@ -664,7 +594,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
             options.getVisualSignature().close();
             options.close();
           } catch (IOException e) {
-            logger.debug("Failed to close VisualSignature!", e);
+            log.debug("Failed to close VisualSignature!", e);
           }
         }
       }
@@ -674,11 +604,58 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
           doc.close();
           // SignaturePlaceholderExtractor.getPlaceholders().clear();
         } catch (final IOException e) {
-          logger.debug("Failed to close COS Doc!", e);
+          log.debug("Failed to close COS Doc!", e);
           // Ignore
         }
       }
     }
+  }
+
+  private TablePos prepareTablePosition(SignaturePlaceholderData nextPlaceholderData, 
+      SignatureProfileConfiguration signatureProfileConfiguration, String profilePosParam) throws PdfAsException {
+
+                            
+    if (nextPlaceholderData != null && nextPlaceholderData.getTablePos() != null) {
+      final float minWidth = signatureProfileConfiguration.getMinWidth();
+      TablePos tablePos = nextPlaceholderData.getTablePos();         
+      if (minWidth > 0) {
+        if (tablePos.getWidth() < minWidth) {
+          tablePos.width = minWidth;
+          log.debug("Correcting placeholder with to minimum width {}", minWidth);
+        }
+      }
+      log.debug("Placeholder Position set to: " + tablePos.toString());
+      return tablePos;
+      
+    } else {
+      TablePos signaturePos = null;
+      final String signaturePosString = signatureProfileConfiguration.getDefaultPositioning();
+
+      if (signaturePosString != null) {
+        log.debug("using signature Positioning: " + signaturePosString);
+        signaturePos = new TablePos(signaturePosString);
+        
+      }
+
+      log.debug("using Positioning: " + profilePosParam);
+
+      if (profilePosParam != null) {
+        // Merge Signature Position
+        return new TablePos(profilePosParam, signaturePos);        
+      
+      } else if (signaturePos != null){
+        // Fallback to signature Position!
+        return signaturePos;
+        
+      } else {
+        return new TablePos();
+        
+      }
+    }
+  }
+
+  private String getSignatureFieldNameConfig(PDFBOXObject pdfObject) {
+    return pdfObject.getStatus().getSettings().getValue(SIGNATURE_FIELD_NAME);
   }
 
   private int getParentTreeNextKey(PDStructureTreeRoot structureTreeRoot) throws IOException {
@@ -717,31 +694,31 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
       document.close();
       result = document.getResult();
-      logger.info("PDF-A Validation Result: " + result.isValid());
+      log.info("PDF-A Validation Result: " + result.isValid());
 
       if (result.getErrorsList().size() > 0) {
-        logger.error("The following validation errors occured for PDF-A validation");
+        log.error("The following validation errors occured for PDF-A validation");
       }
 
       for (final ValidationResult.ValidationError ve : result.getErrorsList()) {
-        logger.error("\t" + ve.getErrorCode() + ": " + ve.getDetails());
+        log.error("\t" + ve.getErrorCode() + ": " + ve.getDetails());
       }
 
       if (!result.isValid()) {
-        logger.info("The file is not a valid PDF-A document");
+        log.info("The file is not a valid PDF-A document");
       }
 
     } catch (final SyntaxValidationException e) {
-      logger.error("The file is syntactically invalid.", e);
+      log.error("The file is syntactically invalid.", e);
       throw new PdfAsException("Resulting PDF Document is syntactically invalid.");
     } catch (final ValidationException e) {
-      logger.error("The file is not a valid PDF-A document.", e);
+      log.error("The file is not a valid PDF-A document.", e);
     } catch (final IOException e) {
-      logger.error("An IOException (" + e.getMessage()
+      log.error("An IOException (" + e.getMessage()
           + ") occurred, while validating the PDF-A conformance", e);
       throw new PdfAsException("Failed validating PDF Document IOException.");
     } catch (final RuntimeException e) {
-      logger.debug("An RuntimeException (" + e.getMessage()
+      log.debug("An RuntimeException (" + e.getMessage()
           + ") occurred, while validating the PDF-A conformance", e);
       throw new PdfAsException("Failed validating PDF Document RuntimeException.");
     } finally {
@@ -876,10 +853,10 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       return cutOut;
       
     } catch (final PdfAsException e) {
-      logger.warn("PDF-AS  Exception", e);
+      log.warn("PDF-AS  Exception", e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     } catch (final Throwable e) {
-      logger.warn("Unexpected Throwable  Exception", e);
+      log.warn("Unexpected Throwable  Exception", e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     }
   }
@@ -897,7 +874,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
           if (pdfaIdentificationSchema != null) {
             final Integer pdfaversion = pdfaIdentificationSchema.getPart();
             final String conformance = pdfaIdentificationSchema.getConformance();
-            logger.info("Detected PDF/A Version: {} - {}", pdfaversion, conformance);
+            log.info("Detected PDF/A Version: {} - {}", pdfaversion, conformance);
 
             if (pdfaversion != null) {
               return String.valueOf(pdfaversion);
@@ -906,7 +883,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
       }
     } catch (final Throwable e) {
-      logger.warn("Failed to determine PDF/A Version!", e);
+      log.warn("Failed to determine PDF/A Version!", e);
     }
     return null;
   }
@@ -931,74 +908,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
     }
     return signature;
   }
-
-  private List<String> existingSignatureLocations(PDDocument doc) {
-    final List<String> existingLocations = new ArrayList<>();
-    try {
-      final List<PDSignature> pdSignatureList = doc.getSignatureDictionaries();
-      if (pdSignatureList.size() != 0) {
-        for (final PDSignature sig : pdSignatureList) {
-          existingLocations.add(sig.getLocation());
-        }
-      }
-    } catch (final IOException e) {
-      e.printStackTrace();
-    }
-    return existingLocations;
-  }
-
-  // find first placeholder_id
-  public SignaturePlaceholderData checkAvailablePlaceholders(List<SignaturePlaceholderData> placeholders,
-      List<String> existingPlaceholders) {
-    SignaturePlaceholderData result = null;
-
-    if (placeholders != null) {
-      for (int i = 0; i < placeholders.size(); ++i) {
-        // take smallest id
-        if (!existingPlaceholders.contains(placeholders.get(i).getPlaceholderName())) {
-          final SignaturePlaceholderData spd = placeholders.get(i);
-          if (spd.getId() != null) {
-            if (result == null) {
-              result = spd;
-            } else {
-              try {
-                final int currentID = Integer.parseInt(result.getId());
-                final int testID = Integer.parseInt(spd.getId());
-                if (testID < currentID) {
-                  result = spd;
-                }
-              } catch (final Exception e) {
-                // fallback to string compare
-                final String currentID = result.getId();
-                final String testID = spd.getId();
-                if (testID.compareToIgnoreCase(currentID) < 0) {
-                  result = spd;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return result;
-  }
-
-  // find first placeholder_id
-  public List<SignaturePlaceholderData> listAvailablePlaceholders(List<SignaturePlaceholderData> placeholders,
-      List<String> existingPlaceholders) {
-    final List<SignaturePlaceholderData> result = new ArrayList<>();
-
-    if (placeholders != null) {
-      for (int i = 0; i < placeholders.size(); ++i) {
-        // take smallest id
-        if (!existingPlaceholders.contains(placeholders.get(i).getPlaceholderName())) {
-          result.add(placeholders.get(i));
-        }
-      }
-    } 
-    return result;
-  }
-
+  
   static Map<Integer, COSObjectable> getNumberTreeAsMap(PDNumberTreeNode tree)
       throws IOException {
     Map<Integer, COSObjectable> numbers = tree.getNumbers();

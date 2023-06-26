@@ -1,15 +1,16 @@
 package at.gv.egiz.pdfas.lib.testpdfbox;
 
-import at.gv.egiz.pdfas.lib.impl.pdfbox2.placeholder.SignatureFieldsAndPlaceHolderExtractor;
-import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderData;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.junit.Assert;
+import org.junit.Test;
+
+import at.gv.egiz.pdfas.lib.impl.pdfbox2.placeholder.SignatureFieldsAndPlaceHolderExtractor;
+import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderData;
 
 public class SignatureFieldsAndPlaceHolderExtractorTest {
 
@@ -48,6 +49,14 @@ public class SignatureFieldsAndPlaceHolderExtractorTest {
     SignaturePlaceholderData result = getNextSignaturePlaceHolder(getPath("manySignFields.pdf"));
     Assert.assertEquals(null,result);
   }
+  
+  @Test
+  public void firstQrCodeOnUnsignedDoc() {
+    SignaturePlaceholderData result = getNextSignaturePlaceHolder(getPath("new_qr_2-2.pdf"));
+    Assert.assertEquals("Image5",result.getPlaceholderName());
+    
+  }
+  
   @Test
   public void subsequentCalls(){
     SignaturePlaceholderData result = getNextSignaturePlaceHolder(getPath("new_qr_2_signed_signed_signed.pdf"));

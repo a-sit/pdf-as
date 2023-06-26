@@ -24,145 +24,69 @@
 package at.gv.egiz.pdfas.lib.impl.placeholder;
 
 import java.io.IOException;
-import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsErrorCarrier;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
-import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderWebConfiguration;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
-import org.apache.commons.lang3.StringUtils;
 
 public class PlaceholderFilter implements IConfigurationConstants,
 		PlaceholderExtractorConstants {
-
+  
 	public static SignaturePlaceholderData checkPlaceholderSignatureLocation(
-			OperationStatus status, ISettings settings, String signatureLocation) throws PdfAsException,
-			IOException {
+	    OperationStatus status, ISettings settings, String placeholderId) throws PdfAsException, IOException {
+		
+	  String signingProfile = status.getRequestedSignature().getSignatureProfileID();
+	  
+		if (status.getPlaceholderConfiguration().isGlobalPlaceholderEnabled()) {		
+			String defaultPlaceHolderId = settings.getValue(PLACEHOLDER_ID);			
+			return status.getBackend().getPlaceholderExtractor().extract(
+			    status.getPdfObject(), getPlaceHolderId(placeholderId, defaultPlaceHolderId) , 
+			    getPlaceHolderMode(settings, PLACEHOLDER_MATCH_MODE_SORTED));
 
-		String placeholderID;
-
-		if (status.getPlaceholderConfiguration().isGlobalPlaceholderEnabled()) {
-			PlaceholderExtractor extractor = status.getBackend().getPlaceholderExtractor();
-
-			if(StringUtils.isNotEmpty(signatureLocation)) {
-				placeholderID = signatureLocation;
-			} else {
-				placeholderID = PlaceholderWebConfiguration.getValue(PLACEHOLDER_WEB_ID);
-				if(StringUtils.isEmpty(placeholderID)) {
-					placeholderID = settings.getValue(PLACEHOLDER_ID);
-				}
-			}
-
-			String placeholderModeString = settings.getValue(PLACEHOLDER_MODE);
-			int placeholderMode = PLACEHOLDER_MATCH_MODE_MODERATE;
-			if (StringUtils.isNotEmpty(placeholderModeString)) {
-				try {
-					placeholderMode = Integer.parseInt(placeholderModeString);
-					if (placeholderMode < PLACEHOLDER_MODE_MIN
-							|| placeholderMode > PLACEHOLDER_MODE_MAX) {
-						throw new PdfAsErrorCarrier(new PDFASError(
-								PDFASError.ERROR_INVALID_PLACEHOLDER_MODE));
-					}
-				} catch (NumberFormatException e) {
-					throw new PdfAsErrorCarrier(new PDFASError(
-							PDFASError.ERROR_INVALID_PLACEHOLDER_MODE, e));
-				}
-			}
-			SignaturePlaceholderData signaturePlaceholderData = extractor.extract(status.getPdfObject(), placeholderID, placeholderMode);
-			return signaturePlaceholderData;
-
-		} else if (status.getPlaceholderConfiguration().isProfileConfigurationEnabled(status.getRequestedSignature().getSignatureProfileID())) {
-			//filter for local placeholder in selected profiles
-			PlaceholderExtractor extractor = status.getBackend().getPlaceholderExtractor();
-			int placeholderMode = PLACEHOLDER_MATCH_MODE_SORTED;
-
-			placeholderID = status.getPlaceholderConfiguration().getProfilePlaceholderID(status.getRequestedSignature().getSignatureProfileID());
-			if(StringUtils.isNotEmpty(placeholderID)) {
-				placeholderMode = PLACEHOLDER_MATCH_MODE_MODERATE;
-			}
-			String placeholderModeString = settings.getValue(PLACEHOLDER_MODE);
-			if (StringUtils.isNotEmpty(placeholderModeString))  {
-				try {
-					placeholderMode = Integer.parseInt(placeholderModeString);
-					if (placeholderMode < PLACEHOLDER_MODE_MIN
-							|| placeholderMode > PLACEHOLDER_MODE_MAX) {
-						throw new PdfAsErrorCarrier(new PDFASError(
-								PDFASError.ERROR_INVALID_PLACEHOLDER_MODE));
-					}
-				} catch (NumberFormatException e) {
-					throw new PdfAsErrorCarrier(new PDFASError(
-							PDFASError.ERROR_INVALID_PLACEHOLDER_MODE, e));
-				}
-			}
-			SignaturePlaceholderData signaturePlaceholderData = extractor.extract(status.getPdfObject(), placeholderID, placeholderMode);
-			return signaturePlaceholderData;
+		} else if (status.getPlaceholderConfiguration().isProfileConfigurationEnabled(signingProfile)) {
+			String defaultPlaceHolderId = status.getPlaceholderConfiguration().getProfilePlaceholderID(signingProfile);
+			return status.getBackend().getPlaceholderExtractor().extract(
+			    status.getPdfObject(), getPlaceHolderId(placeholderId, defaultPlaceHolderId), 
+			    getPlaceHolderMode(settings, 
+			        StringUtils.isNotEmpty(defaultPlaceHolderId) ? PLACEHOLDER_MATCH_MODE_MODERATE : PLACEHOLDER_MATCH_MODE_SORTED));
 		}
 		return null;
 	}
-
-	public static List<SignaturePlaceholderData> checkPlaceholderSignatureLocationList(OperationStatus status, ISettings settings, String signatureLocation) throws PdfAsException,
-			IOException {
-		String placeholderID;
-
-		if (status.getPlaceholderConfiguration().isGlobalPlaceholderEnabled()) {
-			PlaceholderExtractor extractor = status.getBackend().getPlaceholderExtractor();
-
-			if(StringUtils.isNotEmpty(signatureLocation)) {
-				placeholderID = signatureLocation;
-			} else {
-				placeholderID = PlaceholderWebConfiguration.getValue(PLACEHOLDER_WEB_ID);
-				if(StringUtils.isEmpty(placeholderID)) {
-					placeholderID = settings.getValue(PLACEHOLDER_ID);
-				}
-			}
-
-			String placeholderModeString = settings.getValue(PLACEHOLDER_MODE);
-			int placeholderMode = PLACEHOLDER_MATCH_MODE_MODERATE;
-			if (StringUtils.isNotEmpty(placeholderModeString)) {
-				try {
-					placeholderMode = Integer.parseInt(placeholderModeString);
-					if (placeholderMode < PLACEHOLDER_MODE_MIN
-							|| placeholderMode > PLACEHOLDER_MODE_MAX) {
-						throw new PdfAsErrorCarrier(new PDFASError(
-								PDFASError.ERROR_INVALID_PLACEHOLDER_MODE));
-					}
-				} catch (NumberFormatException e) {
-					throw new PdfAsErrorCarrier(new PDFASError(
-							PDFASError.ERROR_INVALID_PLACEHOLDER_MODE, e));
-				}
-			}
-			return extractor.extractList(status.getPdfObject(), placeholderID,
-					placeholderMode);
-
-		} else if (status.getPlaceholderConfiguration().isProfileConfigurationEnabled(status.getRequestedSignature().getSignatureProfileID())) {
-			//filter for local placeholder in selected profiles
-			PlaceholderExtractor extractor = status.getBackend().getPlaceholderExtractor();
-			int placeholderMode = PLACEHOLDER_MATCH_MODE_SORTED;
-
-			placeholderID = status.getPlaceholderConfiguration().getProfilePlaceholderID(status.getRequestedSignature().getSignatureProfileID());
-			if(StringUtils.isNotEmpty(placeholderID)) {
-				placeholderMode = PLACEHOLDER_MATCH_MODE_MODERATE;
-			}
-			String placeholderModeString = settings.getValue(PLACEHOLDER_MODE);
-			if (StringUtils.isNotEmpty(placeholderModeString))  {
-				try {
-					placeholderMode = Integer.parseInt(placeholderModeString);
-					if (placeholderMode < PLACEHOLDER_MODE_MIN
-							|| placeholderMode > PLACEHOLDER_MODE_MAX) {
-						throw new PdfAsErrorCarrier(new PDFASError(
-								PDFASError.ERROR_INVALID_PLACEHOLDER_MODE));
-					}
-				} catch (NumberFormatException e) {
-					throw new PdfAsErrorCarrier(new PDFASError(
-							PDFASError.ERROR_INVALID_PLACEHOLDER_MODE, e));
-				}
-			}
-			return extractor.extractList(status.getPdfObject(), placeholderID,
-					placeholderMode);
-		}
-		return null;
+	
+	private static int getPlaceHolderMode(ISettings settings, int defaultValue) throws PdfAsErrorCarrier {
+    String placeholderModeString = settings.getValue(PLACEHOLDER_MODE);   
+    if (StringUtils.isNotEmpty(placeholderModeString)) {
+      try {
+        int placeholderMode = Integer.parseInt(placeholderModeString);
+        if (placeholderMode < PLACEHOLDER_MODE_MIN || placeholderMode > PLACEHOLDER_MODE_MAX) {
+          throw new PdfAsErrorCarrier(new PDFASError(PDFASError.ERROR_INVALID_PLACEHOLDER_MODE));
+          
+        }
+        return placeholderMode;
+        
+      } catch (NumberFormatException e) {
+        throw new PdfAsErrorCarrier(new PDFASError(
+            PDFASError.ERROR_INVALID_PLACEHOLDER_MODE, e));
+      }
+      
+    } else {
+      return defaultValue;
+      
+    }
 	}
+	
+  private static String getPlaceHolderId(String requestId, String defaultValue) {
+    if (StringUtils.isEmpty(requestId)) {
+      return defaultValue;
+      
+    } else {
+      return requestId;
+      
+    }    
+  }
 }

@@ -54,6 +54,22 @@ public interface SignParameter extends PdfAsParameter {
 	 */
 	public void setSignaturePosition(String signaturePosition);
 	
+	
+	/**
+	 * Get Id of a placeholder that should be used for positioning.
+	 * 
+	 * @return Id of a placeholder
+	 */
+	String getPlaceHolderId();
+	
+	
+	/**
+	 * Set Id of a placeholder that should be used for positioning.
+	 * 
+	 * @param id Id of a placeholder
+	 */
+	void setPlaceHolderId(String id);
+	
 	/**
 	 * Sets the signer to use
 	 * 

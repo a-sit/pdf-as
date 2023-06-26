@@ -115,7 +115,6 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
   public void signPDF(PDFObject genericPdfObject, RequestedSignature requestedSignature,
       PDFASSignatureInterface genericSigner) throws PdfAsException {
 
-    PDFAsVisualSignatureProperties properties = null;
     
     boolean isAdobeSigForm = false;
     
@@ -131,8 +130,6 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
     
     final PDFBOXObject pdfObject = (PDFBOXObject) genericPdfObject;
     final PDFASPDFBOXSignatureInterface signer = (PDFASPDFBOXSignatureInterface) genericSigner;
-
-    String pdfaVersion = null;
 
     PDDocument doc = null;
     SignatureOptions options = new SignatureOptions();
@@ -152,19 +149,23 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         
       }
 
+      // set basic signature parameters
       signature.setFilter(COSName.getPDFName(signer.getPDFFilter()));
       signature.setSubFilter(COSName.getPDFName(signer.getPDFSubFilter()));
+      signature.setSignDate(Calendar.getInstance());
+      log.debug("Signing @ " + signature.getSignDate().getTime().toString());
       
-      
-      String placeholder_id = pdfObject.getStatus().getSignParamter().getPlaceHolderId();      
-      
+      // extract next QR-code placeholder, if exists 
       SignaturePlaceholderData nextPlaceholderData = PlaceholderFilter.checkPlaceholderSignatureLocation(
-          pdfObject.getStatus(), pdfObject.getStatus().getSettings(), placeholder_id);
+          pdfObject.getStatus(), pdfObject.getStatus().getSettings(), 
+          pdfObject.getStatus().getSignParamter().getPlaceHolderId());
 
       if (nextPlaceholderData != null) {
         log.info("Placeholder data found.");
         signature.setLocation(nextPlaceholderData.getPlaceholderName());
-                        
+                     
+        
+        // TODO: only over-write if requested
         if (nextPlaceholderData.getProfile() != null) {                    
           log.debug("Placeholder Profile set to: {}", nextPlaceholderData.getProfile());
           requestedSignature.setSignatureProfileID(nextPlaceholderData.getProfile());
@@ -173,92 +174,49 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       }
       
                 
-      final SignatureProfileSettings signatureProfileSettings = TableFactory.createProfile(
-          requestedSignature.getSignatureProfileID(), pdfObject.getStatus().getSettings());
-
-      // Check if input document is PDF-A conform
-      if (signatureProfileSettings.isPDFA()) {
-        final DataSource origDoc = pdfObject.getOriginalDocument();
-        final InputStream stream = origDoc.getInputStream();
-        // Run PreflightParser for checking conformity//
-        // runPDFAPreflight(origDoc);
-      }
+      final SignatureProfileSettings signatureProfileSettings = 
+          TableFactory.createProfile(requestedSignature.getSignatureProfileID(), pdfObject.getStatus().getSettings());
+       
+      // set signature name
       final ValueResolver resolver = new ValueResolver(requestedSignature, pdfObject.getStatus());
-
-      final String signerName = resolver.resolve("SIG_SUBJECT", signatureProfileSettings.getValue(
-          "SIG_SUBJECT"),
-          signatureProfileSettings);
-
+      final String signerName = resolver.resolve("SIG_SUBJECT", 
+          signatureProfileSettings.getValue("SIG_SUBJECT"), signatureProfileSettings);
       signature.setName(signerName);
-      signature.setSignDate(Calendar.getInstance());
-      String signerReason = signatureProfileSettings.getSigningReason();
 
-      if (signerReason == null) {
-        signerReason = "PAdES Signature";
-      }
-
+      // set signature reason
+      String signerReason = signatureProfileSettings.getSigningReason() != null 
+          ? signatureProfileSettings.getSigningReason() : "PAdES Signature";
       signature.setReason(signerReason);
       log.debug("Signing reason: " + signerReason);
 
-      
-      
-      log.debug("Signing @ " + signer.getSigningDate().getTime().toString());
-      // the signing date, needed for valid signature
-      // signature.setSignDate(signer.getSigningDate());
-
       signer.setPDSignature(signature);
 
-      int signatureSize = 0x1000;
-      try {
-        final String reservedSignatureSizeString = signatureProfileSettings.getValue(SIG_RESERVED_SIZE);
-        if (reservedSignatureSizeString != null) {
-          signatureSize = Integer.parseInt(reservedSignatureSizeString);
-        }
-        log.debug("Reserving {} bytes for signature", signatureSize);
-      } catch (final NumberFormatException e) {
-        log.warn("Invalid configuration value: {} should be a number using 0x1000", SIG_RESERVED_SIZE);
-      }
-      options.setPreferredSignatureSize(signatureSize);
-
+      
       if (signatureProfileSettings.isPDFA() || signatureProfileSettings.isPDFA3()) {
-        pdfaVersion = getPDFAVersion(doc);
-        signatureProfileSettings.setPDFAVersion(pdfaVersion);
+        signatureProfileSettings.setPDFAVersion(getPDFAVersion(doc));
+        
       }
 
-      // Is visible Signature
+      // prepare basic signature options
+      options.setPreferredSignatureSize(calculateBlankAreaForSignature(signatureProfileSettings));
+
+            
+      PDFAsVisualSignatureProperties properties = null;
       if (requestedSignature.isVisual()) {                
         log.info("Creating visual siganture block");
         
         final SignatureProfileConfiguration signatureProfileConfiguration = 
             pdfObject.getStatus().getSignatureProfileConfiguration(requestedSignature.getSignatureProfileID());
-        TablePos tablePos = prepareTablePosition(nextPlaceholderData, signatureProfileConfiguration,
+        final TablePos tablePos = prepareTablePosition(nextPlaceholderData, signatureProfileConfiguration,
             pdfObject.getStatus().getSignParamter().getSignaturePosition());
-        
-        
-
-        // Legacy Modes not supported with pdfbox2 anymore
-//				boolean legacy32Position = signatureProfileConfiguration.getLegacy32Positioning();
-//				boolean legacy40Position = signatureProfileConfiguration.getLegacy40Positioning();
-
-        // create Table describtion
-
         final Table main = TableFactory.createSigTable(signatureProfileSettings, MAIN, pdfObject.getStatus(),
             requestedSignature);
 
         final IPDFStamper stamper = StamperFactory.createDefaultStamper(pdfObject.getStatus().getSettings());
-
         final IPDFVisualObject visualObject = stamper.createVisualPDFObject(pdfObject, main);
 
-        /*
-         * PDDocument originalDocument = PDDocument .load(new
-         * ByteArrayInputStream(pdfObject.getStatus()
-         * .getPdfObject().getOriginalDocument()));
-         */
-
         final PositioningInstruction positioningInstruction = Positioning.determineTablePositioning(tablePos,
-            "",
             doc, visualObject, pdfObject.getStatus().getSettings(), signatureProfileSettings);
-
         log.debug("Positioning: {}", positioningInstruction.toString());
 
         if (!isAdobeSigForm) {
@@ -289,43 +247,10 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
           position.setWidth(visualObject.getWidth());
           requestedSignature.setSignaturePosition(position);
         }
-
+                
         properties = new PDFAsVisualSignatureProperties(pdfObject.getStatus().getSettings(), pdfObject,
             (PdfBoxVisualObject) visualObject, positioningInstruction, signatureProfileSettings);
-
         properties.buildSignature();
-
-        /*
-         * ByteArrayOutputStream sigbos = new ByteArrayOutputStream();
-         * sigbos.write(StreamUtils.inputStreamToByteArray (properties
-         * .getVisibleSignature())); sigbos.close();
-         */
-
-        /*
-         * if (signaturePlaceholderData != null) {
-         * 
-         * InputStream fis =
-         * PADESPDFBOXSigner.class.getResourceAsStream("/placeholder/empty.jpg");
-         * PDImageXObject img = JPEGFactory.createFromStream(doc, fis);
-         * 
-         * img.getCOSObject().setNeedToBeUpdated(true); // PDDocumentCatalog root =
-         * doc.getDocumentCatalog(); // PDPageNode rootPages = root.getPages(); //
-         * List<PDPage> kids = new ArrayList<PDPage>(); // rootPages.getAllKids(kids);
-         * int pageNumber = positioningInstruction.getPage(); PDPage page =
-         * doc.getPages().get(pageNumber - 1);
-         * 
-         * log.info("Placeholder name: " +
-         * signaturePlaceholderData.getPlaceholderName()); COSDictionary
-         * xobjectsDictionary = (COSDictionary) page.getResources().getCOSObject()
-         * .getDictionaryObject(COSName.XOBJECT);
-         * 
-         * 
-         * xobjectsDictionary.setItem(signaturePlaceholderData.getPlaceholderName(),
-         * img); xobjectsDictionary.setNeedToBeUpdated(true);
-         * page.getResources().getCOSObject().setNeedToBeUpdated(true);
-         * log.info("Placeholder name: " +
-         * signaturePlaceholderData.getPlaceholderName()); }
-         */
 
         if (signatureProfileSettings.isPDFA() || signatureProfileSettings.isPDFA3()) {
           final PDDocumentCatalog root = doc.getDocumentCatalog();
@@ -350,37 +275,26 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
           } catch (final Throwable e) {
             e.printStackTrace();
             throw new PdfAsException("Failed to add Output Intent", e);
+            
           } finally {
             IOUtils.closeQuietly(colorProfile);
+            
           }
         }
+        
         options.setPage(positioningInstruction.getPage() - 1);
         options.setVisualSignature(properties.getVisibleSignature());
+        
       }
 
       doc.addSignature(signature, signer, options);
-
-      String sigFieldName = getSignatureFieldNameConfig(pdfObject);
       
-      if (sigFieldName == null) {
-        sigFieldName = "PDF-AS Signatur";
-      }
-      final int count = PdfBoxUtils.countSignatures(doc, sigFieldName);
-
-      sigFieldName = sigFieldName + count;
-
-      final PDAcroForm acroFormm = doc.getDocumentCatalog().getAcroForm();
-
-      // PDStructureTreeRoot pdstRoot =
-      // doc.getDocumentCatalog().getStructureTreeRoot();
-      // COSDictionary dic =
-      // doc.getDocumentCatalog().getCOSDictionary();
-      // PDStructureElement el = new PDStructureElement("Widget",
-      // pdstRoot);
-
+      String sigFieldName = buildNextSignatureFieldName(doc, pdfObject);
+      
       // this is not used for Adobe signature fields
       if (!isAdobeSigForm) {
         PDSignatureField signatureField = null;
+        final PDAcroForm acroFormm = doc.getDocumentCatalog().getAcroForm();
         if (acroFormm != null) {
           @SuppressWarnings("unchecked")
           final List<PDField> fields = acroFormm.getFields();
@@ -416,6 +330,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
           }
         } else {
           log.warn("Failed to name Signature Field! [Cannot find acroForm!]");
+          
         }
       }
 
@@ -423,160 +338,15 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       final PDAcroForm acroForm = doc.getDocumentCatalog().getAcroForm();
       if (acroForm != null) {
         signatureField = (PDSignatureField) acroForm.getField(sigFieldName);
+        
       }
 
-      // PDF-UA
-      log.info("Adding pdf/ua content.");
-      try {
-        final PDDocumentCatalog root = doc.getDocumentCatalog();
-        final PDStructureTreeRoot structureTreeRoot = root.getStructureTreeRoot();
-        if (structureTreeRoot != null) {
-          log.info("Tree Root: {}", structureTreeRoot.toString());
-          final List<Object> kids = structureTreeRoot.getKids();
 
-          if (kids == null) {
-            log.info("No kid-elements in structure tree Root, maybe not PDF/UA document");
-          }
-
-          PDStructureElement docElement = null;
-          for (final Object k : kids) {
-            if (k instanceof PDStructureElement) {
-              docElement = (PDStructureElement) k;
-              break;
-
-            }
-          }
-
-          final PDStructureElement sigBlock = new PDStructureElement("Form", docElement);
-
-          // create object dictionary and add as child element
-          final COSDictionary objectDic = new COSDictionary();
-          objectDic.setName("Type", "OBJR");
-
-          objectDic.setItem("Pg", signatureField.getWidget().getPage());
-          objectDic.setItem("Obj", signatureField.getWidget());
-
-          final List<Object> l = new ArrayList<>();
-          l.add(objectDic);
-          sigBlock.setKids(l);
-          sigBlock.setPage(signatureField.getWidget().getPage());
-
-          sigBlock.setTitle("Signature Table");
-          sigBlock.setParent(docElement);
-          docElement.appendKid(sigBlock);
-
-          // Create and add Attribute dictionary to mitigate PAC
-          // warning
-          final COSDictionary sigBlockDic = sigBlock.getCOSObject();
-          final COSDictionary sub = new COSDictionary();
-
-          sub.setName("O", "Layout");
-          sub.setName("Placement", "Block");
-          sigBlockDic.setItem(COSName.A, sub);
-          sigBlockDic.setNeedToBeUpdated(true);
-
-          // Modify number tree
-          PDNumberTreeNode ntn = structureTreeRoot.getParentTree();
-          if (ntn == null) {
-            ntn = new PDNumberTreeNode(objectDic, null);
-            log.info("No number-tree-node found!");
-          }
-
-          final COSArray ntnKids = (COSArray) ntn.getCOSObject().getDictionaryObject(COSName.KIDS);
-          final COSArray ntnNumbers = (COSArray) ntn.getCOSObject().getDictionaryObject(COSName.NUMS);
-
-          final int parentTreeNextKey = getParentTreeNextKey(structureTreeRoot);
-
-          if (ntnNumbers == null && ntnKids != null) {// no number array, so continue with the kids array
-            // create dictionary with limits and nums array
-            final COSDictionary pTreeEntry = new COSDictionary();
-            final COSArray limitsArray = new COSArray();
-            // limits for exact one entry
-            limitsArray.add(COSInteger.get(parentTreeNextKey));
-            limitsArray.add(COSInteger.get(parentTreeNextKey));
-
-            final COSArray numsArray = new COSArray();
-            numsArray.add(COSInteger.get(parentTreeNextKey));
-            numsArray.add(sigBlock);
-
-            pTreeEntry.setItem(COSName.NUMS, numsArray);
-            pTreeEntry.setItem(COSName.LIMITS, limitsArray);
-
-            final PDNumberTreeNode newKidsElement = new PDNumberTreeNode(pTreeEntry, PDNumberTreeNode.class);
-
-            ntnKids.add(newKidsElement);
-            ntnKids.setNeedToBeUpdated(true);
-
-          } else if (ntnNumbers != null && ntnKids == null) {
-
-            final int arrindex = ntnNumbers.size();
-
-            ntnNumbers.add(arrindex, COSInteger.get(parentTreeNextKey));
-            ntnNumbers.add(arrindex + 1, sigBlock.getCOSObject());
-
-            ntnNumbers.setNeedToBeUpdated(true);
-
-            structureTreeRoot.setParentTree(ntn);
-
-          } else if (ntnNumbers == null && ntnKids == null) {
-            // document is not pdfua conform before signature creation
-            throw new PdfAsException("error.pdf.sig.pdfua.1");
-          } else {
-            // this is not allowed
-            throw new PdfAsException("error.pdf.sig.pdfua.1");
-          }
-
-          // set StructureParent for signature field annotation
-          signatureField.getWidget().setStructParent(parentTreeNextKey);
-
-          // Increase the next Key value in the structure tree root
-          structureTreeRoot.setParentTreeNextKey(parentTreeNextKey + 1);
-
-          // add the Tabs /S Element for Tabbing through annots
-          final PDPage p = signatureField.getWidget().getPage();
-          p.getCOSObject().setName("Tabs", "S");
-          p.getCOSObject().setNeedToBeUpdated(true);
-
-          // check alternative signature field name
-          if (signatureField != null) {
-            if (signatureField.getAlternateFieldName().equals("")) {
-              signatureField.setAlternateFieldName(sigFieldName);
-            }
-          }
-
-          ntn.getCOSObject().setNeedToBeUpdated(true);
-          sigBlock.getCOSObject().setNeedToBeUpdated(true);
-          structureTreeRoot.getCOSObject().setNeedToBeUpdated(true);
-          objectDic.setNeedToBeUpdated(true);
-          docElement.getCOSObject().setNeedToBeUpdated(true);
-        }
-      } catch (final Throwable e) {
-        if (signatureProfileSettings.isPDFUA() == true) {
-          log.error("Could not create PDF-UA conform document!");
-          throw new PdfAsException("error.pdf.sig.pdfua.1", e);
-        } else {
-          log.info("Could not create PDF-UA conform signature");
-        }
-      }
-
-      try {
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        synchronized (doc) {
-          doc.saveIncremental(bos);
-          final byte[] outputDocument = bos.toByteArray();
-          pdfObject.setSignedDocument(outputDocument);
-        }
-        /* Check if resulting pdf is PDF-A conform */
-        if (signatureProfileSettings.isPDFA()) {
-          runPDFAPreflight(new ByteArrayDataSource(pdfObject.getSignedDocument()));
-        }
-
-      } catch (final IOException e1) {
-        log.error("Can not save incremental update", e1);
-
-      }
+      injectPdfUaContent(doc, signatureField, sigFieldName, signatureProfileSettings);
       
-      System.gc();
+      performTechnicalSignature(doc, pdfObject, signatureProfileSettings);
+
+
       log.debug("Signature done!");
       
     } catch (final IOException e) {
@@ -609,6 +379,194 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
       }
     }
+  }
+
+  private void performTechnicalSignature(PDDocument doc, PDFBOXObject pdfObject, 
+      SignatureProfileSettings signatureProfileSettings) throws PdfAsException {
+    try {
+      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      synchronized (doc) {
+        doc.saveIncremental(bos);
+        final byte[] outputDocument = bos.toByteArray();
+        pdfObject.setSignedDocument(outputDocument);
+      }
+      /* Check if resulting pdf is PDF-A conform */
+      if (signatureProfileSettings.isPDFA()) {
+        runPDFAPreflight(new ByteArrayDataSource(pdfObject.getSignedDocument()));
+      }
+
+    } catch (final IOException e1) {
+      log.error("Can not save incremental update", e1);
+
+    }
+    
+    System.gc();
+    
+  }
+
+  private void injectPdfUaContent(PDDocument doc, PDSignatureField signatureField, String sigFieldName, 
+      SignatureProfileSettings signatureProfileSettings) throws PdfAsException {
+    try {
+      log.info("Adding pdf/ua content .... ");
+      final PDDocumentCatalog root = doc.getDocumentCatalog();
+      final PDStructureTreeRoot structureTreeRoot = root.getStructureTreeRoot();
+      if (structureTreeRoot != null) {
+        log.info("Tree Root: {}", structureTreeRoot.toString());
+        final List<Object> kids = structureTreeRoot.getKids();
+
+        if (kids == null) {
+          log.info("No kid-elements in structure tree Root, maybe not PDF/UA document");
+        }
+
+        PDStructureElement docElement = null;
+        for (final Object k : kids) {
+          if (k instanceof PDStructureElement) {
+            docElement = (PDStructureElement) k;
+            break;
+
+          }
+        }
+
+        final PDStructureElement sigBlock = new PDStructureElement("Form", docElement);
+
+        // create object dictionary and add as child element
+        final COSDictionary objectDic = new COSDictionary();
+        objectDic.setName("Type", "OBJR");
+
+        objectDic.setItem("Pg", signatureField.getWidget().getPage());
+        objectDic.setItem("Obj", signatureField.getWidget());
+
+        final List<Object> l = new ArrayList<>();
+        l.add(objectDic);
+        sigBlock.setKids(l);
+        sigBlock.setPage(signatureField.getWidget().getPage());
+
+        sigBlock.setTitle("Signature Table");
+        sigBlock.setParent(docElement);
+        docElement.appendKid(sigBlock);
+
+        // Create and add Attribute dictionary to mitigate PAC
+        // warning
+        final COSDictionary sigBlockDic = sigBlock.getCOSObject();
+        final COSDictionary sub = new COSDictionary();
+
+        sub.setName("O", "Layout");
+        sub.setName("Placement", "Block");
+        sigBlockDic.setItem(COSName.A, sub);
+        sigBlockDic.setNeedToBeUpdated(true);
+
+        // Modify number tree
+        PDNumberTreeNode ntn = structureTreeRoot.getParentTree();
+        if (ntn == null) {
+          ntn = new PDNumberTreeNode(objectDic, null);
+          log.info("No number-tree-node found!");
+        }
+
+        final COSArray ntnKids = (COSArray) ntn.getCOSObject().getDictionaryObject(COSName.KIDS);
+        final COSArray ntnNumbers = (COSArray) ntn.getCOSObject().getDictionaryObject(COSName.NUMS);
+
+        final int parentTreeNextKey = getParentTreeNextKey(structureTreeRoot);
+
+        if (ntnNumbers == null && ntnKids != null) {// no number array, so continue with the kids array
+          // create dictionary with limits and nums array
+          final COSDictionary pTreeEntry = new COSDictionary();
+          final COSArray limitsArray = new COSArray();
+          // limits for exact one entry
+          limitsArray.add(COSInteger.get(parentTreeNextKey));
+          limitsArray.add(COSInteger.get(parentTreeNextKey));
+
+          final COSArray numsArray = new COSArray();
+          numsArray.add(COSInteger.get(parentTreeNextKey));
+          numsArray.add(sigBlock);
+
+          pTreeEntry.setItem(COSName.NUMS, numsArray);
+          pTreeEntry.setItem(COSName.LIMITS, limitsArray);
+
+          final PDNumberTreeNode newKidsElement = new PDNumberTreeNode(pTreeEntry, PDNumberTreeNode.class);
+
+          ntnKids.add(newKidsElement);
+          ntnKids.setNeedToBeUpdated(true);
+
+        } else if (ntnNumbers != null && ntnKids == null) {
+
+          final int arrindex = ntnNumbers.size();
+
+          ntnNumbers.add(arrindex, COSInteger.get(parentTreeNextKey));
+          ntnNumbers.add(arrindex + 1, sigBlock.getCOSObject());
+
+          ntnNumbers.setNeedToBeUpdated(true);
+
+          structureTreeRoot.setParentTree(ntn);
+
+        } else if (ntnNumbers == null && ntnKids == null) {
+          // document is not pdfua conform before signature creation
+          throw new PdfAsException("error.pdf.sig.pdfua.1");
+        } else {
+          // this is not allowed
+          throw new PdfAsException("error.pdf.sig.pdfua.1");
+        }
+
+        // set StructureParent for signature field annotation
+        signatureField.getWidget().setStructParent(parentTreeNextKey);
+
+        // Increase the next Key value in the structure tree root
+        structureTreeRoot.setParentTreeNextKey(parentTreeNextKey + 1);
+
+        // add the Tabs /S Element for Tabbing through annots
+        final PDPage p = signatureField.getWidget().getPage();
+        p.getCOSObject().setName("Tabs", "S");
+        p.getCOSObject().setNeedToBeUpdated(true);
+
+        // check alternative signature field name
+        if (signatureField != null) {
+          if (signatureField.getAlternateFieldName().equals("")) {
+            signatureField.setAlternateFieldName(sigFieldName);
+          }
+        }
+
+        ntn.getCOSObject().setNeedToBeUpdated(true);
+        sigBlock.getCOSObject().setNeedToBeUpdated(true);
+        structureTreeRoot.getCOSObject().setNeedToBeUpdated(true);
+        objectDic.setNeedToBeUpdated(true);
+        docElement.getCOSObject().setNeedToBeUpdated(true);
+      }
+    } catch (final Throwable e) {
+      if (signatureProfileSettings.isPDFUA()) {
+        log.error("Could not create PDF-UA conform document!");
+        throw new PdfAsException("error.pdf.sig.pdfua.1", e);
+        
+      } else {
+        log.info("Could not create PDF-UA conform signature");
+      }
+    }
+    
+  }
+
+  private String buildNextSignatureFieldName(PDDocument doc, PDFBOXObject pdfObject) {
+    String sigFieldName = getSignatureFieldNameConfig(pdfObject);   
+    if (sigFieldName == null) {
+      sigFieldName = "PDF-AS Signatur";
+      
+    }
+    return sigFieldName + PdfBoxUtils.countSignatures(doc, sigFieldName);
+    
+  }
+
+  private int calculateBlankAreaForSignature(SignatureProfileSettings signatureProfileSettings) {
+    int signatureSize = 0x1000;
+    try {
+      final String reservedSignatureSizeString = signatureProfileSettings.getValue(SIG_RESERVED_SIZE);
+      if (reservedSignatureSizeString != null) {
+        signatureSize = Integer.parseInt(reservedSignatureSizeString);
+      }
+      log.debug("Reserving {} bytes for signature", signatureSize);
+      
+    } catch (final NumberFormatException e) {
+      log.warn("Invalid configuration value: {} should be a number using 0x1000", SIG_RESERVED_SIZE);
+      
+    }
+    
+    return signatureSize;    
   }
 
   private TablePos prepareTablePosition(SignaturePlaceholderData nextPlaceholderData, 
@@ -796,10 +754,10 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       final String signaturePosString = signatureProfileConfiguration.getDefaultPositioning();
       PositioningInstruction positioningInstruction;
       if (signaturePosString != null) {
-        positioningInstruction = Positioning.determineTablePositioning(new TablePos(signaturePosString), "",
+        positioningInstruction = Positioning.determineTablePositioning(new TablePos(signaturePosString),
             origDoc, visualObject, pdfObject.getStatus().getSettings(), signatureProfileSettings);
       } else {
-        positioningInstruction = Positioning.determineTablePositioning(new TablePos(), "", origDoc,
+        positioningInstruction = Positioning.determineTablePositioning(new TablePos(), origDoc,
             visualObject, pdfObject.getStatus().getSettings(), signatureProfileSettings);
       }
 
@@ -907,6 +865,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       }
     }
     return signature;
+    
   }
   
   static Map<Integer, COSObjectable> getNumberTreeAsMap(PDNumberTreeNode tree)

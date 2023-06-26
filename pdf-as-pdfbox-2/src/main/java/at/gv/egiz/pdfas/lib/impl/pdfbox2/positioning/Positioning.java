@@ -66,7 +66,6 @@ public class Positioning {
    *
    * @param pos            The absolute positioning parameter. If null it is
    *                       sought in the profile definition.
-   * @param signature_type The profile definition of the table to be written.
    * @param pdfDataSource  The pdf.
    * @param pdf_table      The pdf table to be written.
    * @param settings
@@ -75,7 +74,7 @@ public class Positioning {
    * @throws PdfAsException F.e.
    */
   public static PositioningInstruction determineTablePositioning(
-      TablePos pos, String signature_type, PDDocument pdfDataSource,
+      TablePos pos, PDDocument pdfDataSource,
       IPDFVisualObject pdf_table, ISettings settings, SignatureProfileSettings signatureProfileSettings) throws PdfAsException {
     return adjustSignatureTableandCalculatePosition(pdfDataSource,
         pdf_table, pos, settings, signatureProfileSettings);

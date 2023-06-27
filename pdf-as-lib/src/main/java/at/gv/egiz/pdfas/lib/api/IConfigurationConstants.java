@@ -46,6 +46,7 @@ public interface IConfigurationConstants {
 	public static final String MIN_WIDTH = "minWidth";
 
 	public static final String PLACEHOLDER_ID = "placeholder_id";
+	public static final String PLACEHOLDER_WEB_ID = "placeholder_web_id";
 	public static final String PLACEHOLDER_MODE = "placeholder_mode";
 	public static final String PLACEHOLDER_PROFILE_OVERWRITE = "placeholder_profile_overwrite";
 	

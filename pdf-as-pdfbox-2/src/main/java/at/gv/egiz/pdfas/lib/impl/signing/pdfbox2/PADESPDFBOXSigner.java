@@ -165,7 +165,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         signature.setLocation(nextPlaceholderData.getPlaceholderName());
                      
         if (nextPlaceholderData.getProfile() != null) {
-          if ( pdfObject.getStatus().getSettings().isValue(IConfigurationConstants.PLACEHOLDER_PROFILE_OVERWRITE, true)) {
+          if (pdfObject.getStatus().getSettings().isValue(IConfigurationConstants.PLACEHOLDER_PROFILE_OVERWRITE, true)) {
             log.debug("Placeholder Profile set to: {}", nextPlaceholderData.getProfile());
             requestedSignature.setSignatureProfileID(nextPlaceholderData.getProfile());
           
@@ -174,6 +174,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
             
           }
         } 
+      }
       
                 
       final SignatureProfileSettings signatureProfileSettings = 

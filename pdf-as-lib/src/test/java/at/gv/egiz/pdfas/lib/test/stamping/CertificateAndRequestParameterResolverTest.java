@@ -113,6 +113,17 @@ public class CertificateAndRequestParameterResolverTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
+
+      @Override
+      public boolean isValue(String key) {
+        // TODO Auto-generated method stub
+        return false;
+      }
+
+      @Override
+      public boolean isValue(String key, boolean defaultValue) {
+        return defaultValue;
+      }
 		};
 	}
 }

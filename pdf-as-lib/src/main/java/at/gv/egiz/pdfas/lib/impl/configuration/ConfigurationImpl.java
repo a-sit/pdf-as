@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.apache.commons.lang3.StringUtils;
+
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.settings.Settings;
@@ -56,6 +58,28 @@ public class ConfigurationImpl implements ISettings, Configuration {
     }
   }
 
+  @Override
+  public boolean isValue(String key) {
+    return isValue(key, false);
+  }
+
+  @Override
+  public boolean isValue(String key, boolean defaultValue) {
+    if (overwrittenProperties.containsKey(key)) {
+      String value = overwrittenProperties.getProperty(key);
+      if (StringUtils.isNotEmpty(value)) {
+        return Boolean.valueOf(value);
+        
+      } else {
+        return defaultValue;
+        
+      }
+    } else {
+      return this.settings.isValue(key);
+      
+    }
+  }
+  
   @Override
   public boolean hasValue(String key) {
     if (overwrittenProperties.containsKey(key)) {

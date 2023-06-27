@@ -44,6 +44,10 @@ public class SignParameterImpl extends PdfAsParameterImpl implements SignParamet
 	@Setter
 	protected String placeHolderId;
 	
+	@Getter
+  @Setter
+	protected boolean placeHolderSearchEnabled;
+	
 	protected DataSource output = null;
 	protected IPlainSigner signer = null;
 	protected OutputStream outputStream = null;

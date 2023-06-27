@@ -30,10 +30,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
-import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
+import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 
 public class PdfAsParameterExtractor {
 
@@ -116,6 +118,16 @@ public class PdfAsParameterExtractor {
 
 	public static String getPlaceholderId(HttpServletRequest request) {
 		return (String)request.getAttribute(IConfigurationConstants.PLACEHOLDER_WEB_ID);
+	}
+
+	public static boolean isPlaceholderSearchEnabled(HttpServletRequest request) {
+	  String value = (String)request.getAttribute(IConfigurationConstants.PLACEHOLDER_WEB_ENABLED);
+	  if (StringUtils.isNotEmpty(value)) {
+	      return Boolean.valueOf(value);
+	      
+	  } else {
+	    return true;
+	  }	   
 	}
 
 	public static String getTransactionId(HttpServletRequest request) {

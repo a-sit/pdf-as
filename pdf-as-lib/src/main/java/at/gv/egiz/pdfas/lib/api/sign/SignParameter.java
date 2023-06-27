@@ -71,6 +71,23 @@ public interface SignParameter extends PdfAsParameter {
 	void setPlaceHolderId(String id);
 	
 	/**
+	 * Is QR-Code placeholder search enabled for this request.
+	 * 
+	 * @return <code>true</code> if it's enabled, otherwise <code>false</code>
+	 */
+	boolean isPlaceHolderSearchEnabled();
+	
+	
+	/**
+	 * Enable / disable QR-Code placeholder search on request level.
+	 * 
+	 * <p>Default value is <code>true</code></p>
+	 * 
+	 * @param flag <code>true</code> to enable, <code>false</code> to disable
+	 */
+	void setPlaceHolderSearchEnabled(boolean flag);
+	
+	/**
 	 * Sets the signer to use
 	 * 
 	 * 

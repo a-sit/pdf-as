@@ -380,6 +380,7 @@ public class ExternSignServlet extends HttpServlet {
     document.setPosition(PdfAsHelper.buildPosString(request, response));
     document.setProfile(PdfAsParameterExtractor.getSigType(request));
     document.setPlaceHolderId(PdfAsParameterExtractor.getPlaceholderId(request));
+    document.setPlaceholderSearchEnabled(PdfAsParameterExtractor.isPlaceholderSearchEnabled(request));
     document.setQrCodeContent(qrcodeContent);
     document.setFileName(PdfAsHelper.getPDFFileName(request)); 
     data.addDocumentToSign(document);

@@ -33,7 +33,9 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PlaceholderFilter implements IConfigurationConstants,
 		PlaceholderExtractorConstants {
   
@@ -42,19 +44,25 @@ public class PlaceholderFilter implements IConfigurationConstants,
 		
 	  String signingProfile = status.getRequestedSignature().getSignatureProfileID();
 	  
-		if (status.getPlaceholderConfiguration().isGlobalPlaceholderEnabled()) {		
-			String defaultPlaceHolderId = settings.getValue(PLACEHOLDER_ID);			
-			return status.getBackend().getPlaceholderExtractor().extract(
-			    status.getPdfObject(), getPlaceHolderId(placeholderId, defaultPlaceHolderId) , 
-			    getPlaceHolderMode(settings, PLACEHOLDER_MATCH_MODE_SORTED));
+	  if (status.getSignParamter().isPlaceHolderSearchEnabled()) {	  
+	    if (status.getPlaceholderConfiguration().isGlobalPlaceholderEnabled()) {		
+	      String defaultPlaceHolderId = settings.getValue(PLACEHOLDER_ID);			
+	      return status.getBackend().getPlaceholderExtractor().extract(
+	          status.getPdfObject(), getPlaceHolderId(placeholderId, defaultPlaceHolderId) , 
+	          getPlaceHolderMode(settings, PLACEHOLDER_MATCH_MODE_SORTED));
 
-		} else if (status.getPlaceholderConfiguration().isProfileConfigurationEnabled(signingProfile)) {
-			String defaultPlaceHolderId = status.getPlaceholderConfiguration().getProfilePlaceholderID(signingProfile);
-			return status.getBackend().getPlaceholderExtractor().extract(
-			    status.getPdfObject(), getPlaceHolderId(placeholderId, defaultPlaceHolderId), 
-			    getPlaceHolderMode(settings, 
-			        StringUtils.isNotEmpty(defaultPlaceHolderId) ? PLACEHOLDER_MATCH_MODE_MODERATE : PLACEHOLDER_MATCH_MODE_SORTED));
-		}
+	    } else if (status.getPlaceholderConfiguration().isProfileConfigurationEnabled(signingProfile)) {
+	      String defaultPlaceHolderId = status.getPlaceholderConfiguration().getProfilePlaceholderID(signingProfile);
+	      return status.getBackend().getPlaceholderExtractor().extract(
+	          status.getPdfObject(), getPlaceHolderId(placeholderId, defaultPlaceHolderId), 
+	          getPlaceHolderMode(settings, 
+	              StringUtils.isNotEmpty(defaultPlaceHolderId) ? PLACEHOLDER_MATCH_MODE_MODERATE : PLACEHOLDER_MATCH_MODE_SORTED));
+	    }
+	  } else {
+	    log.debug("Searching placeholders are disabled for this request");
+	    
+	  }
+	  
 		return null;
 	}
 	

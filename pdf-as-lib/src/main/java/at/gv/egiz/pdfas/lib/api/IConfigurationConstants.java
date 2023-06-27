@@ -47,6 +47,7 @@ public interface IConfigurationConstants {
 
 	public static final String PLACEHOLDER_ID = "placeholder_id";
 	public static final String PLACEHOLDER_MODE = "placeholder_mode";
+	public static final String PLACEHOLDER_PROFILE_OVERWRITE = "placeholder_profile_overwrite";
 	
 	public static final String PLACEHOLDER_SEARCH_ENABLED = "enable_placeholder_search";
 	public static final String DEFAULT_SIGNATURE_PROFILE = SIG_OBJECT + SEPERATOR + TYPE + SEPERATOR + DEFAULT;

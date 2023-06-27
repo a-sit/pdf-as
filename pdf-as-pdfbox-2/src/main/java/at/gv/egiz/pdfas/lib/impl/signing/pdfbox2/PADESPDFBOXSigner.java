@@ -155,7 +155,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       signature.setSignDate(Calendar.getInstance());
       log.debug("Signing @ " + signature.getSignDate().getTime().toString());
       
-      // extract next QR-code placeholder, if exists 
+      // extract next QR-code placeholder, if exists             
       SignaturePlaceholderData nextPlaceholderData = PlaceholderFilter.checkPlaceholderSignatureLocation(
           pdfObject.getStatus(), pdfObject.getStatus().getSettings(), 
           pdfObject.getStatus().getSignParamter().getPlaceHolderId());
@@ -164,14 +164,16 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         log.info("Placeholder data found.");
         signature.setLocation(nextPlaceholderData.getPlaceholderName());
                      
-        
-        // TODO: only over-write if requested
-        if (nextPlaceholderData.getProfile() != null) {                    
-          log.debug("Placeholder Profile set to: {}", nextPlaceholderData.getProfile());
-          requestedSignature.setSignatureProfileID(nextPlaceholderData.getProfile());
+        if (nextPlaceholderData.getProfile() != null) {
+          if ( pdfObject.getStatus().getSettings().isValue(IConfigurationConstants.PLACEHOLDER_PROFILE_OVERWRITE, true)) {
+            log.debug("Placeholder Profile set to: {}", nextPlaceholderData.getProfile());
+            requestedSignature.setSignatureProfileID(nextPlaceholderData.getProfile());
           
-        }
-      }
+          } else {
+            log.debug("Placeholder profile over-write is disabled. Using profile from request ... ");
+            
+          }
+        } 
       
                 
       final SignatureProfileSettings signatureProfileSettings = 

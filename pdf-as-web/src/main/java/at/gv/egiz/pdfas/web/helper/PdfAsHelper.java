@@ -161,7 +161,9 @@ public class PdfAsHelper {
 		reloadConfig();
 	}
 
-	public static void init() {
+	public static void init() {	 
+    JsonSecurityUtils.getInstance();
+	  
 		log.info("PDF-AS Helper initialized");
 	}
 
@@ -903,6 +905,10 @@ public class PdfAsHelper {
 				JsonObject sl20Req = null;
 				String reqId = UUID.randomUUID().toString();
 				if (WebConfiguration.isSL20SigningEnabled()) {
+				  if (joseTools == null) {
+				    throw new PdfAsException("error.config.sl20.01");
+				  }
+				  
 					String signedCertCommand = SL20JSONBuilderUtils.createSignedCommand(
 							SL20Constants.SL20_COMMAND_IDENTIFIER_GETCERTIFICATE, getCertParams, joseTools);
 					sl20Req = SL20JSONBuilderUtils.createGenericRequest(reqId, null, null, signedCertCommand);

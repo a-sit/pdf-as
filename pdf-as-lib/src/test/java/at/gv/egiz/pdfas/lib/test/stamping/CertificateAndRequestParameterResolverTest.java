@@ -4,8 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
+import at.gv.egiz.pdfas.common.settings.IProfileConstants;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
@@ -76,18 +79,23 @@ public class CertificateAndRequestParameterResolverTest {
 	}
 
 	private ISettings buildDummySettings() {
-		return new ISettings() {
-			
+	  Map<String, String> configMap = new HashMap<>();
+	  configMap.put(IProfileConstants.SIG_OBJ + "test", "test");
+	  
+	  return new ISettings() {
+					  		  		  		  
 			@Override
 			public boolean hasValue(String key) {
-				// TODO Auto-generated method stub
-				return false;
+				return configMap.containsKey(key);
 			}
 			
 			@Override
 			public boolean hasPrefix(String prefix) {
-				// TODO Auto-generated method stub
-				return false;
+			  return configMap.keySet().stream()
+			      .filter(el -> el.startsWith(prefix))
+			      .findFirst()
+			      .isPresent();
+
 			}
 			
 			@Override
@@ -98,14 +106,16 @@ public class CertificateAndRequestParameterResolverTest {
 			
 			@Override
 			public Map<String, String> getValuesPrefix(String prefix) {
-				// TODO Auto-generated method stub
-				return null;
+			  return configMap.entrySet().stream()
+			      .filter(el -> el.getKey().startsWith(prefix))
+			      .collect(Collectors.toMap(key -> key.getKey(), value -> value.getValue()));
+
 			}
 			
 			@Override
 			public String getValue(String key) {
-				// TODO Auto-generated method stub
-				return null;
+				return configMap.get(key);
+				
 			}
 			
 			@Override
@@ -116,14 +126,13 @@ public class CertificateAndRequestParameterResolverTest {
 
       @Override
       public boolean isValue(String key) {
-        // TODO Auto-generated method stub
-        return false;
+        return isValue(key, false);
       }
 
       @Override
       public boolean isValue(String key, boolean defaultValue) {
-        return defaultValue;
+        return hasValue(key) ? Boolean.valueOf(getValue(key)) : defaultValue;
       }
-		};
+		};		
 	}
 }

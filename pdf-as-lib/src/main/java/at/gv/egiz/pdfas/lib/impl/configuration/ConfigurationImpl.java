@@ -102,10 +102,6 @@ public class ConfigurationImpl implements ISettings, Configuration {
       }
     }
 
-    if (valueMap.isEmpty()) {
-      return null;
-    }
-
     return valueMap;
   }
 

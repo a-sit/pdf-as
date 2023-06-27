@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang3.StringUtils;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
 import at.gv.egiz.pdfas.common.settings.IProfileConstants;
@@ -322,6 +323,21 @@ public class Settings implements ISettings, IProfileConstants {
     return properties.getProperty(key);
   }
 
+  public boolean isValue(String key) {
+    return isValue(key, false);
+        
+  }
+  public boolean isValue(String key, boolean defaultValue) {
+    String value = getValue(key);
+    if (StringUtils.isNotEmpty(value)) {
+      return Boolean.valueOf(value);
+      
+    } else {
+      return defaultValue;
+      
+    }
+  }
+  
   @Override
   public boolean hasValue(String key) {
     return properties.containsKey(key);

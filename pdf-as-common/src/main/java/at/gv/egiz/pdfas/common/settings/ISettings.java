@@ -29,6 +29,22 @@ import java.util.Vector;
 public interface ISettings {
 	public String getValue(String key);
 	public boolean hasValue(String key);
+	
+	/**
+	 * Get boolean configuration value.
+	 * @param key Configuration key
+	 * @return <code>true</code> if configuration exists and has value <code>true</code>, otherwise <code>false</code>
+	 */
+	public boolean isValue(String key);
+	
+	/**
+   * Get boolean configuration value.
+   * @param key Configuration key
+   * @param defaultValue Value if configuration does not exist
+   * @return <code>true</code> if configuration exists and has value <code>true</code>, otherwise default value
+   */
+	public boolean isValue(String key, boolean defaultValue);
+	
 	public boolean hasPrefix(String prefix);
 	public Map<String, String> getValuesPrefix(String prefix);
 	public Vector<String> getFirstLevelKeys(String prefix);

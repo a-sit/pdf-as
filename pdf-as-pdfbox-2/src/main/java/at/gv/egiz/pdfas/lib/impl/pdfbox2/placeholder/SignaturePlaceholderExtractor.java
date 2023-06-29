@@ -256,10 +256,39 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
     }
   }
   
+  private SignaturePlaceholderData matchPlaceholderPage(
+      List<SignaturePlaceholderData> placeholders, String placeholderId, int matchMode) {
+    log.debug("Searching requested placeholder:{} with matchMode:{} in single page ... ", placeholderId, matchMode);
+    
+    if (placeholders.size() == 0) {
+      return null;
+      
+    }
+    
+    // check if find a placeholder with that ID    
+    for (final SignaturePlaceholderData data : placeholders) {
+      if (placeholderId != null && data.getId() != null 
+          && matchPlaceHolderId(placeholderId, data.getId())) {
+        return data;
+        
+      }
+      
+      if (matchMode != PLACEHOLDER_MATCH_MODE_SORTED 
+          && placeholderId == null && data.getId() == null) {
+        return data;
+        
+      }
+    }
+    
+    return null;
+  }
+  
   private SignaturePlaceholderData matchPlaceholderDocument(
       List<SignaturePlaceholderData> placeholders, String placeholderId,
       int matchMode) throws PlaceholderExtractionException {
 
+    log.debug("Searching requested placeholder:{} with matchMode:{} on any page ... ", placeholderId, matchMode);
+    
     if (matchMode == PLACEHOLDER_MATCH_MODE_STRICT) {
       throw new PlaceholderExtractionException("error.pdf.stamp.09");
     }
@@ -307,6 +336,20 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
     return null;
   }
 
+  private boolean matchPlaceHolderId(String first, String second) {
+    try {
+      Integer firstIdInt = Integer.valueOf(first);
+      Integer secondIdInt = Integer.valueOf(second);
+      return firstIdInt == secondIdInt;
+                  
+    } catch (NumberFormatException e) {
+      log.trace("Can not compare placeholderId's on integer level. Using String compare ... ");
+      return first.equalsIgnoreCase(second);
+      
+    } 
+    
+  }
+  
   private SignaturePlaceholderData placeHolderIdMatcher(SignaturePlaceholderData currentFirstSpd,
       SignaturePlaceholderData spd) {
     try {
@@ -339,28 +382,6 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
     }       
   }
 
-  private SignaturePlaceholderData matchPlaceholderPage(
-      List<SignaturePlaceholderData> placeholders, String placeholderId,
-      int matchMode) {
-
-    if ((matchMode == PLACEHOLDER_MATCH_MODE_SORTED) || (placeholders.size() == 0)) {      
-      return null;
-    }
-    
-    for (final SignaturePlaceholderData data : placeholders) {
-      if (placeholderId != null && placeholderId.equals(data.getId())) {
-        return data;
-        
-      }
-      if (placeholderId == null && data.getId() == null) {
-        return data;
-        
-      }
-    }
-    
-    return null;
-  }
-
   private List<String> existingExistingSignatureNames(PDDocument doc) {
     final List<String> existingLocations = new ArrayList<>();
     try {
@@ -379,9 +400,12 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
   private List<SignaturePlaceholderData> removeAlreadyUsePlaceholders(
       List<SignaturePlaceholderData> placeholders, List<String> existingPlaceholders) {
     if (placeholders != null) {
-      return placeholders.stream()
+      List<SignaturePlaceholderData> result = placeholders.stream()
           .filter(el -> !existingPlaceholders.contains(el.getPlaceholderName()))
           .collect(Collectors.toList());             
+      log.debug("Initial found #{} placeholders, but #{} removed because already used.",
+          placeholders.size(), placeholders.size() - result.size());
+      return result;
       
     } else {
       return Collections.emptyList();

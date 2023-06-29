@@ -145,7 +145,7 @@ public class PDFData extends HttpServlet {
     }
     
     // build response
-    response.setHeader("Content-Disposition", "inline;filename=multiple_documents.zip");        
+    response.setHeader("Content-Disposition", "inline;filename=\"multiple_documents.zip\"");        
     response.setContentType("application/zip");
     final OutputStream os = response.getOutputStream();
 
@@ -234,8 +234,8 @@ public class PDFData extends HttpServlet {
           return;
         }
       }
-      response.setHeader("Content-Disposition", "inline;filename="
-          + PdfAsHelper.getPDFFileName(request));
+      response.setHeader("Content-Disposition", "inline;filename=\""
+          + PdfAsHelper.getPDFFileName(request) + "\"");
       final String pdfCert = signedFile.getSignerCertificate();
       if (pdfCert != null) {
         response.setHeader("Signer-Certificate", pdfCert);

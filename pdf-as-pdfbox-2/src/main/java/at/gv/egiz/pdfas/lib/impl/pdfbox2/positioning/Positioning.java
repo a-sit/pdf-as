@@ -282,7 +282,7 @@ public class Positioning {
       long numberOfExistingSignatures, ISettings settings, SignatureProfileSettings profilConfig) throws PdfAsException {
     if (pos_y - footer_line <= table_height) {
       
-      make_new_page = checkIfNewPageIsAllowed(true, numberOfExistingSignatures, settings, profilConfig);
+      make_new_page = checkIfNewPageIsAllowed(pos.isPauto(), numberOfExistingSignatures, settings, profilConfig);
       if (make_new_page) {        
         page++;
         

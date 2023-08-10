@@ -75,7 +75,7 @@ public class ConfigurationImpl implements ISettings, Configuration {
         
       }
     } else {
-      return this.settings.isValue(key);
+      return this.settings.isValue(key, defaultValue);
       
     }
   }

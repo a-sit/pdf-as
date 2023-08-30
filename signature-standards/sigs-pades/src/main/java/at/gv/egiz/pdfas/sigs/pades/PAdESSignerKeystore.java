@@ -23,23 +23,6 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.sigs.pades;
 
-import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
-import iaik.asn1.ASN1Object;
-import iaik.asn1.CodingException;
-import iaik.asn1.ObjectID;
-import iaik.asn1.SEQUENCE;
-import iaik.asn1.UTF8String;
-import iaik.asn1.structures.AlgorithmID;
-import iaik.asn1.structures.Attribute;
-import iaik.asn1.structures.ChoiceOfTime;
-import iaik.cms.ContentInfo;
-import iaik.cms.IssuerAndSerialNumber;
-import iaik.cms.SignedData;
-import iaik.cms.SignerInfo;
-import iaik.smime.ess.ESSCertID;
-import iaik.smime.ess.ESSCertIDv2;
-import iaik.x509.X509Certificate;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +46,7 @@ import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
+import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
@@ -70,6 +54,21 @@ import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
 import at.gv.egiz.pdfas.lib.util.CertificateUtils;
 import at.gv.egiz.pdfas.lib.util.SignatureUtils;
+import iaik.asn1.ASN1Object;
+import iaik.asn1.CodingException;
+import iaik.asn1.ObjectID;
+import iaik.asn1.SEQUENCE;
+import iaik.asn1.UTF8String;
+import iaik.asn1.structures.AlgorithmID;
+import iaik.asn1.structures.Attribute;
+import iaik.asn1.structures.ChoiceOfTime;
+import iaik.cms.ContentInfo;
+import iaik.cms.IssuerAndSerialNumber;
+import iaik.cms.SignedData;
+import iaik.cms.SignerInfo;
+import iaik.smime.ess.ESSCertID;
+import iaik.smime.ess.ESSCertIDv2;
+import iaik.x509.X509Certificate;
 
 public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 
@@ -82,85 +81,6 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 
 	PrivateKey privKey;
 	X509Certificate cert;
-
-	private void readKeyStore(KeyStore ks, String alias, String keypassword)  throws Throwable {
-		if (keypassword == null) {
-			throw new PdfAsException("error.pdf.sig.16");
-		}
-		PasswordProtection pwdProt = new PasswordProtection(
-				keypassword.toCharArray());
-
-		logger.info("Opening Alias: [" + alias + "]");
-
-		Entry entry = ks.getEntry(alias, pwdProt);
-
-		if (!(entry instanceof PrivateKeyEntry)) {
-			throw new PdfAsException("error.pdf.sig.18");
-		}
-
-		PrivateKeyEntry privateEntry = (PrivateKeyEntry) entry;
-
-		privKey = privateEntry.getPrivateKey();
-
-		if (privKey == null) {
-			throw new PdfAsException("error.pdf.sig.13");
-		}
-
-		Certificate c = privateEntry.getCertificate();
-
-		if (c == null) {
-			if (privateEntry.getCertificateChain() != null) {
-				if (privateEntry.getCertificateChain().length > 0) {
-					c = privateEntry.getCertificateChain()[0];
-				}
-			}
-		}
-
-		if (c == null) {
-			throw new PdfAsException("error.pdf.sig.17");
-		}
-
-		cert = new X509Certificate(c.getEncoded());
-	}
-	
-	private KeyStore buildKeyStoreFromFile(String file, String kspassword, 
-			String type, String provider)  throws Throwable {
-		String viusalProvider = (provider == null ? "IAIK" : provider);
-		logger.trace("Opening Keystore: " + file + " with [" + viusalProvider
-				+ "]");
-
-		KeyStore ks = null;
-		if (provider == null) {
-			ks = KeyStore.getInstance(type);
-		} else {
-			ks = KeyStore.getInstance(type, provider);
-		}
-
-		if (ks == null) {
-			throw new PdfAsException("error.pdf.sig.14");
-		}
-		if (kspassword == null) {
-			throw new PdfAsException("error.pdf.sig.15");
-		}
-		FileInputStream is = null;
-		try {
-			is = new FileInputStream(file);
-			ks.load(is, kspassword.toCharArray());
-		} finally {
-			if (is != null) {
-				is.close();
-			}
-		}
-		return ks;
-	}
-	
-	private void loadKeystore(String file, String alias, String kspassword,
-			String keypassword, String type, String provider) throws Throwable {
-
-		KeyStore ks = buildKeyStoreFromFile(file, kspassword, type, provider);
-
-		readKeyStore(ks, alias, keypassword);
-	}
 
 	public PAdESSignerKeystore(KeyStore ks, String alias,
 			String keypassword) throws PDFASError {
@@ -221,6 +141,160 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 		return cert;
 	}
 
+	 public byte[] sign(byte[] input, int[] byteRange, SignParameter parameter,
+	      RequestedSignature requestedSignature) throws PdfAsException {
+	    try {
+	      logger.info("Creating PAdES signature.");
+
+	      requestedSignature.getStatus().getMetaInformations()
+	      .put(ErrorConstants.STATUS_INFO_SIGDEVICE, SIGNATURE_DEVICE);
+	      requestedSignature.getStatus().getMetaInformations()
+	      .put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION, PdfAsFactory.getVersion());
+	      
+	      IssuerAndSerialNumber issuer = new IssuerAndSerialNumber(cert);
+
+	      AlgorithmID[] algorithms = CertificateUtils.getAlgorithmIDs(cert);
+
+	      SignerInfo signer1 = new SignerInfo(issuer, algorithms[1],
+	          algorithms[0], privKey);
+
+	      SignedData si = new SignedData(input, SignedData.EXPLICIT);
+	      si.addCertificates(new Certificate[] { cert });
+
+
+	      //Check PAdES Flag
+	      if (parameter.getConfiguration().hasValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG))
+	      {
+	        if (IConfigurationConstants.TRUE.equalsIgnoreCase(parameter.getConfiguration().getValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG)))
+	        {
+	          setAttributes(cert, signer1);
+	        }
+	        else
+	        {
+	          setAttributes("application/pdf", cert, new Date(), signer1);
+	        }
+	      }
+	      else
+	      {
+	        setAttributes("application/pdf", cert, new Date(), signer1);
+	      }
+
+	      si.addSignerInfo(signer1);
+	      InputStream dataIs = si.getInputStream();
+	      byte[] buf = new byte[1024];
+	      @SuppressWarnings("unused")
+	      int r;
+	      while ((r = dataIs.read(buf)) > 0)
+	        ; // skip data
+	      ContentInfo ci = new ContentInfo(si);
+	      byte[] signature = ci.getEncoded();
+	      
+	      VerifyResult verifyResult = SignatureUtils.verifySignature(
+	          signature, input);
+	      
+	      return signature;
+	    } catch (NoSuchAlgorithmException e) {
+	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
+	    } catch (iaik.cms.CMSException e) {
+	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
+	    } catch (IOException e) {
+	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
+	    } catch (CertificateException e) {
+	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
+	    } catch (CodingException e) {
+	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
+	    } catch (PDFASError e) {
+	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
+	    }
+	  }
+
+	  public String getPDFSubFilter() {
+	    return SUBFILTER_ETSI_CADES_DETACHED;
+	  }
+
+	  public String getPDFFilter() {
+	    return FILTER_ADOBE_PPKLITE;
+	  }
+	
+	 private void readKeyStore(KeyStore ks, String alias, String keypassword)  throws Throwable {
+	    if (keypassword == null) {
+	      throw new PdfAsException("error.pdf.sig.16");
+	    }
+	    PasswordProtection pwdProt = new PasswordProtection(
+	        keypassword.toCharArray());
+
+	    logger.info("Opening Alias: [" + alias + "]");
+
+	    Entry entry = ks.getEntry(alias, pwdProt);
+
+	    if (!(entry instanceof PrivateKeyEntry)) {
+	      throw new PdfAsException("error.pdf.sig.18");
+	    }
+
+	    PrivateKeyEntry privateEntry = (PrivateKeyEntry) entry;
+
+	    privKey = privateEntry.getPrivateKey();
+
+	    if (privKey == null) {
+	      throw new PdfAsException("error.pdf.sig.13");
+	    }
+
+	    Certificate c = privateEntry.getCertificate();
+
+	    if (c == null) {
+	      if (privateEntry.getCertificateChain() != null) {
+	        if (privateEntry.getCertificateChain().length > 0) {
+	          c = privateEntry.getCertificateChain()[0];
+	        }
+	      }
+	    }
+
+	    if (c == null) {
+	      throw new PdfAsException("error.pdf.sig.17");
+	    }
+
+	    cert = new X509Certificate(c.getEncoded());
+	  }
+	  
+	  private KeyStore buildKeyStoreFromFile(String file, String kspassword, 
+	      String type, String provider)  throws Throwable {
+	    String viusalProvider = (provider == null ? "IAIK" : provider);
+	    logger.trace("Opening Keystore: " + file + " with [" + viusalProvider
+	        + "]");
+
+	    KeyStore ks = null;
+	    if (provider == null) {
+	      ks = KeyStore.getInstance(type);
+	    } else {
+	      ks = KeyStore.getInstance(type, provider);
+	    }
+
+	    if (ks == null) {
+	      throw new PdfAsException("error.pdf.sig.14");
+	    }
+	    if (kspassword == null) {
+	      throw new PdfAsException("error.pdf.sig.15");
+	    }
+	    FileInputStream is = null;
+	    try {
+	      is = new FileInputStream(file);
+	      ks.load(is, kspassword.toCharArray());
+	    } finally {
+	      if (is != null) {
+	        is.close();
+	      }
+	    }
+	    return ks;
+	  }
+	  
+	  private void loadKeystore(String file, String alias, String kspassword,
+	      String keypassword, String type, String provider) throws Throwable {
+
+	    KeyStore ks = buildKeyStoreFromFile(file, kspassword, type, provider);
+
+	    readKeyStore(ks, alias, keypassword);
+	  }
+	
 	private void setMimeTypeAttrib(List<Attribute> attributes, String mimeType) {
 		String oidStr = "0.4.0.1733.2.1";
 		String name = "mime-type";
@@ -290,81 +364,6 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 		Attribute[] attributeArray = attributes
 				.toArray(new Attribute[attributes.size()]);
 		signerInfo.setSignedAttributes(attributeArray);
-	}
-
-	public byte[] sign(byte[] input, int[] byteRange, SignParameter parameter,
-			RequestedSignature requestedSignature) throws PdfAsException {
-		try {
-			logger.info("Creating PAdES signature.");
-
-			requestedSignature.getStatus().getMetaInformations()
-			.put(ErrorConstants.STATUS_INFO_SIGDEVICE, SIGNATURE_DEVICE);
-			requestedSignature.getStatus().getMetaInformations()
-			.put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION, PdfAsFactory.getVersion());
-			
-			IssuerAndSerialNumber issuer = new IssuerAndSerialNumber(cert);
-
-			AlgorithmID[] algorithms = CertificateUtils.getAlgorithmIDs(cert);
-
-			SignerInfo signer1 = new SignerInfo(issuer, algorithms[1],
-					algorithms[0], privKey);
-
-			SignedData si = new SignedData(input, SignedData.EXPLICIT);
-			si.addCertificates(new Certificate[] { cert });
-
-
-			//Check PAdES Flag
-			if (parameter.getConfiguration().hasValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG))
-			{
-				if (IConfigurationConstants.TRUE.equalsIgnoreCase(parameter.getConfiguration().getValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG)))
-				{
-					setAttributes(cert, signer1);
-				}
-				else
-				{
-					setAttributes("application/pdf", cert, new Date(), signer1);
-				}
-			}
-			else
-			{
-				setAttributes("application/pdf", cert, new Date(), signer1);
-			}
-
-			si.addSignerInfo(signer1);
-			InputStream dataIs = si.getInputStream();
-			byte[] buf = new byte[1024];
-			@SuppressWarnings("unused")
-			int r;
-			while ((r = dataIs.read(buf)) > 0)
-				; // skip data
-			ContentInfo ci = new ContentInfo(si);
-			byte[] signature = ci.getEncoded();
-			
-			VerifyResult verifyResult = SignatureUtils.verifySignature(
-					signature, input);
-			
-			return signature;
-		} catch (NoSuchAlgorithmException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
-		} catch (iaik.cms.CMSException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
-		} catch (IOException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
-		} catch (CertificateException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
-		} catch (CodingException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
-		} catch (PDFASError e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
-		}
-	}
-
-	public String getPDFSubFilter() {
-		return SUBFILTER_ETSI_CADES_DETACHED;
-	}
-
-	public String getPDFFilter() {
-		return FILTER_ADOBE_PPKLITE;
 	}
 
 }

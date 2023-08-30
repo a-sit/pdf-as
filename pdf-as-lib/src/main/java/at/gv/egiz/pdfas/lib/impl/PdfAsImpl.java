@@ -208,9 +208,10 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
       // Create signature
       try {
-        signer.signPDF(status.getPdfObject(), requestedSignature, signer
-            .buildSignaturInterface(status.getSignParamter()
-                .getPlainSigner(), parameter, requestedSignature));
+        signer.signPDF(status.getPdfObject(), requestedSignature, 
+            signer.buildSignaturInterface(status.getSignParamter().getPlainSigner(), 
+                parameter, requestedSignature));
+        
       } finally {
         if (parameter instanceof BKUHeaderHolder) {
           final BKUHeaderHolder holder = (BKUHeaderHolder) parameter;

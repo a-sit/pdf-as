@@ -553,8 +553,7 @@ public class PdfAsHelper {
 
 		
     PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
-    verResponse.setSignerCertificate(signResult.getSignerCertificate()
-        .getEncoded());
+    verResponse.setSignerCertificate(signResult.getSignerCertificate().getEncoded());
 
 		
     SignedDocument signPdfDoc = SignedDocument.builder()

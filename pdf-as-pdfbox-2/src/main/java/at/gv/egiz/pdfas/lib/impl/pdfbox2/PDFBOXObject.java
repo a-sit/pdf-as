@@ -1,14 +1,10 @@
 package at.gv.egiz.pdfas.lib.impl.pdfbox2;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.activation.DataSource;
 
-import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import at.gv.egiz.pdfas.lib.impl.stamping.pdfbox2.PDFAsFontCache;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
@@ -17,9 +13,7 @@ import at.gv.egiz.pdfas.lib.impl.status.PDFObject;
 public class PDFBOXObject extends PDFObject {
 
 	private PDDocument doc;
-	
-	private Map<String, PDFont> fontCache = new HashMap<String, PDFont>();
-	
+		
 	private PDFAsFontCache sigBlockFontCache = new PDFAsFontCache();
 	
 	public PDFAsFontCache getSigBlockFontCache() {
@@ -52,11 +46,6 @@ public class PDFBOXObject extends PDFObject {
 			}
 			doc = null;
 		}
-	}
-
-	private MemoryUsageSetting getMemoryUsageSettings() {
-		// TODO: allow fine tuning of memory usage (divided main memory vs file memory)
-		return MemoryUsageSetting.setupMainMemoryOnly();
 	}
 
 	public void setOriginalDocument(DataSource originalDocument) throws IOException {

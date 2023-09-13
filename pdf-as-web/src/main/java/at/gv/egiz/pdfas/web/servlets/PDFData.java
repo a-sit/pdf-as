@@ -26,6 +26,8 @@ package at.gv.egiz.pdfas.web.servlets;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.Deflater;
@@ -236,6 +238,11 @@ public class PDFData extends HttpServlet {
       }
       response.setHeader("Content-Disposition", "inline;filename=\""
           + PdfAsHelper.getPDFFileName(request) + "\"");
+      
+      response.setHeader("X-FILENAME-BASE64URL", 
+          Base64.getUrlEncoder().encodeToString(
+              PdfAsHelper.getPDFFileName(request).getBytes(StandardCharsets.UTF_8)));
+      
       final String pdfCert = signedFile.getSignerCertificate();
       if (pdfCert != null) {
         response.setHeader("Signer-Certificate", pdfCert);

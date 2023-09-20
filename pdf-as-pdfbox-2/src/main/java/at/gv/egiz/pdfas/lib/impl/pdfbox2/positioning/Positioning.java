@@ -116,13 +116,7 @@ public class Positioning {
 
     make_new_page = checkIfNewPageIsAllowed(make_new_page, numberOfExistingSignatures, settings, profilConfig);
     
-    
-    if(make_new_page && numberOfExistingSignatures!=0) {
-      make_new_page = false;
-      
-    }
-       
-    
+           
     final PDPage pdPage = pdfDataSource.getPage(page - 1);
 
     PDRectangle cropBox = pdPage.getCropBox();
@@ -256,7 +250,7 @@ public class Positioning {
   
   private static boolean checkIfNewPageIsAllowed(boolean make_new_page, long numberOfExistingSignatures, ISettings settings, 
       SignatureProfileSettings profilConfig) throws PdfAsException {
-    if(make_new_page && numberOfExistingSignatures!=0) {
+    if(make_new_page && numberOfExistingSignatures !=0 ) {
       log.debug("Signature-block would be need a new page, but new pages are not allowed on already signed documents.");
       if (isNewPageOnSignedDocumentsEnabled(profilConfig)) {
         log.info("New pages not allowed on already signed documents, but force new page by configuration");

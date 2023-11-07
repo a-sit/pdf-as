@@ -27,6 +27,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -165,8 +166,9 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
       status.setRequestedSignature(requestedSignature);
 
-      try {
-        requestedSignature.setCertificate(status.getSignParamter().getPlainSigner().getCertificate(parameter));
+      try {        
+        requestedSignature.setCertificate(getValidCertificate(
+            status.getSignParamter().getPlainSigner().getCertificate(parameter)));
 
       } finally {
         if (parameter instanceof BKUHeaderHolder) {
@@ -264,6 +266,22 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
         
       }
       logger.trace("sign done");
+    }
+  }
+
+  private X509Certificate getValidCertificate(X509Certificate certificate) throws PDFASError {
+    Date notAfter = certificate.getNotAfter();
+    Date notBefore = certificate.getNotBefore();
+    Date now = new Date();
+    
+    if (now.after(notAfter) || now.before(notBefore)) {
+      logger.warn("Signer certificate is not valid. notBefore:{} | notAfter:{} | now:{}",
+          notBefore, notAfter, now);
+      throw new PDFASError(11021);
+      
+    } else {
+      return certificate;
+      
     }
   }
 

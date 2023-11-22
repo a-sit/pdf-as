@@ -1363,29 +1363,35 @@ public class PdfAsHelper {
 	
 	private static String generateURL(HttpServletRequest request,
 			HttpServletResponse response, String Servlet) {
-		HttpSession session = request.getSession();
-		String publicURL = WebConfiguration.getPublicURL();
-		String dataURL = null;
-		if (publicURL != null) {
-			dataURL = publicURL + Servlet + ";jsessionid=" + session.getId();
-		} else {
-			if ((request.getScheme().equals("http") && request.getServerPort() == 80)
-					|| (request.getScheme().equals("https") && request
-							.getServerPort() == 443)) {
-				dataURL = request.getScheme() + "://" + request.getServerName()
-						+ request.getContextPath() + Servlet + ";jsessionid="
-						+ session.getId();
-			} else {
-				dataURL = request.getScheme() + "://" + request.getServerName()
-						+ ":" + request.getServerPort()
-						+ request.getContextPath() + Servlet + ";jsessionid="
-						+ session.getId();
-			}
-		}
-		log.debug("Generated URL: " + dataURL);
-		return dataURL;
+		return generateURL(request, response, Servlet, WebConfiguration.getPublicURL());
+		
 	}
 
+	 private static String generateURL(HttpServletRequest request,
+	      HttpServletResponse response, String Servlet, String publicURL) {
+	    HttpSession session = request.getSession();
+	    String dataURL = null;
+	    if (publicURL != null) {
+	      dataURL = publicURL + Servlet + ";jsessionid=" + session.getId();
+	    } else {
+	      if ((request.getScheme().equals("http") && request.getServerPort() == 80)
+	          || (request.getScheme().equals("https") && request
+	              .getServerPort() == 443)) {
+	        dataURL = request.getScheme() + "://" + request.getServerName()
+	            + request.getContextPath() + Servlet + ";jsessionid="
+	            + session.getId();
+	      } else {
+	        dataURL = request.getScheme() + "://" + request.getServerName()
+	            + ":" + request.getServerPort()
+	            + request.getContextPath() + Servlet + ";jsessionid="
+	            + session.getId();
+	      }
+	    }
+	    log.debug("Generated URL: " + dataURL);
+	    return dataURL;
+	  }
+	
+	
 	public static void regenerateSession(HttpServletRequest request) {
 		request.getSession(false).invalidate();
 		request.getSession(true);
@@ -1393,12 +1399,16 @@ public class PdfAsHelper {
 
 	public static String generateDataURLSL20(HttpServletRequest request,
 			HttpServletResponse response) {
-		return generateURL(request, response, PDF_SL20_DATAURL_PAGE);
+		return generateURL(request, response, PDF_SL20_DATAURL_PAGE,
+        WebConfiguration.getPublicDataURL() != null 
+            ? WebConfiguration.getPublicDataURL() : WebConfiguration.getPublicURL());
 	}
 	
 	public static String generateDataURL(HttpServletRequest request,
 			HttpServletResponse response) {
-		return generateURL(request, response, PDF_DATAURL_PAGE);
+		return generateURL(request, response, PDF_DATAURL_PAGE,
+		    WebConfiguration.getPublicDataURL() != null 
+		        ? WebConfiguration.getPublicDataURL() : WebConfiguration.getPublicURL());
 	}
 
 	public static String generateProvideURL(HttpServletRequest request,

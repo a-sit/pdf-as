@@ -39,6 +39,7 @@ import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 public class WebConfiguration implements IConfigurationConstants {
 
 	public static final String PUBLIC_URL = "public.url";
+	public static final String PUBLIC_DATA_URL = "public.data.url";
 	public static final String LOCAL_BKU_ENABLED = "bku.sign.enabled";
 	public static final String ONLINE_BKU_ENABLED = "moc.sign.enabled";
 	public static final String MOBILE_BKU_ENABLED = "mobile.sign.enabled";
@@ -226,6 +227,10 @@ public class WebConfiguration implements IConfigurationConstants {
 		return properties.getProperty(PUBLIC_URL);
 	}
 
+	 public static String getPublicDataURL() {
+	    return properties.getProperty(PUBLIC_DATA_URL);
+	  }
+	
 	public static String getLocalBKUURL() {
 		if(getLocalBKUEnabled()) {
 			String overwrite = properties.getProperty(CONFIG_BKU_URL);

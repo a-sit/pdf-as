@@ -73,6 +73,8 @@ import org.apache.xmpbox.xml.DomXmpParser;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException;
+import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException;
 import at.gv.egiz.pdfas.common.messages.MessageResolver;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource;
@@ -398,8 +400,13 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         runPDFAPreflight(new ByteArrayDataSource(pdfObject.getSignedDocument()));
       }
 
-    } catch (final IOException e1) {
-      log.error("Can not save incremental update", e1);
+    } catch (PdfAsWrappedIOException e) {
+      logPdfUpdateError(e.getDecoratedException());
+      throw e.getDecoratedException();
+      
+    } catch (final IOException e) {
+      logPdfUpdateError(e);
+      throw new PdfAsException("error.pdf.sig.06", e);
 
     }
     
@@ -407,6 +414,16 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
     
   }
 
+  private void logPdfUpdateError(Throwable e) {
+    if (e instanceof SLPdfAsException && !((SLPdfAsException) e).isCriticalError()) {
+      log.info("Can not save incremental update", e);
+      
+    } else {
+      log.error("Can not save incremental update", e);
+      
+    }    
+  }
+  
   private void injectPdfUaContent(PDDocument doc, PDSignatureField signatureField, String sigFieldName, 
       SignatureProfileSettings signatureProfileSettings) throws PdfAsException {
     try {

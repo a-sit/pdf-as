@@ -36,4 +36,8 @@ public class PdfAsWrappedIOException extends IOException {
 		super(e);
 	}
 	
+	public PdfAsException getDecoratedException() {
+	  return (PdfAsException) getCause();	  
+	}
+	
 }

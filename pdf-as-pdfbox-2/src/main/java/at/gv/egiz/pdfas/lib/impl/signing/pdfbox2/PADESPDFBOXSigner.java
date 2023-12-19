@@ -252,7 +252,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
                 
         properties = new PDFAsVisualSignatureProperties(pdfObject.getStatus().getSettings(), pdfObject,
-            (PdfBoxVisualObject) visualObject, positioningInstruction, signatureProfileSettings);
+            (PdfBoxVisualObject) visualObject, positioningInstruction, signatureProfileSettings, false);
         properties.buildSignature();
 
         if (signatureProfileSettings.isPDFA() || signatureProfileSettings.isPDFA3()) {
@@ -763,7 +763,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         positioningInstruction = Positioning.determineTablePositioning(new TablePos(), origDoc,
             visualObject, pdfObject.getStatus().getSettings(), signatureProfileSettings);
       }
-
+          
       origDoc.close();
 
       final SignaturePositionImpl position = new SignaturePositionImpl();
@@ -777,14 +777,15 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
       final PDFAsVisualSignatureProperties properties = new PDFAsVisualSignatureProperties(
           pdfObject.getStatus().getSettings(), pdfObject, (PdfBoxVisualObject) visualObject,
-          positioningInstruction, signatureProfileSettings);
-
+          positioningInstruction, signatureProfileSettings, true);
+      
+      // build visual-signature form
       properties.buildSignature();
-      PDDocument visualDoc;
+            
+      PDDocument visualDoc;     
       synchronized (PDDocument.class) {
         visualDoc = PDDocument.load(properties.getVisibleSignature());
       }
-
 
       final float stdRes = 72;
       final float targetRes = resolution;
@@ -797,7 +798,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
 
       visualDoc.close();
       pdfRenderer = null;
-      
+            
       final BufferedImage cutOut = new BufferedImage(
           (int) (position.getWidth() * factor),
           (int) (position.getHeight() * factor), 

@@ -50,6 +50,12 @@ subprojects {
        	}
     }
     maven {
+       	url "https://apps.egiz.gv.at/maven-internal/"     	
+       	mavenContent {
+           	releasesOnly()
+       	}
+    }
+    maven {
        	url "https://apps.egiz.gv.at/maven-snapshot/"
        	mavenContent {
            	snapshotsOnly()

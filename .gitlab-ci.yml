@@ -6,8 +6,8 @@ variables:
   LANGUAGE: "en_US"
   LIB_NAME: "PDF-AS 4"
   GIT_DEPTH: "2"
-  SECURE_LOG_LEVEL: "debug"  
-  
+  SECURE_LOG_LEVEL: "debug"
+
 include:
   - template: Dependency-Scanning.gitlab-ci.yml
   - template: Security/SAST.gitlab-ci.yml
@@ -18,16 +18,16 @@ dependency_scanning:
   variables:
     MAVEN_CLI_OPTS: "-DskipTests --settings ${CI_PROJECT_DIR}/.cisettings.xml"
     DS_JAVA_VERSION: 11
-  
+
 spotbugs-sast:
   variables:
-    MAVEN_CLI_OPTS: "-DskipTests --settings ${CI_PROJECT_DIR}/.cisettings.xml" 
-    SAST_JAVA_VERSION: 11    
-  
+    MAVEN_CLI_OPTS: "-DskipTests --settings ${CI_PROJECT_DIR}/.cisettings.xml"
+    SAST_JAVA_VERSION: 11
+
 default:
   tags:
     - docker
-    
+
 stages:
   - assemble
   - test
@@ -43,41 +43,44 @@ cache:
 assemble:
   stage: assemble
   tags:
-    - docker    
+    - docker
   except:
-    - tags  
+    - tags
   script: |
-    ./gradlew --warning-mode all -x test clean build 
+    ./gradlew --warning-mode all clean build
   artifacts:
     when: always
     reports:
       junit: "**/build/test-results/test/**/TEST-*.xml"
+    paths:
+      - "**/pdf-as-tests/src/test/test-suites"
+
 
 release_packaging:
   stage: package
   tags:
-    - docker    
+    - docker
   except:
-    - tags  
+    - tags
     - /^feature/.*$/i
     - /^issue.*$/i
   before_script:
     - mkdir -p ~/.ssh
     - ssh-keyscan apps.egiz.gv.at >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts      
+    - chmod 644 ~/.ssh/known_hosts
   script: |
     ./gradlew --stacktrace -x test assemble uploadArchives
   artifacts:
     when: always
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"  
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
     reports:
-      dotenv: variables.env    
-    
+      dotenv: variables.env
+
 release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   tags:
-    - docker   
+    - docker
   needs:
     - job: assemble
       artifacts: true

@@ -1,6 +1,9 @@
 package at.gv.egiz.param_tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -16,10 +19,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.icepdf.core.pobjects.Document;
-import org.icepdf.core.pobjects.PDimension;
-import org.icepdf.core.pobjects.Page;
-import org.icepdf.core.util.GraphicsRenderingHints;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -222,8 +223,16 @@ public class SignaturePositionTest extends SignatureTest {
         BufferedImage sigPageImage = captureImage(baseTestData.getOutputFile(),
                 sigPageNumber);
         assertNotNull("Could not get image of page", sigPageImage);
+        
+        /*
+         *  Re-classify.
+         *  Only use this after manually check all signature block results that currently fail!
+         *  
+         *  <code>ImageIO.write(sigPageImage, "png", new File(refImageFileName));</code>  
+         */       
+        
         BufferedImage refImage = ImageIO.read(new File(refImageFileName));
-        assertNotNull("Could not get reference image", sigPageImage);
+        assertNotNull("Could not get reference image", refImage);
 
         assertEquals("Width of image differs from reference",
                 refImage.getWidth(), sigPageImage.getWidth());
@@ -235,7 +244,7 @@ public class SignaturePositionTest extends SignatureTest {
         int imageHeight = sigPageImage.getHeight();
         ignoreAreas(sigPageGraphics, imageHeight);
         ignoreAreas(refImageGraphics, imageHeight);
-
+        
         String refImageIgnored = extractDirectoryString(baseTestData
                 .getOutputFile()) + "refImage_ignored.png";
         ImageIO.write(refImage, "png", new File(refImageIgnored));
@@ -303,8 +312,7 @@ public class SignaturePositionTest extends SignatureTest {
     }
 
     /**
-     * This method captures an image of a page of a PDF document. This is done
-     * using the rendering capabilities of ICEPDF.
+     * This method captures an image of a page of a PDF document.
      * 
      * @param fileName
      *            the name of the PDF file
@@ -313,30 +321,18 @@ public class SignaturePositionTest extends SignatureTest {
      * @return the captured image
      * @throws InterruptedException 
      */
-    private BufferedImage captureImage(String fileName, int pageNumber) throws InterruptedException {
-        Document document = new Document();
-        try {
-            document.setFile(fileName);
-        } catch (Exception e) {
-            document.dispose();
-            fail(String
-                    .format("Not possible to capture page %d of file %s, because of %s.",
-                            pageNumber, fileName, e.getMessage()));
-        }
-        Page page = document.getPageTree().getPage(pageNumber - 1);
-        page.init();
-        PDimension sz = page.getSize(Page.BOUNDARY_CROPBOX, 0, ZOOM);
-
-        int pageWidth = (int) sz.getWidth();
-        int pageHeight = (int) sz.getHeight();
-
-        BufferedImage image = new BufferedImage(pageWidth, pageHeight,
-                BufferedImage.TYPE_4BYTE_ABGR);
-        Graphics g = image.createGraphics();
-        page.paint(g, GraphicsRenderingHints.PRINT, Page.BOUNDARY_CROPBOX, 0,
-                ZOOM);
-        document.dispose();
-        return image;
+    private BufferedImage captureImage(String fileName, int pageNumber) throws InterruptedException {             
+      try {        
+        PDDocument signedPdf = PDDocument.load(new File(fileName));
+        PDFRenderer renderer = new PDFRenderer(signedPdf);        
+        return renderer.renderImage(pageNumber - 1, ZOOM);
+              
+      } catch (IOException e) {
+        fail(String
+            .format("Not possible to capture page %d of file %s, because of %s.",
+                    pageNumber, fileName, e.getMessage()));
+        return null;
+      }     
     }
 
 }

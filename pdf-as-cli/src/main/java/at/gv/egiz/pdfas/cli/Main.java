@@ -42,8 +42,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.utils.StreamUtils;
@@ -57,6 +57,7 @@ import at.gv.egiz.pdfas.lib.api.sign.SignResult;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
+import at.gv.egiz.pdfas.lib.impl.signing.AtrustRemoteSigner;
 import at.gv.egiz.pdfas.moa.MOAConnector;
 import at.gv.egiz.pdfas.sigs.pades.PAdESSigner;
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore;
@@ -428,7 +429,12 @@ public class Main {
 				slConnector = new PAdESSignerKeystore(keystoreFilename,
 						keystoreAlias, keystoreStorepass, keystoreKeypass,
 						keystoreType);
+			
+			} else if (connector.equalsIgnoreCase("test")) {
+			  slConnector =  new PAdESSigner(new AtrustRemoteSigner());
+			  
 			}
+			
 		}
 		if (slConnector == null) {
 			slConnector = new PAdESSigner(new BKUSLConnector(configuration));

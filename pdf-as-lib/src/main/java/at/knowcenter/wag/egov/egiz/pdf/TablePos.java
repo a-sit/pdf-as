@@ -49,8 +49,12 @@
 package at.knowcenter.wag.egov.egiz.pdf;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Class that holds the exact position where the table should be written to the
@@ -59,9 +63,14 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
  * @author wprinz
  * @author mruhmer
  */
+@NoArgsConstructor
 public class TablePos implements Serializable
 {
 
+  public enum PAGE_MODE {AUTO, LAST, EXACT, NEW}; 
+  public enum POS_MODE {AUTO, EXACT};
+  
+  
   /**
    * SVUID.
    */
@@ -71,198 +80,215 @@ public class TablePos implements Serializable
    * The page on which the block should be displayed.
    * 
    */
+  @Getter
   private int page = 0;
 
   /**
    * The x position.
    */
-  private float pos_x = 0.0f;
+  @Getter
+  private float posX = 0.0f;
 
   /**
    * The y position.
    */
-  private float pos_y = 0.0f;
+  @Getter
+  private float posY = 0.0f;
 
   /**
    * The width of the block.
    */
-  public float width = 0.0f;
+  @Getter
+  @Setter
+  private float width = 0.0f;
+  
   /**
    * The top y position of the footer line.
    */
-  public float footer_line = 0.0f;
+  private float footerLine = 0.0f;
   
   /**
    * The rotation of the signature block
    */
-  public float rotation = 0.0f;
-
+  @Getter
+  private float rotation = 0.0f;
+  
+     
+  @Getter
+  private PAGE_MODE pageMode = PAGE_MODE.AUTO;
+  
+  @Getter
+  private POS_MODE xMode = POS_MODE.AUTO;
+  
+  @Getter
+  private POS_MODE yMode = POS_MODE.AUTO;
+  
+  @Getter
+  private POS_MODE wMode = POS_MODE.AUTO;
+  
+  public boolean isXauto() {
+    return xMode.equals(POS_MODE.AUTO);
+  
+  }
+  
+  public boolean isYauto() {
+    return yMode.equals(POS_MODE.AUTO);
+	
+  } 
+  
+  public boolean isWauto() {
+    return wMode.equals(POS_MODE.AUTO);
+  }
+    
+  public float getFooterLine() {
+    //ignore if newpage and y is not auto
+    return yMode.equals(POS_MODE.EXACT) || pageMode.equals(PAGE_MODE.NEW) ? 0.0f : footerLine;  
+      
+  } 
+  
   /**
-   * The y position.
+   * Constructor.
+   * 
+   * @param pos_string The pos instruction.
+   *        format : [x:x_algo];[y:y_algo];[w:w_algo][p:p_algo];[f:f_algo];[r:r_algo]
+   *        x_algo:='auto'     ... automatic positioning x
+   *                floatvalue ... absolute x
+   *        y_algo:='auto'     ... automatic positioning y
+   *                floatvalue ... absolute y
+   *        w_algo:='auto'     ... automatic width
+   *                floatvalue ... absolute width    
+   *        p_algo:='auto'     ... automatic last page
+   *                'new'      ... new page
+   *                'last'     ... force last page  
+   *                intvalue   ... pagenumber
+   *        f_algo  floatvalue ... consider footerline (only if y_algo is auto and p_algo is not 'new')
+   *        r_algo  floatvalue ... rotate the table arround the lower left corner anti clockwise in degree
+   * @throws PdfAsException
    */
-  public String myposstring = "";
+  public TablePos(String pos_string) throws PdfAsException {
+    parsePosString(pos_string);
+    
+  }
   
-  private boolean newpage = false;
-  private boolean autoX = true; 
-  private boolean autoY = true;
-  private boolean autoW = true;
-  private boolean autoP = true;
+  /**
+   * Constructor
+   * @param pos_string The pos instruction.
+   *    format : [x:x_algo];[y:y_algo];[w:w_algo][p:p_algo];[f:f_algo];[r:r_algo]
+   *        x_algo:='auto'     ... automatic positioning x
+   *                floatvalue ... absolute x
+   *        y_algo:='auto'     ... automatic positioning y
+   *                floatvalue ... absolute y
+   *        w_algo:='auto'     ... automatic width
+   *                floatvalue ... absolute width    
+   *        p_algo:='auto'     ... automatic position
+   *                'new'      ... new page 
+   *                'last'     ... force last page 
+   *                intvalue   ... pagenumber
+   *        f_algo  floatvalue ... consider footerline (only if y_algo is auto and p_algo is not 'new')
+   *        r_algo  floatvalue ... rotate the table arround the lower left corner anti clockwise in degree
+   * @param basePosition The base Table Position these values are the base values
+   * @throws PdfAsException
+   */
+  public TablePos(String pos_string, TablePos basePosition) throws PdfAsException {
+    if(basePosition != null) {
+      readFromPos(basePosition);
+      
+    }
+    parsePosString(pos_string);
+    
+  }
   
-  public boolean isXauto()
-  {
-	return this.autoX;
+  public String toString() {  
+   String thatsme = "pos_x:"+this.posX+" pos_y:"+this.posY+" page:"+this.page+" width:"+this.width+" footer:"+this.footerLine+" rotation:"+this.rotation+"\n "+" autoX:"+xMode+" autoY:"+yMode+" autoW:"+wMode+" pageMode:"+pageMode; 
+   return thatsme;
+   
   }
-  public boolean isYauto()
-  {
-	return this.autoY;
-  } 
-  public boolean isWauto()
-  {
-	return this.autoW;
+  
+  
+  private float parseAndCheck(String commandval, int minValue, String errorMsg) 
+      throws PdfAsException, NumberFormatException {    
+    float value= Float.parseFloat(commandval);
+    if (value < minValue) {
+      throw new PdfAsException(MessageFormat.format(errorMsg, value));
+          
+    }       
+    return value;
+       
   }
-  public boolean isPauto()
-  {
-	return this.autoP;
-  }
-  public boolean isNewPage()
-  {
-	return this.newpage;
-  }
-  public int getPage()
-  {
-	return this.page;  
-  }
-  public float getFooterLine()
-  {
-	//ignore if newpage and y is not auto
-	if (!this.autoY || this.newpage) 
-	{
-	  return 0.0f;
-	}
-	return this.footer_line;  
-  } 
-  public float getPosX()
-  {
-	return this.pos_x;  
-  }  
-  public float getPosY()
-  {
-	return this.pos_y;  
-  } 
-  public float getWidth()
-  {
-	return this.width;  
-  }  
-  public TablePos()
-  {
-    //nothing to do --> default
-  } 
   
   private void parsePosString(String pos_string) throws PdfAsException {
 	//parse posstring and throw exception
 		//[x:x_algo];[y:y_algo];[w:w_algo][p:p_algo];[f:f_algo]
 		
 		String[] strs = pos_string.split(";");
-		try
-		{
-		  for (int cmds = 0;cmds<strs.length;cmds++)
-		  {
-			 
+		try {
+		  for (int cmds = 0;cmds<strs.length;cmds++) {			 
 			 String cmd_kvstring = strs[cmds];
 			 String[] cmd_kv = cmd_kvstring.split(":");
-			 if (cmd_kv.length != 2)
-			 {
+			 
+			 if (cmd_kv.length != 2) {
 				 throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
+				 
 			 }
+			 
 			 String cmdstr =  cmd_kv[0];
-			 if (cmdstr.length() != 1)
-			 {
+			 if (cmdstr.length() != 1) {
 				 throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
-			 }		 
+				 
+			 }
+			 
 			 char command = cmdstr.charAt(0);
-		     String commandval= cmd_kv[1];
-		     switch (command)
-		     {
+		   String commandval= cmd_kv[1];
+		   switch (command) {
 		     	case 'x': {
-		     		         if (!commandval.equalsIgnoreCase("auto"))
-		     		         {  
-		     		        	float xval= Float.parseFloat(commandval);
-		     		            if (xval<0)
-		     		            {
-		     		            	throw new PdfAsException("Pos string (x:" + xval + ") is invalid.");
-		     		            }	     		          
-		     		        	this.pos_x = xval;
-		     		        	this.autoX = false; 
-		     		         } else {
-		     		        	this.pos_x = 0.0f;
-		     		        	this.autoX = true;
+		     		         if (!commandval.equalsIgnoreCase("auto")) {	     		          
+		     		        	this.posX = parseAndCheck(commandval, 0, "Pos string (x:{0}) is invalid.");
+		     		        	this.xMode = POS_MODE.EXACT;		     		        	
 		     		         }
 		     		         break;
 		     			  }	
 		     	case 'y': {
-			         		if (!commandval.equalsIgnoreCase("auto"))
-			         		{
-			         			float yval= Float.parseFloat(commandval);
-		     		            if (yval<0)
-		     		            {
-		     		            	throw new PdfAsException("Pos string (y:" + yval + ") is invalid.");
-		     		            }			         			
-			         			this.pos_y = yval;
-			         			this.autoY = false; 
-			         		} else {
-		     		        	this.pos_y = 0.0f;
-		     		        	this.autoY = true;
-		     		         }   		         
+			         		if (!commandval.equalsIgnoreCase("auto")) {			         			
+			         			this.posY = parseAndCheck(commandval, 0, "Pos string (y:{0}) is invalid.");
+			         			this.yMode = POS_MODE.EXACT; 			         			
+			         		}    		         
 			         		break;
 		     			  }		
 		     	case 'w': { 
-	         				if (!commandval.equalsIgnoreCase("auto"))
-	         				{    
-			         			float wval= Float.parseFloat(commandval);
-		     		            if (wval<=0)
-		     		            {
-		     		            	throw new PdfAsException("pos.width (w:" + wval + ") must not be lower or equal 0.");
-		     		            }        					
-	         					this.width = wval;
-	         					this.autoW = false; 
-	         				} else {
-		     		        	this.width = 0.0f;
-		     		        	this.autoW = true;
-		     		        }     		         
+	         				if (!commandval.equalsIgnoreCase("auto")) {
+	         					this.width = parseAndCheck(commandval, 1, "pos.width (w:{0}) must not be lower or equal 0.");
+	         					this.wMode = POS_MODE.EXACT; 
+	         				}      		         
 	         				break;
 	      				  }
 		     	case 'p': {
-	 						if (!commandval.equalsIgnoreCase("auto"))
-	 						{ 
-	 							if (commandval.equalsIgnoreCase("new"))
-	 							{ 								
-	 								this.newpage = true;
-	 							}
-	 							else
-	 							{
+	 						if (!commandval.equalsIgnoreCase("auto")) { 
+	 							if (commandval.equalsIgnoreCase("new")) { 								
+	 							 pageMode = PAGE_MODE.NEW;
+	 							  
+	 							} else if (commandval.equalsIgnoreCase("last")) {                 
+	                 pageMode = PAGE_MODE.LAST;
+	                  	 							 
+	 							} else {
 	 								int pval = Integer.parseInt(commandval);
-	 								if (pval<1)
-	 								{
+	 								if (pval<1) {
 	 									throw new PdfAsException("Page (p:" + pval + ") must not be lower than 1.");
+	 									
 	 								}
-	 								this.page = pval;
-	 								this.autoP = false;
+	 								this.page =pval;
+	 								pageMode = PAGE_MODE.EXACT;
+	 								
 	 							}
+	 						
 	 						} else {
-	 							this.page = 0;
-	 							this.autoP = true;
-	 							this.newpage = false;
+  	 						pageMode = PAGE_MODE.AUTO;
+	 							
 	 						}
 	 						break;
 	      				  }
 		     	case 'f': {
-		     		        float flval=Float.parseFloat(commandval);
-	     		            if (flval<0)
-	     		            {
-	     		            	throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
-	     		            } 	     		        
-		     				this.footer_line = flval;
-		     				break;
+		     	        footerLine = parseAndCheck(commandval, 0, "Footer pos string (f={0}) is invalid.");
+		     	        break;
 		     			  }
 		     	case 'r': {
 	 		        		float flval=Float.parseFloat(commandval);
@@ -280,7 +306,7 @@ public class TablePos implements Serializable
 		                  }
 		     }
 		  }
-		  this.myposstring=pos_string;
+
 	    }
 	    catch (NumberFormatException e)
 	    {
@@ -289,73 +315,18 @@ public class TablePos implements Serializable
   }
   
   private void readFromPos(TablePos base) {
-	  this.autoP = base.autoP;
-	  this.autoW = base.autoW;
-	  this.autoX = base.autoX;
-	  this.autoY = base.autoY;
+	  this.pageMode = base.getPageMode();
+	  this.xMode = base.getXMode();
+	  this.yMode = base.getYMode();	  
+	  this.wMode = base.getWMode();	  	  	 
 	  
-	  this.footer_line = base.footer_line;
-	  this.myposstring = base.myposstring;
-	  this.newpage = base.newpage;
+	  this.footerLine = base.getFooterLine();
 	  this.page = base.page;
-	  this.pos_x = base.pos_x;
-	  this.pos_y = base.pos_y;
+	  this.posX = base.posX;
+	  this.posY = base.posY;
 	  this.rotation  = base.rotation;
 	  this.width = base.width;
+	  
   }
   
-  /**
-   * Constructor.
-   * 
-   * @param pos_string The pos instruction.
-   *        format : [x:x_algo];[y:y_algo];[w:w_algo][p:p_algo];[f:f_algo];[r:r_algo]
-   *        x_algo:='auto'     ... automatic positioning x
-   *                floatvalue ... absolute x
-   *        y_algo:='auto'     ... automatic positioning y
-   *                floatvalue ... absolute y
-   *        w_algo:='auto'     ... automatic width
-   *                floatvalue ... absolute width    
-   *        p_algo:='auto'     ... automatic last page
-   *                'new'      ... new page  
-   *                intvalue   ... pagenumber
-   *        f_algo  floatvalue ... consider footerline (only if y_algo is auto and p_algo is not 'new')
-   *        r_algo  floatvalue ... rotate the table arround the lower left corner anti clockwise in degree
-   * @throws PdfAsException
-   */
-  public TablePos(String pos_string) throws PdfAsException
-  {
-    parsePosString(pos_string);
-  }
-  
-  /**
-   * Constructor
-   * @param pos_string The pos instruction.
-   * 		format : [x:x_algo];[y:y_algo];[w:w_algo][p:p_algo];[f:f_algo];[r:r_algo]
-   *        x_algo:='auto'     ... automatic positioning x
-   *                floatvalue ... absolute x
-   *        y_algo:='auto'     ... automatic positioning y
-   *                floatvalue ... absolute y
-   *        w_algo:='auto'     ... automatic width
-   *                floatvalue ... absolute width    
-   *        p_algo:='auto'     ... automatic last page
-   *                'new'      ... new page  
-   *                intvalue   ... pagenumber
-   *        f_algo  floatvalue ... consider footerline (only if y_algo is auto and p_algo is not 'new')
-   *        r_algo  floatvalue ... rotate the table arround the lower left corner anti clockwise in degree
-   * @param basePosition The base Table Position these values are the base values
-   * @throws PdfAsException
-   */
-  public TablePos(String pos_string, TablePos basePosition) throws PdfAsException
-  {
-	  if(basePosition != null) {
-		  readFromPos(basePosition);
-	  }
-	  parsePosString(pos_string);
-  }
-  
-  public String toString()
-  {  
-	 String thatsme = "cmd:"+this.myposstring+" pos_x:"+this.pos_x+" pos_y:"+this.pos_y+" page:"+this.page+" width:"+this.width+" footer:"+this.footer_line+" rotation:"+this.rotation+"\n "+" autoX:"+this.autoX+" autoY:"+this.autoY+" autoW:"+this.autoW+" Newpage:"+this.newpage+" autoP:"+this.autoP; 
-	 return thatsme;
-  }
 }

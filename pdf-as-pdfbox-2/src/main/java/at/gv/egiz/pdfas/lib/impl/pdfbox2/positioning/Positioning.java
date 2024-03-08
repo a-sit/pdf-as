@@ -40,6 +40,7 @@ import at.gv.egiz.pdfas.lib.impl.pdfbox2.utils.PdfBoxUtils;
 import at.gv.egiz.pdfas.lib.impl.stamping.IPDFVisualObject;
 import at.knowcenter.wag.egov.egiz.pdf.PositioningInstruction;
 import at.knowcenter.wag.egov.egiz.pdf.TablePos;
+import at.knowcenter.wag.egov.egiz.pdf.TablePos.PAGE_MODE;
 import at.knowcenter.wag.egov.egiz.pdfbox2.pdf.PDFUtilities;
 import lombok.extern.slf4j.Slf4j;
 
@@ -100,55 +101,31 @@ public class Positioning {
     // get pages of currentdocument
     final int doc_pages = pdfDataSource.getNumberOfPages();
     int page = doc_pages;
-    boolean make_new_page = pos.isNewPage();
+    boolean make_new_page = PAGE_MODE.NEW.equals(pos.getPageMode());
 
-
-    if (!(pos.isNewPage() || pos.isPauto())) {
+    if (PAGE_MODE.EXACT.equals(pos.getPageMode())) {
       // we should posit signaturtable on this page
       page = pos.getPage();
       if (page > doc_pages) {
-        log.debug("Document is shorter than requested page for signature block. Adding new page ...");
+        log.info("Document is shorter than requested page for signature block. Adding new page ...");
         make_new_page = true;
         page = doc_pages;
         
-      }
+      }      
     }
-
+       
     make_new_page = checkIfNewPageIsAllowed(make_new_page, numberOfExistingSignatures, settings, profilConfig);
-    
-           
+                  
     final PDPage pdPage = pdfDataSource.getPage(page - 1);
-
     PDRectangle cropBox = pdPage.getCropBox();
-
-    // fallback to MediaBox if Cropbox not available!
-
-    if (cropBox == null) {
-      cropBox = pdPage.getCropBox();
-    }
-
-    if (cropBox == null) {
-      cropBox = pdPage.getCropBox();
-    }
-
-    // getPagedimensions
-    // Rectangle psize = reader.getPageSizeWithRotation(page);
-    // int page_rotation = reader.getPageRotation(page);
-
-    // Integer rotation = pdPage.getRotation();
-    // int page_rotation = rotation.intValue();
-
-    final int rotation = pdPage.getRotation();
-
     log.debug("Original CropBox: " + cropBox.toString());
-
+    
+    final int rotation = pdPage.getRotation();   
     cropBox = rotateBox(cropBox, rotation);
-
     log.debug("Rotated CropBox: " + cropBox.toString());
 
     final float page_width = cropBox.getWidth();
     final float page_height = cropBox.getHeight();
-
     log.debug("CropBox width: " + page_width);
     log.debug("CropBox heigth: " + page_height);
 
@@ -161,6 +138,8 @@ public class Positioning {
     // calculate width
     // center
     float pre_width = page_width - 2 * pre_pos_x;
+    
+    
     if (!pos.isWauto()) {
       // we do have absolute width
       pre_width = pos.getWidth();
@@ -178,9 +157,19 @@ public class Positioning {
     pdf_table.fixWidth();
 
     final float table_height = pdf_table.getHeight();
+    
     // now check pos_y
-    float pos_y = pos.getPosY();
-
+    
+    // last page was requested. Use all parameters as they was
+    if (PAGE_MODE.LAST.equals(pos.getPageMode())) {
+      log.debug("Positioning on last page was requested. Selecting this and use y-position as requested ... ");
+      return new PositioningInstruction(make_new_page, page, pos_x, 
+          pos.isYauto() ? page_height - SIGNATURE_MARGIN_VERTICAL : pos.getPosY(), 
+          pos.getRotation());
+      
+    }
+    
+    
     // in case an absolute y position is already given OR
     // if the table is related to an invisible signature
     // there is no need for further calculations
@@ -190,8 +179,9 @@ public class Positioning {
       if (make_new_page) {
         page++;
         
-      }      
-      return new PositioningInstruction(make_new_page, page, pos_x, pos_y, pos.rotation);
+      }
+      
+      return new PositioningInstruction(make_new_page, page, pos_x, pos.getPosY(), pos.getRotation());
       
     }
     
@@ -199,8 +189,8 @@ public class Positioning {
     if (make_new_page) {            
       // ignore footer in new page
       page++;
-      pos_y = page_height - SIGNATURE_MARGIN_VERTICAL;            
-      return new PositioningInstruction(make_new_page, page, pos_x, pos_y, pos.rotation);
+      return new PositioningInstruction(make_new_page, page, pos_x, 
+          page_height - SIGNATURE_MARGIN_VERTICAL, pos.getRotation());
       
     }
     
@@ -210,16 +200,16 @@ public class Positioning {
     float pre_page_length = calculatePrePageLength(pdfDataSource, page, pdf_table, pos.getFooterLine(), settings);
    
     if (pre_page_length == Float.NEGATIVE_INFINITY) {
-      // we do have an empty page or nothing in area above footerline     
-      pos_y = page_height - SIGNATURE_MARGIN_VERTICAL;      
-      return buildPostitionInfoOnSubpage(pdfDataSource, make_new_page, page, pos_x, pos_y, pos.rotation, 
+      // we do have an empty page or nothing in area above footerline           
+      return buildPostitionInfoOnSubpage(pdfDataSource, make_new_page, page, pos_x, 
+          page_height - SIGNATURE_MARGIN_VERTICAL, pos.getRotation(), 
           pos.getFooterLine(), table_height, pos, page_height, numberOfExistingSignatures, settings, profilConfig);
            
     } else {    
       // we do have text take SIGNATURE_MARGIN
-      pos_y = page_height - pre_page_length - SIGNATURE_MARGIN_VERTICAL;
-      return buildPostitionInfoOnSubpage(pdfDataSource, make_new_page, page, pos_x, pos_y, pos.rotation, 
-          pos.getFooterLine(), table_height, pos, page_height, numberOfExistingSignatures, settings, profilConfig);
+      return buildPostitionInfoOnSubpage(pdfDataSource, make_new_page, page, pos_x, 
+          page_height - pre_page_length - SIGNATURE_MARGIN_VERTICAL, 
+          pos.getRotation(), pos.getFooterLine(), table_height, pos, page_height, numberOfExistingSignatures, settings, profilConfig);
     
     }  
   }
@@ -274,15 +264,17 @@ public class Positioning {
   private static PositioningInstruction buildPostitionInfoOnSubpage(PDDocument pdfDataSource, boolean make_new_page, int page, float pos_x, 
       float pos_y, float rotation, float footer_line, float table_height, TablePos pos, float page_height, 
       long numberOfExistingSignatures, ISettings settings, SignatureProfileSettings profilConfig) throws PdfAsException {
+    
     if (pos_y - footer_line <= table_height) {
+      boolean isPageModeAuto = PAGE_MODE.AUTO.equals(pos.getPageMode());
       
-      make_new_page = checkIfNewPageIsAllowed(pos.isPauto(), numberOfExistingSignatures, settings, profilConfig);
+      make_new_page = checkIfNewPageIsAllowed(isPageModeAuto, numberOfExistingSignatures, settings, profilConfig);
       if (make_new_page) {        
         page++;
         
       }
             
-      if (!pos.isPauto()) {
+      if (!isPageModeAuto) {
         // we have to correct pagenumber
         page = pdfDataSource.getNumberOfPages();
         
@@ -292,7 +284,7 @@ public class Positioning {
       
     }
     
-    return new PositioningInstruction(make_new_page, page, pos_x, pos_y, pos.rotation);
+    return new PositioningInstruction(make_new_page, page, pos_x, pos_y, pos.getRotation());
     
   }
 

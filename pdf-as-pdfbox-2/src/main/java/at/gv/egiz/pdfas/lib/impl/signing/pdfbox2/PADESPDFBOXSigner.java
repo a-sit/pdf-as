@@ -598,7 +598,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       TablePos tablePos = nextPlaceholderData.getTablePos();         
       if (minWidth > 0) {
         if (tablePos.getWidth() < minWidth) {
-          tablePos.width = minWidth;
+          tablePos.setWidth(minWidth);
           log.debug("Correcting placeholder with to minimum width {}", minWidth);
         }
       }

@@ -23,12 +23,12 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Formatter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created with IntelliJ IDEA. User: afitzek Date: 8/28/13 Time: 12:42 PM To
@@ -38,6 +38,7 @@ public class StringUtils {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(StringUtils.class);
+  private static final CharSequence TABULATOR = '\u0009'+"";
 
 	public static String bytesToHexString(byte[] bytes) {
 		StringBuilder sb = new StringBuilder(bytes.length * 2);
@@ -75,10 +76,17 @@ public class StringUtils {
 			// Cannot encode String with CP1252 have to use URL encoding ...
 			return URLEncoder.encode(value, "UTF-8");
 		}
-		return value;
+		
+		return replaceSpecialCharacters(value);
+		
 	}
 
-	public static byte[] applyWinAnsiEncoding(String text)
+	private static String replaceSpecialCharacters(String value) {
+	  return value.replace(TABULATOR, " ");
+	  
+  }
+
+  public static byte[] applyWinAnsiEncoding(String text)
 			throws UnsupportedEncodingException {
 		byte[] replace_bytes;
 		replace_bytes = text.getBytes("windows-1252");// CP1252 =

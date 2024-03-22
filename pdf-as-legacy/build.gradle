@@ -20,7 +20,7 @@ dependencies {
 	implementation project (':signature-standards:sigs-pkcs7detached')
 	implementation project (':signature-standards:sigs-pades')
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
-	implementation group: 'commons-codec', name: 'commons-codec', version: '1.16.0'
+	implementation group: 'commons-codec', name: 'commons-codec', version: '1.16.1'
 }
 
 task releases(type: Copy) {

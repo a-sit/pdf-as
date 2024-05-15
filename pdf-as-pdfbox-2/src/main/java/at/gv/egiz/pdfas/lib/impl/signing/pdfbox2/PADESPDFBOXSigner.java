@@ -431,11 +431,13 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       final PDDocumentCatalog root = doc.getDocumentCatalog();
       final PDStructureTreeRoot structureTreeRoot = root.getStructureTreeRoot();
       if (structureTreeRoot != null) {
-        log.info("Tree Root: {}", structureTreeRoot.toString());
+        log.debug("Tree Root: {}", structureTreeRoot.toString());
         final List<Object> kids = structureTreeRoot.getKids();
 
-        if (kids == null) {
-          log.info("No kid-elements in structure tree Root, maybe not PDF/UA document");
+        if (kids == null || kids.isEmpty()) {
+          log.info("No kid-elements in structure tree Root, maybe not PDF/UA document. Skipping PDF/UA injection ... ");
+          return;
+          
         }
 
         PDStructureElement docElement = null;
@@ -556,7 +558,12 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         throw new PdfAsException("error.pdf.sig.pdfua.1", e);
         
       } else {
-        log.info("Could not create PDF-UA conform signature");
+        if (log.isDebugEnabled()) {
+          log.debug("Could not create PDF-UA conform signature. Reason: {}", e.getMessage(), e);
+          
+        } else {
+          log.info("Could not create PDF-UA conform signature. Reason: {}", e.getMessage());
+        }
       }
     }
     

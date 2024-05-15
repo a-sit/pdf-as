@@ -27,8 +27,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
-import at.gv.egiz.pdfas.lib.impl.stamping.TableFactory;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -158,23 +156,17 @@ public class PDFBoxFont {
 //		return null;
 //	}
 
-	private PDFont generateTTF(String fonttype, PDFBOXObject pdfObject)
-			throws IOException {
-
-
+	private PDFont generateTTF(String fonttype, PDFBOXObject pdfObject) throws IOException {
 		ttfFontDesc = fonttype;
 		String fontName = fonttype.replaceFirst("TTF:", "");
-		String fontPath = this.settings.getWorkingDirectory() + File.separator
-				+ "fonts" + File.separator + fontName;
+		String fontPath = this.settings.getWorkingDirectory() + File.separator + "fonts" + File.separator + fontName;
 		
 		logger.debug("Font from: \"" + fontPath + "\".");
-
-
-		PDFAsFontCache fontCache = pdfObject.getSigBlockFontCache();
-		
+		PDFAsFontCache fontCache = pdfObject.getSigBlockFontCache();		
 		if(fontCache.contains(fontPath)){
 			logger.debug("Using cached font.");
 			return fontCache.getFont(fontPath);
+			
 		}
 
 		
@@ -209,6 +201,7 @@ public class PDFBoxFont {
 		if (fonttype.startsWith("TTF:")) {
 			// Load TTF Font
 			return generateTTF(fonttype, pdfObject);
+			
 		} else {
 			if (fontder == null) {
 				fontder = NORMAL;
@@ -219,8 +212,10 @@ public class PDFBoxFont {
 			if (font == null) {
 				pdfObject.getSigBlockFontCache().showAvailableFonts();
 				throw new IOException("Invalid font descriptor \"" + fontDesc + "\"");
-			}
+				
+			}			
 			return font;
+			
 		}
 	}
 

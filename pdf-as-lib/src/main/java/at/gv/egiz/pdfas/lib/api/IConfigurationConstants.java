@@ -82,6 +82,8 @@ public interface IConfigurationConstants {
 	
 	public static final String MOA_SIGN_KEY_ID = MOA_SS_KEY_IDENTIFIER;
 	public static final String MOA_SIGN_CERTIFICATE = MOA_SS_KEY_CERTIFICATE;
+	public static final String MOA_MTOM_ENABLED = "moa.sign.soap.mtom.enable";
+	
 	
 	/**
 	 * MOA Verify URL configuration Key

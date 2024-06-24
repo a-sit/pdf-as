@@ -4,6 +4,7 @@ package at.gv.e_government.reference.namespace.moa._20020822;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
@@ -43,6 +44,7 @@ import javax.xml.bind.annotation.XmlType;
 public class ContentBaseType {
 
     @XmlElement(name = "Base64Content")
+    @XmlMimeType("application/octet-stream")
     protected byte[] base64Content;
     @XmlElement(name = "XMLContent")
     protected XMLContentType xmlContent;

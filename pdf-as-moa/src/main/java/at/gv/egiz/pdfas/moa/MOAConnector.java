@@ -23,29 +23,31 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.moa;
 
-import at.gv.e_government.reference.namespace.moa._20020822.*;
-import iaik.x509.X509Certificate;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.gv.e_government.reference.namespace.moa._20020822.CMSContentBaseType;
 import at.gv.e_government.reference.namespace.moa._20020822.CMSDataObjectInfoType.DataObject;
+import at.gv.e_government.reference.namespace.moa._20020822.CreateCMSSignatureRequest;
 import at.gv.e_government.reference.namespace.moa._20020822.CreateCMSSignatureRequestType.SingleSignatureInfo;
 import at.gv.e_government.reference.namespace.moa._20020822.CreateCMSSignatureRequestType.SingleSignatureInfo.DataObjectInfo;
+import at.gv.e_government.reference.namespace.moa._20020822.CreateCMSSignatureResponseType;
+import at.gv.e_government.reference.namespace.moa._20020822.ErrorResponseType;
+import at.gv.e_government.reference.namespace.moa._20020822.MetaInfoType;
 import at.gv.e_government.reference.namespace.moa._20020822_.MOAFault;
 import at.gv.e_government.reference.namespace.moa._20020822_.SignatureCreationPortType;
 import at.gv.e_government.reference.namespace.moa._20020822_.SignatureCreationService;
@@ -66,6 +68,7 @@ import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
 import at.gv.egiz.pdfas.lib.util.SignatureUtils;
 import at.gv.egiz.sl.util.ISignatureConnector;
+import iaik.x509.X509Certificate;
 
 public class MOAConnector implements ISignatureConnector,
 		IConfigurationConstants {
@@ -78,6 +81,7 @@ public class MOAConnector implements ISignatureConnector,
 	private X509Certificate certificate;
 	private String moaEndpoint;
 	private String keyIdentifier;
+  private boolean mtomEnabled;
 
 
 	public MOAConnector(Configuration config,
@@ -125,16 +129,23 @@ public class MOAConnector implements ISignatureConnector,
 			if (certificateValue.startsWith("http")) {
 				logger.debug("Loading certificate from url: " + certificateValue);
 
+				InputStream is = null;
 				try {
 					URL certificateURL = new URL(certificateValue);
-
-					this.certificate = new X509Certificate(
-							certificateURL.openStream());
+					is = certificateURL.openStream();
+					this.certificate = new X509Certificate();
+														
 				} catch (MalformedURLException e) {
 					logger.error(certificateValue + " is not a valid url but starts with http!");
-					throw new PdfAsWrappedIOException(new PdfAsException(
-							certificateValue + " is not a valid url but!"));
-				}
+					throw new PdfAsWrappedIOException(new PdfAsException(certificateValue + " is not a valid url but!"));
+					
+				} finally {
+          if (is != null) {
+            is.close();
+            
+          }
+        }
+				
 			} else {
 
 				File certFile = new File(certificateValue);
@@ -154,9 +165,12 @@ public class MOAConnector implements ISignatureConnector,
 		
 		this.moaEndpoint = config.getValue(MOA_SIGN_URL);
 		this.keyIdentifier = config.getValue(MOA_SIGN_KEY_ID);
+		this.mtomEnabled = parseConfigToBoolean(config.getValue(MOA_MTOM_ENABLED), false);
+		logger.info("MOA client {} SOAP with MTOM", this.mtomEnabled ? "enabled" : "disabled");
+		
 	}
 
-	public X509Certificate getCertificate(SignParameter parameter)
+  public X509Certificate getCertificate(SignParameter parameter)
 			throws PdfAsException {
 		return this.certificate;
 	}
@@ -173,12 +187,16 @@ public class MOAConnector implements ISignatureConnector,
 		 */
 		SignatureCreationService service = new SignatureCreationService();
 
-		SignatureCreationPortType creationPort = service
-				.getSignatureCreationPort();
+		SignatureCreationPortType creationPort = service.getSignatureCreationPort();
 		BindingProvider provider = (BindingProvider) creationPort;
-		provider.getRequestContext().put(
-				BindingProvider.ENDPOINT_ADDRESS_PROPERTY, this.moaEndpoint);
+		provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, this.moaEndpoint);
 
+		if (this.mtomEnabled) {
+	    if (provider.getBinding() instanceof SOAPBinding) {
+	      ((SOAPBinding) provider.getBinding()).setMTOMEnabled(true);	      	      
+	    }		  
+		}
+				
 		CreateCMSSignatureRequest request = new CreateCMSSignatureRequest();
 		request.setKeyIdentifier(this.keyIdentifier.trim());
 		SingleSignatureInfo sigInfo = new SingleSignatureInfo();
@@ -217,21 +235,24 @@ public class MOAConnector implements ISignatureConnector,
 		request.getSingleSignatureInfo().add(sigInfo);
 
 		requestedSignature.getStatus().getMetaInformations()
-		.put(ErrorConstants.STATUS_INFO_SIGDEVICE, SIGNATURE_DEVICE);
+		    .put(ErrorConstants.STATUS_INFO_SIGDEVICE, SIGNATURE_DEVICE);
+
 		// TODO: Find a way to get MOA-SPSS Version
 		requestedSignature.getStatus().getMetaInformations()
-		.put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION, "UNKNOWN");
+		    .put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION, "UNKNOWN");
 		
 		CreateCMSSignatureResponseType response;
 		try {
 			response = creationPort.createCMSSignature(request);
+			
 		} catch (MOAFault e) {
 			logger.warn("MOA signing failed!", e);
 			if (e.getFaultInfo() != null) {
-				throw new PdfAsMOAException(e.getFaultInfo().getErrorCode()
-						.toString(), e.getFaultInfo().getInfo(), "", "");
+				throw new PdfAsMOAException(e.getFaultInfo().getErrorCode().toString(), e.getFaultInfo().getInfo(), "", "");
+				
 			} else {
 				throw new PdfAsMOAException("", e.getMessage(), "", "");
+				
 			}
 		}
 
@@ -282,4 +303,17 @@ public class MOAConnector implements ISignatureConnector,
 							+ resp.getClass().getName());
 		}
 	}
+
+	
+	 private boolean parseConfigToBoolean(String value, boolean defaultValue) {
+	   if (StringUtils.isNotEmpty(value)) {
+	     return Boolean.valueOf(value);
+	     
+	   } else {
+	     return defaultValue;
+	     
+	   }	   	    
+	  }
+	 
+	
 }

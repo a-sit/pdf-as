@@ -133,7 +133,7 @@ public class MOAConnector implements ISignatureConnector,
 				try {
 					URL certificateURL = new URL(certificateValue);
 					is = certificateURL.openStream();
-					this.certificate = new X509Certificate();
+					this.certificate = new X509Certificate(is);
 														
 				} catch (MalformedURLException e) {
 					logger.error(certificateValue + " is not a valid url but starts with http!");

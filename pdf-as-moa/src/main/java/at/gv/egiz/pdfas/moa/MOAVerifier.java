@@ -1,7 +1,5 @@
 package at.gv.egiz.pdfas.moa;
 
-import iaik.x509.X509Certificate;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -14,17 +12,17 @@ import javax.xml.ws.BindingProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3._2000._09.xmldsig.KeyInfoType;
-import org.w3._2000._09.xmldsig.X509DataType;
+import org.w3._2000._09.xmldsig_.KeyInfoType;
+import org.w3._2000._09.xmldsig_.X509DataType;
 
-import at.gv.e_government.reference.namespace.moa._20020822.CMSContentBaseType;
-import at.gv.e_government.reference.namespace.moa._20020822.CMSDataObjectOptionalMetaType;
-import at.gv.e_government.reference.namespace.moa._20020822.CheckResultType;
-import at.gv.e_government.reference.namespace.moa._20020822.MetaInfoType;
-import at.gv.e_government.reference.namespace.moa._20020822.VerifyCMSSignatureRequest;
-import at.gv.e_government.reference.namespace.moa._20020822.VerifyCMSSignatureResponseType;
+import at.gv.e_government.reference.namespace.moa._20020822_.CMSContentBaseType;
+import at.gv.e_government.reference.namespace.moa._20020822_.CMSDataObjectOptionalMetaType;
+import at.gv.e_government.reference.namespace.moa._20020822_.CheckResultType;
+import at.gv.e_government.reference.namespace.moa._20020822_.MetaInfoType;
 import at.gv.e_government.reference.namespace.moa._20020822_.SignatureVerificationPortType;
 import at.gv.e_government.reference.namespace.moa._20020822_.SignatureVerificationService;
+import at.gv.e_government.reference.namespace.moa._20020822_.VerifyCMSSignatureRequest;
+import at.gv.e_government.reference.namespace.moa._20020822_.VerifyCMSSignatureResponseType;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
@@ -32,6 +30,7 @@ import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import at.gv.egiz.pdfas.lib.impl.verify.IVerifier;
 import at.gv.egiz.pdfas.lib.impl.verify.SignatureCheckImpl;
 import at.gv.egiz.pdfas.lib.impl.verify.VerifyResultImpl;
+import iaik.x509.X509Certificate;
 
 public class MOAVerifier implements IVerifier {
 
@@ -86,7 +85,7 @@ public class MOAVerifier implements IVerifier {
 			
 			logger.debug("Got Verify Response from MOA");
 			
-			List<JAXBElement<?>> verifySequence = response.getSignerInfoAndSignatureCheckAndCertificateCheck();
+			List<JAXBElement<?>> verifySequence = response.getSignerInfoAndSignatureAlgorithmAndSignatureCheck();
 			
 			VerifyResultImpl result = new VerifyResultImpl();
 			

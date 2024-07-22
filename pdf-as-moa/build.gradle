@@ -65,7 +65,7 @@ task wsdl2Java() {
 		doLast {
 			wsdlsToGenerate.each { argsin ->
 				argsin.add(argsin.size - 1, '-d')
-				argsin.add(argsin.size - 1, generatedWsdlDir)
+				argsin.add(argsin.size - 1, 'src/generated/java')
 				argsin.add(argsin.size - 1, '-wsdlLocation')
 				argsin.add(argsin.size - 1, '/wsdl/MOA-SPSS-2.0.0.wsdl')
 				javaexec {

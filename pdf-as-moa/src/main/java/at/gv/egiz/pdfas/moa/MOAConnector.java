@@ -40,15 +40,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.gv.e_government.reference.namespace.moa._20020822.CMSContentBaseType;
-import at.gv.e_government.reference.namespace.moa._20020822.CMSDataObjectInfoType.DataObject;
-import at.gv.e_government.reference.namespace.moa._20020822.CreateCMSSignatureRequest;
-import at.gv.e_government.reference.namespace.moa._20020822.CreateCMSSignatureRequestType.SingleSignatureInfo;
-import at.gv.e_government.reference.namespace.moa._20020822.CreateCMSSignatureRequestType.SingleSignatureInfo.DataObjectInfo;
-import at.gv.e_government.reference.namespace.moa._20020822.CreateCMSSignatureResponseType;
-import at.gv.e_government.reference.namespace.moa._20020822.ErrorResponseType;
-import at.gv.e_government.reference.namespace.moa._20020822.MetaInfoType;
+import at.gv.e_government.reference.namespace.moa._20020822_.CMSContentBaseType;
+import at.gv.e_government.reference.namespace.moa._20020822_.CMSDataObjectInfoType.DataObject;
+import at.gv.e_government.reference.namespace.moa._20020822_.CreateCMSSignatureRequest;
+import at.gv.e_government.reference.namespace.moa._20020822_.CreateCMSSignatureRequestType.SingleSignatureInfo;
+import at.gv.e_government.reference.namespace.moa._20020822_.CreateCMSSignatureRequestType.SingleSignatureInfo.DataObjectInfo;
+import at.gv.e_government.reference.namespace.moa._20020822_.CreateCMSSignatureResponseType;
+import at.gv.e_government.reference.namespace.moa._20020822_.ErrorResponseType;
 import at.gv.e_government.reference.namespace.moa._20020822_.MOAFault;
+import at.gv.e_government.reference.namespace.moa._20020822_.MetaInfoType;
 import at.gv.e_government.reference.namespace.moa._20020822_.SignatureCreationPortType;
 import at.gv.e_government.reference.namespace.moa._20020822_.SignatureCreationService;
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
@@ -134,7 +134,7 @@ public class MOAConnector implements ISignatureConnector,
 					URL certificateURL = new URL(certificateValue);
 					is = certificateURL.openStream();
 					this.certificate = new X509Certificate(is);
-														
+					
 				} catch (MalformedURLException e) {
 					logger.error(certificateValue + " is not a valid url but starts with http!");
 					throw new PdfAsWrappedIOException(new PdfAsException(certificateValue + " is not a valid url but!"));
@@ -193,10 +193,11 @@ public class MOAConnector implements ISignatureConnector,
 
 		if (this.mtomEnabled) {
 	    if (provider.getBinding() instanceof SOAPBinding) {
-	      ((SOAPBinding) provider.getBinding()).setMTOMEnabled(true);	      	      
+	      ((SOAPBinding) provider.getBinding()).setMTOMEnabled(true);
+	      
 	    }		  
 		}
-				
+						
 		CreateCMSSignatureRequest request = new CreateCMSSignatureRequest();
 		request.setKeyIdentifier(this.keyIdentifier.trim());
 		SingleSignatureInfo sigInfo = new SingleSignatureInfo();
@@ -205,8 +206,7 @@ public class MOAConnector implements ISignatureConnector,
 		dataObjectInfo.setStructure("detached");
 		DataObject dataObject = new DataObject();
 		MetaInfoType metaInfoType = new MetaInfoType();
-
-
+		
 		if (parameter.getConfiguration().hasValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG))
 		{
 			if (IConfigurationConstants.TRUE.equalsIgnoreCase(parameter.getConfiguration().getValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG)))
@@ -244,6 +244,8 @@ public class MOAConnector implements ISignatureConnector,
 		CreateCMSSignatureResponseType response;
 		try {
 			response = creationPort.createCMSSignature(request);
+			
+			
 			
 		} catch (MOAFault e) {
 			logger.warn("MOA signing failed!", e);

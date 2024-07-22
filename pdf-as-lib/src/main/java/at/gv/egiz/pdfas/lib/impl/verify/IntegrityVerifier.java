@@ -1,15 +1,5 @@
 package at.gv.egiz.pdfas.lib.impl.verify;
 
-import iaik.asn1.ObjectID;
-import iaik.asn1.structures.AlgorithmID;
-import iaik.asn1.structures.Attribute;
-import iaik.cms.ContentInfo;
-import iaik.cms.SignedData;
-import iaik.cms.SignerInfo;
-import iaik.smime.ess.SigningCertificate;
-import iaik.smime.ess.SigningCertificateV2;
-import iaik.x509.X509Certificate;
-
 import java.io.ByteArrayInputStream;
 import java.security.SignatureException;
 import java.util.ArrayList;
@@ -24,6 +14,15 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
+import iaik.asn1.ObjectID;
+import iaik.asn1.structures.AlgorithmID;
+import iaik.asn1.structures.Attribute;
+import iaik.cms.ContentInfo;
+import iaik.cms.SignedData;
+import iaik.cms.SignerInfo;
+import iaik.smime.ess.SigningCertificate;
+import iaik.smime.ess.SigningCertificateV2;
+import iaik.x509.X509Certificate;
 
 public class IntegrityVerifier implements IVerifier {
 
@@ -36,8 +35,10 @@ public class IntegrityVerifier implements IVerifier {
 			List<VerifyResult> result = new ArrayList<VerifyResult>();
 
 			SignedData signedData = new SignedData(signatureContent,
-					new AlgorithmID[] { AlgorithmID.sha256, AlgorithmID.sha1,
-							AlgorithmID.ripeMd160, AlgorithmID.ripeMd160_ISO });
+					new AlgorithmID[] { 
+					    AlgorithmID.sha512, AlgorithmID.sha384, 
+					    AlgorithmID.sha256, 
+					    AlgorithmID.sha1, AlgorithmID.ripeMd160, AlgorithmID.ripeMd160_ISO });
 			ContentInfo ci = new ContentInfo(
 					new ByteArrayInputStream(signature));
 			if (!ci.getContentType().equals(ObjectID.cms_signedData)) {

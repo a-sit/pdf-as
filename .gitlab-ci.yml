@@ -90,7 +90,6 @@ release:
   script: |
     echo "Releasing version $VERSION of $LIB_NAME"
     echo "Publishing version $VERSION to public EGIZ maven"
-    cd ./moaSig
     ./gradlew release
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-release"

@@ -58,6 +58,7 @@ public class WebConfiguration implements IConfigurationConstants {
 	
 	public static final String MOA_SS_ENABLED = "moa.enabled";
 	public static final String SOAP_SIGN_ENABLED = "soap.sign.enabled";
+	public static final String SOAP_SIGN_WITH_VERIFY_ENABLED = "soap.sign.with.verify.enabled";
 	public static final String SOAP_VERIFY_ENABLED = "soap.verify.enabled";
 	public static final String RELOAD_PASSWORD = "reload.pwd";
 	public static final String RELOAD_ENABLED = "reload.enabled";
@@ -505,6 +506,15 @@ public class WebConfiguration implements IConfigurationConstants {
 		}
 		return false;
 	}
+	
+	 public static boolean isSoapSignWithVerifyEnabled() {
+	    String value = properties.getProperty(SOAP_SIGN_WITH_VERIFY_ENABLED);
+	    if (value != null) {
+	      return value.equals("true");
+	      
+	    }
+	    return getSoapSignEnabled();
+	  }
 	
 	public static boolean getSoapVerifyEnabled() {
 		String value = properties.getProperty(SOAP_VERIFY_ENABLED);

@@ -455,67 +455,80 @@ public class PDFASSigningImpl implements PDFASSigning {
   @SneakyThrows
   private void validatePdfSignature(SignedDocument el, PdfasSignRequest request,
       StatisticEvent statisticEvent) {
-
-    Map<String, String> preProcessor = null;
-    if (request.getCoreParams().getPreprocessor() != null) {
-      preProcessor = request.getCoreParams().getPreprocessor();
-
-    }
-
-    VerifyResult verifyResult = null;
-    if (request.getVerificationLevel() != null &&
-        request.getVerificationLevel().equals(
-            VerificationLevel.FULL_CERT_PATH)) {
-      final List<VerifyResult> verResults = PdfAsHelper
-          .synchronousVerify(
-              el.getOutputData(),
-              -1,
-              SignatureVerificationLevel.FULL_VERIFICATION,
-              preProcessor);
-
-      if (verResults.size() < 1) {
-        throw new WebServiceException(
-            "Document verification failed! " + verResults.size());
+    
+    if (WebConfiguration.isSoapSignWithVerifyEnabled()) {                 
+      Map<String, String> preProcessor = null;
+      if (request.getCoreParams().getPreprocessor() != null) {
+        preProcessor = request.getCoreParams().getPreprocessor();
+  
       }
-      verifyResult = verResults.get(verResults.size() - 1);
+  
+      VerifyResult verifyResult = null;
+      if (request.getVerificationLevel() != null &&
+          request.getVerificationLevel().equals(
+              VerificationLevel.FULL_CERT_PATH)) {
+        final List<VerifyResult> verResults = PdfAsHelper
+            .synchronousVerify(
+                el.getOutputData(),
+                -1,
+                SignatureVerificationLevel.FULL_VERIFICATION,
+                preProcessor);
+  
+        if (verResults.size() < 1) {
+          throw new WebServiceException(
+              "Document verification failed! " + verResults.size());
+        }
+        verifyResult = verResults.get(verResults.size() - 1);
+      } else {
+        final List<VerifyResult> verResults = PdfAsHelper
+            .synchronousVerify(
+                el.getOutputData(),
+                -1,
+                SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION,
+                preProcessor);
+  
+        if (verResults.size() < 1) {
+          throw new WebServiceException(
+              "Document verification failed! " + verResults.size());
+        }
+  
+        verifyResult = verResults.get(verResults.size() - 1);
+  
+      }
+  
+      if (verifyResult.getValueCheckCode().getCode() == 0) {
+        statisticEvent.setStatus(Status.OK);
+        statisticEvent.setEndNow();
+        statisticEvent.setTimestampNow();
+        statisticEvent.setFilesize(el.getOutputData().length);
+        StatisticFrontend.getInstance().storeEvent(statisticEvent);
+        statisticEvent.setLogged(true);
+        
+      } else {
+        statisticEvent.setStatus(Status.ERROR);
+        statisticEvent.setErrorCode(verifyResult.getValueCheckCode().getCode());
+        statisticEvent.setEndNow();
+        statisticEvent.setTimestampNow();
+        statisticEvent.setFilesize(el.getOutputData().length);
+        StatisticFrontend.getInstance().storeEvent(statisticEvent);
+        statisticEvent.setLogged(true);
+      }
+  
+      el.getVerificationResponse().setCertificateCode(
+          verifyResult.getCertificateCheck().getCode());
+      el.getVerificationResponse().setValueCode(
+          verifyResult.getValueCheckCode().getCode());
+
     } else {
-      final List<VerifyResult> verResults = PdfAsHelper
-          .synchronousVerify(
-              el.getOutputData(),
-              -1,
-              SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION,
-              preProcessor);
-
-      if (verResults.size() < 1) {
-        throw new WebServiceException(
-            "Document verification failed! " + verResults.size());
-      }
-
-      verifyResult = verResults.get(verResults.size() - 1);
-
-    }
-
-    if (verifyResult.getValueCheckCode().getCode() == 0) {
+      log.debug("Implicite signature-verification skipped by configuration");
       statisticEvent.setStatus(Status.OK);
       statisticEvent.setEndNow();
       statisticEvent.setTimestampNow();
       statisticEvent.setFilesize(el.getOutputData().length);
       StatisticFrontend.getInstance().storeEvent(statisticEvent);
       statisticEvent.setLogged(true);
-    } else {
-      statisticEvent.setStatus(Status.ERROR);
-      statisticEvent.setErrorCode(verifyResult.getValueCheckCode().getCode());
-      statisticEvent.setEndNow();
-      statisticEvent.setTimestampNow();
-      statisticEvent.setFilesize(el.getOutputData().length);
-      StatisticFrontend.getInstance().storeEvent(statisticEvent);
-      statisticEvent.setLogged(true);
+      
     }
-
-    el.getVerificationResponse().setCertificateCode(
-        verifyResult.getCertificateCheck().getCode());
-    el.getVerificationResponse().setValueCode(
-        verifyResult.getValueCheckCode().getCode());
-
+    
   }
 }

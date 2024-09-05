@@ -57,16 +57,16 @@ dependencies {
 	api project (':pdf-as-web-statistic-api')
 	api project (':pdf-as-pdfbox-2')
 	api group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
-	api group: 'commons-io', name: 'commons-io', version: '2.15.1'
+	api group: 'commons-io', name: 'commons-io', version: '2.16.1'
 	api group: 'opensymphony', name: 'sitemesh', version: '2.4.2'
 	api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     api group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'
 	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
-    api "commons-codec:commons-codec:1.16.1"
-	api 'org.apache.commons:commons-lang3:3.14.0'
+    api "commons-codec:commons-codec:1.17.1"
+	api 'org.apache.commons:commons-lang3:3.17.0'
 	api group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-	api 'org.apache.cxf:cxf-rt-transports-http:3.5.8'
-	api 'org.apache.cxf:cxf-rt-frontend-jaxws:3.5.8'
+	api 'org.apache.cxf:cxf-rt-transports-http:3.5.9'
+	api 'org.apache.cxf:cxf-rt-frontend-jaxws:3.5.9'
 	api 'com.thetransactioncompany:cors-filter:2.10'
 	api 'ch.qos.logback:logback-classic:1.2.13'
 	api 'ch.qos.logback:logback-core:1.2.13'

@@ -25,13 +25,13 @@ import at.gv.egiz.pdfas.web.ws.PDFASSigningImpl;
 import lombok.SneakyThrows;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class SimpleWebServiceTest {
+public class SimpleWebServiceWithoutVerificationTest {
 
   @BeforeClass
   public static void classInitializer() throws IOException {
     final String current = new java.io.File(".").getCanonicalPath();
     System.setProperty("pdf-as-web.conf", 
-        current + "/src/test/resources/config/pdfas/pdf-as-web.properties");
+        current + "/src/test/resources/config/pdfas/pdf-as-web-verify-disabled.properties");
     
     String webconfig = System.getProperty("pdf-as-web.conf");
     

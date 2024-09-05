@@ -36,7 +36,6 @@ import at.gv.egiz.pdfas.web.stats.StatisticEvent.Operation;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Source;
 import lombok.SneakyThrows;
 
-//@Ignore
 @RunWith(BlockJUnit4ClassRunner.class)
 public class SimpleVerifyServletTest {
 

@@ -47,7 +47,7 @@ assemble:
   except:
     - tags
   script: |
-    ./gradlew --warning-mode all clean wsdl2java build
+    ./gradlew --warning-mode all clean build
   artifacts:
     when: always
     reports:

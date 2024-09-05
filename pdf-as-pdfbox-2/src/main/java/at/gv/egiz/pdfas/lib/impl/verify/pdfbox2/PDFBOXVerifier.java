@@ -33,7 +33,7 @@ public class PDFBOXVerifier implements VerifyBackend {
 	@Override
 	public List<VerifyResult> verify(VerifyParameter parameter) throws PDFASError {
 		int signatureToVerify = parameter.getWhichSignature();
-		int currentSignature = 0;
+		
 		PDDocument doc = null;
 		try {
 			List<VerifyResult> result = new ArrayList<VerifyResult>();
@@ -62,97 +62,136 @@ public class PDFBOXVerifier implements VerifyBackend {
 				return result;
 			}
 
-			int lastSig = -1;
-			for (int i = 0; i < fields.size(); i++) {
-				COSDictionary field = (COSDictionary) fields.getObject(i);
-				String type = field.getNameAsString("FT");
-				if ("Sig".equals(type)) {
-					lastSig = i;
-				}
-			}
-
+			int lastSig = selectLastSigIndex(fields);
 			byte[] inputData = IOUtils.toByteArray(parameter.getDataSource().getInputStream());
 
+			int currentSignature = 0;
 			for (int i = 0; i < fields.size(); i++) {
 				COSDictionary field = (COSDictionary) fields.getObject(i);
 				String type = field.getNameAsString("FT");
-				if ("Sig".equals(type)) {
-					boolean verifyThis = true;
-
-					if (signatureToVerify >= 0) {
-						// verify only specific siganture!
-						verifyThis = signatureToVerify == currentSignature;
-					}
-
-					if (signatureToVerify == -2) {
-						verifyThis = i == lastSig;
-					}
-
-					if (verifyThis) {
-						logger.trace("Found Signature: ");
+				if ("Sig".equals(type)) {										
+					if (verifyCurrentSig(signatureToVerify, i, lastSig, currentSignature)) {
+						logger.trace("Found Signature Form: ");
 						COSBase base = field.getDictionaryObject("V");
-						COSDictionary dict = (COSDictionary) base;
-
-						logger.debug("Signer: " + dict.getNameAsString("Name"));
-						logger.debug("SubFilter: " + dict.getNameAsString("SubFilter"));
-						logger.debug("Filter: " + dict.getNameAsString("Filter"));
-						logger.debug("Modified: " + dict.getNameAsString("M"));
-						COSArray byteRange = (COSArray) dict.getDictionaryObject("ByteRange");
-
-						StringBuilder sb = new StringBuilder();
-						int[] bytes = new int[byteRange.size()];
-						for (int j = 0; j < byteRange.size(); j++) {
-							bytes[j] = byteRange.getInt(j);
-							sb.append(" " + bytes[j]);
+						if (base != null) {
+						  checkTechicalSig(base, inputData, verifier, parameter, result, i);
+						  
+						} else {
+						  logger.info("Skipping signature form, because it looks empty");
+						  
 						}
-
-						logger.debug("ByteRange" + sb.toString());
-
-						COSString content = (COSString) dict.getDictionaryObject("Contents");
-
-						ByteArrayOutputStream contentData = new ByteArrayOutputStream();
-						for (int j = 0; j < bytes.length; j = j + 2) {
-							int offset = bytes[j];
-							int length = bytes[j + 1];
-
-							contentData.write(inputData, offset, length);
-						}
-						contentData.close();
-
-						IVerifyFilter verifyFilter = verifier.getVerifier(dict.getNameAsString("Filter"),
-								dict.getNameAsString("SubFilter"));
-
-						IVerifier lvlVerifier = verifier.getVerifierByLevel(parameter.getSignatureVerificationLevel());
-						synchronized (lvlVerifier) {
-							lvlVerifier.setConfiguration(parameter.getConfiguration());
-							if (verifyFilter != null) {
-								List<VerifyResult> results = verifyFilter.verify(contentData.toByteArray(),
-										content.getBytes(), parameter.getVerificationTime(), bytes, lvlVerifier);
-								if (results != null && !results.isEmpty()) {
-									result.addAll(results);
-								}
-							}
-						}
+						
 					}
-					currentSignature++;
+					
+					currentSignature++;					
 				}
-			}
+			}			
 			return result;
+			
 		} catch (IOException e) {
 			logger.warn("Failed to verify document", e);
 			throw ErrorExtractor.searchPdfAsError(e, null);
+			
 		} catch (PdfAsException e) {
 			logger.warn("Failed to verify document", e);
 			throw ErrorExtractor.searchPdfAsError(e, null);
+			
 		} finally {
 			if (doc != null) {
 				try {
 					doc.close();
+					
 				} catch (IOException e) {
 					logger.info("Failed to close doc");
+					
 				}
 			}
 		}
 	}
 
+  private boolean verifyCurrentSig(int signatureToVerify, int i, int lastSig, int currentSignature) {
+    if (signatureToVerify >= 0) {
+      // verify only specific siganture!
+      return signatureToVerify == currentSignature;
+      
+    }
+
+    if (signatureToVerify == -2) {
+      return i == lastSig;
+      
+    }
+    
+    return true;
+  }
+
+  private int selectLastSigIndex(COSArray fields) {
+    int lastSig = -1;
+    for (int i = 0; i < fields.size(); i++) {
+      COSDictionary field = (COSDictionary) fields.getObject(i);
+      String type = field.getNameAsString("FT");
+      if ("Sig".equals(type)) {
+        lastSig = i;
+      }
+    }
+    
+    return lastSig;
+    
+  }
+
+  private void checkTechicalSig(COSBase base, byte[] inputData, VerifierDispatcher verifier, VerifyParameter parameter, 
+      List<VerifyResult> result, int i) throws IOException, PdfAsException {
+    try {
+      COSDictionary dict = (COSDictionary) base;
+
+      logger.debug("Signer: " + dict.getNameAsString("Name"));
+      logger.debug("SubFilter: " + dict.getNameAsString("SubFilter"));
+      logger.debug("Filter: " + dict.getNameAsString("Filter"));
+      logger.debug("Modified: " + dict.getNameAsString("M"));
+      COSArray byteRange = (COSArray) dict.getDictionaryObject("ByteRange");
+  
+      StringBuilder sb = new StringBuilder();
+      int[] bytes = new int[byteRange.size()];
+      for (int j = 0; j < byteRange.size(); j++) {
+        bytes[j] = byteRange.getInt(j);
+        sb.append(" " + bytes[j]);
+      }
+  
+      logger.debug("ByteRange" + sb.toString());
+  
+      COSString content = (COSString) dict.getDictionaryObject("Contents");
+  
+      ByteArrayOutputStream contentData = new ByteArrayOutputStream();
+      for (int j = 0; j < bytes.length; j = j + 2) {
+        int offset = bytes[j];
+        int length = bytes[j + 1];
+  
+        contentData.write(inputData, offset, length);
+      }
+      contentData.close();
+  
+      IVerifyFilter verifyFilter = verifier.getVerifier(dict.getNameAsString("Filter"),
+          dict.getNameAsString("SubFilter"));
+  
+      IVerifier lvlVerifier = verifier.getVerifierByLevel(parameter.getSignatureVerificationLevel());
+      synchronized (lvlVerifier) {
+        lvlVerifier.setConfiguration(parameter.getConfiguration());
+        if (verifyFilter != null) {
+          List<VerifyResult> results = verifyFilter.verify(contentData.toByteArray(),
+              content.getBytes(), parameter.getVerificationTime(), bytes, lvlVerifier);
+          if (results != null && !results.isEmpty()) {
+            result.addAll(results);
+          }
+        }
+      }
+      
+    } catch (NullPointerException e) {
+      logger.info("Verification of signature #{} failed with generic error", i);
+    }
+    
+  } 
+
 }
+
+
+    
+ 

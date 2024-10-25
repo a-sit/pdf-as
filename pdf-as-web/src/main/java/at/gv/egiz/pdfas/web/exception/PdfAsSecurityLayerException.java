@@ -33,5 +33,10 @@ public class PdfAsSecurityLayerException extends Exception {
 	public PdfAsSecurityLayerException(String info, int errorcode) {
 		super("SecurityLayer Error: [" + errorcode + "] " + info);
 	}
+
+  public PdfAsSecurityLayerException(String info, int errorcode, Exception e) {
+    super("SecurityLayer Error: [" + errorcode + "] " + info, e);
+    
+  }
 	
 }

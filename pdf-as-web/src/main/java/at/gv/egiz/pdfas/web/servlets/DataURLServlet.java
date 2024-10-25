@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBElement;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,41 +79,58 @@ public class DataURLServlet extends HttpServlet {
 	}
 
 	protected void process(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		try {
+			HttpServletResponse response) throws ServletException, IOException {		
+	  String xmlResponse = null;
+	  try {
 			if(!PdfAsHelper.checkDataUrlAccess(request)) {
 				throw new Exception("No valid dataURL access");
+				
 			}
 			
 			PdfAsHelper.setFromDataUrl(request);
-			String xmlResponse = request.getParameter("XMLResponse");
+			xmlResponse = request.getParameter("XMLResponse");
 			
-			//System.out.println(xmlResponse);
+			if (StringUtils.isEmpty(xmlResponse)) {
+			  logger.error("SL response is null or empty");
+			  throw new PdfAsSecurityLayerException("SL response is null or empty",  9999);
+			  
+			}
 			
 			JAXBElement<?> jaxbObject = (JAXBElement<?>) SLMarschaller.unmarshalFromString(xmlResponse);
 			if(jaxbObject.getValue() instanceof InfoboxReadResponseType) {
 				InfoboxReadResponseType infoboxReadResponseType = (InfoboxReadResponseType)jaxbObject.getValue();
 				logger.info("Got InfoboxReadResponseType");
 				PdfAsHelper.injectCertificate(request, response, PdfAsHelper.getCertificate(infoboxReadResponseType), getServletContext());
+				
 			} else if(jaxbObject.getValue() instanceof CreateCMSSignatureResponseType) {
 				CreateCMSSignatureResponseType createCMSSignatureResponseType = (CreateCMSSignatureResponseType)jaxbObject.getValue();
 				logger.info("Got CreateCMSSignatureResponseType");
 				PdfAsHelper.injectSignature(request, response, createCMSSignatureResponseType.getCMSSignature(), getServletContext());
+				
 			} else if(jaxbObject.getValue() instanceof ErrorResponseType) {
 				ErrorResponseType errorResponseType = (ErrorResponseType)jaxbObject.getValue();
 				logger.warn("SecurityLayer: " + errorResponseType.getErrorCode() + " " + errorResponseType.getInfo());
-				throw new PdfAsSecurityLayerException(errorResponseType.getInfo(), 
-						errorResponseType.getErrorCode());
+				throw new PdfAsSecurityLayerException(errorResponseType.getInfo(),  errorResponseType.getErrorCode());
+				
 			} else {
 				logger.error("Unknown SL response {}", xmlResponse);
-				throw new PdfAsSecurityLayerException("Unknown SL response", 
-						9999);
+				throw new PdfAsSecurityLayerException("Unknown SL response",  9999);
+				
 			}
-		} catch (Exception e) {
-			logger.warn("Error in DataURL Servlet. " , e);
-			PdfAsHelper.setSessionException(request, response, e.getMessage(),
-					e);
+			
+	  } catch (PdfAsSecurityLayerException e) {
+	    PdfAsHelper.setSessionException(request, response, e.getMessage(), e);
+      PdfAsHelper.gotoError(getServletContext(), request, response);
+			
+		} catch (Exception e) {		  		  
+		  logger.debug("Receive XML response from VDA: {}", 
+		      StringUtils.isNotEmpty(xmlResponse) ? xmlResponse : " ...empty response...");
+		  logger.warn("General Error in DataURL Servlet. " , e);			
+					  		  
+			PdfAsHelper.setSessionException(request, response, e.getMessage(), 
+			    new PdfAsSecurityLayerException("Invalid SL response",  9999, e));
 			PdfAsHelper.gotoError(getServletContext(), request, response);
+			
 		}
 	}
 

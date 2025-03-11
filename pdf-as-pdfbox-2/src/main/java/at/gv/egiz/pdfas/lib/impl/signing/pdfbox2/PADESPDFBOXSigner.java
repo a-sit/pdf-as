@@ -613,24 +613,24 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       return tablePos;
       
     } else {
-      TablePos signaturePos = null;
-      final String signaturePosString = signatureProfileConfiguration.getDefaultPositioning();
+      TablePos defaultSignaturePos = null;
+      final String defaultPosString = signatureProfileConfiguration.getDefaultPositioning();
 
-      if (signaturePosString != null) {
-        log.debug("using signature Positioning: " + signaturePosString);
-        signaturePos = new TablePos(signaturePosString);
+      
+      if (defaultPosString != null) {
+        log.debug("Default signature positioning is: {}", defaultPosString);
+        defaultSignaturePos = new TablePos(defaultPosString);
         
       }
 
-      log.debug("using Positioning: " + profilePosParam);
-
       if (profilePosParam != null) {
+        log.debug("Find positioning parameter: {} Merge it with default ...", profilePosParam);
         // Merge Signature Position
-        return new TablePos(profilePosParam, signaturePos);        
+        return new TablePos(profilePosParam, defaultSignaturePos);        
       
-      } else if (signaturePos != null){
+      } else if (defaultSignaturePos != null){
         // Fallback to signature Position!
-        return signaturePos;
+        return defaultSignaturePos;
         
       } else {
         return new TablePos();

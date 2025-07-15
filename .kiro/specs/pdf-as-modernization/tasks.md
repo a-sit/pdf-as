@@ -19,6 +19,7 @@
   - Update IDE configuration files for Java 17
   - Test compilation of all modules with Java 17
   - Run `./gradlew build test` to verify compilation and basic tests pass
+  - **Commit changes**: `git add . && git commit -m "feat: upgrade Java version compatibility from Java 8 to Java 17"`
   - _Requirements: 1.1, 1.2, 1.4_
 
 - [ ] 3. Update build tool plugins and configurations
@@ -29,6 +30,7 @@
   - Update deprecated Gradle API usage in build scripts
   - Test all Gradle tasks work correctly with updated plugins
   - Run `./gradlew build test` to verify plugins work correctly
+  - **Commit changes**: `git add . && git commit -m "feat: update build tool plugins and configurations"`
   - _Requirements: 4.2, 4.3, 4.4_
 
 - [ ] 4. Update core common dependencies
@@ -40,6 +42,7 @@
   - Update Lombok to latest stable version
   - Handle any API compatibility issues from Commons Collections upgrade
   - Run `./gradlew build test` to verify all modules compile and tests pass
+  - **Commit changes**: `git add . && git commit -m "feat: update core common dependencies (SLF4J, Commons Collections, Lombok)"`
   - _Requirements: 2.1, 2.6_
 
 - [ ] 5. Update PDF processing dependencies
@@ -49,6 +52,7 @@
   - Update any PDFBox API usage that changed between 2.x and 3.x
   - Test PDF signing and verification functionality with new PDFBox version
   - Run `./gradlew build test` to verify PDF processing modules work correctly
+  - **Commit changes**: `git add . && git commit -m "feat: update PDF processing dependencies (Apache PDFBox to 3.x)"`
   - _Requirements: 2.1, 2.3, 6.4_
 
 - [ ] 6. Update web application dependencies
@@ -59,6 +63,7 @@
   - Update servlet API dependencies from javax.servlet to jakarta.servlet
   - Update web.xml configurations for Jakarta EE namespaces
   - Run `./gradlew build` to verify web modules compile with updated dependencies
+  - **Commit changes**: `git add . && git commit -m "feat: update web application dependencies (CXF 4.x, Jakarta EE)"`
   - _Requirements: 2.1, 3.1, 3.2, 3.3_
 
 - [ ] 7. Migrate web modules to Jakarta EE
@@ -67,6 +72,7 @@
   - Update any other Java EE to Jakarta EE namespace migrations needed
   - Test web application deployment on updated Tomcat version
   - Run `./gradlew build war` to verify web application builds successfully
+  - **Commit changes**: `git add . && git commit -m "feat: migrate web modules to Jakarta EE namespace"`
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
 - [ ] 8. Handle pdf-as-legacy module with minimal changes
@@ -76,6 +82,7 @@
   - Avoid extensive code changes to maintain stability
   - Test integration points with other modules still work
   - Run `./gradlew :pdf-as-legacy:build` to verify legacy module builds correctly
+  - **Commit changes**: `git add . && git commit -m "feat: update pdf-as-legacy module with minimal changes for Java 17"`
   - _Requirements: 5.4, 1.2_
 
 - [ ] 9. Update signature standard modules
@@ -84,6 +91,7 @@
   - Test signature generation and verification with updated dependencies
   - Ensure compatibility with updated pdf-as-lib module
   - Run `./gradlew :signature-standards:sigs-pades:build :signature-standards:sigs-pkcs7detached:build test` to verify modules work correctly
+  - **Commit changes**: `git add . && git commit -m "feat: update signature standard modules dependencies"`
   - _Requirements: 2.1, 6.4_
 
 - [ ] 10. Update MOA integration module
@@ -92,6 +100,7 @@
   - Test MOA service integration functionality
   - Handle any XML processing API changes
   - Run `./gradlew :pdf-as-moa:build test` to verify MOA module works correctly
+  - **Commit changes**: `git add . && git commit -m "feat: update MOA integration module dependencies"`
   - _Requirements: 2.1, 6.3_
 
 - [ ] 11. Update CLI and client modules
@@ -101,6 +110,7 @@
   - Test web service client operations
   - Ensure backward compatibility of CLI commands
   - Run `./gradlew :pdf-as-cli:build :pdf-as-web-client:build test` to verify CLI and client modules work correctly
+  - **Commit changes**: `git add . && git commit -m "feat: update CLI and client modules dependencies"`
   - _Requirements: 2.1, 5.1, 6.3_
 
 - [ ] 12. Update web support modules
@@ -110,6 +120,7 @@
   - Test database integration functionality
   - Test status monitoring and statistics API
   - Run `./gradlew :pdf-as-web-db:build :pdf-as-web-status:build :pdf-as-web-statistic-api:build test` to verify web support modules work correctly
+  - **Commit changes**: `git add . && git commit -m "feat: update web support modules dependencies"`
   - _Requirements: 2.1, 3.4_
 
 - [ ] 13. Run comprehensive test suite
@@ -120,6 +131,7 @@
   - Verify all signature profiles and configurations work correctly
   - Run `./gradlew test` to execute full test suite across all modules
   - Run `./gradlew :pdf-as-tests:test` to execute integration tests
+  - **Commit changes**: `git add . && git commit -m "test: run comprehensive test suite and fix any issues"`
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
 - [ ] 14. Perform security vulnerability assessment
@@ -129,6 +141,7 @@
   - Document any remaining low-risk vulnerabilities with justification
   - Run `./gradlew dependencyCheckAnalyze` to perform security vulnerability scan
   - Run `./gradlew build test` to verify fixes don't break functionality
+  - **Commit changes**: `git add . && git commit -m "security: perform vulnerability assessment and address issues"`
   - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
 - [ ] 15. Update build and release processes
@@ -139,6 +152,7 @@
   - Ensure backward compatibility of generated artifacts
   - Run `./gradlew jar sourcesJar war distZip distTar releases` to verify all build outputs generate correctly
   - Run `./gradlew publishToMavenLocal` to test Maven publishing
+  - **Commit changes**: `git add . && git commit -m "feat: update build and release processes"`
   - _Requirements: 4.5, 5.2, 5.3_
 
 - [ ] 16. Create comprehensive documentation
@@ -148,6 +162,7 @@
   - Document any API changes or breaking changes
   - Update configuration migration guidance
   - Verify documentation accuracy by testing documented build procedures
+  - **Commit changes**: `git add . && git commit -m "docs: create comprehensive documentation and migration guide"`
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
 - [ ] 17. Perform final integration testing
@@ -158,4 +173,5 @@
   - Validate backward compatibility with existing configurations and integrations
   - Run `./gradlew clean build test` from fresh checkout to verify complete build process
   - Run `./gradlew doFullRelease` to test full release process
+  - **Commit changes**: `git add . && git commit -m "test: perform final integration testing and validation"`
   - _Requirements: 5.1, 5.2, 5.3, 6.1, 6.2, 6.3, 6.4, 6.5_

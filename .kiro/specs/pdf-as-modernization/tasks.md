@@ -1,5 +1,7 @@
 # Implementation Plan
 
+**Note**: After completing each task, commit all changes to the `feature/gradle-modernization` git branch with a descriptive commit message.
+
 - [x] 1. Update Gradle build system foundation
   - Research Gradle 6.8.3 to 8.14.3 migration guide and breaking changes
   - Update Gradle wrapper to version 8.14.3
@@ -7,6 +9,7 @@
   - Update gradle.properties if needed for new Gradle version
   - Test basic project compilation with new Gradle version
   - Run `./gradlew build` to verify all modules compile successfully
+  - **Commit changes**: `git add . && git commit -m "feat: modernize Gradle build system to version 8.14.3"`
   - _Requirements: 4.1, 4.2, 4.3_
 
 - [ ] 2. Upgrade Java version compatibility

@@ -2,7 +2,9 @@ apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
-mainClassName = "at.gv.egiz.pdfas.cli.Main"
+application {
+    mainClass = "at.gv.egiz.pdfas.cli.Main"
+}
 
 repositories {
 	mavenLocal()

@@ -1,13 +1,6 @@
-buildscript {
-	repositories {
-		gradlePluginPortal()
-		mavenCentral()
-	}
-	
-	dependencies {
-		 classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
-		 classpath "org.owasp:dependency-check-gradle:6.5.0.1"
-	}
+plugins {
+	id "com.github.ben-manes.versions" version "0.51.0" apply false
+	id "org.owasp.dependencycheck" version "10.0.4" apply false
 }
 
 allprojects {
@@ -15,7 +8,7 @@ allprojects {
 	repositories {  
 		mavenCentral()
 		maven {
-        	url "https://repo.spring.io/milestone/"
+        	url = "https://repo.spring.io/milestone/"
     	}  
     }
 	version = '4.4.3-SNAPSHOT'
@@ -25,7 +18,6 @@ subprojects {
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven-publish'
-	apply plugin: 'maven'
 	apply plugin: 'org.owasp.dependencycheck'
 	group = 'at.gv.egiz.pdfas'
 
@@ -38,25 +30,25 @@ subprojects {
     mavenLocal()
     
     maven {
-       	url "https://repo.spring.io/milestone/"
+       	url = "https://repo.spring.io/milestone/"
        	mavenContent {
            	releasesOnly()
        	}
     }      
     maven {
-       	url "https://apps.egiz.gv.at/maven/"     	
+       	url = "https://apps.egiz.gv.at/maven/"     	
        	mavenContent {
            	releasesOnly()
        	}
     }
     maven {
-       	url "https://apps.egiz.gv.at/maven-internal/"     	
+       	url = "https://apps.egiz.gv.at/maven-internal/"     	
        	mavenContent {
            	releasesOnly()
        	}
     }
     maven {
-       	url "https://apps.egiz.gv.at/maven-snapshot/"
+       	url = "https://apps.egiz.gv.at/maven-snapshot/"
        	mavenContent {
            	snapshotsOnly()
        	}
@@ -64,14 +56,14 @@ subprojects {
   }
 
 	dependencies { 
-		implementation "org.projectlombok:lombok:1.18.28"    
-		annotationProcessor "org.projectlombok:lombok:1.18.28"
-		testAnnotationProcessor "org.projectlombok:lombok:1.18.28"
+		implementation "org.projectlombok:lombok:1.18.38"    
+		annotationProcessor "org.projectlombok:lombok:1.18.38"
+		testAnnotationProcessor "org.projectlombok:lombok:1.18.38"
 		testImplementation 'junit:junit:4.13.2' 
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {
-	    classifier = 'sources'
+	    archiveClassifier = 'sources'
 	    from sourceSets.main.allSource
 	}
 
@@ -79,7 +71,10 @@ subprojects {
 	    archives sourcesJar
 	}
 
-	sourceCompatibility = 1.8
+	java {
+		sourceCompatibility = JavaVersion.VERSION_1_8
+		targetCompatibility = JavaVersion.VERSION_1_8
+	}
 	compileJava.options.encoding = "UTF-8"
 	compileTestJava.options.encoding = "UTF-8"
 	project.ext{
@@ -98,12 +93,12 @@ subprojects {
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }
 	
 	task copyDeps(type: Copy) {
-		from configurations.runtime
+		from configurations.runtimeClasspath
 		into (new File(rootDir, 'build/alldependencies')).toString()
 	}
 	
 	task copyDepsLocal(type: Copy) {
-		from configurations.runtime
+		from configurations.runtimeClasspath
 		into 'build/alldependencies'
 	}
 
@@ -122,24 +117,8 @@ subprojects {
     	}
 	}	
 	
-	dependencies {
-    	deployerJars "org.apache.maven.wagon:wagon-ssh:3.4.3"
-    	
-	}
-
-	uploadArchives {
-    	repositories.mavenDeployer {        	
-        	configuration = configurations.deployerJars        	        	
-        	repository(url: "sftp://apps.egiz.gv.at/maven") {
-            	authentication(userName: System.getenv("EGIZ_MAVEN_USER"), password: System.getenv("EGIZ_MAVEN_PASSWORD"))
-            	
-        	}
-        	snapshotRepository(url: "sftp://apps.egiz.gv.at/maven-snapshot") {
-            	authentication(userName: System.getenv("EGIZ_MAVEN_USER"), password: System.getenv("EGIZ_MAVEN_PASSWORD"))
-            	
-        	}
-    	}
-	}  
+	// Legacy uploadArchives replaced with modern Maven publishing
+	// Configure remote repositories in publishing block above  
 	
 	
 	task(internalRelease) {
@@ -195,8 +174,15 @@ task releases(type: Copy) {
 
 def getCheckedOutGitCommitHash() {
     def takeFromHash = 40
-    'git rev-parse --verify HEAD'.execute().text.trim().take takeFromHash
-
+    try {
+        def process = new ProcessBuilder('git', 'rev-parse', '--verify', 'HEAD')
+            .directory(project.rootDir)
+            .start()
+        process.waitFor()
+        return process.text.trim().take(takeFromHash)
+    } catch (Exception e) {
+        return "unknown"
+    }
 }
 /*
 task docs(type: Javadoc) {

@@ -11,18 +11,18 @@ buildscript {
     // enable this to use snapshot versions of Gretty:
     // maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
     maven {
-    	url "https://plugins.gradle.org/m2/"
+    	url = "https://plugins.gradle.org/m2/"
     }   
   }
 
   dependencies {
-    classpath 'org.gretty:gretty:3.0.7'
+    classpath 'org.gretty:gretty:4.1.4'
   }
 }
 
 
 
-configurations { providedCompile
+configurations { 
 				 pdfbox2
 			   }
 
@@ -37,14 +37,12 @@ repositories {
 	mavenLocal()
     mavenCentral()
 	maven {
-		url "https://repo.spring.io/milestone/"
+		url = "https://repo.spring.io/milestone/"
     }        
 }
 
 
-sourceSets.main.compileClasspath += configurations.providedCompile
-sourceSets.test.compileClasspath += configurations.providedCompile
-sourceSets.test.runtimeClasspath += configurations.providedCompile
+// providedCompile configuration removed - using compileOnly instead
 
 
 dependencies {
@@ -80,8 +78,8 @@ dependencies {
 
 gretty {
   // supported values:
-  // 'jetty7', 'jetty8', 'jetty9', 'jetty9.3', 'jetty9.4', 'tomcat85', 'tomcat9'
-  servletContainer = 'tomcat85'
+  // 'jetty9', 'jetty9.4', 'jetty10', 'jetty11', 'tomcat9', 'tomcat10'
+  servletContainer = 'tomcat10'
   
   jvmArgs = [ '-Dpdf-as-web.conf=' + System.getProperty("user.home") + '/.pdfas/pdf-as-web.properties' ]
 }
@@ -231,8 +229,8 @@ task buildTomcat(dependsOn: injectPdfAsWebApp, type: Zip) {
 	archive = archive.replaceAll("##PVERSION##", project.version);
 	
 	from targetDir
-	archiveName archive
-	destinationDir project.buildDir
+	archiveFileName = archive
+	destinationDirectory = project.buildDir
 }
 
 task buildTomcatTar(dependsOn: injectPdfAsWebApp, type: Tar) {
@@ -245,8 +243,8 @@ task buildTomcatTar(dependsOn: injectPdfAsWebApp, type: Tar) {
 	archive = archive.replaceAll("##PVERSION##", project.version);
 	
 	from targetDir
-	archiveName archive
-	destinationDir project.buildDir
+	archiveFileName = archive
+	destinationDirectory = project.buildDir
 }
 
 

@@ -33,7 +33,7 @@ sourceSets {
 configurations { 
 	ws 
 	
-	pdfDoclet { extendsFrom compile }
+	pdfDoclet { extendsFrom compileClasspath }
 }
 
 project.ext {
@@ -48,8 +48,8 @@ project.ext {
 task createConf(type: Zip, dependsOn: JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
 	from 'src/configuration'
 	//archiveBaseName 'config'
-	archiveName 'config.zip'
-	destinationDir new File(projectDir, 'src/main/resources/config')
+	archiveFileName = 'config.zip'
+	destinationDirectory = new File(projectDir, 'src/main/resources/config')
 }
 
 compileJava.dependsOn(createConf)
@@ -130,7 +130,7 @@ releases.dependsOn distTar
 releases.dependsOn releaseConfig
 
 task apidocs(type: Javadoc) {
-	classpath = configurations.compile
+	classpath = configurations.compileClasspath
 	source = sourceSets.main.allJava
 	destinationDir = new File(rootDir.toString() + "/releases/" + version + "/docs/api")
 	title = "PDF-AS " + project.pdfasversion + " Documentation"
@@ -147,7 +147,7 @@ task apidocs(type: Javadoc) {
 }
 
 task fulldocs(type: Javadoc) {
-	classpath = configurations.compile
+	classpath = configurations.compileClasspath
 	source = sourceSets.main.allJava
 	destinationDir = new File(rootDir.toString() + "/releases/" + version + "/docs/full")
 	title = "PDF-AS " + project.pdfasversion + " Documentation"

@@ -27,7 +27,7 @@ sourceSets {
 configurations { 
 	ws 
 	
-	pdfDoclet { extendsFrom compile }
+	pdfDoclet { extendsFrom compileClasspath }
 }
 
 project.ext {

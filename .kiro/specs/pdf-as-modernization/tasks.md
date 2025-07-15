@@ -12,7 +12,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: modernize Gradle build system to version 8.14.3"`
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 2. Upgrade Java version compatibility
+- [x] 2. Upgrade Java version compatibility
   - Research Java 8 to Java 17 migration guide and breaking changes
   - Update sourceCompatibility and targetCompatibility to Java 17 in all build.gradle files
   - Update any Java 8 specific code patterns that are incompatible with Java 17

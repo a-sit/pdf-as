@@ -84,7 +84,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update pdf-as-legacy module with minimal changes"`
   - _Requirements: 5.4, 1.2_
 
-- [-] 9. Update signature standard modules
+- [x] 9. Update signature standard modules
   - Update dependencies in signature-standards:sigs-pades module
   - Update dependencies in signature-standards:sigs-pkcs7detached module
   - Test signature generation and verification with updated dependencies
@@ -93,7 +93,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update signature standard modules dependencies"`
   - _Requirements: 2.1, 6.4_
 
-- [ ] 10. Update MOA integration module
+- [-] 10. Update MOA integration module
   - Update dependencies in pdf-as-moa module
   - Update WSDL and XML schema processing for new dependency versions
   - Test MOA service integration functionality

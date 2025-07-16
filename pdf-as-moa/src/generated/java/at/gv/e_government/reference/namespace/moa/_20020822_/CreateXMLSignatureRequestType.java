@@ -3,68 +3,68 @@ package at.gv.e_government.reference.namespace.moa._20020822_;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für CreateXMLSignatureRequestType complex type.
+ * <p>Java class for CreateXMLSignatureRequestType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="CreateXMLSignatureRequestType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="KeyIdentifier" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}KeyIdentifierType"/&gt;
- *         &lt;element name="SingleSignatureInfo" maxOccurs="unbounded"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;sequence&gt;
- *                   &lt;element name="DataObjectInfo" maxOccurs="unbounded"&gt;
- *                     &lt;complexType&gt;
- *                       &lt;complexContent&gt;
- *                         &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}DataObjectInfoType"&gt;
- *                           &lt;attribute name="ChildOfManifest" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
- *                         &lt;/extension&gt;
- *                       &lt;/complexContent&gt;
- *                     &lt;/complexType&gt;
- *                   &lt;/element&gt;
- *                   &lt;element name="CreateSignatureInfo" minOccurs="0"&gt;
- *                     &lt;complexType&gt;
- *                       &lt;complexContent&gt;
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                           &lt;sequence&gt;
- *                             &lt;element name="CreateSignatureEnvironment" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType"/&gt;
- *                             &lt;choice&gt;
- *                               &lt;element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}CreateSignatureEnvironmentProfile"/&gt;
- *                               &lt;element name="CreateSignatureEnvironmentProfileID" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ProfileIdentifierType"/&gt;
- *                             &lt;/choice&gt;
- *                           &lt;/sequence&gt;
- *                         &lt;/restriction&gt;
- *                       &lt;/complexContent&gt;
- *                     &lt;/complexType&gt;
- *                   &lt;/element&gt;
- *                 &lt;/sequence&gt;
- *                 &lt;attribute name="SecurityLayerConformity" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="CreateXMLSignatureRequestType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="KeyIdentifier" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}KeyIdentifierType"/>
+ *         <element name="SingleSignatureInfo" maxOccurs="unbounded">
+ *           <complexType>
+ *             <complexContent>
+ *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 <sequence>
+ *                   <element name="DataObjectInfo" maxOccurs="unbounded">
+ *                     <complexType>
+ *                       <complexContent>
+ *                         <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}DataObjectInfoType">
+ *                           <attribute name="ChildOfManifest" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
+ *                         </extension>
+ *                       </complexContent>
+ *                     </complexType>
+ *                   </element>
+ *                   <element name="CreateSignatureInfo" minOccurs="0">
+ *                     <complexType>
+ *                       <complexContent>
+ *                         <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           <sequence>
+ *                             <element name="CreateSignatureEnvironment" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType"/>
+ *                             <choice>
+ *                               <element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}CreateSignatureEnvironmentProfile"/>
+ *                               <element name="CreateSignatureEnvironmentProfileID" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ProfileIdentifierType"/>
+ *                             </choice>
+ *                           </sequence>
+ *                         </restriction>
+ *                       </complexContent>
+ *                     </complexType>
+ *                   </element>
+ *                 </sequence>
+ *                 <attribute name="SecurityLayerConformity" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
+ *               </restriction>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -80,11 +80,16 @@ public class CreateXMLSignatureRequestType {
 
     @XmlElement(name = "KeyIdentifier", required = true)
     protected String keyIdentifier;
+    /**
+     * ErmÃ¶glichung der Stapelsignatur durch
+     * 						wiederholte Angabe dieses Elements
+     * 
+     */
     @XmlElement(name = "SingleSignatureInfo", required = true)
     protected List<CreateXMLSignatureRequestType.SingleSignatureInfo> singleSignatureInfo;
 
     /**
-     * Ruft den Wert der keyIdentifier-Eigenschaft ab.
+     * Gets the value of the keyIdentifier property.
      * 
      * @return
      *     possible object is
@@ -96,7 +101,7 @@ public class CreateXMLSignatureRequestType {
     }
 
     /**
-     * Legt den Wert der keyIdentifier-Eigenschaft fest.
+     * Sets the value of the keyIdentifier property.
      * 
      * @param value
      *     allowed object is
@@ -108,75 +113,81 @@ public class CreateXMLSignatureRequestType {
     }
 
     /**
+     * ErmÃ¶glichung der Stapelsignatur durch
+     * 						wiederholte Angabe dieses Elements
+     * 
      * Gets the value of the singleSignatureInfo property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the singleSignatureInfo property.
+     * This is why there is not a <CODE>set</CODE> method for the singleSignatureInfo property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getSingleSignatureInfo().add(newItem);
+     * getSingleSignatureInfo().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link CreateXMLSignatureRequestType.SingleSignatureInfo }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the singleSignatureInfo property.
      */
     public List<CreateXMLSignatureRequestType.SingleSignatureInfo> getSingleSignatureInfo() {
         if (singleSignatureInfo == null) {
-            singleSignatureInfo = new ArrayList<CreateXMLSignatureRequestType.SingleSignatureInfo>();
+            singleSignatureInfo = new ArrayList<>();
         }
         return this.singleSignatureInfo;
     }
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type</p>.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.</p>
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;sequence&gt;
-     *         &lt;element name="DataObjectInfo" maxOccurs="unbounded"&gt;
-     *           &lt;complexType&gt;
-     *             &lt;complexContent&gt;
-     *               &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}DataObjectInfoType"&gt;
-     *                 &lt;attribute name="ChildOfManifest" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
-     *               &lt;/extension&gt;
-     *             &lt;/complexContent&gt;
-     *           &lt;/complexType&gt;
-     *         &lt;/element&gt;
-     *         &lt;element name="CreateSignatureInfo" minOccurs="0"&gt;
-     *           &lt;complexType&gt;
-     *             &lt;complexContent&gt;
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *                 &lt;sequence&gt;
-     *                   &lt;element name="CreateSignatureEnvironment" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType"/&gt;
-     *                   &lt;choice&gt;
-     *                     &lt;element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}CreateSignatureEnvironmentProfile"/&gt;
-     *                     &lt;element name="CreateSignatureEnvironmentProfileID" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ProfileIdentifierType"/&gt;
-     *                   &lt;/choice&gt;
-     *                 &lt;/sequence&gt;
-     *               &lt;/restriction&gt;
-     *             &lt;/complexContent&gt;
-     *           &lt;/complexType&gt;
-     *         &lt;/element&gt;
-     *       &lt;/sequence&gt;
-     *       &lt;attribute name="SecurityLayerConformity" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       <sequence>
+     *         <element name="DataObjectInfo" maxOccurs="unbounded">
+     *           <complexType>
+     *             <complexContent>
+     *               <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}DataObjectInfoType">
+     *                 <attribute name="ChildOfManifest" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
+     *               </extension>
+     *             </complexContent>
+     *           </complexType>
+     *         </element>
+     *         <element name="CreateSignatureInfo" minOccurs="0">
+     *           <complexType>
+     *             <complexContent>
+     *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 <sequence>
+     *                   <element name="CreateSignatureEnvironment" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType"/>
+     *                   <choice>
+     *                     <element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}CreateSignatureEnvironmentProfile"/>
+     *                     <element name="CreateSignatureEnvironmentProfileID" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ProfileIdentifierType"/>
+     *                   </choice>
+     *                 </sequence>
+     *               </restriction>
+     *             </complexContent>
+     *           </complexType>
+     *         </element>
+     *       </sequence>
+     *       <attribute name="SecurityLayerConformity" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
+     *     </restriction>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */
@@ -197,34 +208,37 @@ public class CreateXMLSignatureRequestType {
         /**
          * Gets the value of the dataObjectInfo property.
          * 
-         * <p>
-         * This accessor method returns a reference to the live list,
+         * <p>This accessor method returns a reference to the live list,
          * not a snapshot. Therefore any modification you make to the
          * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the dataObjectInfo property.
+         * This is why there is not a <CODE>set</CODE> method for the dataObjectInfo property.</p>
          * 
          * <p>
          * For example, to add a new item, do as follows:
+         * </p>
          * <pre>
-         *    getDataObjectInfo().add(newItem);
+         * getDataObjectInfo().add(newItem);
          * </pre>
          * 
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
          * {@link CreateXMLSignatureRequestType.SingleSignatureInfo.DataObjectInfo }
+         * </p>
          * 
          * 
+         * @return
+         *     The value of the dataObjectInfo property.
          */
         public List<CreateXMLSignatureRequestType.SingleSignatureInfo.DataObjectInfo> getDataObjectInfo() {
             if (dataObjectInfo == null) {
-                dataObjectInfo = new ArrayList<CreateXMLSignatureRequestType.SingleSignatureInfo.DataObjectInfo>();
+                dataObjectInfo = new ArrayList<>();
             }
             return this.dataObjectInfo;
         }
 
         /**
-         * Ruft den Wert der createSignatureInfo-Eigenschaft ab.
+         * Gets the value of the createSignatureInfo property.
          * 
          * @return
          *     possible object is
@@ -236,7 +250,7 @@ public class CreateXMLSignatureRequestType {
         }
 
         /**
-         * Legt den Wert der createSignatureInfo-Eigenschaft fest.
+         * Sets the value of the createSignatureInfo property.
          * 
          * @param value
          *     allowed object is
@@ -248,7 +262,7 @@ public class CreateXMLSignatureRequestType {
         }
 
         /**
-         * Ruft den Wert der securityLayerConformity-Eigenschaft ab.
+         * Gets the value of the securityLayerConformity property.
          * 
          * @return
          *     possible object is
@@ -264,7 +278,7 @@ public class CreateXMLSignatureRequestType {
         }
 
         /**
-         * Legt den Wert der securityLayerConformity-Eigenschaft fest.
+         * Sets the value of the securityLayerConformity property.
          * 
          * @param value
          *     allowed object is
@@ -277,25 +291,25 @@ public class CreateXMLSignatureRequestType {
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type</p>.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.</p>
          * 
-         * <pre>
-         * &lt;complexType&gt;
-         *   &lt;complexContent&gt;
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-         *       &lt;sequence&gt;
-         *         &lt;element name="CreateSignatureEnvironment" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType"/&gt;
-         *         &lt;choice&gt;
-         *           &lt;element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}CreateSignatureEnvironmentProfile"/&gt;
-         *           &lt;element name="CreateSignatureEnvironmentProfileID" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ProfileIdentifierType"/&gt;
-         *         &lt;/choice&gt;
-         *       &lt;/sequence&gt;
-         *     &lt;/restriction&gt;
-         *   &lt;/complexContent&gt;
-         * &lt;/complexType&gt;
-         * </pre>
+         * <pre>{@code
+         * <complexType>
+         *   <complexContent>
+         *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       <sequence>
+         *         <element name="CreateSignatureEnvironment" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType"/>
+         *         <choice>
+         *           <element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}CreateSignatureEnvironmentProfile"/>
+         *           <element name="CreateSignatureEnvironmentProfileID" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ProfileIdentifierType"/>
+         *         </choice>
+         *       </sequence>
+         *     </restriction>
+         *   </complexContent>
+         * </complexType>
+         * }</pre>
          * 
          * 
          */
@@ -317,7 +331,7 @@ public class CreateXMLSignatureRequestType {
             protected String createSignatureEnvironmentProfileID;
 
             /**
-             * Ruft den Wert der createSignatureEnvironment-Eigenschaft ab.
+             * Gets the value of the createSignatureEnvironment property.
              * 
              * @return
              *     possible object is
@@ -329,7 +343,7 @@ public class CreateXMLSignatureRequestType {
             }
 
             /**
-             * Legt den Wert der createSignatureEnvironment-Eigenschaft fest.
+             * Sets the value of the createSignatureEnvironment property.
              * 
              * @param value
              *     allowed object is
@@ -341,7 +355,7 @@ public class CreateXMLSignatureRequestType {
             }
 
             /**
-             * Ruft den Wert der createSignatureEnvironmentProfile-Eigenschaft ab.
+             * Gets the value of the createSignatureEnvironmentProfile property.
              * 
              * @return
              *     possible object is
@@ -353,7 +367,7 @@ public class CreateXMLSignatureRequestType {
             }
 
             /**
-             * Legt den Wert der createSignatureEnvironmentProfile-Eigenschaft fest.
+             * Sets the value of the createSignatureEnvironmentProfile property.
              * 
              * @param value
              *     allowed object is
@@ -365,7 +379,7 @@ public class CreateXMLSignatureRequestType {
             }
 
             /**
-             * Ruft den Wert der createSignatureEnvironmentProfileID-Eigenschaft ab.
+             * Gets the value of the createSignatureEnvironmentProfileID property.
              * 
              * @return
              *     possible object is
@@ -377,7 +391,7 @@ public class CreateXMLSignatureRequestType {
             }
 
             /**
-             * Legt den Wert der createSignatureEnvironmentProfileID-Eigenschaft fest.
+             * Sets the value of the createSignatureEnvironmentProfileID property.
              * 
              * @param value
              *     allowed object is
@@ -392,19 +406,19 @@ public class CreateXMLSignatureRequestType {
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type</p>.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.</p>
          * 
-         * <pre>
-         * &lt;complexType&gt;
-         *   &lt;complexContent&gt;
-         *     &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}DataObjectInfoType"&gt;
-         *       &lt;attribute name="ChildOfManifest" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
-         *     &lt;/extension&gt;
-         *   &lt;/complexContent&gt;
-         * &lt;/complexType&gt;
-         * </pre>
+         * <pre>{@code
+         * <complexType>
+         *   <complexContent>
+         *     <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}DataObjectInfoType">
+         *       <attribute name="ChildOfManifest" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
+         *     </extension>
+         *   </complexContent>
+         * </complexType>
+         * }</pre>
          * 
          * 
          */
@@ -418,7 +432,7 @@ public class CreateXMLSignatureRequestType {
             protected Boolean childOfManifest;
 
             /**
-             * Ruft den Wert der childOfManifest-Eigenschaft ab.
+             * Gets the value of the childOfManifest property.
              * 
              * @return
              *     possible object is
@@ -434,7 +448,7 @@ public class CreateXMLSignatureRequestType {
             }
 
             /**
-             * Legt den Wert der childOfManifest-Eigenschaft fest.
+             * Sets the value of the childOfManifest property.
              * 
              * @param value
              *     allowed object is

@@ -3,38 +3,38 @@ package at.gv.e_government.reference.namespace.moa._20020822_;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 
 
 /**
- * <p>Java-Klasse für VerifyXMLSignatureResponseType complex type.
+ * <p>Java class for VerifyXMLSignatureResponseType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="VerifyXMLSignatureResponseType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="SignerInfo" type="{http://www.w3.org/2000/09/xmldsig#}KeyInfoType"/&gt;
- *         &lt;element name="HashInputData" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}InputDataType" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element name="ReferenceInputData" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}InputDataType" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element name="SignatureAlgorithm" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="SignatureCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ReferencesCheckResultType"/&gt;
- *         &lt;element name="SignatureManifestCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ReferencesCheckResultType" minOccurs="0"/&gt;
- *         &lt;element name="XMLDSIGManifestCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ManifestRefsCheckResultType" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element name="CertificateCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}CheckResultType"/&gt;
- *         &lt;element name="FormCheckResult" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}FormResultType" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element name="ExtendedCertificateCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ExtendedCertificateCheckResultType" minOccurs="0"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="VerifyXMLSignatureResponseType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="SignerInfo" type="{http://www.w3.org/2000/09/xmldsig#}KeyInfoType"/>
+ *         <element name="HashInputData" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}InputDataType" maxOccurs="unbounded" minOccurs="0"/>
+ *         <element name="ReferenceInputData" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}InputDataType" maxOccurs="unbounded" minOccurs="0"/>
+ *         <element name="SignatureAlgorithm" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         <element name="SignatureCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ReferencesCheckResultType"/>
+ *         <element name="SignatureManifestCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ReferencesCheckResultType" minOccurs="0"/>
+ *         <element name="XMLDSIGManifestCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ManifestRefsCheckResultType" maxOccurs="unbounded" minOccurs="0"/>
+ *         <element name="CertificateCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}CheckResultType"/>
+ *         <element name="FormCheckResult" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}FormResultType" maxOccurs="unbounded" minOccurs="0"/>
+ *         <element name="ExtendedCertificateCheck" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ExtendedCertificateCheckResultType" minOccurs="0"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -53,6 +53,14 @@ import org.w3._2000._09.xmldsig_.KeyInfoType;
 })
 public class VerifyXMLSignatureResponseType {
 
+    /**
+     * only ds:X509Data and ds:RetrievalMethod is
+     * 						supported; QualifiedCertificate is included as X509Data/any;
+     * 						PublicAuthority is included as X509Data/any;
+     * 						SecureSignatureCreationDevice is included as X509Data/any,
+     * 						IssuingCountry is included as X509Data/any
+     * 
+     */
     @XmlElement(name = "SignerInfo", required = true)
     protected KeyInfoType signerInfo;
     @XmlElement(name = "HashInputData")
@@ -75,7 +83,11 @@ public class VerifyXMLSignatureResponseType {
     protected ExtendedCertificateCheckResultType extendedCertificateCheck;
 
     /**
-     * Ruft den Wert der signerInfo-Eigenschaft ab.
+     * only ds:X509Data and ds:RetrievalMethod is
+     * 						supported; QualifiedCertificate is included as X509Data/any;
+     * 						PublicAuthority is included as X509Data/any;
+     * 						SecureSignatureCreationDevice is included as X509Data/any,
+     * 						IssuingCountry is included as X509Data/any
      * 
      * @return
      *     possible object is
@@ -87,12 +99,13 @@ public class VerifyXMLSignatureResponseType {
     }
 
     /**
-     * Legt den Wert der signerInfo-Eigenschaft fest.
+     * Sets the value of the signerInfo property.
      * 
      * @param value
      *     allowed object is
      *     {@link KeyInfoType }
      *     
+     * @see #getSignerInfo()
      */
     public void setSignerInfo(KeyInfoType value) {
         this.signerInfo = value;
@@ -101,28 +114,31 @@ public class VerifyXMLSignatureResponseType {
     /**
      * Gets the value of the hashInputData property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the hashInputData property.
+     * This is why there is not a <CODE>set</CODE> method for the hashInputData property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getHashInputData().add(newItem);
+     * getHashInputData().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link InputDataType }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the hashInputData property.
      */
     public List<InputDataType> getHashInputData() {
         if (hashInputData == null) {
-            hashInputData = new ArrayList<InputDataType>();
+            hashInputData = new ArrayList<>();
         }
         return this.hashInputData;
     }
@@ -130,34 +146,37 @@ public class VerifyXMLSignatureResponseType {
     /**
      * Gets the value of the referenceInputData property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the referenceInputData property.
+     * This is why there is not a <CODE>set</CODE> method for the referenceInputData property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getReferenceInputData().add(newItem);
+     * getReferenceInputData().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link InputDataType }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the referenceInputData property.
      */
     public List<InputDataType> getReferenceInputData() {
         if (referenceInputData == null) {
-            referenceInputData = new ArrayList<InputDataType>();
+            referenceInputData = new ArrayList<>();
         }
         return this.referenceInputData;
     }
 
     /**
-     * Ruft den Wert der signatureAlgorithm-Eigenschaft ab.
+     * Gets the value of the signatureAlgorithm property.
      * 
      * @return
      *     possible object is
@@ -169,7 +188,7 @@ public class VerifyXMLSignatureResponseType {
     }
 
     /**
-     * Legt den Wert der signatureAlgorithm-Eigenschaft fest.
+     * Sets the value of the signatureAlgorithm property.
      * 
      * @param value
      *     allowed object is
@@ -181,7 +200,7 @@ public class VerifyXMLSignatureResponseType {
     }
 
     /**
-     * Ruft den Wert der signatureCheck-Eigenschaft ab.
+     * Gets the value of the signatureCheck property.
      * 
      * @return
      *     possible object is
@@ -193,7 +212,7 @@ public class VerifyXMLSignatureResponseType {
     }
 
     /**
-     * Legt den Wert der signatureCheck-Eigenschaft fest.
+     * Sets the value of the signatureCheck property.
      * 
      * @param value
      *     allowed object is
@@ -205,7 +224,7 @@ public class VerifyXMLSignatureResponseType {
     }
 
     /**
-     * Ruft den Wert der signatureManifestCheck-Eigenschaft ab.
+     * Gets the value of the signatureManifestCheck property.
      * 
      * @return
      *     possible object is
@@ -217,7 +236,7 @@ public class VerifyXMLSignatureResponseType {
     }
 
     /**
-     * Legt den Wert der signatureManifestCheck-Eigenschaft fest.
+     * Sets the value of the signatureManifestCheck property.
      * 
      * @param value
      *     allowed object is
@@ -231,34 +250,37 @@ public class VerifyXMLSignatureResponseType {
     /**
      * Gets the value of the xmldsigManifestCheck property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the xmldsigManifestCheck property.
+     * This is why there is not a <CODE>set</CODE> method for the xmldsigManifestCheck property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getXMLDSIGManifestCheck().add(newItem);
+     * getXMLDSIGManifestCheck().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ManifestRefsCheckResultType }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the xmldsigManifestCheck property.
      */
     public List<ManifestRefsCheckResultType> getXMLDSIGManifestCheck() {
         if (xmldsigManifestCheck == null) {
-            xmldsigManifestCheck = new ArrayList<ManifestRefsCheckResultType>();
+            xmldsigManifestCheck = new ArrayList<>();
         }
         return this.xmldsigManifestCheck;
     }
 
     /**
-     * Ruft den Wert der certificateCheck-Eigenschaft ab.
+     * Gets the value of the certificateCheck property.
      * 
      * @return
      *     possible object is
@@ -270,7 +292,7 @@ public class VerifyXMLSignatureResponseType {
     }
 
     /**
-     * Legt den Wert der certificateCheck-Eigenschaft fest.
+     * Sets the value of the certificateCheck property.
      * 
      * @param value
      *     allowed object is
@@ -284,34 +306,37 @@ public class VerifyXMLSignatureResponseType {
     /**
      * Gets the value of the formCheckResult property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the formCheckResult property.
+     * This is why there is not a <CODE>set</CODE> method for the formCheckResult property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getFormCheckResult().add(newItem);
+     * getFormCheckResult().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link FormResultType }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the formCheckResult property.
      */
     public List<FormResultType> getFormCheckResult() {
         if (formCheckResult == null) {
-            formCheckResult = new ArrayList<FormResultType>();
+            formCheckResult = new ArrayList<>();
         }
         return this.formCheckResult;
     }
 
     /**
-     * Ruft den Wert der extendedCertificateCheck-Eigenschaft ab.
+     * Gets the value of the extendedCertificateCheck property.
      * 
      * @return
      *     possible object is
@@ -323,7 +348,7 @@ public class VerifyXMLSignatureResponseType {
     }
 
     /**
-     * Legt den Wert der extendedCertificateCheck-Eigenschaft fest.
+     * Sets the value of the extendedCertificateCheck property.
      * 
      * @param value
      *     allowed object is

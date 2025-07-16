@@ -1,52 +1,52 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für DataObjectInfoType complex type.
+ * <p>Java class for DataObjectInfoType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="DataObjectInfoType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="DataObject"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType"&gt;
- *               &lt;/extension&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;choice&gt;
- *           &lt;element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}CreateTransformsInfoProfile"/&gt;
- *           &lt;element name="CreateTransformsInfoProfileID" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ProfileIdentifierType"/&gt;
- *         &lt;/choice&gt;
- *       &lt;/sequence&gt;
- *       &lt;attribute name="Structure" use="required"&gt;
- *         &lt;simpleType&gt;
- *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *             &lt;enumeration value="detached"/&gt;
- *             &lt;enumeration value="enveloping"/&gt;
- *           &lt;/restriction&gt;
- *         &lt;/simpleType&gt;
- *       &lt;/attribute&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="DataObjectInfoType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="DataObject">
+ *           <complexType>
+ *             <complexContent>
+ *               <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType">
+ *               </extension>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *         <choice>
+ *           <element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}CreateTransformsInfoProfile"/>
+ *           <element name="CreateTransformsInfoProfileID" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}ProfileIdentifierType"/>
+ *         </choice>
+ *       </sequence>
+ *       <attribute name="Structure" use="required">
+ *         <simpleType>
+ *           <restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *             <enumeration value="detached"/>
+ *             <enumeration value="enveloping"/>
+ *           </restriction>
+ *         </simpleType>
+ *       </attribute>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -73,7 +73,7 @@ public class DataObjectInfoType {
     protected String structure;
 
     /**
-     * Ruft den Wert der dataObject-Eigenschaft ab.
+     * Gets the value of the dataObject property.
      * 
      * @return
      *     possible object is
@@ -85,7 +85,7 @@ public class DataObjectInfoType {
     }
 
     /**
-     * Legt den Wert der dataObject-Eigenschaft fest.
+     * Sets the value of the dataObject property.
      * 
      * @param value
      *     allowed object is
@@ -97,7 +97,7 @@ public class DataObjectInfoType {
     }
 
     /**
-     * Ruft den Wert der createTransformsInfoProfile-Eigenschaft ab.
+     * Gets the value of the createTransformsInfoProfile property.
      * 
      * @return
      *     possible object is
@@ -109,7 +109,7 @@ public class DataObjectInfoType {
     }
 
     /**
-     * Legt den Wert der createTransformsInfoProfile-Eigenschaft fest.
+     * Sets the value of the createTransformsInfoProfile property.
      * 
      * @param value
      *     allowed object is
@@ -121,7 +121,7 @@ public class DataObjectInfoType {
     }
 
     /**
-     * Ruft den Wert der createTransformsInfoProfileID-Eigenschaft ab.
+     * Gets the value of the createTransformsInfoProfileID property.
      * 
      * @return
      *     possible object is
@@ -133,7 +133,7 @@ public class DataObjectInfoType {
     }
 
     /**
-     * Legt den Wert der createTransformsInfoProfileID-Eigenschaft fest.
+     * Sets the value of the createTransformsInfoProfileID property.
      * 
      * @param value
      *     allowed object is
@@ -145,7 +145,7 @@ public class DataObjectInfoType {
     }
 
     /**
-     * Ruft den Wert der structure-Eigenschaft ab.
+     * Gets the value of the structure property.
      * 
      * @return
      *     possible object is
@@ -157,7 +157,7 @@ public class DataObjectInfoType {
     }
 
     /**
-     * Legt den Wert der structure-Eigenschaft fest.
+     * Sets the value of the structure property.
      * 
      * @param value
      *     allowed object is
@@ -170,18 +170,18 @@ public class DataObjectInfoType {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type</p>.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.</p>
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType"&gt;
-     *     &lt;/extension&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentOptionalRefType">
+     *     </extension>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */

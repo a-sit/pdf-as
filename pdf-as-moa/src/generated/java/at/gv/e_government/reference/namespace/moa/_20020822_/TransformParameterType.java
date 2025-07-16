@@ -1,44 +1,44 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 import org.w3._2000._09.xmldsig_.DigestMethodType;
 
 
 /**
- * <p>Java-Klasse für TransformParameterType complex type.
+ * <p>Java class for TransformParameterType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="TransformParameterType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;choice minOccurs="0"&gt;
- *         &lt;element name="Base64Content" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
- *         &lt;element name="Hash"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;sequence&gt;
- *                   &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}DigestMethod"/&gt;
- *                   &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}DigestValue"/&gt;
- *                 &lt;/sequence&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/choice&gt;
- *       &lt;attribute name="URI" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="TransformParameterType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <choice minOccurs="0">
+ *         <element name="Base64Content" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+ *         <element name="Hash">
+ *           <complexType>
+ *             <complexContent>
+ *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 <sequence>
+ *                   <element ref="{http://www.w3.org/2000/09/xmldsig#}DigestMethod"/>
+ *                   <element ref="{http://www.w3.org/2000/09/xmldsig#}DigestValue"/>
+ *                 </sequence>
+ *               </restriction>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *       </choice>
+ *       <attribute name="URI" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -49,8 +49,16 @@ import org.w3._2000._09.xmldsig_.DigestMethodType;
 })
 public class TransformParameterType {
 
+    /**
+     * Der Transformationsparameter explizit angegeben.
+     * 
+     */
     @XmlElement(name = "Base64Content")
     protected byte[] base64Content;
+    /**
+     * Der Hashwert des Transformationsparameters.
+     * 
+     */
     @XmlElement(name = "Hash")
     protected TransformParameterType.Hash hash;
     @XmlAttribute(name = "URI", required = true)
@@ -58,7 +66,7 @@ public class TransformParameterType {
     protected String uri;
 
     /**
-     * Ruft den Wert der base64Content-Eigenschaft ab.
+     * Der Transformationsparameter explizit angegeben.
      * 
      * @return
      *     possible object is
@@ -69,18 +77,19 @@ public class TransformParameterType {
     }
 
     /**
-     * Legt den Wert der base64Content-Eigenschaft fest.
+     * Sets the value of the base64Content property.
      * 
      * @param value
      *     allowed object is
      *     byte[]
+     * @see #getBase64Content()
      */
     public void setBase64Content(byte[] value) {
         this.base64Content = value;
     }
 
     /**
-     * Ruft den Wert der hash-Eigenschaft ab.
+     * Der Hashwert des Transformationsparameters.
      * 
      * @return
      *     possible object is
@@ -92,19 +101,20 @@ public class TransformParameterType {
     }
 
     /**
-     * Legt den Wert der hash-Eigenschaft fest.
+     * Sets the value of the hash property.
      * 
      * @param value
      *     allowed object is
      *     {@link TransformParameterType.Hash }
      *     
+     * @see #getHash()
      */
     public void setHash(TransformParameterType.Hash value) {
         this.hash = value;
     }
 
     /**
-     * Ruft den Wert der uri-Eigenschaft ab.
+     * Gets the value of the uri property.
      * 
      * @return
      *     possible object is
@@ -116,7 +126,7 @@ public class TransformParameterType {
     }
 
     /**
-     * Legt den Wert der uri-Eigenschaft fest.
+     * Sets the value of the uri property.
      * 
      * @param value
      *     allowed object is
@@ -129,22 +139,22 @@ public class TransformParameterType {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type</p>.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.</p>
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;sequence&gt;
-     *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}DigestMethod"/&gt;
-     *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}DigestValue"/&gt;
-     *       &lt;/sequence&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       <sequence>
+     *         <element ref="{http://www.w3.org/2000/09/xmldsig#}DigestMethod"/>
+     *         <element ref="{http://www.w3.org/2000/09/xmldsig#}DigestValue"/>
+     *       </sequence>
+     *     </restriction>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */
@@ -161,7 +171,7 @@ public class TransformParameterType {
         protected String digestValue;
 
         /**
-         * Ruft den Wert der digestMethod-Eigenschaft ab.
+         * Gets the value of the digestMethod property.
          * 
          * @return
          *     possible object is
@@ -173,7 +183,7 @@ public class TransformParameterType {
         }
 
         /**
-         * Legt den Wert der digestMethod-Eigenschaft fest.
+         * Sets the value of the digestMethod property.
          * 
          * @param value
          *     allowed object is
@@ -185,7 +195,7 @@ public class TransformParameterType {
         }
 
         /**
-         * Ruft den Wert der digestValue-Eigenschaft ab.
+         * Gets the value of the digestValue property.
          * 
          * @return
          *     possible object is
@@ -197,7 +207,7 @@ public class TransformParameterType {
         }
 
         /**
-         * Legt den Wert der digestValue-Eigenschaft fest.
+         * Sets the value of the digestValue property.
          * 
          * @param value
          *     allowed object is

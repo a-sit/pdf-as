@@ -1,36 +1,36 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für VerifyPDFSignatureRequestType complex type.
+ * <p>Java class for VerifyPDFSignatureRequestType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="VerifyPDFSignatureRequestType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="DateTime" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/&gt;
- *         &lt;element name="ExtendedValidation" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/&gt;
- *         &lt;element name="PDFSignature" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
- *         &lt;element name="TrustProfileID" type="{http://www.w3.org/2001/XMLSchema}token"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="VerifyPDFSignatureRequestType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="DateTime" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/>
+ *         <element name="ExtendedValidation" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
+ *         <element name="PDFSignature" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+ *         <element name="TrustProfileID" type="{http://www.w3.org/2001/XMLSchema}token"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -53,13 +53,18 @@ public class VerifyPDFSignatureRequestType {
     protected Boolean extendedValidation;
     @XmlElement(name = "PDFSignature", required = true)
     protected byte[] pdfSignature;
+    /**
+     * mit diesem Profil wird eine Menge von
+     * 						vertrauenswÃ¼rdigen Wurzelzertifikaten spezifiziert
+     * 
+     */
     @XmlElement(name = "TrustProfileID", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
     protected String trustProfileID;
 
     /**
-     * Ruft den Wert der dateTime-Eigenschaft ab.
+     * Gets the value of the dateTime property.
      * 
      * @return
      *     possible object is
@@ -71,7 +76,7 @@ public class VerifyPDFSignatureRequestType {
     }
 
     /**
-     * Legt den Wert der dateTime-Eigenschaft fest.
+     * Sets the value of the dateTime property.
      * 
      * @param value
      *     allowed object is
@@ -83,7 +88,7 @@ public class VerifyPDFSignatureRequestType {
     }
 
     /**
-     * Ruft den Wert der extendedValidation-Eigenschaft ab.
+     * Gets the value of the extendedValidation property.
      * 
      * @return
      *     possible object is
@@ -95,7 +100,7 @@ public class VerifyPDFSignatureRequestType {
     }
 
     /**
-     * Legt den Wert der extendedValidation-Eigenschaft fest.
+     * Sets the value of the extendedValidation property.
      * 
      * @param value
      *     allowed object is
@@ -107,7 +112,7 @@ public class VerifyPDFSignatureRequestType {
     }
 
     /**
-     * Ruft den Wert der pdfSignature-Eigenschaft ab.
+     * Gets the value of the pdfSignature property.
      * 
      * @return
      *     possible object is
@@ -118,7 +123,7 @@ public class VerifyPDFSignatureRequestType {
     }
 
     /**
-     * Legt den Wert der pdfSignature-Eigenschaft fest.
+     * Sets the value of the pdfSignature property.
      * 
      * @param value
      *     allowed object is
@@ -129,7 +134,8 @@ public class VerifyPDFSignatureRequestType {
     }
 
     /**
-     * Ruft den Wert der trustProfileID-Eigenschaft ab.
+     * mit diesem Profil wird eine Menge von
+     * 						vertrauenswÃ¼rdigen Wurzelzertifikaten spezifiziert
      * 
      * @return
      *     possible object is
@@ -141,12 +147,13 @@ public class VerifyPDFSignatureRequestType {
     }
 
     /**
-     * Legt den Wert der trustProfileID-Eigenschaft fest.
+     * Sets the value of the trustProfileID property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
+     * @see #getTrustProfileID()
      */
     public void setTrustProfileID(String value) {
         this.trustProfileID = value;

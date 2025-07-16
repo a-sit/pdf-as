@@ -2,29 +2,29 @@
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
 import java.math.BigInteger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für ErrorResponseType complex type.
+ * <p>Java class for ErrorResponseType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="ErrorResponseType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="ErrorCode" type="{http://www.w3.org/2001/XMLSchema}integer"/&gt;
- *         &lt;element name="Info" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="ErrorResponseType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="ErrorCode" type="{http://www.w3.org/2001/XMLSchema}integer"/>
+ *         <element name="Info" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -41,7 +41,7 @@ public class ErrorResponseType {
     protected String info;
 
     /**
-     * Ruft den Wert der errorCode-Eigenschaft ab.
+     * Gets the value of the errorCode property.
      * 
      * @return
      *     possible object is
@@ -53,7 +53,7 @@ public class ErrorResponseType {
     }
 
     /**
-     * Legt den Wert der errorCode-Eigenschaft fest.
+     * Sets the value of the errorCode property.
      * 
      * @param value
      *     allowed object is
@@ -65,7 +65,7 @@ public class ErrorResponseType {
     }
 
     /**
-     * Ruft den Wert der info-Eigenschaft ab.
+     * Gets the value of the info property.
      * 
      * @return
      *     possible object is
@@ -77,7 +77,7 @@ public class ErrorResponseType {
     }
 
     /**
-     * Legt den Wert der info-Eigenschaft fest.
+     * Sets the value of the info property.
      * 
      * @param value
      *     allowed object is

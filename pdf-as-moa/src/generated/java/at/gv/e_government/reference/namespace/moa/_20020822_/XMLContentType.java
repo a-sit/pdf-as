@@ -1,28 +1,28 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für XMLContentType complex type.
+ * <p>Java class for XMLContentType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="XMLContentType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}AnyChildrenType"&gt;
- *       &lt;attribute ref="{http://www.w3.org/XML/1998/namespace}space"/&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="XMLContentType">
+ *   <complexContent>
+ *     <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}AnyChildrenType">
+ *       <attribute ref="{http://www.w3.org/XML/1998/namespace}space"/>
+ *     </extension>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -37,7 +37,7 @@ public class XMLContentType
     protected String space;
 
     /**
-     * Ruft den Wert der space-Eigenschaft ab.
+     * Gets the value of the space property.
      * 
      * @return
      *     possible object is
@@ -49,7 +49,7 @@ public class XMLContentType
     }
 
     /**
-     * Legt den Wert der space-Eigenschaft fest.
+     * Sets the value of the space property.
      * 
      * @param value
      *     allowed object is

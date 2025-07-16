@@ -48,8 +48,8 @@ project.ext {
 task createConf(type: Zip, dependsOn: JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
 	from 'src/configuration'
 	//archiveBaseName 'config'
-	archiveFileName = 'config.zip'
-	destinationDirectory = new File(projectDir, 'src/main/resources/config')
+	archiveFileName.set('config.zip')
+	destinationDirectory.set(new File(projectDir, 'src/main/resources/config'))
 }
 
 compileJava.dependsOn(createConf)

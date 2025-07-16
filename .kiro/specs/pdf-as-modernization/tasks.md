@@ -22,7 +22,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: upgrade Java version compatibility from Java 8 to Java 17"`
   - _Requirements: 1.1, 1.2, 1.4_
 
-- [ ] 3. Update build tool plugins and configurations
+- [x] 3. Update build tool plugins and configurations
   - Research migration guides for Gradle Versions Plugin and OWASP Dependency Check updates
   - Update Gradle Versions Plugin to latest stable version
   - Update OWASP Dependency Check plugin to latest stable version

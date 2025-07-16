@@ -230,8 +230,8 @@ task buildTomcat(dependsOn: injectPdfAsWebApp, type: Zip) {
 	archive = archive.replaceAll("##PVERSION##", project.version);
 	
 	from targetDir
-	archiveFileName = archive
-	destinationDirectory = project.buildDir
+	archiveFileName.set(archive)
+	destinationDirectory.set(project.layout.buildDirectory)
 }
 
 task buildTomcatTar(dependsOn: injectPdfAsWebApp, type: Tar) {
@@ -244,8 +244,8 @@ task buildTomcatTar(dependsOn: injectPdfAsWebApp, type: Tar) {
 	archive = archive.replaceAll("##PVERSION##", project.version);
 	
 	from targetDir
-	archiveFileName = archive
-	destinationDirectory = project.buildDir
+	archiveFileName.set(archive)
+	destinationDirectory.set(project.layout.buildDirectory)
 }
 
 

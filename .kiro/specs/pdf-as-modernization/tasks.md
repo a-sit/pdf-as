@@ -102,7 +102,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update MOA integration module dependencies"`
   - _Requirements: 2.1, 6.3_
 
-- [-] 11. Update CLI and client modules
+- [x] 11. Update CLI and client modules
   - Update dependencies in pdf-as-cli module
   - Update dependencies in pdf-as-web-client module
   - Test command-line interface functionality
@@ -112,7 +112,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update CLI and client modules dependencies"`
   - _Requirements: 2.1, 5.1, 6.3_
 
-- [ ] 12. Update web support modules
+- [-] 12. Update web support modules
   - Update dependencies in pdf-as-web-db module
   - Update dependencies in pdf-as-web-status module
   - Update dependencies in pdf-as-web-statistic-api module

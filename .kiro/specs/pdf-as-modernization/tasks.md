@@ -33,7 +33,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update build tool plugins and configurations"`
   - _Requirements: 4.2, 4.3, 4.4_
 
-- [-] 4. Update core common dependencies
+- [x] 4. Update core common dependencies
   - Research SLF4J 1.7.x to 2.0.x migration guide and API changes
   - Research Commons Collections 3.x to 4.x migration guide and breaking changes
   - Update SLF4J to latest 2.0.x version in pdf-as-common module
@@ -45,7 +45,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update core common dependencies (SLF4J, Commons Collections, Lombok)"`
   - _Requirements: 2.1, 2.6_
 
-- [ ] 5. Update PDF processing dependencies
+- [-] 5. Update PDF processing dependencies
   - Research Apache PDFBox 2.x to 3.x migration guide and API breaking changes
   - Update Apache PDFBox from 2.0.32 to latest 3.0.x version in pdf-as-pdfbox-2 module
   - Update PDFBox Tools and Preflight dependencies to match PDFBox version

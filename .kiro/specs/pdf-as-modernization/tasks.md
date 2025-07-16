@@ -93,7 +93,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update signature standard modules dependencies"`
   - _Requirements: 2.1, 6.4_
 
-- [-] 10. Update MOA integration module
+- [x] 10. Update MOA integration module
   - Update dependencies in pdf-as-moa module
   - Update WSDL and XML schema processing for new dependency versions
   - Test MOA service integration functionality
@@ -102,7 +102,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update MOA integration module dependencies"`
   - _Requirements: 2.1, 6.3_
 
-- [ ] 11. Update CLI and client modules
+- [-] 11. Update CLI and client modules
   - Update dependencies in pdf-as-cli module
   - Update dependencies in pdf-as-web-client module
   - Test command-line interface functionality

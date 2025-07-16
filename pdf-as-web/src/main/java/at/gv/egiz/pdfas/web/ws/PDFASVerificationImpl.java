@@ -16,9 +16,9 @@ import iaik.x509.X509Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.MTOM;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.MTOM;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

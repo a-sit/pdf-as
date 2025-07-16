@@ -57,7 +57,7 @@ public class DBRequestStore implements IRequestStore {
       tx = session.beginTransaction();
       final Query query = session.createQuery("delete from Request as req"
           + " where req.created < :date");
-      query.setCalendar("date", calendar);
+      query.setParameter("date", calendar.getTime());
       query.executeUpdate();
       tx.commit();
     } catch (final Throwable e) {
@@ -82,17 +82,17 @@ public class DBRequestStore implements IRequestStore {
       session = sessions.openSession();
       final Query query = session.createQuery("delete from Request as req"
           + " where req.created < :date");
-      query.setCalendar("date", calendar);
+      query.setParameter("date", calendar.getTime());
       query.executeUpdate();
 
       final Query queryStat = session.createQuery("delete from StatisticRequest as req"
           + " where req.created < :date");
-      queryStat.setCalendar("date", calendar);
+      queryStat.setParameter("date", calendar.getTime());
       queryStat.executeUpdate();
 
       final Query queryResponse = session.createQuery("delete from Response as req"
           + " where req.created < :date");
-      queryResponse.setCalendar("date", calendar);
+      queryResponse.setParameter("date", calendar.getTime());
       queryResponse.executeUpdate();
       
     } finally {

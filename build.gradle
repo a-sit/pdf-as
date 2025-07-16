@@ -85,9 +85,9 @@ subprojects {
 		revision = getCheckedOutGitCommitHash()
 		//tomcatVersion = '7.0.54';
 		//tomcatVersion = '8.0.36';
-		tomcatVersion = '9.0.93';
+		tomcatVersion = '10.1.34';
 		slf4jVersion = '2.0.16'
-		cxfVersion = '3.5.9'
+		cxfVersion = '4.1.0'
 	  }
 	
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }

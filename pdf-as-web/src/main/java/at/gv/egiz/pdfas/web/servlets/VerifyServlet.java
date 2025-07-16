@@ -27,14 +27,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,7 +159,7 @@ public class VerifyServlet extends HttpServlet {
 			byte[] filecontent = null;
 
 			// checks if the request actually contains upload file
-			if (!ServletFileUpload.isMultipartContent(request)) {
+			if (!JakartaServletFileUpload.isMultipartContent(request)) {
 				// No Uploaded data!
 				if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
 					doGet(request, response);
@@ -169,12 +169,12 @@ public class VerifyServlet extends HttpServlet {
 				}
 			} else {
 				// configures upload settings
-				DiskFileItemFactory factory = new DiskFileItemFactory();
-				factory.setSizeThreshold(THRESHOLD_SIZE);
-				factory.setRepository(new File(System
-						.getProperty("java.io.tmpdir")));
+				DiskFileItemFactory factory = DiskFileItemFactory.builder()
+					.setBufferSize(THRESHOLD_SIZE)
+					.setPath(new File(System.getProperty("java.io.tmpdir")).toPath())
+					.get();
 
-				ServletFileUpload upload = new ServletFileUpload(factory);
+				JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
 				upload.setFileSizeMax(MAX_FILE_SIZE);
 				upload.setSizeMax(MAX_REQUEST_SIZE);
 

@@ -23,7 +23,7 @@ sourceSets.test.runtimeClasspath += configurations.providedCompile
 dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 	implementation 'org.apache.commons:commons-lang3:3.17.0'
-	compileOnly 'javax.servlet:javax.servlet-api:3.0.1'
+	compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0'
 }
 
 task releases(type: Copy) {

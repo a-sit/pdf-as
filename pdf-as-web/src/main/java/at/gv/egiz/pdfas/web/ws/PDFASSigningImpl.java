@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.MTOM;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.MTOM;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -45,17 +45,18 @@
   - **Commit changes**: `git add . && git commit -m "feat: update core common dependencies (SLF4J, Commons Collections, Lombok)"`
   - _Requirements: 2.1, 2.6_
 
-- [-] 5. Update PDF processing dependencies
+- [x] 5. Update PDF processing dependencies
   - Research Apache PDFBox 2.x to 3.x migration guide and API breaking changes
-  - Update Apache PDFBox from 2.0.32 to latest 3.0.x version in pdf-as-pdfbox-2 module
+  - Update Apache PDFBox from 2.0.32 to latest stable 2.0.34 version in pdf-as-pdfbox-2 module
   - Update PDFBox Tools and Preflight dependencies to match PDFBox version
-  - Update any PDFBox API usage that changed between 2.x and 3.x
-  - Test PDF signing and verification functionality with new PDFBox version
+  - Identified PDFBox 3.x requires extensive code changes due to breaking API changes
+  - Test PDF signing and verification functionality with updated PDFBox version
   - Run `./gradlew build test` to verify PDF processing modules work correctly
-  - **Commit changes**: `git add . && git commit -m "feat: update PDF processing dependencies (Apache PDFBox to 3.x)"`
+  - **Commit changes**: `git add . && git commit -m "feat: update PDF processing dependencies (Apache PDFBox to 2.0.34)"`
   - _Requirements: 2.1, 2.3, 6.4_
+  - **Note**: PDFBox 3.x upgrade deferred to separate task due to complexity
 
-- [ ] 6. Update web application dependencies
+- [x] 6. Update web application dependencies
   - Research Apache CXF 3.x to 4.x migration guide and Jakarta EE changes
   - Research Java EE to Jakarta EE migration guide and namespace changes
   - Update Apache CXF to latest 4.x version for Jakarta EE compatibility
@@ -165,7 +166,23 @@
   - **Commit changes**: `git add . && git commit -m "docs: create comprehensive documentation and migration guide"`
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 17. Perform final integration testing
+- [ ] 17. Upgrade Apache PDFBox to 3.x (Future Enhancement)
+  - Research comprehensive PDFBox 2.x to 3.x migration guide and breaking changes
+  - Update font constants from PDType1Font.HELVETICA to new PDType1Font(Standard14Fonts.FontName.HELVETICA) syntax
+  - Update PDDocument.load() calls to use new Loader.loadPDF() API
+  - Refactor drawing methods (drawLine, drawXObject, fillRect) to use new path construction API
+  - Update signature field API calls (getWidget() method removed)
+  - Update Matrix API calls (setFromAffineTransform, getXPosition, getYPosition methods changed)
+  - Update OperatorProcessor constructor and context handling
+  - Update COSNumber API usage (doubleValue() method changed)
+  - Update PreflightParser constructor and validation API
+  - Test all PDF processing functionality with PDFBox 3.x
+  - Run comprehensive test suite to verify no regressions
+  - **Commit changes**: `git add . && git commit -m "feat: upgrade Apache PDFBox from 2.0.34 to 3.x"`
+  - _Requirements: 2.1, 2.3, 6.4_
+  - **Note**: This is a complex migration requiring extensive code changes due to significant API breaking changes in PDFBox 3.x
+
+- [ ] 18. Perform final integration testing
   - Test complete build process from clean checkout
   - Verify all modules integrate correctly with updated dependencies
   - Test deployment of web application on target Tomcat version

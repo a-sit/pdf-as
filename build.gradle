@@ -86,7 +86,7 @@ subprojects {
 		//tomcatVersion = '7.0.54';
 		//tomcatVersion = '8.0.36';
 		tomcatVersion = '9.0.93';
-		slf4jVersion = '1.7.36'
+		slf4jVersion = '2.0.16'
 		cxfVersion = '3.5.9'
 	  }
 	

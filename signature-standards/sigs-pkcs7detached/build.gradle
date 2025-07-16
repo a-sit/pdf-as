@@ -23,7 +23,7 @@ releases.dependsOn sourcesJar
 dependencies {
 	implementation project (':pdf-as-lib')
 	implementation project (':pdf-as-common')
-    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'org.apache.commons:commons-collections4:4.5.0'
     testImplementation group: 'junit', name: 'junit', version: '4.+'
 }
 

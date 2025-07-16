@@ -33,7 +33,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update build tool plugins and configurations"`
   - _Requirements: 4.2, 4.3, 4.4_
 
-- [ ] 4. Update core common dependencies
+- [-] 4. Update core common dependencies
   - Research SLF4J 1.7.x to 2.0.x migration guide and API changes
   - Research Commons Collections 3.x to 4.x migration guide and breaking changes
   - Update SLF4J to latest 2.0.x version in pdf-as-common module

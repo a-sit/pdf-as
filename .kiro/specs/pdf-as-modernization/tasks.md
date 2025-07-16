@@ -112,7 +112,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update CLI and client modules dependencies"`
   - _Requirements: 2.1, 5.1, 6.3_
 
-- [-] 12. Update web support modules
+- [x] 12. Update web support modules
   - Update dependencies in pdf-as-web-db module
   - Update dependencies in pdf-as-web-status module
   - Update dependencies in pdf-as-web-statistic-api module
@@ -122,7 +122,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update web support modules dependencies"`
   - _Requirements: 2.1, 3.4_
 
-- [ ] 13. Run comprehensive test suite
+- [-] 13. Run comprehensive test suite
   - Execute all existing unit tests with updated dependencies
   - Run integration tests for PDF signing and verification
   - Test web application end-to-end functionality

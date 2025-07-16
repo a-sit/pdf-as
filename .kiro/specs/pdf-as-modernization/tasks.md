@@ -67,7 +67,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update web application dependencies (CXF 4.x, Jakarta EE)"`
   - _Requirements: 2.1, 3.1, 3.2, 3.3_
 
-- [ ] 7. Migrate web modules to Jakarta EE
+- [x] 7. Migrate web modules to Jakarta EE
   - Update servlet imports from javax.servlet to jakarta.servlet in pdf-as-web module
   - Update JSP and web configuration files for Jakarta EE
   - Update any other Java EE to Jakarta EE namespace migrations needed

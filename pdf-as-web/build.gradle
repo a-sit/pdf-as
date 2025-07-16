@@ -72,8 +72,8 @@ dependencies {
 	api group: 'jakarta.jws', name: 'jakarta.jws-api', version: '3.0.0'
 	compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0'
     testImplementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
-    testImplementation 'org.springframework:spring-test:5.3.31'
-    testImplementation 'org.springframework:spring-web:5.3.31'
+    testImplementation 'org.springframework:spring-test:6.1.4'
+    testImplementation 'org.springframework:spring-web:6.1.4'
     
 }
 

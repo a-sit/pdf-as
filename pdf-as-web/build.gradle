@@ -55,20 +55,20 @@ dependencies {
 	api project (':pdf-as-web-statistic-api')
 	api project (':pdf-as-pdfbox-2')
 	api group: 'org.apache.commons', name: 'commons-fileupload2-jakarta', version: '2.0.0-M1'
-	api group: 'commons-io', name: 'commons-io', version: '2.16.1'
+	api group: 'commons-io', name: 'commons-io', version: commonsIoVersion
 	api group: 'opensymphony', name: 'sitemesh', version: '2.4.2'
 	api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
     api group: 'jakarta.xml.ws', name: 'jakarta.xml.ws-api', version: '4.0.2'
 	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
-    api "commons-codec:commons-codec:1.17.1"
-	api 'org.apache.commons:commons-lang3:3.17.0'
+    api group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
+	api group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
 	api group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
-	api 'org.apache.cxf:cxf-rt-transports-http:4.1.0'
-	api 'org.apache.cxf:cxf-rt-frontend-jaxws:4.1.0'
-	api 'com.thetransactioncompany:cors-filter:2.10'
-	api 'ch.qos.logback:logback-classic:1.2.13'
-	api 'ch.qos.logback:logback-core:1.2.13'
-	api 'org.json:json:20240303'
+	api group: 'org.apache.cxf', name: 'cxf-rt-transports-http', version: cxfVersion
+	api group: 'org.apache.cxf', name: 'cxf-rt-frontend-jaxws', version: cxfVersion
+	api 'com.thetransactioncompany:cors-filter:3.1'
+	api group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+	api group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
+	api group: 'org.json', name: 'json', version: jsonVersion
 	api group: 'jakarta.jws', name: 'jakarta.jws-api', version: '3.0.0'
 	compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0'
     testImplementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'

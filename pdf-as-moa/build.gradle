@@ -57,8 +57,8 @@ dependencies {
 	api group: 'jakarta.jws', name: 'jakarta.jws-api', version: '3.0.0'
 	
 	// Apache Commons Codec for Base64 encoding
-	implementation group: 'commons-codec', name: 'commons-codec', version: '1.17.1'
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
+	implementation group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
 	
 	testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 	

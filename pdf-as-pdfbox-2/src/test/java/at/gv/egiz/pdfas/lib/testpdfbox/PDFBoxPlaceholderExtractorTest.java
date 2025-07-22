@@ -2,6 +2,7 @@ package at.gv.egiz.pdfas.lib.testpdfbox;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +20,9 @@ public class PDFBoxPlaceholderExtractorTest {
   @SneakyThrows
   public void nextPlaceholder() {
     SignaturePlaceholderData result = getNextSignaturePlaceHolder("/data/platzhalter_en_de_test.pdf");
+    
+
+    
     assertEquals("Im48", result.getPlaceholderName());
 
   }
@@ -31,6 +35,8 @@ public class PDFBoxPlaceholderExtractorTest {
 
   }
 
+
+
   private static List<String> getPlaceHolders(String filePath) throws IOException {
     final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
         filePath));
@@ -42,6 +48,9 @@ public class PDFBoxPlaceholderExtractorTest {
   private static SignaturePlaceholderData getNextSignaturePlaceHolder(String filePath) throws IOException {
     final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
         filePath));
+    
+
+    
     final SignaturePlaceholderData result =
         SignatureFieldsAndPlaceHolderExtractor.getNextUnusedSignaturePlaceHolder(doc);
     return result;

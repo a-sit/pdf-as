@@ -122,7 +122,7 @@
   - **Commit changes**: `git add . && git commit -m "feat: update web support modules dependencies"`
   - _Requirements: 2.1, 3.4_
 
-- [-] 13. Run comprehensive test suite
+- [x] 13. Run comprehensive test suite
   - Execute all existing unit tests with updated dependencies
   - Run integration tests for PDF signing and verification
   - Test web application end-to-end functionality
@@ -133,7 +133,7 @@
   - **Commit changes**: `git add . && git commit -m "test: run comprehensive test suite and fix any issues"`
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 14. Perform security vulnerability assessment
+- [x] 14. Perform security vulnerability assessment
   - Run OWASP dependency check with updated plugin version
   - Address any high or critical security vulnerabilities found
   - Verify cryptographic libraries meet current security standards
@@ -143,7 +143,25 @@
   - **Commit changes**: `git add . && git commit -m "security: perform vulnerability assessment and address issues"`
   - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 15. Update build and release processes
+- [x] 15. Comprehensive dependency update to latest versions
+  - Use Gradle Versions Plugin to identify all outdated dependencies across all modules
+  - Research compatibility and breaking changes for major version updates
+  - Update Tomcat embedded version from 10.1.19 to latest 10.1.x in pdf-as-web module
+  - Update Eclipse Jetty version from 11.0.17 to latest 11.0.x in pdf-as-web module
+  - Update Spring Framework components to latest compatible versions
+  - Update Logback from 1.2.13 to latest 1.4.x or 1.5.x version
+  - Update Jackson, Gson, and other JSON processing libraries to latest versions
+  - Update Apache Commons libraries (Collections, Codec, Configuration) to latest versions
+  - Update JAXB and JAX-WS implementations to latest Jakarta EE versions
+  - Update test dependencies (JUnit, Mockito) to latest versions
+  - Update build tool dependencies (Maven plugins, Gradle plugins) to latest versions
+  - Run `./gradlew dependencyUpdates` to identify all available updates
+  - Run `./gradlew build test` after each major dependency group update
+  - Run `./gradlew dependencyCheckAnalyze` to verify security improvements
+  - **Commit changes**: `git add . && git commit -m "feat: comprehensive dependency update to latest versions"`
+  - _Requirements: 2.1, 2.6, 7.1, 7.2_
+
+- [ ] 16. Update build and release processes
   - Test jar, war, and distribution archive generation
   - Verify Maven repository publishing works correctly
   - Test release task execution with updated build system

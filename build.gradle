@@ -174,17 +174,18 @@ subprojects {
 }
 
 task(doFullRelease) {
+	def projectVer = version
 	doLast {
-		println "done building all distribution stuff for " + project.version
+		println "done building all distribution stuff for " + projectVer
 	}
 }
 
 task copyLicenses {
 	doLast {
    		mkdir("releases/"+ version +"/licenses");
-   		def target = project.projectDir.toString() + "/releases/" + version + "/licenses"
-		subprojects{
-	    	def src=project.projectDir.toString() + "/licenses"
+   		def target = rootProject.projectDir.toString() + "/releases/" + version + "/licenses"
+		subprojects{ subproject ->
+	    	def src = subproject.projectDir.toString() + "/licenses"
 	    	copy{
 				from src
 				into target

@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+provider: EGIZ
+Specification-Version: 89a58655c8a4eb4792489558a5dff5e9185a1b0e
+Implementation-Version: 4.4.2
+Implementation-Title: PDF-AS-4 Commons
+

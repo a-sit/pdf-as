@@ -110,6 +110,7 @@ task wsdl2Java() {
 }
 
 task releaseConfig(type: Copy) {
+	dependsOn createConf
 	from 'src/main/resources/config/config.zip'
 	into rootDir.toString() + "/releases/" + version + "/cfg"
 	rename 'config.zip', 'defaultConfig.zip'

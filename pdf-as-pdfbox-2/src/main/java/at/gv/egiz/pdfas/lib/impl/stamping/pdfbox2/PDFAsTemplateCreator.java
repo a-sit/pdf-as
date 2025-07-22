@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -173,7 +174,7 @@ public class PDFAsTemplateCreator extends PDFTemplateCreator {
             //fos.write(baos.toByteArray());
             //fos.close();
 
-            PDDocument cidSetRemoved = PDDocument.load(baos.toByteArray());
+            PDDocument cidSetRemoved = Loader.loadPDF(baos.toByteArray());
             try {
                 this.pdfBuilder.removeCidSet(cidSetRemoved);
                 baos.reset();

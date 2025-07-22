@@ -82,7 +82,7 @@ public class MoveTo  extends PathConstructionOperatorProcessor{
 
 			COSNumber x = (COSNumber) operands.get(0);
 			COSNumber y = (COSNumber) operands.get(1);
-			Point2D p = transform(x.doubleValue(), y.doubleValue());
+			Point2D p = transform(x.floatValue(), y.floatValue());
 
 			pdfPage.getCurrentPath().moveTo((float) p.getX(), (float) p.getY());
 

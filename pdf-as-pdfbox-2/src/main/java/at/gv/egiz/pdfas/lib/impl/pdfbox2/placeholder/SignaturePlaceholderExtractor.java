@@ -206,17 +206,14 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
             rotation.setToRotation(rotationInRadians);
             final AffineTransform rotationInverse = rotation
                 .createInverse();
-            final Matrix rotationInverseMatrix = new Matrix();
-            rotationInverseMatrix
-                .setFromAffineTransform(rotationInverse);
-            final Matrix rotationMatrix = new Matrix();
-            rotationMatrix.setFromAffineTransform(rotation);
+            final Matrix rotationInverseMatrix = new Matrix(rotationInverse);
+            final Matrix rotationMatrix = new Matrix(rotation);
 
             final Matrix unrotatedCTM = ctm
                 .multiply(rotationInverseMatrix);
 
-            float x = unrotatedCTM.getXPosition();
-            final float yPos = unrotatedCTM.getYPosition();
+            float x = unrotatedCTM.getTranslateX();
+            final float yPos = unrotatedCTM.getTranslateY();
             final float yScale = unrotatedCTM.getScaleY();
             float y = yPos + yScale;
             final float w = unrotatedCTM.getScaleX();

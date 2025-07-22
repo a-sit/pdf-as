@@ -45,6 +45,7 @@ import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSString;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
@@ -455,13 +456,13 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         final COSDictionary objectDic = new COSDictionary();
         objectDic.setName("Type", "OBJR");
 
-        objectDic.setItem("Pg", signatureField.getWidget().getPage());
-        objectDic.setItem("Obj", signatureField.getWidget());
+        objectDic.setItem("Pg", signatureField.getPage());
+        objectDic.setItem("Obj", signatureField);
 
         final List<Object> l = new ArrayList<>();
         l.add(objectDic);
         sigBlock.setKids(l);
-        sigBlock.setPage(signatureField.getWidget().getPage());
+        sigBlock.setPage(signatureField.getPage());
 
         sigBlock.setTitle("Signature Table");
         sigBlock.setParent(docElement);
@@ -529,13 +530,13 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
 
         // set StructureParent for signature field annotation
-        signatureField.getWidget().setStructParent(parentTreeNextKey);
+        signatureField.setStructParent(parentTreeNextKey);
 
         // Increase the next Key value in the structure tree root
         structureTreeRoot.setParentTreeNextKey(parentTreeNextKey + 1);
 
         // add the Tabs /S Element for Tabbing through annots
-        final PDPage p = signatureField.getWidget().getPage();
+        final PDPage p = signatureField.getPage();
         p.getCOSObject().setName("Tabs", "S");
         p.getCOSObject().setNeedToBeUpdated(true);
 
@@ -670,7 +671,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
     PreflightDocument document = null;
     ValidationResult result = null;
     try {
-      final PreflightParser parser = new PreflightParser(signedDocument);
+      final PreflightParser parser = new PreflightParser(signedDocument.getInputStream());
       //
       // parser.parse(Format.PDF_A1B);
       parser.parse();
@@ -808,7 +809,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
             
       PDDocument visualDoc;     
       synchronized (PDDocument.class) {
-        visualDoc = PDDocument.load(properties.getVisibleSignature());
+        visualDoc = Loader.loadPDF(properties.getVisibleSignature());
       }
 
       final float stdRes = 72;

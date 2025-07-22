@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import javax.activation.DataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.Loader;
 
 import at.gv.egiz.pdfas.lib.impl.stamping.pdfbox2.PDFAsFontCache;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
@@ -54,7 +56,8 @@ public class PDFBOXObject extends PDFObject {
 			doc.close();
 		}
 		synchronized(PDDocument.class) {
-			this.doc = PDDocument.load(this.originalDocument.getInputStream());
+			byte[] pdfBytes = IOUtils.toByteArray(this.originalDocument.getInputStream());
+			this.doc = Loader.loadPDF(pdfBytes);
 		}
 		if(this.doc != null) {
 			this.doc.getDocument().setWarnMissingClose(false);

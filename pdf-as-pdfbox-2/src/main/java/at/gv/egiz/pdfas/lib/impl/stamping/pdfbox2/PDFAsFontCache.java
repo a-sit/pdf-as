@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,22 +23,22 @@ public class PDFAsFontCache {
 	private static final String ITALIC = "ITALIC";
 	private static final String SEP = ":";
 
-	public static PDFont defaultFont = PDType1Font.HELVETICA;
+	public static PDFont defaultFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 	public static float defaultFontSize = 8;
 
 	private Map<String, PDFont> fonts;
 	
 	private static Map<String, PDFont> defaultFonts = new HashMap<String, PDFont>();
 	static {
-		defaultFonts.put(HELVETICA + SEP + NORMAL, PDType1Font.HELVETICA);
-		defaultFonts.put(HELVETICA + SEP + BOLD, PDType1Font.HELVETICA_BOLD);
+		defaultFonts.put(HELVETICA + SEP + NORMAL, new PDType1Font(Standard14Fonts.FontName.HELVETICA));
+		defaultFonts.put(HELVETICA + SEP + BOLD, new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD));
 
-		defaultFonts.put(COURIER + SEP + NORMAL, PDType1Font.COURIER);
-		defaultFonts.put(COURIER + SEP + BOLD, PDType1Font.COURIER_BOLD);
+		defaultFonts.put(COURIER + SEP + NORMAL, new PDType1Font(Standard14Fonts.FontName.COURIER));
+		defaultFonts.put(COURIER + SEP + BOLD, new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD));
 
-		defaultFonts.put(TIMES_ROMAN + SEP + NORMAL, PDType1Font.TIMES_ROMAN);
-		defaultFonts.put(TIMES_ROMAN + SEP + BOLD, PDType1Font.TIMES_BOLD);
-		defaultFonts.put(TIMES_ROMAN + SEP + ITALIC, PDType1Font.TIMES_ITALIC);
+		defaultFonts.put(TIMES_ROMAN + SEP + NORMAL, new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN));
+		defaultFonts.put(TIMES_ROMAN + SEP + BOLD, new PDType1Font(Standard14Fonts.FontName.TIMES_BOLD));
+		defaultFonts.put(TIMES_ROMAN + SEP + ITALIC, new PDType1Font(Standard14Fonts.FontName.TIMES_ITALIC));
 	}
 
 	public PDFAsFontCache(){

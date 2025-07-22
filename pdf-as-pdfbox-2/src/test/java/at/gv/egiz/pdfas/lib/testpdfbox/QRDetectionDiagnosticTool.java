@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
@@ -53,7 +54,7 @@ public class QRDetectionDiagnosticTool {
     public static List<ImageAnalysisResult> analyzeAllImages(String pdfPath) throws IOException {
         List<ImageAnalysisResult> results = new ArrayList<>();
         
-        PDDocument doc = PDDocument.load(QRDetectionDiagnosticTool.class.getResourceAsStream(pdfPath));
+        PDDocument doc = Loader.loadPDF(QRDetectionDiagnosticTool.class.getResourceAsStream(pdfPath));
         
         System.out.println("=== QR DETECTION DIAGNOSTIC ANALYSIS ===");
         System.out.println("PDF: " + pdfPath);

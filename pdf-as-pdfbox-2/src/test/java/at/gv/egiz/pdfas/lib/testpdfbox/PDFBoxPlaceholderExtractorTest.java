@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.Loader;
 import org.junit.Test;
 
 import at.gv.egiz.pdfas.lib.impl.pdfbox2.placeholder.SignatureFieldsAndPlaceHolderExtractor;
@@ -38,7 +39,7 @@ public class PDFBoxPlaceholderExtractorTest {
 
 
   private static List<String> getPlaceHolders(String filePath) throws IOException {
-    final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
+    final PDDocument doc = Loader.loadPDF(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
         filePath));
     final List<String> results = SignatureFieldsAndPlaceHolderExtractor.findEmptySignatureFields(doc);
     return results;
@@ -46,7 +47,7 @@ public class PDFBoxPlaceholderExtractorTest {
   }
 
   private static SignaturePlaceholderData getNextSignaturePlaceHolder(String filePath) throws IOException {
-    final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
+    final PDDocument doc = Loader.loadPDF(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
         filePath));
     
 

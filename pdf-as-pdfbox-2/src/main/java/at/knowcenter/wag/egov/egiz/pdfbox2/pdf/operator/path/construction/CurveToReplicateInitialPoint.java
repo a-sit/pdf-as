@@ -86,8 +86,8 @@ public class CurveToReplicateInitialPoint extends PathConstructionOperatorProces
 			COSNumber y3 = (COSNumber) operands.get(3);
 
 	        Point2D currentPoint = pdfPage.getCurrentPath().getCurrentPoint();
-			Point2D p2 = transform(x2.doubleValue(), y2.doubleValue());
-			Point2D p3 = transform(x3.doubleValue(), y3.doubleValue());
+			Point2D p2 = transform(x2.floatValue(), y2.floatValue());
+			Point2D p3 = transform(x3.floatValue(), y3.floatValue());
 
 			pdfPage.getCurrentPath().curveTo(
 					(float)currentPoint.getX(), (float)currentPoint.getY(),

@@ -378,8 +378,8 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 			String signatureName) throws IOException {
 		PDSignature pdSignature = new PDSignature();
 		pdSignatureField.setSignature(pdSignature);
-		pdSignatureField.getWidget().setPage(page);
-		page.getAnnotations().add(pdSignatureField.getWidget());
+		pdSignatureField.setPage(page);
+		page.getAnnotations().add(pdSignatureField);
 		pdSignature.setName(signatureName);
 		pdSignature.setByteRange(new int[] { 0, 0, 0, 0 });
 		pdSignature.setContents(new byte[4096]);
@@ -481,7 +481,7 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 		rect.setLowerLeftX((float) llDst.getX());
 		logger.debug("rectangle of signature has been created: {}",
 				rect.toString());
-		signatureField.getWidget().setRectangle(rect);
+		signatureField.setRectangle(rect);
 		getStructure().setSignatureRectangle(rect);
 		logger.debug("rectangle of signature has been created");
 	}
@@ -559,7 +559,7 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 		transform.rotate(Math.toRadians(degrees));
 		appearanceStream.setMatrix(transform);
 		appearance.setNormalAppearance(appearanceStream);
-		signatureField.getWidget().setAppearance(appearance);
+		signatureField.setAppearance(appearance);
 
 		getStructure().setAppearanceDictionary(appearance);
 		logger.debug("PDF appereance Dictionary has been created");

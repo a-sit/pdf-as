@@ -8,13 +8,12 @@ import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.Loader;
 
 public class TTFFontTest {
 
 	public static void main(String[] args) {
 		try {
-			PDDocument doc = Loader.loadPDF(new File("/home/afitzek/Downloads/pdf_groesse/willenserklaerung_signedByUser.pdf"));
+			PDDocument doc = PDDocument.load(new File("/home/afitzek/Downloads/pdf_groesse/willenserklaerung_signedByUser.pdf"));
 		
 			List<COSObject> cosObjects = doc.getDocument().getObjectsByType(COSName.FONT);
 		

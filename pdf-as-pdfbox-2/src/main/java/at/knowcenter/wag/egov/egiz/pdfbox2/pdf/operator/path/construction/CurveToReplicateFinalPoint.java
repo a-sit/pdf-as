@@ -85,8 +85,8 @@ public class CurveToReplicateFinalPoint extends PathConstructionOperatorProcesso
 			COSNumber x3 = (COSNumber) operands.get(2);
 			COSNumber y3 = (COSNumber) operands.get(3);
 
-			Point2D p1 = transform(x1.floatValue(), y1.floatValue());
-			Point2D p3 = transform(x3.floatValue(), y3.floatValue());
+			Point2D p1 = transform(x1.doubleValue(), y1.doubleValue());
+			Point2D p3 = transform(x3.doubleValue(), y3.doubleValue());
 
 			pdfPage.getCurrentPath().curveTo(
 					(float) p1.getX(), (float) p1.getY(),

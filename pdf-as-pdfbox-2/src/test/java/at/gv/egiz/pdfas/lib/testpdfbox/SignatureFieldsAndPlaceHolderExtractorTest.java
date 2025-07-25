@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.Loader;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -157,7 +156,7 @@ public class SignatureFieldsAndPlaceHolderExtractorTest {
 
   private static List<String> getPlaceHolders(String filePath) {
     try {
-      PDDocument doc = Loader.loadPDF(new File(filePath));
+      PDDocument doc = PDDocument.load(new File(filePath));
       List<String> results = SignatureFieldsAndPlaceHolderExtractor.findEmptySignatureFields(doc);
 //      System.out.println(filePath + ": " + result);
       return results;
@@ -169,7 +168,7 @@ public class SignatureFieldsAndPlaceHolderExtractorTest {
 
   public static SignaturePlaceholderData getNextSignaturePlaceHolder(String filePath) {
     try {
-      PDDocument doc = Loader.loadPDF(new File(filePath));
+      PDDocument doc = PDDocument.load(new File(filePath));
       SignaturePlaceholderData result =
           SignatureFieldsAndPlaceHolderExtractor.getNextUnusedSignaturePlaceHolder(doc);
 //      System.out.println(filePath + ": " + result);

@@ -545,9 +545,7 @@ public class TableDrawUtils {
 				// draw first line
 				logger.debug("ROW LINE: {} {} {} {}", x_from, y_from, x_to,
 						y_from);
-				contentStream.moveTo(x, y_from);
-				contentStream.lineTo(x_to, y_from);
-				contentStream.stroke();
+				contentStream.drawLine(x, y_from, x_to, y_from);
 
 				// Draw all row borders
 				for (int i = 0; i < rows; i++) {
@@ -556,9 +554,7 @@ public class TableDrawUtils {
 					// Draw row border!
 					logger.debug("ROW LINE: {} {} {} {}", x_from, y_from, x_to,
 							y_from);
-					contentStream.moveTo(x, y_from);
-					contentStream.lineTo(x_to, y_from);
-					contentStream.stroke();
+					contentStream.drawLine(x, y_from, x_to, y_from);
 
 				}
 
@@ -577,9 +573,7 @@ public class TableDrawUtils {
 					logger.debug("COL LINE: {} {} {} {}", x_from, y_from,
 							x_from, y_to);
 
-					contentStream.moveTo(x_from, y_from);
-					contentStream.lineTo(x_from, y_to);
-					contentStream.stroke();
+					contentStream.drawLine(x_from, y_from, x_from, y_to);
 
 					for (int j = 0; j < row.size(); j++) {
 						Entry cell = (Entry) row.get(j);
@@ -591,9 +585,7 @@ public class TableDrawUtils {
 						}
 						logger.debug("COL LINE: {} {} {} {}", x_from, y_from,
 								x_from, y_to);
-						contentStream.moveTo(x_from, y_from);
-						contentStream.lineTo(x_from, y_to);
-						contentStream.stroke();
+						contentStream.drawLine(x_from, y_from, x_from, y_to);
 					}
 
 					if (i + 1 < rows) {
@@ -616,9 +608,8 @@ public class TableDrawUtils {
 		try {
 			if (abstractTable.getBGColor() != null) {
 				contentStream.setNonStrokingColor(abstractTable.getBGColor());
-				contentStream.addRect(x, y, abstractTable.getWidth(),
+				contentStream.fillRect(x, y, abstractTable.getWidth(),
 						abstractTable.getHeight());
-				contentStream.fill();
 				contentStream.setNonStrokingColor(Color.BLACK);
 			}
 		} catch (Throwable e) {
@@ -632,21 +623,13 @@ public class TableDrawUtils {
 		if ("true".equals(settings.getValue(TABLE_DEBUG))) {
 			try {
 				contentStream.setStrokingColor(Color.RED);
-				contentStream.moveTo(x, y);
-				contentStream.lineTo(x + width, y);
-				contentStream.stroke();
+				contentStream.drawLine(x, y, x + width, y);
 				contentStream.setStrokingColor(Color.BLUE);
-				contentStream.moveTo(x, y);
-				contentStream.lineTo(x, y - height);
-				contentStream.stroke();
+				contentStream.drawLine(x, y, x, y - height);
 				contentStream.setStrokingColor(Color.GREEN);
-				contentStream.moveTo(x + width, y);
-				contentStream.lineTo(x + width, y - height);
-				contentStream.stroke();
+				contentStream.drawLine(x + width, y, x + width, y - height);
 				contentStream.setStrokingColor(Color.ORANGE);
-				contentStream.moveTo(x, y - height);
-				contentStream.lineTo(x + width, y - height);
-				contentStream.stroke();
+				contentStream.drawLine(x, y - height, x + width, y - height);
 
 				contentStream.setStrokingColor(Color.BLACK);
 			} catch (Throwable e) {
@@ -660,25 +643,15 @@ public class TableDrawUtils {
 		if ("true".equals(settings.getValue(TABLE_DEBUG))) {
 			try {
 				contentStream.setStrokingColor(Color.RED);
-				contentStream.moveTo(x, y);
-				contentStream.lineTo(x + width, y);
-				contentStream.stroke();
+				contentStream.drawLine(x, y, x + width, y);
 				contentStream.setStrokingColor(Color.BLUE);
-				contentStream.moveTo(x, y);
-				contentStream.lineTo(x, y - height);
-				contentStream.stroke();
+				contentStream.drawLine(x, y, x, y - height);
 				contentStream.setStrokingColor(Color.GREEN);
-				contentStream.moveTo(x + width, y);
-				contentStream.lineTo(x + width, y - height);
-				contentStream.stroke();
+				contentStream.drawLine(x + width, y, x + width, y - height);
 				contentStream.setStrokingColor(Color.ORANGE);
-				contentStream.moveTo(x, y - height);
-				contentStream.lineTo(x + width, y - height);
-				contentStream.stroke();
+				contentStream.drawLine(x, y - height, x + width, y - height);
 				contentStream.setStrokingColor(Color.MAGENTA);
-				contentStream.moveTo(x, y + (descent * (-1)) - height);
-				contentStream.lineTo(x + width, y + (descent * (-1)) - height);
-				contentStream.stroke();
+				contentStream.drawLine(x, y + (descent * (-1)) - height, x + width, y + (descent * (-1)) - height);
 
 				contentStream.setStrokingColor(Color.BLACK);
 			} catch (Throwable e) {
@@ -693,18 +666,13 @@ public class TableDrawUtils {
 		if ("true".equals(settings.getValue(TABLE_DEBUG))) {
 			try {
 				contentStream.setStrokingColor(Color.RED);
-				contentStream.moveTo(x, y);
-				contentStream.lineTo(x + padding, y - padding);
-				contentStream.stroke();
-				contentStream.moveTo(x + width, y);
-				contentStream.lineTo(x + width - padding, y - padding);
-				contentStream.stroke();
-				contentStream.moveTo(x + width, y - height);
-				contentStream.lineTo(x + width - padding, y - height + padding);
-				contentStream.stroke();
-				contentStream.moveTo(x, y - height);
-				contentStream.lineTo(x + padding, y - height + padding);
-				contentStream.stroke();
+				contentStream.drawLine(x, y, x + padding, y - padding);
+				contentStream.drawLine(x + width, y, x + width - padding, y
+						- padding);
+				contentStream.drawLine(x + width, y - height, x + width
+						- padding, y - height + padding);
+				contentStream.drawLine(x, y - height, x + padding, y - height
+						+ padding);
 				contentStream.setStrokingColor(Color.BLACK);
 			} catch (Throwable e) {
 				e.printStackTrace();

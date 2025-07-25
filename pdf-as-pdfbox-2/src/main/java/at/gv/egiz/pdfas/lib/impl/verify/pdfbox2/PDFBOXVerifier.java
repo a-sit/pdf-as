@@ -12,7 +12,6 @@ import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSString;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.Loader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +39,7 @@ public class PDFBOXVerifier implements VerifyBackend {
 			List<VerifyResult> result = new ArrayList<VerifyResult>();
 			ISettings settings = (ISettings) parameter.getConfiguration();
 			VerifierDispatcher verifier = new VerifierDispatcher(settings);
-			byte[] pdfBytes = IOUtils.toByteArray(parameter.getDataSource().getInputStream());
-			doc = Loader.loadPDF(pdfBytes);
+			doc = PDDocument.load(parameter.getDataSource().getInputStream());
 
 			COSDictionary trailer = doc.getDocument().getTrailer();
 			if (trailer == null) {

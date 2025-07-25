@@ -33,9 +33,9 @@ dependencies {
 	implementation project (':pdf-as-lib')
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: slf4jVersion
-	api group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.5'
-	api group: 'org.apache.pdfbox', name: 'pdfbox-tools', version: '3.0.5'
-	api group: 'org.apache.pdfbox', name: 'preflight', version: '3.0.5'
+	api group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.34'
+	api group: 'org.apache.pdfbox', name: 'pdfbox-tools', version: '2.0.34'
+	api group: 'org.apache.pdfbox', name: 'preflight', version: '2.0.34'
 	implementation group: 'commons-io', name: 'commons-io', version: commonsIoVersion
 	implementation group: 'ognl', name: 'ognl', version: ognlVersion	
 	api group: 'com.github.jai-imageio', name: 'jai-imageio-jpeg2000', version: '1.4.0'

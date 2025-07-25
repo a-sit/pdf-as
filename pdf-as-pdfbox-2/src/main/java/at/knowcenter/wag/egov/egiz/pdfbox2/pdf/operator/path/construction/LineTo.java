@@ -80,7 +80,7 @@ public class LineTo extends PathConstructionOperatorProcessor {
 
 			COSNumber x = (COSNumber) operands.get(0);
 			COSNumber y = (COSNumber) operands.get(1);
-			Point2D p = transform(x.floatValue(), y.floatValue());
+			Point2D p = transform(x.doubleValue(), y.doubleValue());
 
 			pdfPage.getCurrentPath().lineTo((float) p.getX(), (float) p.getY());
 

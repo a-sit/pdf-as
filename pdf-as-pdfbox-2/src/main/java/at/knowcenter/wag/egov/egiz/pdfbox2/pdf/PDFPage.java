@@ -155,6 +155,7 @@ public class PDFPage extends PDFTextStripper{
 		this.effectivePageHeight = effectivePageHeight;
 
 		OperatorProcessor newInvoke = new MyInvoke(this);
+		newInvoke.setContext(this);
 		this.registerOperatorProcessor("Do", newInvoke);
 
 		if (!legacy32) {

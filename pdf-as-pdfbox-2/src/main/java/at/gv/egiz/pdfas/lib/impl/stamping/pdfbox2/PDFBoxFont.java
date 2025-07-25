@@ -30,7 +30,6 @@ import java.io.IOException;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ public class PDFBoxFont {
 	private static final String NORMAL = "NORMAL";
 	private static final String SEP = ":";
 
-	public static PDFont defaultFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+	public static PDFont defaultFont = PDType1Font.HELVETICA;
 	public static float defaultFontSize = 8;
 
 	//private static Map<String, FontInfoCache> fontInfoCache = new HashMap<String, FontInfoCache>();

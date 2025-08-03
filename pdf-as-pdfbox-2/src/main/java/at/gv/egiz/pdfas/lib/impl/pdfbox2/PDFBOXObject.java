@@ -28,21 +28,15 @@ public class PDFBOXObject extends PDFObject {
 		super(operationStatus);
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		if(doc != null) {
-			doc.close();
-		}
-	}
+	// Note: finalize() method removed as it's deprecated in Java 9+
+	// Resource cleanup should be handled explicitly via close() method
 	
 	public void close() {
 		if(doc != null) {
 			try {
 				doc.close();
-				//System.gc();
-			} catch(Throwable e) {
-				// ignore!
+			} catch(IOException e) {
+				// Log and ignore IOException during close
 			}
 			doc = null;
 		}

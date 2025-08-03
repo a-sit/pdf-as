@@ -4,9 +4,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -53,40 +53,38 @@ public class QRDetectionDiagnosticTool {
     public static List<ImageAnalysisResult> analyzeAllImages(String pdfPath) throws IOException {
         List<ImageAnalysisResult> results = new ArrayList<>();
         
-        PDDocument doc = PDDocument.load(QRDetectionDiagnosticTool.class.getResourceAsStream(pdfPath));
-        
-        System.out.println("=== QR DETECTION DIAGNOSTIC ANALYSIS ===");
-        System.out.println("PDF: " + pdfPath);
-        System.out.println("Pages: " + doc.getNumberOfPages());
-        
-        for (int pageNum = 0; pageNum < doc.getNumberOfPages(); pageNum++) {
-            PDPage page = doc.getPage(pageNum);
-            System.out.println("\n--- Page " + (pageNum + 1) + " ---");
+        try (PDDocument doc = PDDocument.load(QRDetectionDiagnosticTool.class.getResourceAsStream(pdfPath))) {
+            System.out.println("=== QR DETECTION DIAGNOSTIC ANALYSIS ===");
+            System.out.println("PDF: " + pdfPath);
+            System.out.println("Pages: " + doc.getNumberOfPages());
             
-            if (page.getResources() != null && page.getResources().getXObjectNames() != null) {
-                for (COSName xObjectName : page.getResources().getXObjectNames()) {
-                    PDXObject xObject = page.getResources().getXObject(xObjectName);
-                    
-                    if (xObject instanceof PDImageXObject) {
-                        PDImageXObject imageXObject = (PDImageXObject) xObject;
-                        ImageAnalysisResult result = analyzeImage(imageXObject, xObjectName.getName());
-                        results.add(result);
+            for (int pageNum = 0; pageNum < doc.getNumberOfPages(); pageNum++) {
+                PDPage page = doc.getPage(pageNum);
+                System.out.println("\n--- Page " + (pageNum + 1) + " ---");
+                
+                if (page.getResources() != null && page.getResources().getXObjectNames() != null) {
+                    for (COSName xObjectName : page.getResources().getXObjectNames()) {
+                        PDXObject xObject = page.getResources().getXObject(xObjectName);
                         
-                        System.out.println("  " + result.toString());
-                        
-                        // Save image for manual inspection
-                        saveImageForInspection(imageXObject, xObjectName.getName());
+                        if (xObject instanceof PDImageXObject) {
+                            PDImageXObject imageXObject = (PDImageXObject) xObject;
+                            ImageAnalysisResult result = analyzeImage(imageXObject, xObjectName.getName());
+                            results.add(result);
+                            
+                            System.out.println("  " + result.toString());
+                            
+                            // Save image for manual inspection
+                            saveImageForInspection(imageXObject, xObjectName.getName());
+                        }
                     }
                 }
             }
+            
+            System.out.println("\n=== SUMMARY ===");
+            System.out.println("Total images analyzed: " + results.size());
+            long qrDetectedCount = results.stream().filter(r -> r.qrDetected).count();
+            System.out.println("QR codes detected: " + qrDetectedCount);
         }
-        
-        doc.close();
-        
-        System.out.println("\n=== SUMMARY ===");
-        System.out.println("Total images analyzed: " + results.size());
-        long qrDetectedCount = results.stream().filter(r -> r.qrDetected).count();
-        System.out.println("QR codes detected: " + qrDetectedCount);
         
         return results;
     }
@@ -169,8 +167,8 @@ public class QRDetectionDiagnosticTool {
         LuminanceSource source = new BufferedImageLuminanceSource(image);
         BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
         
-        Hashtable<DecodeHintType, Object> hints = new Hashtable<>();
-        Vector<BarcodeFormat> formats = new Vector<>();
+        Map<DecodeHintType, Object> hints = new HashMap<>();
+        List<BarcodeFormat> formats = new ArrayList<>();
         formats.add(BarcodeFormat.QR_CODE);
         hints.put(DecodeHintType.POSSIBLE_FORMATS, formats);
         
@@ -181,8 +179,8 @@ public class QRDetectionDiagnosticTool {
         LuminanceSource source = new BufferedImageLuminanceSource(image);
         BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
         
-        Hashtable<DecodeHintType, Object> hints = new Hashtable<>();
-        Vector<BarcodeFormat> formats = new Vector<>();
+        Map<DecodeHintType, Object> hints = new HashMap<>();
+        List<BarcodeFormat> formats = new ArrayList<>();
         formats.add(BarcodeFormat.QR_CODE);
         hints.put(DecodeHintType.POSSIBLE_FORMATS, formats);
         hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
@@ -195,8 +193,8 @@ public class QRDetectionDiagnosticTool {
         LuminanceSource source = new BufferedImageLuminanceSource(image);
         BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
         
-        Hashtable<DecodeHintType, Object> hints = new Hashtable<>();
-        Vector<BarcodeFormat> formats = new Vector<>();
+        Map<DecodeHintType, Object> hints = new HashMap<>();
+        List<BarcodeFormat> formats = new ArrayList<>();
         formats.add(BarcodeFormat.QR_CODE);
         hints.put(DecodeHintType.POSSIBLE_FORMATS, formats);
         hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);

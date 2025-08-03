@@ -172,7 +172,22 @@
   - **Commit changes**: `git add . && git commit -m "feat: update build and release processes"`
   - _Requirements: 4.5, 5.2, 5.3_
 
-- [-] 16. Create comprehensive documentation
+- [ ] 16. Modernize code to reflect current Java standards and remove deprecated usage
+  - Scan codebase for deprecated API usage and replace with modern alternatives
+  - Update code to use modern Java features where appropriate (var declarations, enhanced switch, etc.)
+  - Replace deprecated logging patterns with modern SLF4J practices
+  - Update exception handling to use modern patterns (try-with-resources, multi-catch)
+  - Replace deprecated collection operations with modern Stream API where beneficial
+  - Update string handling to use modern StringBuilder patterns and text blocks where appropriate
+  - Replace deprecated file I/O operations with modern java.nio.file APIs
+  - Update deprecated reflection usage with modern alternatives
+  - Replace deprecated date/time APIs with java.time package
+  - Update deprecated security and cryptographic API usage
+  - Run `./gradlew build test` to verify all changes maintain functionality
+  - **Commit changes**: `git add . && git commit -m "refactor: modernize code standards and remove deprecated usage"`
+  - _Requirements: 1.3, 2.1, 7.3, 7.4_
+
+- [-] 17. Create comprehensive documentation
   - Document all dependency version changes with rationale
   - Create migration guide for users upgrading from previous versions
   - Update build instructions for Java 17 and new Gradle version
@@ -182,7 +197,7 @@
   - **Commit changes**: `git add . && git commit -m "docs: create comprehensive documentation and migration guide"`
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 17. Upgrade Apache PDFBox to 3.x (Future Enhancement)
+- [x] 18. Upgrade Apache PDFBox to 3.x (Future Enhancement)
   - Research comprehensive PDFBox 2.x to 3.x migration guide and breaking changes
   - Update font constants from PDType1Font.HELVETICA to new PDType1Font(Standard14Fonts.FontName.HELVETICA) syntax
   - Update PDDocument.load() calls to use new Loader.loadPDF() API
@@ -198,7 +213,7 @@
   - _Requirements: 2.1, 2.3, 6.4_
   - **Note**: This is a complex migration requiring extensive code changes due to significant API breaking changes in PDFBox 3.x
 
-- [ ] 18. Perform final integration testing
+- [ ] 19. Perform final integration testing
   - Test complete build process from clean checkout
   - Verify all modules integrate correctly with updated dependencies
   - Test deployment of web application on target Tomcat version

@@ -38,23 +38,17 @@ public class PDFBoxPlaceholderExtractorTest {
 
 
   private static List<String> getPlaceHolders(String filePath) throws IOException {
-    final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
-        filePath));
-    final List<String> results = SignatureFieldsAndPlaceHolderExtractor.findEmptySignatureFields(doc);
-    return results;
-
+    try (final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
+        filePath))) {
+      return SignatureFieldsAndPlaceHolderExtractor.findEmptySignatureFields(doc);
+    }
   }
 
   private static SignaturePlaceholderData getNextSignaturePlaceHolder(String filePath) throws IOException {
-    final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
-        filePath));
-    
-
-    
-    final SignaturePlaceholderData result =
-        SignatureFieldsAndPlaceHolderExtractor.getNextUnusedSignaturePlaceHolder(doc);
-    return result;
-
+    try (final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
+        filePath))) {
+      return SignatureFieldsAndPlaceHolderExtractor.getNextUnusedSignaturePlaceHolder(doc);
+    }
   }
 
 }

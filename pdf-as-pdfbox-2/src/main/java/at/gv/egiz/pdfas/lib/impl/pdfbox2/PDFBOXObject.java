@@ -36,7 +36,7 @@ public class PDFBOXObject extends PDFObject {
 			try {
 				doc.close();
 			} catch(Throwable e) {
-				// Log and ignore Throwables during close
+				// Ignore Throwables during close
 			}
 			doc = null;
 		}

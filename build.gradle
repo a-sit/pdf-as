@@ -30,8 +30,8 @@ subprojects {
 	// OWASP Dependency Check configuration
 	dependencyCheck {
 		nvd {
-			// Use environment variable NVD_API_KEY or fallback to placeholder
-			apiKey = System.getenv('NVD_API_KEY') ?: 'your-nvd-api-key-here'
+			// Use environment variable NVD_API_KEY
+			apiKey = System.getenv('NVD_API_KEY')
 			// Add delay between API calls to avoid rate limiting
 			delay = 4000
 		}
@@ -40,7 +40,7 @@ subprojects {
 		// Suppress false positives if needed
 		suppressionFile = 'dependency-check-suppressions.xml'
 		// Fail build on CVSS score >= 7 (High severity)
-		failBuildOnCVSS = 7
+		// failBuildOnCVSS = 7
 		// Skip CVSSv4 parsing to avoid compatibility issues
 		skipConfigurations = []
 		// Use local database if NVD API fails

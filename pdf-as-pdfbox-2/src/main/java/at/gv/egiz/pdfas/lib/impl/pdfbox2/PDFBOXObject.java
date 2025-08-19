@@ -35,8 +35,8 @@ public class PDFBOXObject extends PDFObject {
 		if(doc != null) {
 			try {
 				doc.close();
-			} catch(IOException e) {
-				// Log and ignore IOException during close
+			} catch(Throwable e) {
+				// Log and ignore Throwables during close
 			}
 			doc = null;
 		}

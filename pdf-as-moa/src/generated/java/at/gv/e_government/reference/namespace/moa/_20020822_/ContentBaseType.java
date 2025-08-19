@@ -1,32 +1,32 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für ContentBaseType complex type.
+ * <p>Java class for ContentBaseType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="ContentBaseType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;choice minOccurs="0"&gt;
- *         &lt;element name="Base64Content" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
- *         &lt;element name="XMLContent" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}XMLContentType"/&gt;
- *         &lt;element name="LocRefContent" type="{http://www.w3.org/2001/XMLSchema}anyURI"/&gt;
- *       &lt;/choice&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="ContentBaseType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <choice minOccurs="0">
+ *         <element name="Base64Content" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+ *         <element name="XMLContent" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}XMLContentType"/>
+ *         <element name="LocRefContent" type="{http://www.w3.org/2001/XMLSchema}anyURI"/>
+ *       </choice>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -51,7 +51,7 @@ public class ContentBaseType {
     protected String locRefContent;
 
     /**
-     * Ruft den Wert der base64Content-Eigenschaft ab.
+     * Gets the value of the base64Content property.
      * 
      * @return
      *     possible object is
@@ -62,7 +62,7 @@ public class ContentBaseType {
     }
 
     /**
-     * Legt den Wert der base64Content-Eigenschaft fest.
+     * Sets the value of the base64Content property.
      * 
      * @param value
      *     allowed object is
@@ -73,7 +73,7 @@ public class ContentBaseType {
     }
 
     /**
-     * Ruft den Wert der xmlContent-Eigenschaft ab.
+     * Gets the value of the xmlContent property.
      * 
      * @return
      *     possible object is
@@ -85,7 +85,7 @@ public class ContentBaseType {
     }
 
     /**
-     * Legt den Wert der xmlContent-Eigenschaft fest.
+     * Sets the value of the xmlContent property.
      * 
      * @param value
      *     allowed object is
@@ -97,7 +97,7 @@ public class ContentBaseType {
     }
 
     /**
-     * Ruft den Wert der locRefContent-Eigenschaft ab.
+     * Gets the value of the locRefContent property.
      * 
      * @return
      *     possible object is
@@ -109,7 +109,7 @@ public class ContentBaseType {
     }
 
     /**
-     * Legt den Wert der locRefContent-Eigenschaft fest.
+     * Sets the value of the locRefContent property.
      * 
      * @param value
      *     allowed object is

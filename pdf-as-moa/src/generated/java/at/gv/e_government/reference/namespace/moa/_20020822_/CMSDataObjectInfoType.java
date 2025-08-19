@@ -1,45 +1,45 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für CMSDataObjectInfoType complex type.
+ * <p>Java class for CMSDataObjectInfoType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="CMSDataObjectInfoType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="DataObject"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}CMSDataObjectRequiredMetaType"&gt;
- *               &lt;/extension&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/sequence&gt;
- *       &lt;attribute name="Structure" use="required"&gt;
- *         &lt;simpleType&gt;
- *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *             &lt;enumeration value="detached"/&gt;
- *             &lt;enumeration value="enveloping"/&gt;
- *           &lt;/restriction&gt;
- *         &lt;/simpleType&gt;
- *       &lt;/attribute&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="CMSDataObjectInfoType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="DataObject">
+ *           <complexType>
+ *             <complexContent>
+ *               <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}CMSDataObjectRequiredMetaType">
+ *               </extension>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *       </sequence>
+ *       <attribute name="Structure" use="required">
+ *         <simpleType>
+ *           <restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *             <enumeration value="detached"/>
+ *             <enumeration value="enveloping"/>
+ *           </restriction>
+ *         </simpleType>
+ *       </attribute>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -58,7 +58,7 @@ public class CMSDataObjectInfoType {
     protected String structure;
 
     /**
-     * Ruft den Wert der dataObject-Eigenschaft ab.
+     * Gets the value of the dataObject property.
      * 
      * @return
      *     possible object is
@@ -70,7 +70,7 @@ public class CMSDataObjectInfoType {
     }
 
     /**
-     * Legt den Wert der dataObject-Eigenschaft fest.
+     * Sets the value of the dataObject property.
      * 
      * @param value
      *     allowed object is
@@ -82,7 +82,7 @@ public class CMSDataObjectInfoType {
     }
 
     /**
-     * Ruft den Wert der structure-Eigenschaft ab.
+     * Gets the value of the structure property.
      * 
      * @return
      *     possible object is
@@ -94,7 +94,7 @@ public class CMSDataObjectInfoType {
     }
 
     /**
-     * Legt den Wert der structure-Eigenschaft fest.
+     * Sets the value of the structure property.
      * 
      * @param value
      *     allowed object is
@@ -107,18 +107,18 @@ public class CMSDataObjectInfoType {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type</p>.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.</p>
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}CMSDataObjectRequiredMetaType"&gt;
-     *     &lt;/extension&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}CMSDataObjectRequiredMetaType">
+     *     </extension>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */

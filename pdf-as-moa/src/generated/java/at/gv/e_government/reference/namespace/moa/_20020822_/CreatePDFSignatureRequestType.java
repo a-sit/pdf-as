@@ -3,43 +3,43 @@ package at.gv.e_government.reference.namespace.moa._20020822_;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für CreatePDFSignatureRequestType complex type.
+ * <p>Java class for CreatePDFSignatureRequestType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="CreatePDFSignatureRequestType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="KeyIdentifier" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}KeyIdentifierType"/&gt;
- *         &lt;element name="SingleSignatureInfo" maxOccurs="unbounded"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;sequence&gt;
- *                   &lt;element name="PDFDocument" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
- *                   &lt;element name="SignatureProfile" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *                   &lt;element name="SignaturePosition" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *                   &lt;element name="SignatureID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *                 &lt;/sequence&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="CreatePDFSignatureRequestType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="KeyIdentifier" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}KeyIdentifierType"/>
+ *         <element name="SingleSignatureInfo" maxOccurs="unbounded">
+ *           <complexType>
+ *             <complexContent>
+ *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 <sequence>
+ *                   <element name="PDFDocument" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+ *                   <element name="SignatureProfile" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *                   <element name="SignaturePosition" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *                   <element name="SignatureID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *                 </sequence>
+ *               </restriction>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -55,11 +55,16 @@ public class CreatePDFSignatureRequestType {
 
     @XmlElement(name = "KeyIdentifier", required = true)
     protected String keyIdentifier;
+    /**
+     * ErmÃ¶glichung der Stapelsignatur durch
+     * 						wiederholte Angabe dieses Elements
+     * 
+     */
     @XmlElement(name = "SingleSignatureInfo", required = true)
     protected List<CreatePDFSignatureRequestType.SingleSignatureInfo> singleSignatureInfo;
 
     /**
-     * Ruft den Wert der keyIdentifier-Eigenschaft ab.
+     * Gets the value of the keyIdentifier property.
      * 
      * @return
      *     possible object is
@@ -71,7 +76,7 @@ public class CreatePDFSignatureRequestType {
     }
 
     /**
-     * Legt den Wert der keyIdentifier-Eigenschaft fest.
+     * Sets the value of the keyIdentifier property.
      * 
      * @param value
      *     allowed object is
@@ -83,54 +88,60 @@ public class CreatePDFSignatureRequestType {
     }
 
     /**
+     * ErmÃ¶glichung der Stapelsignatur durch
+     * 						wiederholte Angabe dieses Elements
+     * 
      * Gets the value of the singleSignatureInfo property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the singleSignatureInfo property.
+     * This is why there is not a <CODE>set</CODE> method for the singleSignatureInfo property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getSingleSignatureInfo().add(newItem);
+     * getSingleSignatureInfo().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link CreatePDFSignatureRequestType.SingleSignatureInfo }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the singleSignatureInfo property.
      */
     public List<CreatePDFSignatureRequestType.SingleSignatureInfo> getSingleSignatureInfo() {
         if (singleSignatureInfo == null) {
-            singleSignatureInfo = new ArrayList<CreatePDFSignatureRequestType.SingleSignatureInfo>();
+            singleSignatureInfo = new ArrayList<>();
         }
         return this.singleSignatureInfo;
     }
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type</p>.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.</p>
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;sequence&gt;
-     *         &lt;element name="PDFDocument" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
-     *         &lt;element name="SignatureProfile" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
-     *         &lt;element name="SignaturePosition" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
-     *         &lt;element name="SignatureID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
-     *       &lt;/sequence&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       <sequence>
+     *         <element name="PDFDocument" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+     *         <element name="SignatureProfile" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+     *         <element name="SignaturePosition" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+     *         <element name="SignatureID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+     *       </sequence>
+     *     </restriction>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */
@@ -153,7 +164,7 @@ public class CreatePDFSignatureRequestType {
         protected String signatureID;
 
         /**
-         * Ruft den Wert der pdfDocument-Eigenschaft ab.
+         * Gets the value of the pdfDocument property.
          * 
          * @return
          *     possible object is
@@ -164,7 +175,7 @@ public class CreatePDFSignatureRequestType {
         }
 
         /**
-         * Legt den Wert der pdfDocument-Eigenschaft fest.
+         * Sets the value of the pdfDocument property.
          * 
          * @param value
          *     allowed object is
@@ -175,7 +186,7 @@ public class CreatePDFSignatureRequestType {
         }
 
         /**
-         * Ruft den Wert der signatureProfile-Eigenschaft ab.
+         * Gets the value of the signatureProfile property.
          * 
          * @return
          *     possible object is
@@ -187,7 +198,7 @@ public class CreatePDFSignatureRequestType {
         }
 
         /**
-         * Legt den Wert der signatureProfile-Eigenschaft fest.
+         * Sets the value of the signatureProfile property.
          * 
          * @param value
          *     allowed object is
@@ -199,7 +210,7 @@ public class CreatePDFSignatureRequestType {
         }
 
         /**
-         * Ruft den Wert der signaturePosition-Eigenschaft ab.
+         * Gets the value of the signaturePosition property.
          * 
          * @return
          *     possible object is
@@ -211,7 +222,7 @@ public class CreatePDFSignatureRequestType {
         }
 
         /**
-         * Legt den Wert der signaturePosition-Eigenschaft fest.
+         * Sets the value of the signaturePosition property.
          * 
          * @param value
          *     allowed object is
@@ -223,7 +234,7 @@ public class CreatePDFSignatureRequestType {
         }
 
         /**
-         * Ruft den Wert der signatureID-Eigenschaft ab.
+         * Gets the value of the signatureID property.
          * 
          * @return
          *     possible object is
@@ -235,7 +246,7 @@ public class CreatePDFSignatureRequestType {
         }
 
         /**
-         * Legt den Wert der signatureID-Eigenschaft fest.
+         * Sets the value of the signatureID property.
          * 
          * @param value
          *     allowed object is

@@ -11,7 +11,10 @@ jar {
 repositories {
 	mavenLocal()
 	mavenCentral()
-	maven { url "http://nexus.iaik.tugraz.at/nexus/content/groups/internal" }
+	maven { 
+		url = "http://nexus.iaik.tugraz.at/nexus/content/groups/internal"
+		allowInsecureProtocol = true
+	}
 }
 
 dependencies {

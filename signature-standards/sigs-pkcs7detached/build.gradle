@@ -1,5 +1,7 @@
-apply plugin: 'java-library'
-apply plugin: 'eclipse'
+plugins {
+    id 'java-library'
+    id 'eclipse'
+}
 
 jar {
     manifest {
@@ -8,23 +10,24 @@ jar {
 }
 
 repositories {
-	mavenLocal()
+    mavenLocal()
     mavenCentral()
 }
 
 task releases(type: Copy) {
-	from jar.outputs
-	into rootDir.toString() + "/releases/" + version
+    from jar.outputs
+    into rootDir.toString() + "/releases/" + version
 }
 
 releases.dependsOn jar
 releases.dependsOn sourcesJar
 
 dependencies {
-	implementation project (':pdf-as-lib')
-	implementation project (':pdf-as-common')
-    implementation 'org.apache.commons:commons-collections4:4.4'
-    testImplementation group: 'junit', name: 'junit', version: '4.+'
+    implementation project(':pdf-as-lib')
+    implementation project(':pdf-as-common')
+    implementation 'org.apache.commons:commons-collections4:4.5.0'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+    testImplementation 'junit:junit:4.13.2'
 }
 
 test {

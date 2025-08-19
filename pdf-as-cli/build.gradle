@@ -2,7 +2,9 @@ apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
-mainClassName = "at.gv.egiz.pdfas.cli.Main"
+application {
+    mainClass = "at.gv.egiz.pdfas.cli.Main"
+}
 
 repositories {
 	mavenLocal()
@@ -32,11 +34,11 @@ dependencies {
 	implementation project (':signature-standards:sigs-pades')
 	implementation project (':pdf-as-moa')
     implementation project (':pdf-as-pdfbox-2')
-    implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
-	implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
+	implementation group: 'commons-cli', name: 'commons-cli', version: '1.9.0'
 	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
-	implementation 'ch.qos.logback:logback-classic:1.2.13'
-    testImplementation group: 'junit', name: 'junit', version: '4.+'
+	implementation 'ch.qos.logback:logback-classic:1.5.15'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
 
 

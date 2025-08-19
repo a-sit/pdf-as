@@ -20,7 +20,6 @@ public class PDFBoxPlaceholderExtractorTest {
   public void nextPlaceholder() {
     SignaturePlaceholderData result = getNextSignaturePlaceHolder("/data/platzhalter_en_de_test.pdf");
     assertEquals("Im48", result.getPlaceholderName());
-
   }
 
   @Test
@@ -28,24 +27,22 @@ public class PDFBoxPlaceholderExtractorTest {
   public void allPlaceHolders() {
     List<String> listOfPlaceHolders = getPlaceHolders("/data/platzhalter_en_de_test.pdf");
     assertNotNull(listOfPlaceHolders);
-
   }
 
-  private static List<String> getPlaceHolders(String filePath) throws IOException {
-    final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
-        filePath));
-    final List<String> results = SignatureFieldsAndPlaceHolderExtractor.findEmptySignatureFields(doc);
-    return results;
 
+
+  private static List<String> getPlaceHolders(String filePath) throws IOException {
+    try (final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
+        filePath))) {
+      return SignatureFieldsAndPlaceHolderExtractor.findEmptySignatureFields(doc);
+    }
   }
 
   private static SignaturePlaceholderData getNextSignaturePlaceHolder(String filePath) throws IOException {
-    final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
-        filePath));
-    final SignaturePlaceholderData result =
-        SignatureFieldsAndPlaceHolderExtractor.getNextUnusedSignaturePlaceHolder(doc);
-    return result;
-
+    try (final PDDocument doc = PDDocument.load(PDFBoxPlaceholderExtractorTest.class.getResourceAsStream(
+        filePath))) {
+      return SignatureFieldsAndPlaceHolderExtractor.getNextUnusedSignaturePlaceHolder(doc);
+    }
   }
 
 }

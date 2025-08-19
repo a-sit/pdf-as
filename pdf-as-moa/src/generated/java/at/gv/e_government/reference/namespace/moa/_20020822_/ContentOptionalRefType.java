@@ -1,28 +1,28 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für ContentOptionalRefType complex type.
+ * <p>Java class for ContentOptionalRefType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="ContentOptionalRefType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentBaseType"&gt;
- *       &lt;attribute name="Reference" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="ContentOptionalRefType">
+ *   <complexContent>
+ *     <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentBaseType">
+ *       <attribute name="Reference" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *     </extension>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -42,7 +42,7 @@ public class ContentOptionalRefType
     protected String reference;
 
     /**
-     * Ruft den Wert der reference-Eigenschaft ab.
+     * Gets the value of the reference property.
      * 
      * @return
      *     possible object is
@@ -54,7 +54,7 @@ public class ContentOptionalRefType
     }
 
     /**
-     * Legt den Wert der reference-Eigenschaft fest.
+     * Sets the value of the reference property.
      * 
      * @param value
      *     allowed object is

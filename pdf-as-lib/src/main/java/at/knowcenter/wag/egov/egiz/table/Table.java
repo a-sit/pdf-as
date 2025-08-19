@@ -51,7 +51,6 @@ package at.knowcenter.wag.egov.egiz.table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
@@ -81,7 +80,7 @@ public class Table implements Serializable
   /**
    * The row definitions.
    */
-  private Map<String, ArrayList<Entry>> rows_ = new HashMap<String, ArrayList<Entry>>();
+  private Map<String, ArrayList<Entry>> rows_ = new HashMap<>();
 
   /**
    * The table width.
@@ -197,7 +196,7 @@ public class Table implements Serializable
    */
   public ArrayList<ArrayList<Entry>> getRows()
   {
-    ArrayList<ArrayList<Entry>> rows = new ArrayList<ArrayList<Entry>>();
+    ArrayList<ArrayList<Entry>> rows = new ArrayList<>();
     for (int row_idx = 1; row_idx <= rows_.size(); row_idx++)
     {
       ArrayList<Entry> row = rows_.get(String.valueOf(row_idx));
@@ -232,16 +231,14 @@ public class Table implements Serializable
   
   private int calculateRowSize(ArrayList<Entry> newrow) {
 	  int colCount = 0;
-	  for(int i = 0; i < newrow.size(); i++) {
-		  colCount += newrow.get(i).getColSpan();
+	  for (Entry entry : newrow) {
+		  colCount += entry.getColSpan();
 	  }
 	  return colCount;
   }
   
   private void recalculateMaxCol() {
-	  Iterator<ArrayList<Entry>> rowIt = getRows().iterator();
-	  while(rowIt.hasNext()) {
-		  ArrayList<Entry> row = rowIt.next();
+	  for (ArrayList<Entry> row : getRows()) {
 		  calculateMaxCols(row);
 	  }
   }
@@ -253,9 +250,7 @@ public class Table implements Serializable
  * @throws PdfAsSettingsException 
    */
   public void normalize() throws PdfAsSettingsException {	  
-	  Iterator<ArrayList<Entry>> rowIt = getRows().iterator();
-	  while(rowIt.hasNext()) {
-		  ArrayList<Entry> row = rowIt.next();
+	  for (ArrayList<Entry> row : getRows()) {
 		  
 		  // This row fits just fine
 		  if(row.size() == maxCols_) {
@@ -293,20 +288,21 @@ public class Table implements Serializable
    */
   public String toString()
   {
-    String the_string = "\n#### TABLE " + name_ + " BEGIN #####";
-    the_string += " Width:" + width_ + " max cols:" + maxCols_ + " cols:" + colsRelativeWith_;
-    the_string += "\nStyle:" + style_;
+    StringBuilder sb = new StringBuilder();
+    sb.append("\n#### TABLE ").append(name_).append(" BEGIN #####");
+    sb.append(" Width:").append(width_).append(" max cols:").append(maxCols_).append(" cols:").append(colsRelativeWith_);
+    sb.append("\nStyle:").append(style_);
     ArrayList<ArrayList<Entry>> rows = getRows();
     for (int row_idx = 0; row_idx < rows.size(); row_idx++)
     {
       ArrayList<Entry> row = rows.get(row_idx);
       String row_prefix = "\n ++ ROW " + row_idx + " ++ ";
-      for (int entry_idx = 0; entry_idx < row.size(); entry_idx++)
+      for (Entry entry : row)
       {
-        the_string += row_prefix + row.get(entry_idx).toString();
+        sb.append(row_prefix).append(entry.toString());
       }
     }
-    the_string += "\n#### TABLE " + name_ + " END #####";
-    return the_string;
+    sb.append("\n#### TABLE ").append(name_).append(" END #####");
+    return sb.toString();
   }
 }

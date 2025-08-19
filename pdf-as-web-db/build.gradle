@@ -1,6 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'java-library-distribution'
+plugins {
+	id 'java-library'
+	id 'eclipse'
+	id 'distribution'
+}
 
 jar {
 	manifest {
@@ -17,9 +19,8 @@ dependencies {
 	implementation project (':pdf-as-web')
 	implementation project (':pdf-as-web-status')
 	implementation project (':pdf-as-web-statistic-api')
-	api "org.hibernate:hibernate-core:5.6.15.Final"
-	api "org.hibernate:hibernate-entitymanager:5.6.15.Final"
-	implementation 'ch.qos.logback:logback-classic:1.2.13'
+	api "org.hibernate:hibernate-core:6.6.4.Final"
+	implementation 'ch.qos.logback:logback-classic:1.5.15'
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 }
 

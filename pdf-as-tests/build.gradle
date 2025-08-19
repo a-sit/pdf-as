@@ -8,7 +8,7 @@ jar {
 }
 
 repositories {	
-	maven { url "https://apps.egiz.gv.at/maven-internal/" }
+	maven { url = "https://apps.egiz.gv.at/maven-internal/" }
 //	mavenLocal()
 //	mavenCentral()
 //	maven { url "https://repository.jboss.org/maven2/" }	
@@ -57,7 +57,7 @@ suiteDir.eachDir {	File subDir ->
 
 	task "runTestSuite${dirname.capitalize()}"(type: Test) {
 
-		description "runs tests from Test Suite: " + dirname
+		description = "runs tests from Test Suite: " + dirname
 		systemProperties 'test.dir': subDir.absolutePath
 
 		if(dirname =="public_pdfbox2"){

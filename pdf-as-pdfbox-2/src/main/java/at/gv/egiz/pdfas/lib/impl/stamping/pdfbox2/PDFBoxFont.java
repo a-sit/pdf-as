@@ -161,7 +161,7 @@ public class PDFBoxFont {
 		String fontName = fonttype.replaceFirst("TTF:", "");
 		String fontPath = this.settings.getWorkingDirectory() + File.separator + "fonts" + File.separator + fontName;
 		
-		logger.debug("Font from: \"" + fontPath + "\".");
+		logger.debug("Font from: \"{}\".", fontPath);
 		PDFAsFontCache fontCache = pdfObject.getSigBlockFontCache();		
 		if(fontCache.contains(fontPath)){
 			logger.debug("Using cached font.");
@@ -189,8 +189,11 @@ public class PDFBoxFont {
 
 		boolean requirePDFA3 = signatureProfileSettings.isPDFA3();
 */
-		PDType0Font font = PDType0Font.load(pdfObject.getDocument(), new FileInputStream(fontPath));
-		fontCache.addFont(fontPath,font);
+		PDType0Font font;
+		try (FileInputStream fontStream = new FileInputStream(fontPath)) {
+			font = PDType0Font.load(pdfObject.getDocument(), fontStream);
+		}
+		fontCache.addFont(fontPath, font);
 		
 		return font;
 
@@ -242,7 +245,7 @@ public class PDFBoxFont {
 			PDFBOXObject pdfObject) throws IOException {
 		this.settings = settings;
 		this.fontDesc = fontDesc;
-		logger.debug("Creating Font: " + fontDesc);
+		logger.debug("Creating Font: {}", fontDesc);
 		this.setFont(fontDesc, pdfObject);
 	}
 

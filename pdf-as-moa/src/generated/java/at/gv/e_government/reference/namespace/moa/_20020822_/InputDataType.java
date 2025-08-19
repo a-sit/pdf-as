@@ -2,38 +2,38 @@
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
 import java.math.BigInteger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für InputDataType complex type.
+ * <p>Java class for InputDataType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="InputDataType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentExLocRefBaseType"&gt;
- *       &lt;attribute name="PartOf" default="SignedInfo"&gt;
- *         &lt;simpleType&gt;
- *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}token"&gt;
- *             &lt;enumeration value="SignedInfo"/&gt;
- *             &lt;enumeration value="XMLDSIGManifest"/&gt;
- *           &lt;/restriction&gt;
- *         &lt;/simpleType&gt;
- *       &lt;/attribute&gt;
- *       &lt;attribute name="ReferringSigReference" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
- *       &lt;attribute name="HashAlgorithm" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="InputDataType">
+ *   <complexContent>
+ *     <extension base="{http://reference.e-government.gv.at/namespace/moa/20020822#}ContentExLocRefBaseType">
+ *       <attribute name="PartOf" default="SignedInfo">
+ *         <simpleType>
+ *           <restriction base="{http://www.w3.org/2001/XMLSchema}token">
+ *             <enumeration value="SignedInfo"/>
+ *             <enumeration value="XMLDSIGManifest"/>
+ *           </restriction>
+ *         </simpleType>
+ *       </attribute>
+ *       <attribute name="ReferringSigReference" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" />
+ *       <attribute name="HashAlgorithm" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *     </extension>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -53,7 +53,7 @@ public class InputDataType
     protected String hashAlgorithm;
 
     /**
-     * Ruft den Wert der partOf-Eigenschaft ab.
+     * Gets the value of the partOf property.
      * 
      * @return
      *     possible object is
@@ -69,7 +69,7 @@ public class InputDataType
     }
 
     /**
-     * Legt den Wert der partOf-Eigenschaft fest.
+     * Sets the value of the partOf property.
      * 
      * @param value
      *     allowed object is
@@ -81,7 +81,7 @@ public class InputDataType
     }
 
     /**
-     * Ruft den Wert der referringSigReference-Eigenschaft ab.
+     * Gets the value of the referringSigReference property.
      * 
      * @return
      *     possible object is
@@ -93,7 +93,7 @@ public class InputDataType
     }
 
     /**
-     * Legt den Wert der referringSigReference-Eigenschaft fest.
+     * Sets the value of the referringSigReference property.
      * 
      * @param value
      *     allowed object is
@@ -105,7 +105,7 @@ public class InputDataType
     }
 
     /**
-     * Ruft den Wert der hashAlgorithm-Eigenschaft ab.
+     * Gets the value of the hashAlgorithm property.
      * 
      * @return
      *     possible object is
@@ -117,7 +117,7 @@ public class InputDataType
     }
 
     /**
-     * Legt den Wert der hashAlgorithm-Eigenschaft fest.
+     * Sets the value of the hashAlgorithm property.
      * 
      * @param value
      *     allowed object is

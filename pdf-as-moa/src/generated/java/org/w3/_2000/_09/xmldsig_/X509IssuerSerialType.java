@@ -2,29 +2,29 @@
 package org.w3._2000._09.xmldsig_;
 
 import java.math.BigInteger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für X509IssuerSerialType complex type.
+ * <p>Java class for X509IssuerSerialType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="X509IssuerSerialType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="X509IssuerName" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="X509SerialNumber" type="{http://www.w3.org/2001/XMLSchema}integer"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="X509IssuerSerialType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="X509IssuerName" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         <element name="X509SerialNumber" type="{http://www.w3.org/2001/XMLSchema}integer"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -41,7 +41,7 @@ public class X509IssuerSerialType {
     protected BigInteger x509SerialNumber;
 
     /**
-     * Ruft den Wert der x509IssuerName-Eigenschaft ab.
+     * Gets the value of the x509IssuerName property.
      * 
      * @return
      *     possible object is
@@ -53,7 +53,7 @@ public class X509IssuerSerialType {
     }
 
     /**
-     * Legt den Wert der x509IssuerName-Eigenschaft fest.
+     * Sets the value of the x509IssuerName property.
      * 
      * @param value
      *     allowed object is
@@ -65,7 +65,7 @@ public class X509IssuerSerialType {
     }
 
     /**
-     * Ruft den Wert der x509SerialNumber-Eigenschaft ab.
+     * Gets the value of the x509SerialNumber property.
      * 
      * @return
      *     possible object is
@@ -77,7 +77,7 @@ public class X509IssuerSerialType {
     }
 
     /**
-     * Legt den Wert der x509SerialNumber-Eigenschaft fest.
+     * Sets the value of the x509SerialNumber property.
      * 
      * @param value
      *     allowed object is

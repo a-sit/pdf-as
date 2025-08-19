@@ -108,7 +108,7 @@ public class RemotePDFFetcher {
 					
 					if(fetchInfos.length == 3) {
 					    String userpass = fetchInfos[1] + ":" + fetchInfos[2];
-					    String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes("UTF-8"));
+					    String basicAuth = "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes("UTF-8"));
 					    uc.setRequestProperty("Authorization", basicAuth);
 					}
 					

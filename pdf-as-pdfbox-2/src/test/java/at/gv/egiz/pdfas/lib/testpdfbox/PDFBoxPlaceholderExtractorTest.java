@@ -21,8 +21,7 @@ public class PDFBoxPlaceholderExtractorTest {
   @SneakyThrows
   public void nextPlaceholder() {
     SignaturePlaceholderData result = getNextSignaturePlaceHolder("/data/platzhalter_en_de_test.pdf");
-    assertEquals("Im48_48", result.getPlaceholderName());
-
+    assertEquals("Im48", result.getPlaceholderName());
   }
 
   @Test
@@ -34,6 +33,16 @@ public class PDFBoxPlaceholderExtractorTest {
 
   }
 
+  @Test
+  @SneakyThrows
+  public void nextPlaceholderDuplicateElements() {
+    assertEquals("Im1", getNextSignaturePlaceHolder("/data/own_Testdoc+Signatur-sign-sign.pdf").getPlaceholderName());
+    assertEquals("Im1", getNextSignaturePlaceHolder("/data/cmd_test-pdf-signed.pdf").getPlaceholderName());
+    assertEquals("Im0_48", getNextSignaturePlaceHolder("/data/cmd_test-pdf-signed_2.pdf").getPlaceholderName());
+    assertEquals("Im1_49", getNextSignaturePlaceHolder("/data/cmd_test-pdf-signed_3.pdf").getPlaceholderName());
+
+  }
+    
   @Test
   @Ignore
   @SneakyThrows

@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
@@ -69,6 +70,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDPropBuild;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDPropBuildDataDict;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.util.Matrix;
 
@@ -101,6 +104,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SignaturePlaceholderExtractor extends PDFStreamEngine implements PlaceholderExtractorConstants {
 
+  public static final String PREFIX = "PDF-AS_";
+  
   private final List<SignaturePlaceholderData> placeholders = new ArrayList<>();
   private int currentPage = 0;
 
@@ -235,11 +240,11 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
 
             final String posString = "p:" + currentPage + ";x:" + Math.floor(x)
                 + ";y:" + Math.ceil(y) + ";w:" + Math.ceil(w);
-
-            log.debug("Found Placeholder at: {}", posString);
+                       
             try {
               data.setTablePos(new TablePos(posString));
               data.setPlaceholderName(objectName.getName());
+              log.debug("Found Placeholder at: {}", data.toString());
               placeholders.add(data);
               
             } catch (final PdfAsException e) {
@@ -255,6 +260,38 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
       super.processOperator(operator, arguments);
     }
   }
+  
+  /**
+   * Read placeholderId from signature.
+   * 
+   * @param signature Signature
+   * @return placeholderId or <code>null</code> if there is no placeholderId.
+   */
+  private static String readPlaceHolderId(PDSignature signature) {
+    PDPropBuild sigProps = getOrNew(signature);
+    PDPropBuildDataDict appProps = getOrNew(sigProps);
+    return appProps.getName() != null && appProps.getName().startsWith(PREFIX) 
+        ? appProps.getName().substring(PREFIX.length())
+        : appProps.getName();
+    
+  }
+  
+  /**
+   * Set a placeholderId into signature directory.
+   * 
+   * @param signature Signature
+   * @param placeholderId placeholderId
+   */
+  public static void setPlaceholderId(PDSignature signature, String placeholderId) {
+    PDPropBuild sigProps = getOrNew(signature);    
+    PDPropBuildDataDict appProps = getOrNew(sigProps);        
+    appProps.setName(PREFIX + placeholderId);    
+    sigProps.setPDPropBuildApp(appProps);
+    signature.setPropBuild(sigProps);
+    
+  }
+  
+
   
   private SignaturePlaceholderData matchPlaceholderPage(
       List<SignaturePlaceholderData> placeholders, String placeholderId, int matchMode) {
@@ -382,19 +419,32 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
     }       
   }
 
+
+  
+  private static final PDPropBuildDataDict getOrNew(PDPropBuild sigProps) {
+    PDPropBuildDataDict props = sigProps.getApp();    
+    return props != null ? props : new PDPropBuildDataDict();
+  }
+  
+  private static final PDPropBuild getOrNew(PDSignature signature) {
+    PDPropBuild sigProps = signature.getPropBuild();
+    return sigProps != null ? sigProps : new PDPropBuild(); 
+    
+  }
+  
   private List<String> existingExistingSignatureNames(PDDocument doc) {
-    final List<String> existingLocations = new ArrayList<>();
     try {
-      final List<PDSignature> pdSignatureList = doc.getSignatureDictionaries();
-      if (pdSignatureList.size() != 0) {
-        for (final PDSignature sig : pdSignatureList) {
-          existingLocations.add(sig.getLocation());
-        }
-      }
+      final List<PDSignature> pdSignatureList = doc.getSignatureDictionaries();      
+      return pdSignatureList.stream()
+        .map(el -> readPlaceHolderId(el))
+        .filter(Objects::nonNull)        
+        .collect(Collectors.toList());  
+                 
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.warn("Can not parse signature dictionaries", e);
+      return Collections.emptyList();
+      
     }
-    return existingLocations;
   }
   
   private List<SignaturePlaceholderData> removeAlreadyUsePlaceholders(

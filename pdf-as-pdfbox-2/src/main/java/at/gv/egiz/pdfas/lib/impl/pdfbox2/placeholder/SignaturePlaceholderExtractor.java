@@ -245,7 +245,13 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
                        
             try {
               data.setTablePos(new TablePos(posString));
-              data.setPlaceholderName(buildUniqueObjectName(objectName));
+              
+              boolean idExists = placeholders.stream()
+                  .filter(el -> el.getPlaceholderName().equals(objectName.getName()))
+                  .findFirst()
+                  .isPresent();
+              
+              data.setPlaceholderName(buildUniqueObjectName(objectName, idExists));
               log.debug("Found Placeholder at: {}", data.toString());
               placeholders.add(data);
               
@@ -272,9 +278,12 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
   private static String readPlaceHolderId(PDSignature signature) {
     PDPropBuild sigProps = getOrNew(signature);
     PDPropBuildDataDict appProps = getOrNew(sigProps);
-    return appProps.getName() != null && appProps.getName().startsWith(PREFIX) 
+    String newHolderId = appProps.getName() != null && appProps.getName().startsWith(PREFIX) 
         ? appProps.getName().substring(PREFIX.length())
         : appProps.getName();
+    
+    // read placeHolderId from old location element as backup
+    return newHolderId != null ? newHolderId : signature.getLocation();
     
   }
   
@@ -297,25 +306,22 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
    * Builds unique placeholderId from PDF element.
    * 
    * @param name PDF element name
+   * @param idExists <code>true</code> if same name already found, otherwise false  
    * @return unique identifier
    */
-  private String buildUniqueObjectName(COSName name)
-  {
+  private String buildUniqueObjectName(COSName name, boolean idExists) {
+    if (idExists) {        
       COSDictionary dict = getResources().getCOSObject().getCOSDictionary(COSName.XOBJECT);
-      if (dict == null)
-      {
-          return name.getName();
-          
-      }
-      
-      COSBase base = dict.getItem(name);
-      if (base instanceof COSObject)
-      {                            
+      if (dict != null) {                            
+        COSBase base = dict.getItem(name);
+        if (base instanceof COSObject) {                            
           return name.getName() + "_" + String.valueOf(((COSObject) base).getObjectNumber());      
           
+        }
       }
+    }
 
-      return name.getName();
+    return name.getName();
       
   }
   

@@ -29,12 +29,12 @@ public class SignatureFieldsAndPlaceHolderExtractorTest {
   @Test
   public void notSigned(){
     SignaturePlaceholderData result = getNextSignaturePlaceHolder(getPath("new_qr_2-2.pdf"));
-    Assert.assertEquals("Image5_5",result.getPlaceholderName());
+    Assert.assertEquals("Image5",result.getPlaceholderName());
   }
   @Test
   public void signedOnce(){
     SignaturePlaceholderData result = getNextSignaturePlaceHolder(getPath("new_qr_2_signed.pdf"));
-    Assert.assertEquals("Image8_8",result.getPlaceholderName());
+    Assert.assertEquals("Image8",result.getPlaceholderName());
   }
   @Test
   public void signedTwice(){
@@ -56,7 +56,7 @@ public class SignatureFieldsAndPlaceHolderExtractorTest {
   @Test
   public void firstQrCodeOnUnsignedDoc() {
     SignaturePlaceholderData result = getNextSignaturePlaceHolder(getPath("new_qr_2-2.pdf"));
-    Assert.assertEquals("Image5_5",result.getPlaceholderName());
+    Assert.assertEquals("Image5",result.getPlaceholderName());
     
   }
   
@@ -66,28 +66,28 @@ public class SignatureFieldsAndPlaceHolderExtractorTest {
     Assert.assertEquals(null,result);
 
     result = getNextSignaturePlaceHolder(getPath("new_qr_2_signed.pdf"));
-    Assert.assertEquals("Image8_8",result.getPlaceholderName());
+    Assert.assertEquals("Image8",result.getPlaceholderName());
 
     result = getNextSignaturePlaceHolder(getPath("new_qr_2-2.pdf"));
-    Assert.assertEquals("Image5_5",result.getPlaceholderName());
+    Assert.assertEquals("Image5",result.getPlaceholderName());
 
     result = getNextSignaturePlaceHolder(getPath("new_qr_2-2.pdf"));
-    Assert.assertEquals("Image5_5",result.getPlaceholderName());
+    Assert.assertEquals("Image5",result.getPlaceholderName());
 
     result = getNextSignaturePlaceHolder(getPath("new_qr_2-2.pdf"));
-    Assert.assertEquals("Image5_5",result.getPlaceholderName());
+    Assert.assertEquals("Image5",result.getPlaceholderName());
 
     result = getNextSignaturePlaceHolder(getPath("new_qr_2_signed.pdf"));
-    Assert.assertEquals("Image8_8",result.getPlaceholderName());
+    Assert.assertEquals("Image8",result.getPlaceholderName());
 
     result = getNextSignaturePlaceHolder(getPath("new_qr_2_signed_signed_signed.pdf"));
     Assert.assertEquals(null,result);
 
     result = getNextSignaturePlaceHolder(getPath("new_qr_2-2.pdf"));
-    Assert.assertEquals("Image5_5",result.getPlaceholderName());
+    Assert.assertEquals("Image5",result.getPlaceholderName());
 
     result = getNextSignaturePlaceHolder(getPath("new_qr_2_signed.pdf"));
-    Assert.assertEquals("Image8_8",result.getPlaceholderName());
+    Assert.assertEquals("Image8",result.getPlaceholderName());
   }
   @Test
   public void notSignedAndNoFields(){

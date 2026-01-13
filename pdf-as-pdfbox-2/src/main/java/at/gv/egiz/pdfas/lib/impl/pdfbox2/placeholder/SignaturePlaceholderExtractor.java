@@ -65,7 +65,9 @@ import org.apache.pdfbox.contentstream.PDFStreamEngine;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.contentstream.operator.OperatorProcessor;
 import org.apache.pdfbox.cos.COSBase;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
@@ -243,7 +245,7 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
                        
             try {
               data.setTablePos(new TablePos(posString));
-              data.setPlaceholderName(objectName.getName());
+              data.setPlaceholderName(buildUniqueObjectName(objectName));
               log.debug("Found Placeholder at: {}", data.toString());
               placeholders.add(data);
               
@@ -291,7 +293,31 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
     
   }
   
+  /**
+   * Builds unique placeholderId from PDF element.
+   * 
+   * @param name PDF element name
+   * @return unique identifier
+   */
+  private String buildUniqueObjectName(COSName name)
+  {
+      COSDictionary dict = getResources().getCOSObject().getCOSDictionary(COSName.XOBJECT);
+      if (dict == null)
+      {
+          return name.getName();
+          
+      }
+      
+      COSBase base = dict.getItem(name);
+      if (base instanceof COSObject)
+      {                            
+          return name.getName() + "_" + String.valueOf(((COSObject) base).getObjectNumber());      
+          
+      }
 
+      return name.getName();
+      
+  }
   
   private SignaturePlaceholderData matchPlaceholderPage(
       List<SignaturePlaceholderData> placeholders, String placeholderId, int matchMode) {

@@ -85,6 +85,7 @@ import at.gv.egiz.pdfas.lib.impl.ErrorExtractor;
 import at.gv.egiz.pdfas.lib.impl.SignaturePositionImpl;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
 import at.gv.egiz.pdfas.lib.impl.pdfbox2.PDFBOXObject;
+import at.gv.egiz.pdfas.lib.impl.pdfbox2.placeholder.SignaturePlaceholderExtractor;
 import at.gv.egiz.pdfas.lib.impl.pdfbox2.positioning.Positioning;
 import at.gv.egiz.pdfas.lib.impl.pdfbox2.utils.PdfBoxUtils;
 import at.gv.egiz.pdfas.lib.impl.placeholder.PlaceholderFilter;
@@ -163,9 +164,9 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
           pdfObject.getStatus().getSignParamter().getPlaceHolderId());
 
       if (nextPlaceholderData != null) {
-        log.info("Placeholder data found.");
-        signature.setLocation(nextPlaceholderData.getPlaceholderName());
-                     
+        log.info("Placeholder data found. Injection placeholderId ...");
+        SignaturePlaceholderExtractor.setPlaceholderId(signature, nextPlaceholderData.getPlaceholderName());
+        
         if (nextPlaceholderData.getProfile() != null) {
           if (pdfObject.getStatus().getSettings().isValue(IConfigurationConstants.PLACEHOLDER_PROFILE_OVERWRITE, true)) {
             log.debug("Placeholder Profile set to: {}", nextPlaceholderData.getProfile());

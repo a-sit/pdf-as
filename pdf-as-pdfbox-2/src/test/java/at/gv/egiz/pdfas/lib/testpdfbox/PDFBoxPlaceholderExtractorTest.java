@@ -21,7 +21,7 @@ public class PDFBoxPlaceholderExtractorTest {
   @SneakyThrows
   public void nextPlaceholder() {
     SignaturePlaceholderData result = getNextSignaturePlaceHolder("/data/platzhalter_en_de_test.pdf");
-    assertEquals("Im48", result.getPlaceholderName());
+    assertEquals("Im48_48", result.getPlaceholderName());
 
   }
 

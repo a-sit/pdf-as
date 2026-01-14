@@ -50,15 +50,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 import org.apache.pdfbox.contentstream.PDFStreamEngine;
@@ -107,7 +100,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SignaturePlaceholderExtractor extends PDFStreamEngine implements PlaceholderExtractorConstants {
 
   public static final String PREFIX = "PDF-AS_";
-  
+
+  private final Set<String> placeholderNames = new HashSet<>();
   private final List<SignaturePlaceholderData> placeholders = new ArrayList<>();
   private int currentPage = 0;
 
@@ -153,7 +147,7 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
       pageNr++;
 
       try {
-        this.currentPage = pageNr;        
+        this.currentPage = pageNr;
         if (page.getContents() != null && page.getResources() != null && page.getContentStreams() != null) {
           processPage(page); // TODO: pdfbox2 - right?
 
@@ -246,14 +240,10 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
             try {
               data.setTablePos(new TablePos(posString));
               
-              boolean idExists = placeholders.stream()
-                  .filter(el -> el.getPlaceholderName().equals(objectName.getName()))
-                  .findFirst()
-                  .isPresent();
-              
-              data.setPlaceholderName(buildUniqueObjectName(objectName, idExists));
+              data.setPlaceholderName(buildUniqueObjectName(objectName));
               log.debug("Found Placeholder at: {}", data.toString());
               placeholders.add(data);
+              placeholderNames.add(data.getPlaceholderName());
               
             } catch (final PdfAsException e) {
               throw new IOException();
@@ -306,23 +296,16 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
    * Builds unique placeholderId from PDF element.
    * 
    * @param name PDF element name
-   * @param idExists <code>true</code> if same name already found, otherwise false  
    * @return unique identifier
    */
-  private String buildUniqueObjectName(COSName name, boolean idExists) {
-    if (idExists) {        
-      COSDictionary dict = getResources().getCOSObject().getCOSDictionary(COSName.XOBJECT);
-      if (dict != null) {                            
-        COSBase base = dict.getItem(name);
-        if (base instanceof COSObject) {                            
-          return name.getName() + "_" + String.valueOf(((COSObject) base).getObjectNumber());      
-          
-        }
-      }
+  private String buildUniqueObjectName(COSName name) {
+    final String baseName = name.getName();
+    int i = 0;
+    String candidate = baseName;
+    while (placeholderNames.contains(candidate)) {
+      candidate = baseName + "_" + (++i);
     }
-
-    return name.getName();
-      
+    return candidate;
   }
   
   private SignaturePlaceholderData matchPlaceholderPage(

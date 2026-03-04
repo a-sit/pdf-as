@@ -537,7 +537,15 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   }
 
   private SignResult createSignResult(OperationStatus status)
-      throws IOException {
+      throws IOException, PDFASError {
+
+    if (status.getPdfObject().getSignedDocument() == null 
+        || status.getPdfObject().getSignedDocument().length <= 0) {
+      logger.warn("No signed document in session. Maybe signing-service communication stopped by an error");
+      throw new PDFASError(ERROR_SIG_INVALID_STATUS, 
+          "No signed document in session. Maybe signing-service communication stopped by an error");
+    }
+    
     // ================================================================
     // Create SignResult
     final SignResultImpl result = new SignResultImpl();

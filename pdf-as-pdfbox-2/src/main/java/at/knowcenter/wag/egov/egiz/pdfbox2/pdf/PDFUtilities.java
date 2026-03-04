@@ -68,33 +68,37 @@ public abstract class PDFUtilities implements IConfigurationConstants{
 	
 	public static float getMaxYPosition(
 			PDDocument pdfDataSource, int page, IPDFVisualObject pdfTable, float signatureMarginVertical, float footer_line, ISettings settings) throws IOException {
+
+    int width = (int) pdfDataSource.getPage(page).getCropBox().getWidth();
+    int height = (int) pdfDataSource.getPage(page).getCropBox().getHeight();
 		
-		PositioningRenderer renderer = new PositioningRenderer(pdfDataSource);
-		//BufferedImage bim = renderer.renderImage(page);
-
-		int width = (int) pdfDataSource.getPage(page).getCropBox().getWidth();
-		int height = (int) pdfDataSource.getPage(page).getCropBox().getHeight();
-		BufferedImage bim = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
+    // flip image in case of page rotation is 90 or 270  
+		BufferedImage bim = (pdfDataSource.getPage(page).getRotation() % 180 == 0) 
+		    ? new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+		    : new BufferedImage(height, width, BufferedImage.TYPE_INT_ARGB);
+		    		    
 		Graphics2D graphics = bim.createGraphics();
 		graphics.setBackground(MAGIC_COLOR);
-        
+    
+		PositioningRenderer renderer = new PositioningRenderer(pdfDataSource);
 		renderer.renderPageToGraphics(page, graphics);
 
-		Color bgColor = MAGIC_COLOR;
-		
-		if("true".equals(settings.getValue(BG_COLOR_DETECTION))){ //only used if background color should be determined automatically
-			bgColor = determineBackgroundColor(bim);
-		}
-
+	  /*
+	   * Only used if background color should be determined automatically.
+	   * That can be necessary of PDF contains page-size images.
+	   */
+		Color bgColor = "true".equals(settings.getValue(BG_COLOR_DETECTION))
+		    ? determineBackgroundColor(bim)
+		    : MAGIC_COLOR;
+			
 		int yCoord = bim.getHeight() - 1 - (int)footer_line;
 
 		for(int row = yCoord; row >= 0; row--)
 		{
-			if (row == 0)
-				yCoord = row;
-			else
-			{
+			if (row == 0) {
+				yCoord = row;			
+				
+			} else {
 				for(int col = 0; col < bim.getWidth(); col++){
 					int val = bim.getRGB(col, row);
 					if(val != bgColor.getRGB()){
@@ -105,11 +109,14 @@ public abstract class PDFUtilities implements IConfigurationConstants{
 				}
 			}
 		}
+		
 		String outFile = settings.getValue(SIG_PLACEMENT_DEBUG_OUTPUT);
-		if(outFile!=null){
+		if(outFile != null){
 			ImageIOUtil.writeImage(bim, outFile, 72);
 		}
+		
 		return yCoord;
+		
 	}
 
 	public static Color determineBackgroundColor(BufferedImage bim){

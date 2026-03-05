@@ -37,9 +37,6 @@ dependencies {
 	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
 
 	implementation project (':pdf-as-pdfbox-2')
-	//compile group: 'org.apache.pdfbox', name: 'preflight', version: '2.0.21'
-	//compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.21'
-	//compile group: 'org.apache.pdfbox', name: 'pdfbox-tools', version: '2.0.21'
 
 }
 

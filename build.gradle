@@ -88,11 +88,9 @@ subprojects {
 		version = version
 		pdfasversion = version
 		revision = getCheckedOutGitCommitHash()
-		//tomcatVersion = '7.0.54';
-		//tomcatVersion = '8.0.36';
-		tomcatVersion = '9.0.93';
+		tomcatVersion = '9.0.115';
 		slf4jVersion = '1.7.36'
-		cxfVersion = '3.5.9'
+		cxfVersion = '3.5.11'
 	  }
 	
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }

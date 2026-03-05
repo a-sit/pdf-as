@@ -57,7 +57,7 @@ dependencies {
 	api project (':pdf-as-web-statistic-api')
 	api project (':pdf-as-pdfbox-2')
 	api group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
-	api group: 'commons-io', name: 'commons-io', version: '2.16.1'
+	api group: 'commons-io', name: 'commons-io', version: '2.21.0'
 	api group: 'opensymphony', name: 'sitemesh', version: '2.4.2'
 	api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     api group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'
@@ -65,16 +65,16 @@ dependencies {
     api "commons-codec:commons-codec:1.17.1"
 	api 'org.apache.commons:commons-lang3:3.17.0'
 	api group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-	api 'org.apache.cxf:cxf-rt-transports-http:3.5.9'
-	api 'org.apache.cxf:cxf-rt-frontend-jaxws:3.5.9'
+	api 'org.apache.cxf:cxf-rt-transports-http:3.5.11'
+	api 'org.apache.cxf:cxf-rt-frontend-jaxws:3.5.11'
 	api 'com.thetransactioncompany:cors-filter:2.10'
 	api 'ch.qos.logback:logback-classic:1.2.13'
 	api 'ch.qos.logback:logback-core:1.2.13'
-	api 'org.json:json:20240303'
+	api 'org.json:json:20251224'
 	api group: 'javax.jws', name: 'javax.jws-api', version: '1.1'
 	compileOnly 'javax.servlet:javax.servlet-api:3.0.1'
-    testImplementation 'org.springframework:spring-test:5.3.31'
-    testImplementation 'org.springframework:spring-web:5.3.31'
+    testImplementation 'org.springframework:spring-test:5.3.39'
+    testImplementation 'org.springframework:spring-web:5.3.39'
     
 }
 

@@ -50,17 +50,23 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 import org.apache.pdfbox.contentstream.PDFStreamEngine;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.contentstream.operator.OperatorProcessor;
 import org.apache.pdfbox.cos.COSBase;
-import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
-import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
@@ -138,51 +144,36 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
    */
   public SignaturePlaceholderData extract(PDDocument doc,
       String placeholderId, int matchMode) throws PdfAsException {
-
     List<String> extistingSignatureNames = existingExistingSignatureNames(doc);
-    
-    
-    int pageNr = 0;
-    for (final PDPage page : doc.getPages()) {
-      pageNr++;
+    log.debug("Initial found #{} already used placeholders", extistingSignatureNames.size());
 
-      try {
-        this.currentPage = pageNr;
-        if (page.getContents() != null && page.getResources() != null && page.getContentStreams() != null) {
-          processPage(page); // TODO: pdfbox2 - right?
-
-        }
-        
-        final SignaturePlaceholderData ret = matchPlaceholderPage(
-            removeAlreadyUsePlaceholders(placeholders, extistingSignatureNames), placeholderId, matchMode);        
-        if (ret != null) {
-          return ret;
-          
-        }
-        
-      } catch (final IOException e1) {
-        throw new PDFIOException("error.pdf.io.04", e1);
-        
-      } catch (final Throwable e) {
-        throw new PDFIOException("error.pdf.io.04", e);
-        
-      }
-    }
+    SignaturePlaceholderData foundOnSinglePage = 
+        parseDocumentAndSearchOnSiglePages(doc, extistingSignatureNames, placeholderId, matchMode);
     
-    if (placeholders.size() > 0) {
-      final SignaturePlaceholderData ret = matchPlaceholderDocument(
-          removeAlreadyUsePlaceholders(placeholders, extistingSignatureNames), placeholderId, matchMode);
-      return ret;
+    if (foundOnSinglePage != null) {
+      return foundOnSinglePage;
       
+    } else { 
+      return searchOnAnyPage(extistingSignatureNames, matchMode);
+       
     }
-    // no placeholders found, apply strict mode if set
-    if (matchMode == PLACEHOLDER_MATCH_MODE_STRICT) {
-      throw new PlaceholderExtractionException("error.pdf.stamp.09");
-      
-    }
-    return null;
   }
 
+  /**
+   * Set a placeholderId into signature directory.
+   * 
+   * @param signature Signature
+   * @param placeholderId placeholderId
+   */
+  public static void setPlaceholderId(PDSignature signature, String placeholderId) {
+    PDPropBuild sigProps = getOrNew(signature);    
+    PDPropBuildDataDict appProps = getOrNew(sigProps);        
+    appProps.setName(PREFIX + placeholderId);    
+    sigProps.setPDPropBuildApp(appProps);
+    signature.setPropBuild(sigProps);
+    
+  }
+  
   @Override
   protected void processOperator(Operator operator, List<COSBase> arguments)
       throws IOException {
@@ -258,40 +249,61 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
       super.processOperator(operator, arguments);
     }
   }
-  
-  /**
-   * Read placeholderId from signature.
-   * 
-   * @param signature Signature
-   * @return placeholderId or <code>null</code> if there is no placeholderId.
-   */
-  private static String readPlaceHolderId(PDSignature signature) {
-    PDPropBuild sigProps = getOrNew(signature);
-    PDPropBuildDataDict appProps = getOrNew(sigProps);
-    String newHolderId = appProps.getName() != null && appProps.getName().startsWith(PREFIX) 
-        ? appProps.getName().substring(PREFIX.length())
-        : appProps.getName();
     
-    // read placeHolderId from old location element as backup
-    return newHolderId != null ? newHolderId : signature.getLocation();
+  private SignaturePlaceholderData searchOnAnyPage(List<String> extistingSignatureNames, int matchMode) throws PlaceholderExtractionException {
+    if (placeholders.size() > 0) {
+      final SignaturePlaceholderData ret = matchPlaceholderDocument(
+          removeAlreadyUsePlaceholders(placeholders, extistingSignatureNames), matchMode);
+      return ret;
     
-  }
-  
-  /**
-   * Set a placeholderId into signature directory.
-   * 
-   * @param signature Signature
-   * @param placeholderId placeholderId
-   */
-  public static void setPlaceholderId(PDSignature signature, String placeholderId) {
-    PDPropBuild sigProps = getOrNew(signature);    
-    PDPropBuildDataDict appProps = getOrNew(sigProps);        
-    appProps.setName(PREFIX + placeholderId);    
-    sigProps.setPDPropBuildApp(appProps);
-    signature.setPropBuild(sigProps);
+    }
+    // no placeholders found, apply strict mode if set
+    if (matchMode == PLACEHOLDER_MATCH_MODE_STRICT) {
+      throw new PlaceholderExtractionException("error.pdf.stamp.09");
+    
+    }
+    
+    return null;
     
   }
+
+  private SignaturePlaceholderData parseDocumentAndSearchOnSiglePages(PDDocument doc, List<String> extistingSignatureNames,
+      String placeholderId, int matchMode) throws PDFIOException {
+    int pageNr = 0;
+    for (final PDPage page : doc.getPages()) {      
+      pageNr++;
+      
+      SignaturePlaceholderData ret = processSinglePage(page, pageNr, extistingSignatureNames, placeholderId, matchMode);      
+      if (ret != null) {
+        log.debug("Found placeholder to use on page: {}. Stopping further search ... ", this.currentPage);
+        return ret;
+        
+      }      
+    }
+    
+    return null;
+    
+  }
+
+  private SignaturePlaceholderData processSinglePage(PDPage page, int pageNr, List<String> extistingSignatureNames, 
+      String placeholderId, int matchMode) throws PDFIOException {
+    try {
+      this.currentPage = pageNr;
+      if (page.getContents() != null && page.getResources() != null && page.getContentStreams() != null) {
+        processPage(page); // TODO: pdfbox2 - right?
+
+      }
+      
+      return matchPlaceholderOnSinglePage(
+          removeAlreadyUsePlaceholders(placeholders, extistingSignatureNames), placeholderId, matchMode);        
+            
+    } catch (final Throwable e) {
+      throw new PDFIOException("error.pdf.io.04", e);
+      
+    }    
+  }
   
+ 
   /**
    * Builds unique placeholderId from PDF element.
    * 
@@ -308,7 +320,7 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
     return candidate;
   }
   
-  private SignaturePlaceholderData matchPlaceholderPage(
+  private SignaturePlaceholderData matchPlaceholderOnSinglePage(
       List<SignaturePlaceholderData> placeholders, String placeholderId, int matchMode) {
     log.debug("Searching requested placeholder:{} with matchMode:{} in single page ... ", placeholderId, matchMode);
     
@@ -316,15 +328,22 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
       return null;
       
     }
-    
-    // check if find a placeholder with that ID    
+        
     for (final SignaturePlaceholderData data : placeholders) {
+            
+      /*
+       * If specific placeholderId is requested and placeholder as an Id, check if it already matches
+       */
       if (placeholderId != null && data.getId() != null 
           && matchPlaceHolderId(placeholderId, data.getId())) {
         return data;
         
       }
       
+      /*
+       * If mode is not sorted and there is no specific placeholderId requested 
+       * and placeholder contains no Id use the first one found
+       */
       if (matchMode != PLACEHOLDER_MATCH_MODE_SORTED 
           && placeholderId == null && data.getId() == null) {
         return data;
@@ -336,10 +355,9 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
   }
   
   private SignaturePlaceholderData matchPlaceholderDocument(
-      List<SignaturePlaceholderData> placeholders, String placeholderId,
-      int matchMode) throws PlaceholderExtractionException {
+      List<SignaturePlaceholderData> placeholders, int matchMode) throws PlaceholderExtractionException {
 
-    log.debug("Searching requested placeholder:{} with matchMode:{} on any page ... ", placeholderId, matchMode);
+    log.debug("Searching requested placeholder with matchMode:{} on any page ... ", matchMode);
     
     if (matchMode == PLACEHOLDER_MATCH_MODE_STRICT) {
       throw new PlaceholderExtractionException("error.pdf.stamp.09");
@@ -434,18 +452,6 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
     }       
   }
 
-
-  
-  private static final PDPropBuildDataDict getOrNew(PDPropBuild sigProps) {
-    PDPropBuildDataDict props = sigProps.getApp();    
-    return props != null ? props : new PDPropBuildDataDict();
-  }
-  
-  private static final PDPropBuild getOrNew(PDSignature signature) {
-    PDPropBuild sigProps = signature.getPropBuild();
-    return sigProps != null ? sigProps : new PDPropBuild(); 
-    
-  }
   
   private List<String> existingExistingSignatureNames(PDDocument doc) {
     try {
@@ -468,7 +474,7 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
       List<SignaturePlaceholderData> result = placeholders.stream()
           .filter(el -> !existingPlaceholders.contains(el.getPlaceholderName()))
           .collect(Collectors.toList());             
-      log.debug("Initial found #{} placeholders, but #{} removed because already used.",
+      log.trace("Initial found #{} placeholders, but #{} removed because already used.",
           placeholders.size(), placeholders.size() - result.size());
       return result;
       
@@ -575,5 +581,34 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
       }
     }
     return null;
+  }
+  
+  /**
+   * Read placeholderId from signature.
+   * 
+   * @param signature Signature
+   * @return placeholderId or <code>null</code> if there is no placeholderId.
+   */
+  private static String readPlaceHolderId(PDSignature signature) {
+    PDPropBuild sigProps = getOrNew(signature);
+    PDPropBuildDataDict appProps = getOrNew(sigProps);
+    String newHolderId = appProps.getName() != null && appProps.getName().startsWith(PREFIX) 
+        ? appProps.getName().substring(PREFIX.length())
+        : appProps.getName();
+    
+    // read placeHolderId from old location element as backup
+    return newHolderId != null ? newHolderId : signature.getLocation();
+    
+  }
+  
+  private static final PDPropBuildDataDict getOrNew(PDPropBuild sigProps) {
+    PDPropBuildDataDict props = sigProps.getApp();    
+    return props != null ? props : new PDPropBuildDataDict();
+  }
+  
+  private static final PDPropBuild getOrNew(PDSignature signature) {
+    PDPropBuild sigProps = signature.getPropBuild();
+    return sigProps != null ? sigProps : new PDPropBuild(); 
+    
   }
 }

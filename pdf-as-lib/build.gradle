@@ -13,7 +13,7 @@ buildscript {
 		mavenLocal()
 		mavenCentral()
 	}
-	dependencies { classpath("commons-io:commons-io:2.15.1") }
+	dependencies { classpath("commons-io:commons-io:"+commonsIoVersion) }
 
 }
 
@@ -67,14 +67,14 @@ dependencies {
     api group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
 	api group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.14'
 	api group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
-    api group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: bouncyCastleVersion
-	api group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.4'
-	api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.4'
-	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
+    api group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: bouncyCastleVersion
+	api group: 'jakarta.activation', name: 'jakarta.activation-api', version: jakartaActivationVersion
+	api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: jaxbApiVersion
+	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: jaxbRuntimeVersion
 	api group: 'com.google.code.gson', name: 'gson', version: gsonVersion
 	api group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.9.6'
 	api group: 'commons-io', name: 'commons-io', version: commonsIoVersion
-	api 'org.apache.commons:commons-collections4:4.5.0'
+	api group: 'org.apache.commons', name: 'commons-collections4', version: commonsCollectionsVersion
 	api group: 'ognl', name: 'ognl', version: ognlVersion
 	api files('libs/iaik_eccelerate_cms-6.02.jar')
 	api files('libs/iaik_eccelerate-6.02.jar')
@@ -94,7 +94,7 @@ dependencies {
 
     testImplementation project (':pdf-as-pdfbox-3')
     testImplementation project (':signature-standards:sigs-pades')
-    testImplementation group: 'org.zeroturnaround', name: 'zt-zip', version: '1.17'
+    testImplementation group: 'org.zeroturnaround', name: 'zt-zip', version: ztZipVersion
 }
 
 task wsdl2Java() {

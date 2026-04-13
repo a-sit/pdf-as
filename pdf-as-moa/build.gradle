@@ -13,7 +13,7 @@ buildscript {
 		mavenLocal()
 		mavenCentral()
 	}
-	dependencies { classpath("commons-io:commons-io:2.21.0") }
+	dependencies { classpath("commons-io:commons-io:"+commonsIoVersion) }
 }
 
 sourceSets {
@@ -49,20 +49,20 @@ dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 	
 	// Jakarta EE XML Binding (JAXB) - migrated from javax.xml.bind
-	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.4'
-	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
+	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: jaxbApiVersion
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: jaxbRuntimeVersion
 	
 	// Jakarta EE XML Web Services (JAX-WS) - migrated from javax.xml.ws
-	api group: 'jakarta.xml.ws', name: 'jakarta.xml.ws-api', version: '4.0.2'
-	api group: 'jakarta.jws', name: 'jakarta.jws-api', version: '3.0.0'
+	api group: 'jakarta.xml.ws', name: 'jakarta.xml.ws-api', version: jakartaXmlWsVersion
+	api group: 'jakarta.jws', name: 'jakarta.jws-api', version: jakartaJwsVersion
 	
 	// Apache Commons Codec for Base64 encoding
 	implementation group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
     api group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
-	
-	testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-	
+
+	testImplementation group: 'junit', name: 'junit', version: junitVersion
+
 	// Apache CXF tools for WSDL processing - updated to Jakarta EE compatible version
 	ws group: 'org.apache.cxf', name: 'cxf-tools', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-databinding-jaxb', version: cxfVersion

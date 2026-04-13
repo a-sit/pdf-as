@@ -25,7 +25,7 @@ sourceSets.test.runtimeClasspath += configurations.providedCompile
 dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
     implementation group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
-	compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+	compileOnly group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: jakartaServletVersion
 }
 
 task releases(type: Copy) {

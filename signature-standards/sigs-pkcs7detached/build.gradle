@@ -25,9 +25,9 @@ releases.dependsOn sourcesJar
 dependencies {
     implementation project(':pdf-as-lib')
     implementation project(':pdf-as-common')
-    implementation 'org.apache.commons:commons-collections4:4.5.0'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: commonsCollectionsVersion
     implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation group: 'junit', name: 'junit', version: junitVersion
 }
 
 test {

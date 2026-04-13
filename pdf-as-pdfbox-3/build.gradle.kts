@@ -13,15 +13,16 @@ repositories {
 
 dependencies {
     implementation(project(":pdf-as-lib"))
-    api("org.apache.pdfbox", "pdfbox", "3.0.6")
-    implementation("org.apache.pdfbox", "pdfbox-tools", "3.0.6")
-    implementation("org.apache.pdfbox", "xmpbox", "3.0.6")
-    implementation("org.apache.pdfbox", "preflight", "3.0.6")
+    val pdfboxVersion = project.ext["pdfboxVersion"] as String
+    api("org.apache.pdfbox", "pdfbox", pdfboxVersion)
+    implementation("org.apache.pdfbox", "pdfbox-tools", pdfboxVersion)
+    implementation("org.apache.pdfbox", "xmpbox", pdfboxVersion)
+    implementation("org.apache.pdfbox", "preflight", pdfboxVersion)
 
     testImplementation("ch.qos.logback", "logback-classic", project.ext["logbackVersion"] as String)
     testImplementation(project(":signature-standards:sigs-pades"))
     testImplementation(project(":signature-standards:sigs-pkcs7detached"))
-    testImplementation(group = "org.zeroturnaround", name = "zt-zip", version = "1.17")
+    testImplementation(group = "org.zeroturnaround", name = "zt-zip", version = project.ext["ztZipVersion"] as String)
 }
 
 tasks.register("releases", Copy::class) {

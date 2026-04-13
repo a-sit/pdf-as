@@ -32,9 +32,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import lombok.val;
+import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
-import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,13 +173,13 @@ public class VerifyServlet extends HttpServlet {
 			} else {
 				// configures upload settings
 				DiskFileItemFactory factory = DiskFileItemFactory.builder()
-					.setBufferSize(THRESHOLD_SIZE)
+					.setThreshold(THRESHOLD_SIZE)
 					.setPath(new File(System.getProperty("java.io.tmpdir")).toPath())
 					.get();
 
-				JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
-				upload.setFileSizeMax(MAX_FILE_SIZE);
-				upload.setSizeMax(MAX_REQUEST_SIZE);
+				val upload = new JakartaServletDiskFileUpload(factory);
+				upload.setMaxFileSize(MAX_FILE_SIZE);
+				upload.setMaxSize(MAX_REQUEST_SIZE);
 
 				// constructs the directory path to store upload file
 				String uploadPath = getServletContext().getRealPath("")
@@ -187,9 +190,9 @@ public class VerifyServlet extends HttpServlet {
 					uploadDir.mkdir();
 				}
 
-				List<?> formItems = upload.parseRequest(request);
+				List<DiskFileItem> formItems = upload.parseRequest(request);
 				logger.debug(formItems.size() + " Items in form data");
-				if (formItems.size() < 1) {
+				if (formItems.isEmpty()) {
 					// No Uploaded data!
 					// Try do get
 					// No Uploaded data!
@@ -201,48 +204,41 @@ public class VerifyServlet extends HttpServlet {
 								"No Signature data defined!");
 					}
 				} else {
-					for (int i = 0; i < formItems.size(); i++) {
-						Object obj = formItems.get(i);
-						if (obj instanceof FileItem) {
-							FileItem item = (FileItem) obj;
-							if (item.getFieldName().equals(UPLOAD_PDF_DATA)) {
-								filecontent = item.get();
-								try {
-									File f = new File(item.getName());
-									String name = f.getName();
-									logger.debug("Got upload: "
-											+ item.getName());
-									if (name != null) {
-										if (!(name.endsWith(".pdf") || name
-												.endsWith(".PDF"))) {
-											name += ".pdf";
-										}
+                  for (DiskFileItem item : formItems) {
+                    if (item != null) {
+                      if (item.getFieldName().equals(UPLOAD_PDF_DATA)) {
+                        filecontent = item.getInputStream().readAllBytes();
+                        try {
+                          File f = new File(item.getName());
+                          String name = f.getName();
+                          logger.debug("Got upload: "
+                              + item.getName());
+                          if (!(name.endsWith(".pdf") || name
+                              .endsWith(".PDF"))) {
+                            name += ".pdf";
+                          }
 
-										logger.debug("Setting Filename in session: "
-												+ name);
-										PdfAsHelper.setPDFFileName(request,
-												name);
-									}
-								} catch (Throwable e) {
-									logger.warn("In resolving filename", e);
-								}
-								if (filecontent.length < 10) {
-									filecontent = null;
-								} else {
-									logger.debug("Found pdf Data! Size: "
-											+ filecontent.length);
-								}
-							} else {
-								request.setAttribute(item.getFieldName(),
-										item.getString());
-								logger.debug("Setting " + item.getFieldName()
-										+ " = " + item.getString());
-							}
-						} else {
-							logger.debug(obj.getClass().getName() + " - "
-									+ obj.toString());
-						}
-					}
+                          logger.debug("Setting Filename in session: "
+                              + name);
+                          PdfAsHelper.setPDFFileName(request,
+                              name);
+                        } catch (Throwable e) {
+                          logger.warn("In resolving filename", e);
+                        }
+                        if (filecontent.length < 10) {
+                          filecontent = null;
+                        } else {
+                          logger.debug("Found pdf Data! Size: "
+                              + filecontent.length);
+                        }
+                      } else {
+                        request.setAttribute(item.getFieldName(),
+                            item.getString());
+                        logger.debug("Setting " + item.getFieldName()
+                            + " = " + item.getString());
+                      }
+                    }
+                  }
 				}
 			}
 

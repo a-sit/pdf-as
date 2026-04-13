@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,6 +42,7 @@ import java.security.PrivateKey;
 import java.util.*;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -54,7 +54,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "management.endpoints.web.exposure.include=metrics"
 })
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class MockMoaSigningTest {
   @Autowired MockMvc mvc;
   @Autowired ObjectMapper om;
@@ -185,47 +184,42 @@ public class MockMoaSigningTest {
   @Test
   @SneakyThrows
   public void signWithMockMOA() {
-    try (MockMoa moa = new MockMoa()) {
-      final String pdf = Base64.getEncoder().encodeToString(
-          IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/enc_own.pdf")));
+    try (val watcher = TestUtils.OperationCountWatcher(mvc, "operation:sign", "status:ok")) {
+      try (MockMoa moa = new MockMoa()) {
 
-      final String signRequestID = UUID.randomUUID().toString();
-      final String signRequest = om.writeValueAsString(
-          Map.of(
-              "requestID", signRequestID,
-              "inputData", pdf,
-              "parameters", Map.of(
-                  "connector", "moa",
-                  "keyIdentifier", moa.keyIdentifier,
-                  "transactionId", UUID.randomUUID().toString()
-              )
-          )
-      );
+        final String pdf = Base64.getEncoder().encodeToString(
+            IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/enc_own.pdf")));
 
-      final String signResponse = mvc.perform(
-              post("/api/v2/sign/single")
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .accept(MediaType.APPLICATION_JSON)
-                  .content(signRequest)
-          )
-          .andExpect(status().isOk())
-          .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-          .andExpect(jsonPath("$.requestID").value(signRequestID))
-          .andExpect(jsonPath("$.signedPDF").isNotEmpty())
-          .andExpect(jsonPath("$.verificationResponse").exists())
-          .andReturn().getResponse().getContentAsString();
+        final String signRequestID = UUID.randomUUID().toString();
+        final String signRequest = om.writeValueAsString(
+            Map.of(
+                "requestID", signRequestID,
+                "inputData", pdf,
+                "parameters", Map.of(
+                    "connector", "moa",
+                    "keyIdentifier", moa.keyIdentifier,
+                    "transactionId", UUID.randomUUID().toString()
+                )
+            )
+        );
 
-      final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
-      assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
-          new byte[]{'%','P','D','F','-'}, Arrays.copyOfRange(signedPDF, 0, 5));
+        final String signResponse = mvc.perform(
+                post("/api/v2/sign/single")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(signRequest)
+            )
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.requestID").value(signRequestID))
+            .andExpect(jsonPath("$.signedPDF").isNotEmpty())
+            .andExpect(jsonPath("$.verificationResponse").exists())
+            .andReturn().getResponse().getContentAsString();
 
-      mvc.perform(
-              get("/actuator/metrics/pdfas_requests")
-                  .param("tag", "operation:sign")
-                  .param("tag", "status:ok")
-          )
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.measurements[?(@.statistic == 'COUNT')].value").value(1.0));
+        final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
+        assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
+            new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
+      }
     }
   }
 

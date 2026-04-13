@@ -34,10 +34,10 @@ public class PDFBoxPlaceholderExtractorTest {
   @Test
   @SneakyThrows
   public void nextPlaceholderDuplicateElements() {
-    assertEquals("Im1", getNextSignaturePlaceHolder("/data/own_Testdoc+Signatur-sign-sign.pdf").getPlaceholderName());
-    assertEquals("Im1", getNextSignaturePlaceHolder("/data/cmd_test-pdf-signed.pdf").getPlaceholderName());
-    assertEquals("Im0_48", getNextSignaturePlaceHolder("/data/cmd_test-pdf-signed_2.pdf").getPlaceholderName());
-    assertEquals("Im1_49", getNextSignaturePlaceHolder("/data/cmd_test-pdf-signed_3.pdf").getPlaceholderName());
+    assertEquals("Im0_1", getNextSignaturePlaceHolder("/data/Testdoc_Signatur.pdf").getPlaceholderName());
+    assertEquals("Im0_2", getNextSignaturePlaceHolder("/data/own_Testdoc+Signatur-sign-sign.pdf").getPlaceholderName());
+    assertEquals("Im0_2", getNextSignaturePlaceHolder("/data/own_Testdoc+Signatur-sign-sign-4_sign.pdf").getPlaceholderName());
+    assertEquals("Im0", getNextSignaturePlaceHolder("/data/own_Testdoc+Signatur-sign-sign-4_sign-sign.pdf").getPlaceholderName());
 
   }
     

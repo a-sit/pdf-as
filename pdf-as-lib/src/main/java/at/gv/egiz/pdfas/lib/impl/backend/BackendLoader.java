@@ -32,7 +32,7 @@ public class BackendLoader implements ErrorConstants {
 	public static final String BACKEND_CONFIG = "runtime.backend";
 	
 	/** The default backend. */
-	private static PDFASBackend defaultBackend = null; 
+	private static PDFASBackend defaultBackend = null;
 	
 	static {
 		logger.debug("building PDF-AS Backends");

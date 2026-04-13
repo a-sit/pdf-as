@@ -38,7 +38,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 import javax.crypto.Cipher;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -119,7 +119,7 @@ public class PdfAsFactory implements IConfigurationConstants {
 			registerProvider(new IAIK(), 1);
 			// TODO: register ECCelerate in second position when TLS issue is
 			// fixed
-			registerProvider(new ECCelerate(), -1);
+			registerProvider(ECCelerate.getInstance(), -1);
 
 			registerProvider( new  BouncyCastleProvider(), -2);
 
@@ -170,7 +170,7 @@ public class PdfAsFactory implements IConfigurationConstants {
 		try {
 			teeInformation("+ IAIK-JCE Version: " + IAIK.getVersionInfo());
 			teeInformation("+ ECCelerate Version: "
-					+ ECCelerate.getInstance().getVersion());
+					+ ECCelerate.getInstance().getVersionStr());
 		} catch (Throwable e) {
 			teeInformation("+ Failed to show security provider informations");
 		}

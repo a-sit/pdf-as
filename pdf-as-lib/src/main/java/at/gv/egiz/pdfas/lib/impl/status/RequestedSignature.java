@@ -42,7 +42,7 @@ public class RequestedSignature implements ICertificateProvider {
     	
     	this.status = status;
     	
-    	String profileID = status.getSignParamter().getSignatureProfileId();
+    	String profileID = status.getSignParameter().getSignatureProfileId();
     	
     	if(profileID == null) {
     		profileID = status.getGlobalConfiguration().getDefaultSignatureProfile();
@@ -54,10 +54,10 @@ public class RequestedSignature implements ICertificateProvider {
 		
     	this.signatureProfile = profileID;
     	
-    	if(status.getSignParamter().getSignaturePosition() == null) {
+    	if(status.getSignParameter().getSignaturePosition() == null) {
     		this.tablePosition = new TablePos();
     	} else {
-    		this.tablePosition = new TablePos(status.getSignParamter().getSignaturePosition());
+    		this.tablePosition = new TablePos(status.getSignParameter().getSignaturePosition());
     	}
     }
     

@@ -1,32 +1,32 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für PDFSignedRepsonse complex type.
+ * <p>Java class for PDFSignedRepsonse complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="PDFSignedRepsonse"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="SignatureID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;choice&gt;
- *           &lt;element name="PDFSignature" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
- *           &lt;element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}ErrorResponse"/&gt;
- *         &lt;/choice&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="PDFSignedRepsonse">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="SignatureID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         <choice>
+ *           <element name="PDFSignature" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+ *           <element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}ErrorResponse"/>
+ *         </choice>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -40,13 +40,23 @@ public class PDFSignedRepsonse {
 
     @XmlElement(name = "SignatureID")
     protected String signatureID;
+    /**
+     * Resultat, falls die Signaturerstellung
+     * 							erfolgreich war
+     * 
+     */
     @XmlElement(name = "PDFSignature")
     protected byte[] pdfSignature;
+    /**
+     * Resultat, falls die Signaturerstellung gescheitert
+     * 				ist
+     * 
+     */
     @XmlElement(name = "ErrorResponse")
     protected ErrorResponseType errorResponse;
 
     /**
-     * Ruft den Wert der signatureID-Eigenschaft ab.
+     * Gets the value of the signatureID property.
      * 
      * @return
      *     possible object is
@@ -58,7 +68,7 @@ public class PDFSignedRepsonse {
     }
 
     /**
-     * Legt den Wert der signatureID-Eigenschaft fest.
+     * Sets the value of the signatureID property.
      * 
      * @param value
      *     allowed object is
@@ -70,7 +80,8 @@ public class PDFSignedRepsonse {
     }
 
     /**
-     * Ruft den Wert der pdfSignature-Eigenschaft ab.
+     * Resultat, falls die Signaturerstellung
+     * 							erfolgreich war
      * 
      * @return
      *     possible object is
@@ -81,18 +92,20 @@ public class PDFSignedRepsonse {
     }
 
     /**
-     * Legt den Wert der pdfSignature-Eigenschaft fest.
+     * Sets the value of the pdfSignature property.
      * 
      * @param value
      *     allowed object is
      *     byte[]
+     * @see #getPDFSignature()
      */
     public void setPDFSignature(byte[] value) {
         this.pdfSignature = value;
     }
 
     /**
-     * Ruft den Wert der errorResponse-Eigenschaft ab.
+     * Resultat, falls die Signaturerstellung gescheitert
+     * 				ist
      * 
      * @return
      *     possible object is
@@ -104,12 +117,13 @@ public class PDFSignedRepsonse {
     }
 
     /**
-     * Legt den Wert der errorResponse-Eigenschaft fest.
+     * Sets the value of the errorResponse property.
      * 
      * @param value
      *     allowed object is
      *     {@link ErrorResponseType }
      *     
+     * @see #getErrorResponse()
      */
     public void setErrorResponse(ErrorResponseType value) {
         this.errorResponse = value;

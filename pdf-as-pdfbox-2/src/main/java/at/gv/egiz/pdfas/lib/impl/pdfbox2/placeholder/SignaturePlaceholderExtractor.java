@@ -50,16 +50,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 import org.apache.pdfbox.contentstream.PDFStreamEngine;
@@ -112,7 +106,7 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
   private int currentPage = 0;
 
   protected SignaturePlaceholderExtractor() throws IOException, ClassNotFoundException,
-      InstantiationException, IllegalAccessException {
+      InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
     super();
 
     final Properties properties = new Properties();
@@ -124,7 +118,7 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
       final String processorClassName = (String) entry.getValue();
       final Class<?> klass = Class.forName(processorClassName);
       final org.apache.pdfbox.contentstream.operator.OperatorProcessor processor =
-          (OperatorProcessor) klass.newInstance();
+          (OperatorProcessor) klass.getDeclaredConstructor().newInstance();
 
       addOperator(processor);
       
@@ -198,17 +192,14 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
             rotation.setToRotation(rotationInRadians);
             final AffineTransform rotationInverse = rotation
                 .createInverse();
-            final Matrix rotationInverseMatrix = new Matrix();
-            rotationInverseMatrix
-                .setFromAffineTransform(rotationInverse);
-            final Matrix rotationMatrix = new Matrix();
-            rotationMatrix.setFromAffineTransform(rotation);
+            final Matrix rotationInverseMatrix = new Matrix(rotationInverse);
+            final Matrix rotationMatrix = new Matrix(rotation);
 
             final Matrix unrotatedCTM = ctm
                 .multiply(rotationInverseMatrix);
 
-            float x = unrotatedCTM.getXPosition();
-            final float yPos = unrotatedCTM.getYPosition();
+            float x = unrotatedCTM.getTranslateX();
+            final float yPos = unrotatedCTM.getTranslateY();
             final float yScale = unrotatedCTM.getScaleY();
             float y = yPos + yScale;
             final float w = unrotatedCTM.getScaleX();

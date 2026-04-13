@@ -27,7 +27,7 @@ sourceSets {
 configurations { 
 	ws 
 	
-	pdfDoclet { extendsFrom compile }
+	pdfDoclet { extendsFrom compileClasspath }
 }
 
 project.ext {
@@ -47,22 +47,38 @@ repositories {
 dependencies {
 	implementation project (':pdf-as-lib')
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-	testImplementation group: 'junit', name: 'junit', version: '4.+'
+	
+	// Jakarta EE XML Binding (JAXB) - migrated from javax.xml.bind
+	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.4'
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
+	
+	// Jakarta EE XML Web Services (JAX-WS) - migrated from javax.xml.ws
+	api group: 'jakarta.xml.ws', name: 'jakarta.xml.ws-api', version: '4.0.2'
+	api group: 'jakarta.jws', name: 'jakarta.jws-api', version: '3.0.0'
+	
+	// Apache Commons Codec for Base64 encoding
+	implementation group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
+    api group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
+	
+	testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+	
+	// Apache CXF tools for WSDL processing - updated to Jakarta EE compatible version
 	ws group: 'org.apache.cxf', name: 'cxf-tools', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-databinding-jaxb', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-frontend-jaxws', version: cxfVersion
-	api group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'
-	api group: 'javax.jws', name: 'javax.jws-api', version: '1.1'
-	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'}
+}
 
 task wsdl2Java() {
 	if (!wsdlDir.listFiles()) {
 		// do nothing
 	} else {
 		inputs.files wsdlDir.listFiles()
-		outputs.files generatedWsdlDir
+		outputs.dir generatedWsdlDir
 		doLast {
+			// Ensure the generated directory exists
+			generatedWsdlDir.mkdirs()
+			
 			wsdlsToGenerate.each { argsin ->
 				argsin.add(argsin.size - 1, '-d')
 				argsin.add(argsin.size - 1, 'src/generated/java')
@@ -70,7 +86,7 @@ task wsdl2Java() {
 				argsin.add(argsin.size - 1, '/wsdl/MOA-SPSS-2.0.0.wsdl')
 				javaexec {
 					classpath configurations.ws
-					main = 'org.apache.cxf.tools.wsdlto.WSDLToJava'
+					mainClass = 'org.apache.cxf.tools.wsdlto.WSDLToJava'
 					args = argsin
 					systemProperties = ['exitOnFinish':'TRUE']
 				}

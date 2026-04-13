@@ -19,6 +19,12 @@ public interface ErrorConstants {
 	public static final long ERROR_SIG_INVALID_PROFILE = 11009;
 
 	public static final long ERROR_SIG_CERTIFICATE_MISSMATCH = 11019;
+
+	public static final long ERROR_PDF_PROCESSING_FAILED = 11020;
+
+	public static final long ERROR_SIGNER_CERT_TIMEFRAME_INVALID = 11021;
+
+	public static final long ERROR_SIG_CONNECT_ERROR = 11022;
 	
 	// Verification Errors
 	

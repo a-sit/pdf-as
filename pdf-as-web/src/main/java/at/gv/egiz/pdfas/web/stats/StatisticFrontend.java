@@ -23,23 +23,16 @@ public class StatisticFrontend implements StatisticBackend {
 	private List<StatisticBackend> statisticBackends = new ArrayList<StatisticBackend>();
 
 	private StatisticFrontend() {
-		Iterator<StatisticBackend> statisticIterator = backendLoader.iterator();
 		List<String> enabledBackends = WebConfiguration.getStatisticBackends();
 
 		if (enabledBackends == null) {
-			logger.info("No statitistic backends configured using all available.");
+			logger.info("No statistic backends configured, using all available.");
 		} else {
-			Iterator<String> enabledBackendsIterator = enabledBackends
-					.iterator();
 			logger.info("Allowing the following statistic backends:");
-			while (enabledBackendsIterator.hasNext()) {
-				logger.info(" - {}", enabledBackendsIterator.next());
-			}
+			enabledBackends.forEach(it -> logger.info(" - {}", it));
 		}
 
-		while (statisticIterator.hasNext()) {
-			StatisticBackend statisticBackend = statisticIterator.next();
-
+		for (StatisticBackend statisticBackend : backendLoader) {
 			if (enabledBackends == null
 					|| enabledBackends.contains(statisticBackend.getName())) {
 				logger.info("adding Statistic Logger {} [{}]", statisticBackend
@@ -54,22 +47,8 @@ public class StatisticFrontend implements StatisticBackend {
 		}
 
 		if (enabledBackends != null) {
-			Iterator<String> enabledBackendsIterator = enabledBackends
-					.iterator();
-			while (enabledBackendsIterator.hasNext()) {
-				String enabledBackend = enabledBackendsIterator.next();
-				statisticIterator = statisticBackends.iterator();
-				boolean found = false;
-				while (statisticIterator.hasNext()) {
-					StatisticBackend statisticBackend = statisticIterator
-							.next();
-					if (statisticBackend.getName().equals(enabledBackend)) {
-						found = true;
-						break;
-					}
-				}
-
-				if (!found) {
+			for (String enabledBackend : enabledBackends) {
+				if (statisticBackends.stream().noneMatch(it -> it.getName().equals(enabledBackend))) {
 					logger.warn(
 							"Failed to load statistic backend {}. Not in classpath?",
 							enabledBackend);
@@ -103,13 +82,7 @@ public class StatisticFrontend implements StatisticBackend {
 			return;
 		}
 
-		Iterator<StatisticBackend> statisticBackendIterator = statisticBackends
-				.iterator();
-
-		while (statisticBackendIterator.hasNext()) {
-			StatisticBackend statisticBackend = statisticBackendIterator.next();
-			statisticBackend.storeEvent(statisticEvent);
-		}
+		statisticBackends.forEach(statisticBackend -> statisticBackend.storeEvent(statisticEvent));
 	}
 
 }

@@ -28,14 +28,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 
 import at.gv.egiz.pdfas.api.processing.CoreSignParams;
 import at.gv.egiz.pdfas.api.processing.DocumentToSign;
@@ -70,6 +70,7 @@ public class ExternSignServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
+	// TODO: get this from spring instead of -D
 	public static final String PDF_AS_WEB_CONF = "pdf-as-web.conf";
 	
 	private static final String UPLOAD_PDF_DATA = "pdf-file";
@@ -176,7 +177,7 @@ public class ExternSignServlet extends HttpServlet {
 			byte[] filecontent = null;
 
 			// checks if the request actually contains upload file
-			if (!ServletFileUpload.isMultipartContent(request)) {
+			if (!JakartaServletFileUpload.isMultipartContent(request)) {
 				// No Uploaded data!
 				if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
 					doGet(request, response);
@@ -187,12 +188,12 @@ public class ExternSignServlet extends HttpServlet {
 			} else {
 
 				// configures upload settings
-				DiskFileItemFactory factory = new DiskFileItemFactory();
-				factory.setSizeThreshold(WebConfiguration.getFilesizeThreshold());
-				factory.setRepository(new File(System
-						.getProperty("java.io.tmpdir")));
+				DiskFileItemFactory factory = DiskFileItemFactory.builder()
+					.setBufferSize(WebConfiguration.getFilesizeThreshold())
+					.setPath(new File(System.getProperty("java.io.tmpdir")).toPath())
+					.get();
 
-				ServletFileUpload upload = new ServletFileUpload(factory);
+				JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
 				upload.setFileSizeMax(WebConfiguration.getMaxFilesize());
 				upload.setSizeMax(WebConfiguration.getMaxRequestsize());
 

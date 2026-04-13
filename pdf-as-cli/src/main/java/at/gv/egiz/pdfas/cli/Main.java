@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -600,7 +600,7 @@ public class Main {
 				File outputPdfFile = new File(outputFile);
 				FileOutputStream fos = new FileOutputStream(outputPdfFile,
 						false);
-				fos.write(verifyResult.getSignatureData());
+				fos.write(verifyResult.getSignatureData().getBaseData());
 				fos.close();
 				System.out.println("\tSigned PDF: " + outputFile);
 			}

@@ -25,8 +25,8 @@ package at.gv.egiz.pdfas.api.ws;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name="SignResponse")
 public class PDFASSignResponse implements Serializable {
@@ -37,6 +37,7 @@ public class PDFASSignResponse implements Serializable {
 	private static final long serialVersionUID = -6369697640117556071L;
 	
 	String requestID;
+	Long errorCode;
 	String error;
 	byte[] signedPDF;
 	PDFASVerificationResponse verificationResponse;
@@ -65,7 +66,10 @@ public class PDFASSignResponse implements Serializable {
 	public void setVerificationResponse(PDFASVerificationResponse verificationResponse) {
 		this.verificationResponse = verificationResponse;
 	}
-	
+
+	@XmlElement(required = false, name="errorCode")
+	public Long getErrorCode() { return errorCode; }
+	public void setErrorCode(Long errorCode) { this.errorCode = errorCode; }
 	@XmlElement(required = false, name="error")
 	public String getError() {
 		return error;

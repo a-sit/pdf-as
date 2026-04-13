@@ -1,7 +1,9 @@
-apply plugin: 'java'
-apply plugin: 'war'
-apply plugin: 'eclipse'
-apply plugin: 'java-library-distribution'
+plugins {
+	id 'java-library'
+	id 'war'
+	id 'eclipse'
+	id 'distribution'
+}
 
 jar {
 	manifest {
@@ -22,8 +24,8 @@ sourceSets.test.runtimeClasspath += configurations.providedCompile
 
 dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
-	implementation 'org.apache.commons:commons-lang3:3.20.0'
-	compileOnly 'javax.servlet:javax.servlet-api:3.0.1'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
+	compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 }
 
 task releases(type: Copy) {

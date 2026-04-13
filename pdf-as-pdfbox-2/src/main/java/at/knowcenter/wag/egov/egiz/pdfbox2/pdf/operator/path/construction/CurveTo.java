@@ -87,9 +87,9 @@ public class CurveTo extends PathConstructionOperatorProcessor {
 			COSNumber x3 = (COSNumber) operands.get(4);
 			COSNumber y3 = (COSNumber) operands.get(5);
 
-			Point2D p1 = transform(x1.doubleValue(), y1.doubleValue());
-			Point2D p2 = transform(x2.doubleValue(), y2.doubleValue());
-			Point2D p3 = transform(x3.doubleValue(), y3.doubleValue());
+			Point2D p1 = transform(x1.floatValue(), y1.floatValue());
+			Point2D p2 = transform(x2.floatValue(), y2.floatValue());
+			Point2D p3 = transform(x3.floatValue(), y3.floatValue());
 
 			pdfPage.getCurrentPath().curveTo(
 					(float) p1.getX(), (float) p1.getY(),
@@ -108,8 +108,7 @@ public class CurveTo extends PathConstructionOperatorProcessor {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "c";
 	}
 
 }

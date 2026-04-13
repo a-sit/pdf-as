@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
  * change this template use File | Settings | File Templates.
  */
 @Slf4j
-public class Positioning {
+public class  Positioning {
 
   /**
    * The left/right margin.

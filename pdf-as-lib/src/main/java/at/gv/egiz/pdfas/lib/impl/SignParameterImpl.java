@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
@@ -48,7 +48,6 @@ public class SignParameterImpl extends PdfAsParameterImpl implements SignParamet
   @Setter
 	protected boolean placeHolderSearchEnabled;
 	
-	protected DataSource output = null;
 	protected IPlainSigner signer = null;
 	protected OutputStream outputStream = null;
 	protected List<BKUHeader> processInfo = new ArrayList<BKUHeader>();
@@ -85,10 +84,9 @@ public class SignParameterImpl extends PdfAsParameterImpl implements SignParamet
 		return this.signer;
 	}
 
-	@Override
-	public OutputStream getSignatureResult() {
-		return outputStream;
-	}
+    @Override public void setOutputStream(OutputStream stream) { this.outputStream = stream; }
+
+	@Override public OutputStream getSignatureResult() { return outputStream; }
 
 	public List<BKUHeader> getProcessInfo() {
 		return processInfo;

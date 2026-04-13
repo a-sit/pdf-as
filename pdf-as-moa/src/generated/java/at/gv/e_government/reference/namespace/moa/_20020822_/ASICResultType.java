@@ -3,40 +3,40 @@ package at.gv.e_government.reference.namespace.moa._20020822_;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java-Klasse für ASICResultType complex type.
+ * <p>Java class for ASICResultType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="ASICResultType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="signedFiles" maxOccurs="unbounded" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;simpleContent&gt;
- *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
- *                 &lt;attribute name="hashAlgorithm" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *               &lt;/extension&gt;
- *             &lt;/simpleContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="XMLSignatureResult" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}VerifyASICXMLSignatureResponseType" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element name="CMSSignatureResult" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}VerifyASICCMSSignatureResponseType" maxOccurs="unbounded" minOccurs="0"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="ASICResultType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="signedFiles" maxOccurs="unbounded" minOccurs="0">
+ *           <complexType>
+ *             <simpleContent>
+ *               <extension base="<http://www.w3.org/2001/XMLSchema>string">
+ *                 <attribute name="hashAlgorithm" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *               </extension>
+ *             </simpleContent>
+ *           </complexType>
+ *         </element>
+ *         <element name="XMLSignatureResult" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}VerifyASICXMLSignatureResponseType" maxOccurs="unbounded" minOccurs="0"/>
+ *         <element name="CMSSignatureResult" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}VerifyASICCMSSignatureResponseType" maxOccurs="unbounded" minOccurs="0"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -57,28 +57,31 @@ public class ASICResultType {
     /**
      * Gets the value of the signedFiles property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the signedFiles property.
+     * This is why there is not a <CODE>set</CODE> method for the signedFiles property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getSignedFiles().add(newItem);
+     * getSignedFiles().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ASICResultType.SignedFiles }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the signedFiles property.
      */
     public List<ASICResultType.SignedFiles> getSignedFiles() {
         if (signedFiles == null) {
-            signedFiles = new ArrayList<ASICResultType.SignedFiles>();
+            signedFiles = new ArrayList<>();
         }
         return this.signedFiles;
     }
@@ -86,28 +89,31 @@ public class ASICResultType {
     /**
      * Gets the value of the xmlSignatureResult property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the xmlSignatureResult property.
+     * This is why there is not a <CODE>set</CODE> method for the xmlSignatureResult property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getXMLSignatureResult().add(newItem);
+     * getXMLSignatureResult().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link VerifyASICXMLSignatureResponseType }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the xmlSignatureResult property.
      */
     public List<VerifyASICXMLSignatureResponseType> getXMLSignatureResult() {
         if (xmlSignatureResult == null) {
-            xmlSignatureResult = new ArrayList<VerifyASICXMLSignatureResponseType>();
+            xmlSignatureResult = new ArrayList<>();
         }
         return this.xmlSignatureResult;
     }
@@ -115,47 +121,50 @@ public class ASICResultType {
     /**
      * Gets the value of the cmsSignatureResult property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the cmsSignatureResult property.
+     * This is why there is not a <CODE>set</CODE> method for the cmsSignatureResult property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getCMSSignatureResult().add(newItem);
+     * getCMSSignatureResult().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link VerifyASICCMSSignatureResponseType }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the cmsSignatureResult property.
      */
     public List<VerifyASICCMSSignatureResponseType> getCMSSignatureResult() {
         if (cmsSignatureResult == null) {
-            cmsSignatureResult = new ArrayList<VerifyASICCMSSignatureResponseType>();
+            cmsSignatureResult = new ArrayList<>();
         }
         return this.cmsSignatureResult;
     }
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type</p>.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.</p>
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;simpleContent&gt;
-     *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
-     *       &lt;attribute name="hashAlgorithm" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
-     *     &lt;/extension&gt;
-     *   &lt;/simpleContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <simpleContent>
+     *     <extension base="<http://www.w3.org/2001/XMLSchema>string">
+     *       <attribute name="hashAlgorithm" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *     </extension>
+     *   </simpleContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */
@@ -171,7 +180,7 @@ public class ASICResultType {
         protected String hashAlgorithm;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -183,7 +192,7 @@ public class ASICResultType {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -195,7 +204,7 @@ public class ASICResultType {
         }
 
         /**
-         * Ruft den Wert der hashAlgorithm-Eigenschaft ab.
+         * Gets the value of the hashAlgorithm property.
          * 
          * @return
          *     possible object is
@@ -207,7 +216,7 @@ public class ASICResultType {
         }
 
         /**
-         * Legt den Wert der hashAlgorithm-Eigenschaft fest.
+         * Sets the value of the hashAlgorithm property.
          * 
          * @param value
          *     allowed object is

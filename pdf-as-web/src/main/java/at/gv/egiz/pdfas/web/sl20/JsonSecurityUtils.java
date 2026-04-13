@@ -181,10 +181,10 @@ public class JsonSecurityUtils implements IJOSETools{
 			jws.setCompactSerialization(serializedContent);
 				
 			//set security constrains
-			jws.setAlgorithmConstraints(new AlgorithmConstraints(ConstraintType.WHITELIST,   
-					SL20Constants.SL20_ALGORITHM_WHITELIST_SIGNING.toArray(new String[SL20Constants.SL20_ALGORITHM_WHITELIST_SIGNING.size()])));
+			jws.setAlgorithmConstraints(new AlgorithmConstraints(ConstraintType.PERMIT,
+					SL20Constants.SL20_ALGORITHM_WHITELIST_SIGNING.toArray(new String[0])));
 			
-			//load signinc certs
+			//load signing certs
 			Key selectedKey = null;
 			List<X509Certificate> x5cCerts = jws.getCertificateChainHeaderValue();
 			String x5t256 = jws.getX509CertSha256ThumbprintHeaderValue();
@@ -232,7 +232,7 @@ public class JsonSecurityUtils implements IJOSETools{
 			
 			//load payLoad
 			logger.debug("SL2.0 commando signature validation sucessfull");
-			JsonElement sl20Req = new JsonParser().parse(jws.getPayload());
+			JsonElement sl20Req = JsonParser.parseString(jws.getPayload());
 			
 			return new VerificationResult(sl20Req.getAsJsonObject(), null, valid) ;
 			
@@ -252,11 +252,11 @@ public class JsonSecurityUtils implements IJOSETools{
 					
 			//set security constrains
 			receiverJwe.setAlgorithmConstraints(
-					new AlgorithmConstraints(ConstraintType.WHITELIST,
-							SL20Constants.SL20_ALGORITHM_WHITELIST_KEYENCRYPTION.toArray(new String[SL20Constants.SL20_ALGORITHM_WHITELIST_KEYENCRYPTION.size()])));
+					new AlgorithmConstraints(ConstraintType.PERMIT,
+							SL20Constants.SL20_ALGORITHM_WHITELIST_KEYENCRYPTION.toArray(new String[0])));
 			receiverJwe.setContentEncryptionAlgorithmConstraints(
-					new AlgorithmConstraints(ConstraintType.WHITELIST,
-							SL20Constants.SL20_ALGORITHM_WHITELIST_ENCRYPTION.toArray(new String[SL20Constants.SL20_ALGORITHM_WHITELIST_ENCRYPTION.size()])));
+					new AlgorithmConstraints(ConstraintType.PERMIT,
+							SL20Constants.SL20_ALGORITHM_WHITELIST_ENCRYPTION.toArray(new String[0])));
 		
 			//set payload
 			receiverJwe.setCompactSerialization(compactSerialization);
@@ -295,7 +295,7 @@ public class JsonSecurityUtils implements IJOSETools{
 			
 						
 			//decrypt payload			
-			return new JsonParser().parse(receiverJwe.getPlaintextString());
+			return JsonParser.parseString(receiverJwe.getPlaintextString());
 			
 		} catch (JoseException e) {
 			logger.warn("SL2.0 result decryption FAILED", e);

@@ -65,7 +65,6 @@ public class PDFBoxTable {
 	float tableHeight;
 	Color bgColor;
 
-	boolean[] addPadding;
 	float[] rowHeights;
 	float[] colWidths;
 
@@ -215,7 +214,6 @@ public class PDFBoxTable {
 			PdfAsException {
 		int rows = this.table.getRows().size();
 		rowHeights = new float[rows];
-		addPadding = new boolean[rows];
 
 		for (int i = 0; i < rows; i++) {
 			rowHeights[i] = 0;
@@ -521,16 +519,12 @@ public class PDFBoxTable {
 			try {
 				byte[] linebytes = StringUtils.applyWinAnsiEncoding(lines[i]);
 				for (int j = 0; j < linebytes.length; j++) {
-					float he = c.getHeight(linebytes[j]) / 1000
+					float he = c.getBoundingBox().getHeight() / 1000
 							* fontSize;
 					if (he > maxLineHeight) {
 						maxLineHeight = he;
 					}
 				}
-			} catch (UnsupportedEncodingException e) {
-				logger.warn("failed to determine String height", e);
-				maxLineHeight = c.getFontDescriptor().getCapHeight() / 1000
-						* fontSize;
 			} catch (IOException e) {
 				logger.warn("failed to determine String height", e);
 				maxLineHeight = c.getFontDescriptor().getCapHeight() / 1000

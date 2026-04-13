@@ -100,7 +100,9 @@ public interface SignParameter extends PdfAsParameter {
 	 * @return
 	 */
 	public IPlainSigner getPlainSigner();
-	
+
+    public void setOutputStream(OutputStream stream);
+    public default OutputStream getOutputStream() { return getSignatureResult(); }
 	/**
 	 * Gets the outputstream, where the signed document will be written to
 	 * @return

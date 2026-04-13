@@ -11,7 +11,7 @@ import java.security.cert.CertificateException;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;

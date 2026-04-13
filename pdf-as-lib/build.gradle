@@ -33,7 +33,7 @@ sourceSets {
 configurations { 
 	ws 
 	
-	pdfDoclet { extendsFrom compile }
+	pdfDoclet { extendsFrom compileClasspath }
 }
 
 project.ext {
@@ -45,14 +45,15 @@ project.ext {
 	 ]
 }
 
-task createConf(type: Zip, dependsOn: JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
+tasks.register('createConf', Zip) {
 	from 'src/configuration'
 	//archiveBaseName 'config'
-	archiveName 'config.zip'
-	destinationDir new File(projectDir, 'src/main/resources/config')
+	archiveFileName.set('config.zip')
+	destinationDirectory.set(new File(projectDir, 'src/main/resources/config'))
 }
 
-compileJava.dependsOn(createConf)
+processResources.dependsOn(createConf)
+processTestResources.dependsOn(createConf)
 
 
 repositories {
@@ -62,30 +63,38 @@ repositories {
 
 dependencies {
 	api project (':pdf-as-common')
-	api group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'
+	api group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
+    api group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
 	api group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.14'
 	api group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
-    api group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.82'
-	api group: 'javax.activation', name: 'activation', version: '1.1.1'
-	api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-	api group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
+    api group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: bouncyCastleVersion
+	api group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.4'
+	api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.4'
+	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
+	api group: 'com.google.code.gson', name: 'gson', version: gsonVersion
 	api group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.9.6'
-	api group: 'commons-io', name: 'commons-io', version: '2.21.0'
-	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
+	api group: 'commons-io', name: 'commons-io', version: commonsIoVersion
 	api 'org.apache.commons:commons-collections4:4.5.0'
-	api group: 'ognl', name: 'ognl', version: '3.3.5'
+	api group: 'ognl', name: 'ognl', version: ognlVersion
 	api files('libs/iaik_eccelerate_cms-6.02.jar')
 	api files('libs/iaik_eccelerate-6.02.jar')
 	api files('libs/iaik_jce_full-5.63_moa.jar')
 	api files('libs/iaik_cms-5.1.1.jar')
 	api group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 	api group: 'org.slf4j', name: 'jcl-over-slf4j', version: slf4jVersion	
-	api group: 'com.google.zxing', name: 'core', version: '3.5.0'
-	api group: 'com.google.zxing', name: 'javase', version: '3.5.0'
+	api group: 'com.google.zxing', name: 'core', version: zxingVersion
+	api group: 'com.google.zxing', name: 'javase', version: zxingVersion
+
+    api platform(group: 'io.micrometer', name: 'micrometer-bom', version: micrometerVersion)
+    api 'io.micrometer:micrometer-core'
 	
 	ws group: 'org.apache.cxf', name: 'cxf-tools', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-databinding-jaxb', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-frontend-jaxws', version: cxfVersion
+
+    testImplementation project (':pdf-as-pdfbox-3')
+    testImplementation project (':signature-standards:sigs-pades')
+    testImplementation group: 'org.zeroturnaround', name: 'zt-zip', version: '1.17'
 }
 
 task wsdl2Java() {
@@ -110,6 +119,7 @@ task wsdl2Java() {
 }
 
 task releaseConfig(type: Copy) {
+	dependsOn createConf
 	from 'src/main/resources/config/config.zip'
 	into rootDir.toString() + "/releases/" + version + "/cfg"
 	rename 'config.zip', 'defaultConfig.zip'
@@ -130,7 +140,7 @@ releases.dependsOn distTar
 releases.dependsOn releaseConfig
 
 task apidocs(type: Javadoc) {
-	classpath = configurations.compile
+	classpath = configurations.compileClasspath
 	source = sourceSets.main.allJava
 	destinationDir = new File(rootDir.toString() + "/releases/" + version + "/docs/api")
 	title = "PDF-AS " + project.pdfasversion + " Documentation"
@@ -147,7 +157,7 @@ task apidocs(type: Javadoc) {
 }
 
 task fulldocs(type: Javadoc) {
-	classpath = configurations.compile
+	classpath = configurations.compileClasspath
 	source = sourceSets.main.allJava
 	destinationDir = new File(rootDir.toString() + "/releases/" + version + "/docs/full")
 	title = "PDF-AS " + project.pdfasversion + " Documentation"

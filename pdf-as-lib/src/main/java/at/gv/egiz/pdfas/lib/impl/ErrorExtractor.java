@@ -45,7 +45,7 @@ public class ErrorExtractor implements ErrorConstants {
 			}
 			
 		} else if(e instanceof PdfAsException) {
-		  return new PDFASError(11020, e.getMessage(), e);
+		  return new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, e.getMessage(), e);
 		  
 		}
 		

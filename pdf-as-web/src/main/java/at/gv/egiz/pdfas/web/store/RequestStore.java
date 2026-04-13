@@ -42,15 +42,15 @@ public class RequestStore {
 				logger.info("Using Request Store: " + storeClass);
 
 				Class<?> clazz = Class.forName(storeClass);
-				Object store = clazz.newInstance();
+				Object store = clazz.getDeclaredConstructor().newInstance();
 				if(store instanceof IRequestStore) {
 					instance = (IRequestStore)store;
 				} else {
-					throw new PdfAsStoreException("Failed to instanciate Request Store from " + storeClass);
+					throw new PdfAsStoreException("Failed to instantiate Request Store from " + storeClass);
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
-				throw new PdfAsStoreException("Failed to instanciate Request Store", e);
+				throw new PdfAsStoreException("Failed to instantiate Request Store", e);
 			}
 		}
 		return instance;

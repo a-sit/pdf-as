@@ -12,6 +12,7 @@ import java.util.Collection;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.preflight.PreflightDocument;
 import org.apache.pdfbox.preflight.ValidationResult;
 import org.apache.pdfbox.preflight.exception.SyntaxValidationException;
@@ -134,15 +135,12 @@ public class PDFASignatureTest extends SignatureTest {
      *         null)
      */
     private Pair<ValidationResult, Throwable> checkPDFAConformance(File fd) {
-        PreflightDocument document = null;
         ValidationResult result = null;
         try {
             PreflightParser parser = new PreflightParser(fd);
-            parser.parse();
-            document = parser.getPreflightDocument();
-            document.validate();
-            document.close();
-            result = document.getResult();
+            try (PreflightDocument document = (PreflightDocument) parser.parse()){
+                result = document.validate();
+            }
             return new ImmutablePair<ValidationResult, Throwable>(result, null);
         } catch (SyntaxValidationException e) {
             logger.debug("The file " + fd.getName()
@@ -158,10 +156,6 @@ public class PDFASignatureTest extends SignatureTest {
                     + ") occurred, while validating the PDF-A conformance of "
                     + fd.getName(), e);
             return new ImmutablePair<ValidationResult, Throwable>(result, e);
-        } finally {
-            if (document != null) {
-                IOUtils.closeQuietly((Closeable)document);
-            }
         }
     }
 

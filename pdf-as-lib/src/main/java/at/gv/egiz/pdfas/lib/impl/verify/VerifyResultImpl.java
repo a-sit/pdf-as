@@ -27,6 +27,8 @@ import iaik.x509.X509Certificate;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.verify.SignatureCheck;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
+import lombok.Getter;
+import lombok.Setter;
 
 public class VerifyResultImpl implements VerifyResult {
 
@@ -36,7 +38,8 @@ public class VerifyResultImpl implements VerifyResult {
 	private SignatureCheck certificateCheck;
 	private SignatureCheck valueCheck;
 	private SignatureCheck manifestCheck;
-	private byte[] signatureData;
+    @Setter @Getter
+	private SignatureInputData signatureData;
 	private X509Certificate signerCertificate;
 	
 	public boolean isVerificationDone() {
@@ -93,14 +96,6 @@ public class VerifyResultImpl implements VerifyResult {
 	
 	public void setSignerCertificate(X509Certificate signerCertificate) {
 		this.signerCertificate = signerCertificate;
-	}
-
-	public void setSignatureData(byte[] signaturData) {
-		this.signatureData = signaturData;
-	}
-	
-	public byte[] getSignatureData() {
-		return signatureData;
 	}
 
 }

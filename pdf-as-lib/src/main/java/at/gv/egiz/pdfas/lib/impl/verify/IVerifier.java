@@ -10,7 +10,7 @@ import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 
 public interface IVerifier {
 	public List<VerifyResult> verify(byte[] signature,
-			byte[] signatureContent, Date verificationTime) throws PdfAsException;
+			SignatureInputData signedData, Date verificationTime) throws PdfAsException;
 	
 	public void setConfiguration(Configuration config);
 	

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.gv.egiz.pdfas.lib.impl.verify.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
@@ -21,10 +22,6 @@ import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import at.gv.egiz.pdfas.lib.impl.ErrorExtractor;
-import at.gv.egiz.pdfas.lib.impl.verify.IVerifier;
-import at.gv.egiz.pdfas.lib.impl.verify.IVerifyFilter;
-import at.gv.egiz.pdfas.lib.impl.verify.VerifierDispatcher;
-import at.gv.egiz.pdfas.lib.impl.verify.VerifyBackend;
 
 public class PDFBOXVerifier implements VerifyBackend {
 
@@ -148,26 +145,17 @@ public class PDFBOXVerifier implements VerifyBackend {
       logger.debug("Filter: " + dict.getNameAsString("Filter"));
       logger.debug("Modified: " + dict.getNameAsString("M"));
       COSArray byteRange = (COSArray) dict.getDictionaryObject("ByteRange");
-  
+
       StringBuilder sb = new StringBuilder();
-      int[] bytes = new int[byteRange.size()];
+      final int[] bytes = new int[byteRange.size()];
       for (int j = 0; j < byteRange.size(); j++) {
         bytes[j] = byteRange.getInt(j);
         sb.append(" " + bytes[j]);
       }
-  
+
       logger.debug("ByteRange" + sb.toString());
   
       COSString content = (COSString) dict.getDictionaryObject("Contents");
-  
-      ByteArrayOutputStream contentData = new ByteArrayOutputStream();
-      for (int j = 0; j < bytes.length; j = j + 2) {
-        int offset = bytes[j];
-        int length = bytes[j + 1];
-  
-        contentData.write(inputData, offset, length);
-      }
-      contentData.close();
   
       IVerifyFilter verifyFilter = verifier.getVerifier(dict.getNameAsString("Filter"),
           dict.getNameAsString("SubFilter"));
@@ -176,8 +164,8 @@ public class PDFBOXVerifier implements VerifyBackend {
       synchronized (lvlVerifier) {
         lvlVerifier.setConfiguration(parameter.getConfiguration());
         if (verifyFilter != null) {
-          List<VerifyResult> results = verifyFilter.verify(contentData.toByteArray(),
-              content.getBytes(), parameter.getVerificationTime(), bytes, lvlVerifier);
+          List<VerifyResult> results = verifyFilter.verify(new SignatureInputData(inputData, bytes),
+              content.getBytes(), parameter.getVerificationTime(), lvlVerifier);
           if (results != null && !results.isEmpty()) {
             result.addAll(results);
           }

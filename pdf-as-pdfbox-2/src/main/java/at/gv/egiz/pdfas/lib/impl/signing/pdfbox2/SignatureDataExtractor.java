@@ -23,6 +23,8 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.signing.pdfbox2;
 
+import at.gv.egiz.pdfas.lib.impl.signing.PDFASSignatureExtractor;
+import at.gv.egiz.pdfas.lib.impl.signing.PDFASSignatureInterface;
 import iaik.x509.X509Certificate;
 
 import java.io.IOException;
@@ -30,19 +32,23 @@ import java.io.InputStream;
 import java.security.SignatureException;
 import java.util.Calendar;
 
+import lombok.Getter;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 
 import at.gv.egiz.pdfas.common.utils.StreamUtils;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface;
 
-public class SignatureDataExtractor implements PDFASPDFBOXExtractorInterface {
+public class SignatureDataExtractor implements PDFASSignatureExtractor, PDFASSignatureInterface, SignatureInterface {
 
-	protected X509Certificate certificate;
-	protected byte[] signatureData;
+	@Getter
+    protected X509Certificate certificate;
+	@Getter
+    protected byte[] signatureData;
 	
 	protected String pdfSubFilter;
 	protected String pdfFilter;
-	protected PDSignature signature;
-	protected int[] byteRange;
+	@Getter
+    protected int[] byteRange;
 	protected Calendar date;
 	
 	public SignatureDataExtractor(X509Certificate certificate, 
@@ -52,41 +58,29 @@ public class SignatureDataExtractor implements PDFASPDFBOXExtractorInterface {
 		this.pdfSubFilter = subfilter;
 		this.date = date;
 	}
-	
-	public X509Certificate getCertificate() {
-		return certificate;
-	}
 
-	public String getPDFSubFilter() {
+  public String getPDFSubFilter() {
 		return this.pdfSubFilter;
 	}
 
-	public String getPDFFilter() {
+  public String getPDFFilter() {
 		return this.pdfFilter;
 	}
 
-	public byte[] getSignatureData() {
-		return this.signatureData;
-	}
+  /** Called by PDFBox.
+   * We save the data to be signed and return an all-zeros signature (padded by pdfbox).
+   * We splice the actual signature in at a later point.
+   */
+  public byte[] sign(InputStream content) throws IOException {
+    this.signatureData = StreamUtils.inputStreamToByteArray(content);
+    return new byte[] { 0 };
+  }
 
-	public byte[] sign(InputStream content) throws IOException {
-		signatureData = StreamUtils.inputStreamToByteArray(content);
-		byteRange = this.signature.getByteRange();
-		return new byte[] { 0 };
-	}
+  public void setPDSignature(PDSignature signature) {
+      this.byteRange = signature.getByteRange();
+  }
 
-	public void setPDSignature(PDSignature signature) {
-		this.signature = signature;
-	}
-
-	public int[] getByteRange() {
-		return byteRange;
-	}
-
-	public Calendar getSigningDate() {
-		return this.date;
-	}
-	
-	
-	
+  public Calendar getSigningDate() {
+      return this.date;
+  }
 }

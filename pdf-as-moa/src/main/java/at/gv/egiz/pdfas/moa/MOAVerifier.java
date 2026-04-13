@@ -5,10 +5,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
+import at.gv.egiz.pdfas.lib.impl.verify.SignatureInputData;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ public class MOAVerifier implements IVerifier {
 	private String moaTrustProfile;
 
 	
-	public List<VerifyResult> verify(byte[] signature, byte[] signatureContent,
+	public List<VerifyResult> verify(byte[] signature, SignatureInputData signatureContent,
 			Date verificationTime) throws PdfAsException {
 		List<VerifyResult> resultList = new ArrayList<VerifyResult>();
 		try {
@@ -68,7 +69,7 @@ public class MOAVerifier implements IVerifier {
 			metaDataType.setMetaInfo(metaInfoType);
 			
 			CMSContentBaseType contentBase = new CMSContentBaseType();
-			contentBase.setBase64Content(signatureContent);
+			contentBase.setBase64Content(signatureContent.getSignatureInputBytes());
 			metaDataType.setContent(contentBase);
 			
 			verifyCMSSignatureRequest.setDataObject(metaDataType);

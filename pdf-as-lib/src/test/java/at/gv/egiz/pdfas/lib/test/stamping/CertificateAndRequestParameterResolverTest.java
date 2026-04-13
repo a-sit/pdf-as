@@ -34,7 +34,7 @@ public class CertificateAndRequestParameterResolverTest {
 	@Before
 	public void initialize() throws PDFASError {
 		SignParameter signParams = new SignParameterImpl(null, null, null);
-		opStatus = new OperationStatus(buildDummySettings(), signParams , null);
+		opStatus = new OperationStatus(buildDummySettings(), signParams , null, null);
 		
 		sigProfileSetting = new SignatureProfileSettings("test", buildDummySettings());
 		

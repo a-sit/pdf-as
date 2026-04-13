@@ -29,6 +29,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -36,7 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.cos.COSArray;
@@ -110,29 +112,16 @@ import iaik.x509.X509Certificate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
+public class PADESPDFBOXSigner implements IPdfSigner<PDFBOXObject, SignatureDataExtractor>, IConfigurationConstants {
 
 
 
   @Override
-  public void signPDF(PDFObject genericPdfObject, RequestedSignature requestedSignature,
-      PDFASSignatureInterface genericSigner) throws PdfAsException {
+  public void signPDF(PDFBOXObject pdfObject, RequestedSignature requestedSignature,
+      SignatureDataExtractor signer) throws PdfAsException {
 
     
     boolean isAdobeSigForm = false;
-    
-    if (!(genericPdfObject instanceof PDFBOXObject)) {
-      throw new PdfAsException("PDF to signObject is of wrong type: " + genericPdfObject.getClass().getName());
-      
-    }
-
-    if (!(genericSigner instanceof PDFASPDFBOXSignatureInterface)) {
-      throw new PdfAsException("PDF signerObject is of wrong type:" + genericSigner.getClass().getName());
-      
-    }
-    
-    final PDFBOXObject pdfObject = (PDFBOXObject) genericPdfObject;
-    final PDFASPDFBOXSignatureInterface signer = (PDFASPDFBOXSignatureInterface) genericSigner;
 
     PDDocument doc = null;
     SignatureOptions options = new SignatureOptions();
@@ -161,7 +150,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       // extract next QR-code placeholder, if exists             
       SignaturePlaceholderData nextPlaceholderData = PlaceholderFilter.checkPlaceholderSignatureLocation(
           pdfObject.getStatus(), pdfObject.getStatus().getSettings(), 
-          pdfObject.getStatus().getSignParamter().getPlaceHolderId());
+          pdfObject.getStatus().getSignParameter().getPlaceHolderId());
 
       if (nextPlaceholderData != null) {
         log.info("Placeholder data found. Injection placeholderId ...");
@@ -214,7 +203,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         final SignatureProfileConfiguration signatureProfileConfiguration = 
             pdfObject.getStatus().getSignatureProfileConfiguration(requestedSignature.getSignatureProfileID());
         final TablePos tablePos = prepareTablePosition(nextPlaceholderData, signatureProfileConfiguration,
-            pdfObject.getStatus().getSignParamter().getSignaturePosition());
+            pdfObject.getStatus().getSignParameter().getSignaturePosition());
         final Table main = TableFactory.createSigTable(signatureProfileSettings, MAIN, pdfObject.getStatus(),
             requestedSignature);
 
@@ -456,13 +445,13 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         final COSDictionary objectDic = new COSDictionary();
         objectDic.setName("Type", "OBJR");
 
-        objectDic.setItem("Pg", signatureField.getWidget().getPage());
-        objectDic.setItem("Obj", signatureField.getWidget());
+        objectDic.setItem("Pg", signatureField.getWidgets().get(0).getPage());
+        objectDic.setItem("Obj", signatureField.getWidgets().get(0));
 
         final List<Object> l = new ArrayList<>();
         l.add(objectDic);
         sigBlock.setKids(l);
-        sigBlock.setPage(signatureField.getWidget().getPage());
+        sigBlock.setPage(signatureField.getWidgets().get(0).getPage());
 
         sigBlock.setTitle("Signature Table");
         sigBlock.setParent(docElement);
@@ -530,13 +519,13 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
         }
 
         // set StructureParent for signature field annotation
-        signatureField.getWidget().setStructParent(parentTreeNextKey);
+        signatureField.getWidgets().get(0).setStructParent(parentTreeNextKey);
 
         // Increase the next Key value in the structure tree root
         structureTreeRoot.setParentTreeNextKey(parentTreeNextKey + 1);
 
         // add the Tabs /S Element for Tabbing through annots
-        final PDPage p = signatureField.getWidget().getPage();
+        final PDPage p = signatureField.getWidgets().get(0).getPage();
         p.getCOSObject().setName("Tabs", "S");
         p.getCOSObject().setNeedToBeUpdated(true);
 
@@ -671,7 +660,12 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
     PreflightDocument document = null;
     ValidationResult result = null;
     try {
-      final PreflightParser parser = new PreflightParser(signedDocument);
+      final PreflightParser parser = new PreflightParser(new javax.activation.DataSource() {
+        @Override public InputStream getInputStream() throws IOException { return signedDocument.getInputStream(); }
+        @Override public OutputStream getOutputStream() throws IOException { return signedDocument.getOutputStream(); }
+        @Override public String getContentType() { return signedDocument.getContentType(); }
+        @Override public String getName() { return signedDocument.getName(); }
+      });
       //
       // parser.parse(Format.PDF_A1B);
       parser.parse();
@@ -715,30 +709,18 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
   }
 
   @Override
-  public PDFObject buildPDFObject(OperationStatus operationStatus) {
+  public PDFBOXObject buildPDFObject(OperationStatus operationStatus) {
     return new PDFBOXObject(operationStatus);
   }
 
   @Override
-  public PDFASSignatureInterface buildSignaturInterface(IPlainSigner signer, SignParameter parameters,
-      RequestedSignature requestedSignature) {
-    return new PdfboxSignerWrapper(signer, parameters, requestedSignature);
-  }
-
-  @Override
-  public PDFASSignatureExtractor buildBlindSignaturInterface(X509Certificate certificate, String filter,
+  public SignatureDataExtractor buildBlindSignaturInterface(X509Certificate certificate, String filter,
       String subfilter, Calendar date) {
     return new SignatureDataExtractor(certificate, filter, subfilter, date);
   }
 
   @Override
-  public void checkPDFPermissions(PDFObject genericPdfObject) throws PdfAsException {
-    if (!(genericPdfObject instanceof PDFBOXObject)) {
-      // tODO:
-      throw new PdfAsException();
-    }
-
-    final PDFBOXObject pdfObject = (PDFBOXObject) genericPdfObject;
+  public void checkPDFPermissions(PDFBOXObject pdfObject) throws PdfAsException {
     PdfBoxUtils.checkPDFPermissions(pdfObject.getDocument());
   }
 
@@ -755,7 +737,7 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
       int resolution, OperationStatus status, RequestedSignature requestedSignature) throws PDFASError {
     try {
 
-      final PDFBOXObject pdfObject = (PDFBOXObject) status.getPdfObject();
+      final PDFBOXObject pdfObject = (PDFBOXObject)(PDFBOXObject) status.getPdfObject();
       final PDDocument origDoc = new PDDocument();
 
       origDoc.addPage(new PDPage(PDRectangle.A4));

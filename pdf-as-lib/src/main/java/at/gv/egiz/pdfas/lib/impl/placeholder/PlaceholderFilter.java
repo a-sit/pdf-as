@@ -44,7 +44,7 @@ public class PlaceholderFilter implements IConfigurationConstants,
 		
 	  String signingProfile = status.getRequestedSignature().getSignatureProfileID();
 	  
-	  if (status.getSignParamter().isPlaceHolderSearchEnabled()) {	  
+	  if (status.getSignParameter().isPlaceHolderSearchEnabled()) {
 	    if (status.getPlaceholderConfiguration().isGlobalPlaceholderEnabled()) {		
 	      String defaultPlaceHolderId = settings.getValue(PLACEHOLDER_ID);			
 	      return status.getBackend().getPlaceholderExtractor().extract(

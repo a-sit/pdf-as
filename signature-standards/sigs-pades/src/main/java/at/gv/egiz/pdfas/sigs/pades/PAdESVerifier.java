@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import at.gv.egiz.pdfas.lib.impl.verify.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +35,6 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.utils.PDFUtils;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
-import at.gv.egiz.pdfas.lib.impl.verify.FilterEntry;
-import at.gv.egiz.pdfas.lib.impl.verify.IVerifier;
-import at.gv.egiz.pdfas.lib.impl.verify.IVerifyFilter;
-import at.gv.egiz.pdfas.lib.impl.verify.VerifyResultImpl;
 
 public class PAdESVerifier implements IVerifyFilter, PAdESConstants {
 
@@ -48,17 +45,15 @@ public class PAdESVerifier implements IVerifyFilter, PAdESConstants {
 	public PAdESVerifier() {
 	}
 
-	public List<VerifyResult> verify(byte[] contentData,
-			byte[] signatureContent, Date verificationTime, int[] byteRange, IVerifier verifier)
+    @Override
+	public List<VerifyResult> verify(SignatureInputData signedData, byte[] signature,
+                                     Date verificationTime, IVerifier verifier)
 			throws PdfAsException {
-
-		byte[] data = contentData;
-		byte[] signature = signatureContent;
 		
-		List<VerifyResult> verifieResults = verifier.verify(signature, data, verificationTime);
+		List<VerifyResult> verifieResults = verifier.verify(signature, signedData, verificationTime);
 		for(int i =0; i < verifieResults.size();i++) {
 			VerifyResultImpl result = (VerifyResultImpl)verifieResults.get(i);
-			result.setSignatureData(PDFUtils.blackOutSignature(data, byteRange));
+			result.setSignatureData(signedData);
 		}
 		
 		return verifieResults;
@@ -69,10 +64,6 @@ public class PAdESVerifier implements IVerifyFilter, PAdESConstants {
 		result.add(new FilterEntry(FILTER_ADOBE_PPKLITE,
 				SUBFILTER_ETSI_CADES_DETACHED));
 		return result;
-	}
-
-	public void setConfiguration(Configuration config) {
-		// NOP
 	}
 
 }

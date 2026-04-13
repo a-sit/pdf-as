@@ -2,30 +2,30 @@
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
 import java.math.BigInteger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für CreateSignatureLocationType complex type.
+ * <p>Java class for CreateSignatureLocationType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="CreateSignatureLocationType"&gt;
- *   &lt;simpleContent&gt;
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;token"&gt;
- *       &lt;attribute name="Index" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
- *     &lt;/extension&gt;
- *   &lt;/simpleContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="CreateSignatureLocationType">
+ *   <simpleContent>
+ *     <extension base="<http://www.w3.org/2001/XMLSchema>token">
+ *       <attribute name="Index" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" />
+ *     </extension>
+ *   </simpleContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -43,7 +43,7 @@ public class CreateSignatureLocationType {
     protected BigInteger index;
 
     /**
-     * Ruft den Wert der value-Eigenschaft ab.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
@@ -55,7 +55,7 @@ public class CreateSignatureLocationType {
     }
 
     /**
-     * Legt den Wert der value-Eigenschaft fest.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
@@ -67,7 +67,7 @@ public class CreateSignatureLocationType {
     }
 
     /**
-     * Ruft den Wert der index-Eigenschaft ab.
+     * Gets the value of the index property.
      * 
      * @return
      *     possible object is
@@ -79,7 +79,7 @@ public class CreateSignatureLocationType {
     }
 
     /**
-     * Legt den Wert der index-Eigenschaft fest.
+     * Sets the value of the index property.
      * 
      * @param value
      *     allowed object is

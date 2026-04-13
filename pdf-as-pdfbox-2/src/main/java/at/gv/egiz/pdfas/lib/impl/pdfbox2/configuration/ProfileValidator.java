@@ -52,7 +52,7 @@ public class ProfileValidator implements ConfigurationValidator{
 
 		ArrayList<SignatureProfileSettings> profileSettings = new ArrayList<SignatureProfileSettings>();
 
-		OperationStatus opState = new OperationStatus(settings, null, null);
+		OperationStatus opState = new OperationStatus(settings, null, null, null);
 		
 		X509Certificate dummyCert = new X509Certificate();
 		dummyCert.setSerialNumber(new BigInteger("123"));

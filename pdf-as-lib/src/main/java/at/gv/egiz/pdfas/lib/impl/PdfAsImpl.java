@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import at.gv.egiz.pdfas.lib.util.TimedFunction;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,151 +123,21 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
   @Override
   public SignResult sign(SignParameter parameter) throws PDFASError {
-
-    logger.trace("sign started");
-
-    verifySignParameter(parameter);
-    OperationStatus status = null;
+    val signer = parameter.getPlainSigner();
+    if (signer == null) {
+      throw new IllegalArgumentException("SignParameter is missing plainSigner for use of sign()");
+    }
+    val state1 = (StatusRequestImpl.Stage1)startSign(parameter);
     try {
-      // Status initialization
-      if (!(parameter.getConfiguration() instanceof ISettings)) {
-        throw new PdfAsSettingsException("Invalid settings object!");
-      }
-
-      // execute pre Processors
-      signPreProcessing(parameter);
-
-      // allocated Backend
-      final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
-
-      if (backend == null) {
-        throw new PDFASError(ERROR_NO_BACKEND);
-      }
-
-      final ISettings settings = (ISettings) parameter.getConfiguration();
-      status = new OperationStatus(settings, parameter, backend);
-
-      final IPdfSigner signer = backend.getPdfSigner();
-
-      final PDFObject pdfObject = signer.buildPDFObject(status);
-
-      status.setPdfObject(pdfObject);
-
-      // set Original PDF Document Data
-      status.getPdfObject()
-          .setOriginalDocument(parameter.getDataSource());
-
-      // Check PDF Permissions
-      signer.checkPDFPermissions(status.getPdfObject());
-
-      // PlaceholderConfiguration placeholderConfiguration = status
-      // .getPlaceholderConfiguration();
-
-      final RequestedSignature requestedSignature = new RequestedSignature(
-          status);
-
-      status.setRequestedSignature(requestedSignature);
-
-      try {        
-        requestedSignature.setCertificate(getValidCertificate(
-            status.getSignParamter().getPlainSigner().getCertificate(parameter)));
-
-      } finally {
-        if (parameter instanceof BKUHeaderHolder) {
-          final BKUHeaderHolder holder = (BKUHeaderHolder) parameter;
-
-          final Iterator<BKUHeader> bkuHeaderIt = holder.getProcessInfo()
-              .iterator();
-
-          while (bkuHeaderIt.hasNext()) {
-            final BKUHeader header = bkuHeaderIt.next();
-            if ("Server".equalsIgnoreCase(header.getName())) {
-              requestedSignature
-                  .getStatus()
-                  .getMetaInformations()
-                  .put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION,
-                      header.getValue());
-            } else if (ErrorConstants.STATUS_INFO_SIGDEVICE.equalsIgnoreCase(header.getName())) {
-              requestedSignature
-                  .getStatus()
-                  .getMetaInformations()
-                  .put(ErrorConstants.STATUS_INFO_SIGDEVICE,
-                      header.getValue());
-            }
-          }
-        }
-      }
-      // Only use this profileID because validation was done in
-      // RequestedSignature
-      final String signatureProfileID = requestedSignature
-          .getSignatureProfileID();
-
-      logger.info("Selected signature Profile: " + signatureProfileID);
-
-      // SignatureProfileConfiguration signatureProfileConfiguration =
-      // status
-      // .getSignatureProfileConfiguration(signatureProfileID);
-
-      // this.stampPdf(status);
-
-      // Create signature
-      try {
-        signer.signPDF(status.getPdfObject(), requestedSignature, 
-            signer.buildSignaturInterface(status.getSignParamter().getPlainSigner(), 
-                parameter, requestedSignature));
-        
-      } finally {
-        if (parameter instanceof BKUHeaderHolder) {
-          final BKUHeaderHolder holder = (BKUHeaderHolder) parameter;
-
-          final Iterator<BKUHeader> bkuHeaderIt = holder.getProcessInfo()
-              .iterator();
-
-          while (bkuHeaderIt.hasNext()) {
-            final BKUHeader header = bkuHeaderIt.next();
-            if ("Server".equalsIgnoreCase(header.getName())) {
-              requestedSignature
-                  .getStatus()
-                  .getMetaInformations()
-                  .put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION,
-                      header.getValue());
-            } else if (ErrorConstants.STATUS_INFO_SIGDEVICE.equalsIgnoreCase(header.getName())) {
-              requestedSignature
-                  .getStatus()
-                  .getMetaInformations()
-                  .put(ErrorConstants.STATUS_INFO_SIGDEVICE,
-                      header.getValue());
-            }
-          }
-        }
-      }
-      // ================================================================
-      // Create SignResult
-      final SignResult result = createSignResult(status);
-
-      return result;
-    
-    } catch (final SLPdfAsException e) {           
-      if (e.isCriticalError()) {
-        logger.warn("Failed to create signature [" + e.getMessage() + "]", e);
-        
-      } else {
-        logger.info("Failed to create signature [" + e.getMessage() + "]", e);
-        
-      }      
-      throw ErrorExtractor.searchPdfAsError(e, status);
-          
-    } catch (final Throwable e) {
-      logger.warn("Failed to create signature [" + e.getMessage() + "]", e);
-      throw ErrorExtractor.searchPdfAsError(e, status);
-      
-      
-    } finally {
-      if (status != null) {
-        status.clear();
-        
-      }
-      logger.trace("sign done");
+      val state2 = state1.setCertificate(
+          signer.getCertificate(state1.getSignParameter()));
+      val state3 = state2.setSignature(
+          signer.sign(
+              state2.getSignatureData(), state2.getSignatureDataByteRange(),
+              state2.getSignParameter(), state2.getRequestedSignature()));
+      return state3.finishSign();
+    } catch (final PdfAsException e) {
+      throw ErrorExtractor.searchPdfAsError(e, state1.getStatus());
     }
   }
 
@@ -277,7 +149,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     if (now.after(notAfter) || now.before(notBefore)) {
       logger.warn("Signer certificate is not valid. notBefore:{} | notAfter:{} | now:{}",
           notBefore, notAfter, now);
-      throw new PDFASError(11021);
+      throw new PDFASError(ErrorConstants.ERROR_SIGNER_CERT_TIMEFRAME_INVALID);
       
     } else {
       return certificate;
@@ -285,27 +157,30 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     }
   }
 
+  private final TimedFunction verifyTimer = new TimedFunction("pdfas.verify");
   @Override
   public List<VerifyResult> verify(VerifyParameter parameter)
       throws PDFASError {
 
-    verifyVerifyParameter(parameter);
+    return verifyTimer.timed(() -> {
+        verifyVerifyParameter(parameter);
 
-    // execute pre Processors
-    verifyPreProcessing(parameter);
+        // execute pre Processors
+        verifyPreProcessing(parameter);
 
-    // allocated Backend
-    final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
+        // allocated Backend
+        final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
 
-    if (backend == null) {
-      throw new PDFASError(ERROR_NO_BACKEND);
-    }
+        if (backend == null) {
+            throw new PDFASError(ERROR_NO_BACKEND);
+        }
 
-    try {
-      return backend.getVerifier().verify(parameter);
-    } catch (final Throwable e) {
-      throw ErrorExtractor.searchPdfAsError(e, null);
-    }
+        try {
+            return backend.getVerifier().verify(parameter);
+        } catch (final Throwable e) {
+            throw ErrorExtractor.searchPdfAsError(e, null);
+        }
+    });
   }
 
   @Override
@@ -313,12 +188,11 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     return new ConfigurationImpl(this.settings);
   }
 
+  private final TimedFunction signTimer = new TimedFunction("pdfas.sign");
   @Override
-  public StatusRequest startSign(SignParameter parameter) throws PDFASError {
+  public StatusRequest.Stage1 startSign(SignParameter parameter) throws PDFASError {
 
     verifySignParameter(parameter);
-
-    final StatusRequestImpl request = new StatusRequestImpl();
     OperationStatus status = null;
     try {
       // Status initialization
@@ -338,138 +212,136 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
       final ISettings settings = (ISettings) parameter.getConfiguration();
       status = new OperationStatus(settings, parameter,
-          backend);
+          backend, signTimer.start());
 
       final IPdfSigner signer = backend.getPdfSigner();
 
       status.setPdfObject(signer.buildPDFObject(status));
+      status.getPdfObject().setOriginalDocument(parameter.getDataSource());
+      signer.checkPDFPermissions(status.getPdfObject());
 
-      final RequestedSignature requestedSignature = new RequestedSignature(
+      val requestedSignature = new RequestedSignature(
           status);
 
       status.setRequestedSignature(requestedSignature);
 
-      request.setStatus(status);
-
-      request.setNeedCertificate(true);
-
-      return request;
+      return StatusRequestImpl.create(this, status);
     } catch (final Throwable e) {
+      if (status != null) status.getSignTimer().finishFailure(e);
       logger.warn("startSign", e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     }
   }
 
-  @Override
-  public StatusRequest process(StatusRequest statusRequest) throws PDFASError {
-    if (!(statusRequest instanceof StatusRequestImpl)) {
-      throw new PDFASError(ERROR_SIG_INVALID_STATUS);
-    }
-
-    final StatusRequestImpl request = (StatusRequestImpl) statusRequest;
+  public void processCertificate(StatusRequestImpl request, X509Certificate certificate) throws PDFASError {
     final OperationStatus status = request.getStatus();
+    try {
+      status.getRequestedSignature().setCertificate(certificate);
 
-    if (request.needCertificate()) {
-      try {
-        status.getRequestedSignature().setCertificate(
-            request.getCertificate());
+      if (request.getSignParameter() instanceof BKUHeaderHolder holder) {
 
-        // set Original PDF Document Data
-        status.getPdfObject().setOriginalDocument(
-            status.getSignParamter().getDataSource());
+          for (BKUHeader header : holder.getProcessInfo()) {
+              if ("Server".equalsIgnoreCase(header.getName())) {
+                  status.getRequestedSignature()
+                          .getStatus()
+                          .getMetaInformations()
+                          .put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION,
+                                  header.getValue());
+              } else if (ErrorConstants.STATUS_INFO_SIGDEVICE.equalsIgnoreCase(header.getName())) {
+                  status.getRequestedSignature()
+                          .getStatus()
+                          .getMetaInformations()
+                          .put(ErrorConstants.STATUS_INFO_SIGDEVICE,
+                                  header.getValue());
+              }
+          }
+      }
 
-        // STAMPER!
-        // stampPdf(status);
-        request.setNeedCertificate(false);
+      status.setSigningDate(Calendar.getInstance());
 
-        status.setSigningDate(Calendar.getInstance());
+      // GET Signature DATA
+      final String pdfFilter = status.getSignParameter().getPlainSigner()
+              .getPDFFilter();
+      final String pdfSubFilter = status.getSignParameter().getPlainSigner()
+              .getPDFSubFilter();
 
-        // GET Signature DATA
-        final String pdfFilter = status.getSignParamter().getPlainSigner()
-            .getPDFFilter();
-        final String pdfSubFilter = status.getSignParamter().getPlainSigner()
-            .getPDFSubFilter();
+      final IPdfSigner signer = status.getBackend().getPdfSigner();
 
-        final IPdfSigner signer = status.getBackend().getPdfSigner();
+      final PDFASSignatureExtractor signatureDataExtractor = signer
+              .buildBlindSignaturInterface(certificate,
+                      pdfFilter, pdfSubFilter,
+                      status.getSigningDate());
 
-        final PDFASSignatureExtractor signatureDataExtractor = signer
-            .buildBlindSignaturInterface(request.getCertificate(),
-                pdfFilter, pdfSubFilter,
-                status.getSigningDate());
+      signer.signPDF(status.getPdfObject(),
+              status.getRequestedSignature(), signatureDataExtractor);
 
-        signer.signPDF(status.getPdfObject(),
-            status.getRequestedSignature(), signatureDataExtractor);
+      final StringBuilder sb = new StringBuilder();
 
-        final StringBuilder sb = new StringBuilder();
+      final int[] byteRange = PDFUtils
+              .extractSignatureByteRange(signatureDataExtractor
+                      .getSignatureData());
 
-        final int[] byteRange = PDFUtils
-            .extractSignatureByteRange(signatureDataExtractor
-                .getSignatureData());
-
+      if (logger.isDebugEnabled()) {
         for (final int element : byteRange) {
-          sb.append(" " + element);
+          sb.append(" ").append(element);
         }
-        logger.debug("ByteRange: " + sb.toString());
+        logger.debug("ByteRange: {}", sb);
+      }
 
-        request.setSignatureData(signatureDataExtractor
-            .getSignatureData());
-        request.setByteRange(byteRange);
-        request.setNeedSignature(true);
+      request.setSignatureData(signatureDataExtractor
+              .getSignatureData());
+      request.setByteRange(byteRange);
 
-      } catch (final Throwable e) {
+    } catch (final Throwable e) {
+        status.getSignTimer().finishFailure(e);
         logger.warn("process", e);
         throw ErrorExtractor.searchPdfAsError(e, status);
-        
-      }
-    } else if (request.needSignature()) {
-      request.setNeedSignature(false);
+
+    }
+  }
+
+  public void processSignature(StatusRequestImpl request, byte[] signatureValue) throws PDFASError {
+    final OperationStatus status = request.getStatus();
+    try {
       // Inject signature byte[] into signedDocument
       final int offset = request.getSignatureDataByteRange()[1] + 1;
 
       final byte[] pdfSignature = status.getBackend().getPdfSigner()
-          .rewritePlainSignature(request.getSignature());
+          .rewritePlainSignature(signatureValue);
       // byte[] input =
       // PDFUtils.blackOutSignature(status.getPdfObject().getSignedDocument(),
       // request.getSignatureDataByteRange());
       final VerifyResult verifyResult = SignatureUtils.verifySignature(
-          request.getSignature(), request.getSignatureData());
+          signatureValue, request.getSignatureData());
       final RequestedSignature requestedSignature = request.getStatus()
           .getRequestedSignature();
 
-      if (!StreamUtils.dataCompare(requestedSignature.getCertificate()
-          .getFingerprintSHA(), ((X509Certificate) verifyResult
-              .getSignerCertificate()).getFingerprintSHA())) {
+      if (!StreamUtils.dataCompare(
+          requestedSignature.getCertificate().getFingerprintSHA(),
+          ((X509Certificate) verifyResult.getSignerCertificate()).getFingerprintSHA()
+      )) {
         throw new PDFASError(ERROR_SIG_CERTIFICATE_MISSMATCH);
       }
 
       for (int i = 0; i < pdfSignature.length; i++) {
         status.getPdfObject().getSignedDocument()[offset + i] = pdfSignature[i];
       }
-      request.setIsReady(true);
-    } else {
-      throw new PDFASError(ERROR_SIG_INVALID_STATUS);
+    } catch (final Throwable e) {
+      status.getSignTimer().finishFailure(e);
+      throw e;
     }
-
-    return request;
   }
 
-  @Override
-  public SignResult finishSign(StatusRequest statusRequest) throws PDFASError {
-    if (!(statusRequest instanceof StatusRequestImpl)) {
-      throw new PDFASError(ERROR_SIG_INVALID_STATUS);
-    }
-
-    final StatusRequestImpl request = (StatusRequestImpl) statusRequest;
+  public SignResult finishSign(StatusRequestImpl request) throws PDFASError {
     final OperationStatus status = request.getStatus();
 
-    if (!request.isReady()) {
-      throw new PDFASError(ERROR_SIG_INVALID_STATUS);
-    }
-
     try {
-      return createSignResult(status);
+      val signResult = createSignResult(status);
+      status.getSignTimer().finishSuccess();
+      return signResult;
     } catch (final IOException e) {
       // new PdfAsException("error.pdf.sig.06", e);
+      status.getSignTimer().finishFailure(e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     } finally {
       if (status != null) {
@@ -549,8 +421,8 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     // ================================================================
     // Create SignResult
     final SignResultImpl result = new SignResultImpl();
-    status.getSignParamter().getSignatureResult().write(status.getPdfObject().getSignedDocument());
-    status.getSignParamter().getSignatureResult().flush();
+    status.getSignParameter().getSignatureResult().write(status.getPdfObject().getSignedDocument());
+    status.getSignParameter().getSignatureResult().flush();
     result.setSignerCertificate(status.getRequestedSignature()
         .getCertificate());
     result.setSignaturePosition(status.getRequestedSignature()
@@ -580,7 +452,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
 
       final ISettings settings = (ISettings) parameter.getConfiguration();
-      status = new OperationStatus(settings, parameter, backend);
+      status = new OperationStatus(settings, parameter, backend, null);
 
       final IPdfSigner signer = backend.getPdfSigner();
 

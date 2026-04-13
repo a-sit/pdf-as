@@ -28,5 +28,5 @@
 // Generated on: 2014.04.22 at 04:01:10 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.buergerkarte.at/namespaces/securitylayer/1.2#", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.buergerkarte.at/namespaces/securitylayer/1.2#", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package at.gv.egiz.sl.schema;

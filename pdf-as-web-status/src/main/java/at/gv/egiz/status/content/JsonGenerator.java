@@ -1,14 +1,15 @@
 package at.gv.egiz.status.content;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import at.gv.egiz.status.TestResult;
 import at.gv.egiz.status.TestStatus;
@@ -21,15 +22,13 @@ public class JsonGenerator implements ContentGenerator {
 			HttpServletResponse response, Map<String, TestResult> results,
 			boolean details) throws IOException {
 		boolean allOk = true;
-		
-		Iterator<TestResult> testIterator = results.values().iterator();
-		while(testIterator.hasNext()) {
-			TestResult result = testIterator.next();
-			if(!result.getStatus().equals(TestStatus.OK)){
-				allOk = false;
-				break;
-			}
-		}
+
+        for (TestResult result : results.values()) {
+          if (!result.getStatus().equals(TestStatus.OK)) {
+            allOk = false;
+            break;
+          }
+        }
 		
 		if(!allOk) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -59,16 +58,13 @@ public class JsonGenerator implements ContentGenerator {
 				sb.append(", \"Detail\": \"");
 				
 				StringBuilder detail = new StringBuilder();
+
+                for (String detailString : result.getDetails()) {
+                  detail.append(StringEscapeUtils.escapeJson(detailString));
+                  detail.append(" ");
+                }
 				
-				Iterator<String> detailStringIt = result.getDetails().iterator();
-				
-				while(detailStringIt.hasNext()) {
-					String detailString = detailStringIt.next();
-					detail.append(StringEscapeUtils.escapeJson(detailString));
-					detail.append(" ");
-				}
-				
-				sb.append(detail.toString());
+				sb.append(detail);
 				sb.append("\"");
 			} 
 			
@@ -80,7 +76,7 @@ public class JsonGenerator implements ContentGenerator {
 		
 		sb.append("}");
 		
-		response.getOutputStream().write(sb.toString().getBytes("UTF-8"));
+		response.getOutputStream().write(sb.toString().getBytes(StandardCharsets.UTF_8));
 		response.getOutputStream().close();
 	}
 

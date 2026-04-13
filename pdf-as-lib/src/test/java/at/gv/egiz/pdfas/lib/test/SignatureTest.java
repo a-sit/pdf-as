@@ -87,7 +87,7 @@ public class SignatureTest {
                         state2.getRequestedSignature()));
         state3.finishSign();
 
-        try (FileOutputStream fos = new FileOutputStream("C:/temp/align_signed.pdf")) {
+        try (FileOutputStream fos = new FileOutputStream(tempFolder.newFile())) {
           fos.write(outputStream1.toByteArray());
         }
     }

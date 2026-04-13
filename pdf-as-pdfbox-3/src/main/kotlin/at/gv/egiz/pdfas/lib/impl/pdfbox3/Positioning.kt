@@ -144,9 +144,16 @@ object Positioning {
         footerSize: Int, globalSettings: ISettings
     ): Int {
         try {
-            val cropBox = pdfDataSource.getPage(pageNum).cropBox
+            val (cropBox, rotation) = pdfDataSource.getPage(pageNum).let {
+                Pair(it.cropBox, it.rotation)
+            }
+            val isRotated = (rotation % 180 != 0)
+            val (imageWidth, imageHeight) = when (isRotated) {
+                true -> Pair(cropBox.height, cropBox.width)
+                false -> Pair(cropBox.width, cropBox.height)
+            }
             val image = BufferedImage(
-                cropBox.width.toInt(), cropBox.height.toInt(),
+                imageWidth.toInt(), imageHeight.toInt(),
                 BufferedImage.TYPE_INT_ARGB)
             Renderer(pdfDataSource).renderPageToGraphics(
                 pageNum,
@@ -157,6 +164,10 @@ object Positioning {
 
             val bgColor = when (globalSettings.getValue(IConfigurationConstants.BG_COLOR_DETECTION).toBoolean()) {
                 true -> {
+                    /*
+                     * Only used if background color should be determined automatically.
+                     * That can be necessary of PDF contains page-size images.
+                     */
                     val topLeft = image.getRGB(5,5)
                     val topRight = image.getRGB(image.width-5, 5)
                     val bottomLeft = image.getRGB(5, image.height-5)

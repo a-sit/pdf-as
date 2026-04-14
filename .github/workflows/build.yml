@@ -1,0 +1,204 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+    
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+env:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+  LANGUAGE: "en_US"
+  LIB_NAME: "PDF-AS 4"
+  PROJECT_PATH: '.'
+  PROJECT_NAME: 'pdf-as-4'
+
+jobs:
+  security-checks:
+    name: Security Scans (Dependency/SAST/Secrets)
+    runs-on: [self-hosted, linux]
+    env:
+      REPO_PATH: repo-${{ github.run_id }}-${{ github.job }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.REPO_PATH }}
+          fetch-depth: 2
+          
+      - name: Install jq (local)
+        run: |
+          command -v jq >/dev/null || {
+            mkdir -p "$HOME/.local/bin"
+            curl -fsSL -o "$HOME/.local/bin/jq" https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64
+            chmod +x "$HOME/.local/bin/jq"
+            echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+            export PATH="$HOME/.local/bin:$PATH"
+          }
+          jq --version
+
+      - name: Dependency Scanning (OWASP Dependency-Check)
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: ${{ env.PROJECT_NAME }}
+          path: ${{ env.REPO_PATH }}
+          format: ALL
+          args: --noupdate
+
+      - name: SAST (Semgrep)
+        uses: returntocorp/semgrep-action@v1
+        continue-on-error: true
+        with:
+          config: >-
+            p/security-audit
+            p/java
+
+      - name: Secret Detection (TruffleHog)
+        uses: trufflesecurity/trufflehog@v3.94.3
+        with:
+          path: ${{ env.REPO_PATH }}
+
+  build-and-analyse:
+    name: Build & Quality Checks
+    runs-on: [self-hosted, linux]
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    needs: [security-checks]
+    env:
+      REPO_PATH: repo-${{ github.run_id }}-${{ github.job }}
+      
+    defaults:
+      run:
+        working-directory: ${{ env.REPO_PATH }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.REPO_PATH }}
+          clean: false
+          fetch-depth: 2
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Compile & Test
+        run: ./gradlew --warning-mode all clean build
+
+      - name: Upload Analysis Reports
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: analysis-reports
+          path: |
+            ${{ env.REPO_PATH }}/**/build/reports/pmd/*.xml
+            ${{ env.REPO_PATH }}/**/build/reports/spotbugs/*.xml
+            ${{ env.REPO_PATH }}/**/build/reports/checkstyle/*.xml
+            ${{ env.REPO_PATH }}/**/build/reports/jacoco/**/jacocoTestReport.xml
+            ${{ env.REPO_PATH }}/**/build/test-results/test/TEST-*.xml
+          if-no-files-found: warn
+          retention-days: 1
+
+      - name: Extract Pull Request Number
+        uses: jwalton/gh-find-current-pr@v1
+        if: always()
+        id: pr
+
+      - name: Detect Test Reports
+        id: tests
+        if: always()
+        run: |
+          shopt -s globstar nullglob
+          reports=(**/build/test-results/test/TEST-*.xml)
+          if [ ${#reports[@]} -gt 0 ]; then
+            echo "has_tests=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_tests=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare Quality Monitor config
+        id: qm
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.tests.outputs.has_tests }}" = "true" ]; then
+            echo "name=Run Quality Monitor (with coverage)" >> "$GITHUB_OUTPUT"
+            echo 'config={"tests":{"tools":[{"id":"junit","name":"Unittests","pattern":"**/build/test-results/test/TEST-*.xml"}]},"analysis":[{"name":"Style","id":"style","tools":[{"id":"checkstyle","pattern":"**/build/reports/checkstyle/*.xml"}]},{"name":"Code Analyzer","id":"pmd","tools":[{"id":"pmd","pattern":"**/build/reports/pmd/*.xml"}]},{"name":"Bugs","id":"bugs","tools":[{"id":"spotbugs","pattern":"**/build/reports/spotbugs/*.xml"}]}],"coverage":[{"name":"JaCoCo","tools":[{"id":"jacoco","metric":"line","pattern":"**/build/reports/jacoco/**/jacocoTestReport.xml"},{"id":"jacoco","metric":"branch","pattern":"**/build/reports/jacoco/**/jacocoTestReport.xml"}]}]}' >> "$GITHUB_OUTPUT"
+            echo 'gates={"qualityGates":[{"metric":"line","threshold":75.0,"criticality":"UNSTABLE"},{"metric":"branch","threshold":75.0,"criticality":"UNSTABLE"},{"metric":"checkstyle","threshold":70.0,"criticality":"UNSTABLE"},{"metric":"pmd","threshold":70.0,"criticality":"UNSTABLE"},{"metric":"spotbugs","threshold":10.0,"criticality":"UNSTABLE"}]}' >> "$GITHUB_OUTPUT"
+          else
+            echo "name=Run Quality Monitor (without coverage)" >> "$GITHUB_OUTPUT"
+            echo 'config={"tests":{"tools":[{"id":"junit","name":"Unittests","pattern":"**/build/test-results/test/TEST-*.xml"}]},"analysis":[{"name":"Style","id":"style","tools":[{"id":"checkstyle","pattern":"**/build/reports/checkstyle/*.xml"}]},{"name":"Code Analyzer","id":"pmd","tools":[{"id":"pmd","pattern":"**/build/reports/pmd/*.xml"}]},{"name":"Bugs","id":"bugs","tools":[{"id":"spotbugs","pattern":"**/build/reports/spotbugs/*.xml"}]}]}' >> "$GITHUB_OUTPUT"
+            echo 'gates={"qualityGates":[{"metric":"checkstyle","threshold":70.0,"criticality":"UNSTABLE"},{"metric":"pmd","threshold":70.0,"criticality":"UNSTABLE"},{"metric":"spotbugs","threshold":10.0,"criticality":"UNSTABLE"}]}' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: ${{ steps.qm.outputs.name }}
+        if: always()
+        uses: uhafner/quality-monitor@v4.2.0
+        continue-on-error: true
+        with:
+          pr-number: ${{ steps.pr.outputs.number }}
+          checks-name: Quality Monitor
+          config: ${{ steps.qm.outputs.config }}
+          quality-gates: ${{ steps.qm.outputs.gates }}
+
+  publishToEGIZMaven:
+    name: Assemble Release Package & Publish
+    runs-on: [self-hosted, linux]
+    needs: build-and-analyse
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    environment: release
+    env:
+      REPO_PATH: repo-${{ github.run_id }}-${{ github.job }}
+      
+    defaults:
+      run:
+        working-directory: ${{ env.REPO_PATH }}
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.REPO_PATH }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set SHORT_SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA:0:8}" >> "$GITHUB_ENV"
+
+      - name: Setup SSH known_hosts
+        env:
+          DEPLOY_EGIZ: ${{ secrets.DEPLOY_EGIZ }}
+        run: |
+          mkdir -p ~/.ssh
+          echo $DEPLOY_EGIZ | base64 --decode > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Assemble & Upload Archives
+        run: ./gradlew --stacktrace -x test assemble uploadArchives
+
+      - name: Upload variables.env
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ github.event.repository.name }}-${{ env.SHORT_SHA }}
+          path: ${{ env.REPO_PATH }}/variables.env

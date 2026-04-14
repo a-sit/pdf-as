@@ -1,6 +1,6 @@
 plugins {
 	id "com.github.ben-manes.versions" version "0.51.0" apply false
-	id "org.owasp.dependencycheck" version "12.1.3" apply false
+	id "com.github.spotbugs" version "6.0.0"
 }
 
 allprojects {
@@ -67,27 +67,63 @@ subprojects {
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven-publish'
-	apply plugin: 'org.owasp.dependencycheck'
+	apply plugin: 'checkstyle'
+	apply plugin: 'pmd'
+	apply plugin: 'jacoco'
+	apply plugin: 'com.github.spotbugs'
 	group = 'at.gv.egiz.pdfas'
 
-	// OWASP Dependency Check configuration
-	dependencyCheck {
-		nvd {
-			// Use environment variable NVD_API_KEY
-			apiKey = System.getenv('NVD_API_KEY')
-			// Add delay between API calls to avoid rate limiting
-			delay = 4000
+	pmd {
+		ignoreFailures = System.getenv("CI") == "true"
+	}
+
+	def checkstyleConfig = rootProject.file("config/checkstyle/egiz_checks.xml")
+	def isCi = (System.getenv("CI") ?: "false").toBoolean()
+
+	checkstyle {
+		toolVersion = "8.26"
+		configFile = checkstyleConfig
+		ignoreFailures = isCi
+	}
+
+	tasks.withType(Checkstyle).configureEach { task ->
+		task.ignoreFailures = isCi
+		task.onlyIf { checkstyleConfig.exists() }
+		task.reports {
+			xml.required = true
+			html.required = false
 		}
-		// Configure output formats
-		formats = ['HTML', 'JSON']
-		// Suppress false positives if needed
-		suppressionFile = 'dependency-check-suppressions.xml'
-		// Fail build on CVSS score >= 7 (High severity)
-		// failBuildOnCVSS = 7
-		// Skip CVSSv4 parsing to avoid compatibility issues
-		skipConfigurations = []
-		// Use local database if NVD API fails
-		autoUpdate = true
+	}
+
+	spotbugs {
+		ignoreFailures = System.getenv("CI") == "true"
+		effort = "max"
+		reportLevel = "medium"
+	}
+
+	tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach { task ->
+		task.ignoreFailures = (System.getenv("CI") == "true")
+		task.reports {
+			xml.required = true
+			html.required = false
+		}
+	}
+
+	jacoco {
+		toolVersion = "0.8.12"
+	}
+
+	tasks.withType(Test).configureEach {
+		finalizedBy jacocoTestReport
+	}
+
+	jacocoTestReport {
+		dependsOn test
+		reports {
+			xml.required = true
+			html.required = true
+			csv.required = false
+		}
 	}
 	
 

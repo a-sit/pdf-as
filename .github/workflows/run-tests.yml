@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  security-events: write # for codeql
+  actions: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}

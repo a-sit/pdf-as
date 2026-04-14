@@ -6,7 +6,7 @@ buildscript {
 	
 	dependencies {
 		 classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
-		 classpath "org.owasp:dependency-check-gradle:6.5.0.1"
+		 classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:4.7.10"
 	}
 }
 
@@ -26,8 +26,64 @@ subprojects {
 	apply plugin: 'eclipse'
 	apply plugin: 'maven-publish'
 	apply plugin: 'maven'
-	apply plugin: 'org.owasp.dependencycheck'
+	apply plugin: 'checkstyle'
+	apply plugin: 'pmd'
+	apply plugin: 'jacoco'
+	apply plugin: 'com.github.spotbugs'
 	group = 'at.gv.egiz.pdfas'
+
+	pmd {
+		ignoreFailures = System.getenv("CI") == "true"
+	}
+
+	def checkstyleConfig = rootProject.file("config/checkstyle/egiz_checks.xml")
+	def isCi = (System.getenv("CI") ?: "false").toBoolean()
+
+	checkstyle {
+		toolVersion = "8.26"
+		configFile = checkstyleConfig
+		ignoreFailures = isCi
+	}
+
+	tasks.withType(Checkstyle).configureEach { task ->
+		task.ignoreFailures = isCi
+		task.onlyIf { checkstyleConfig.exists() }
+		task.reports {
+			xml.required = true
+			html.required = false
+		}
+	}
+
+	spotbugs {
+		ignoreFailures = System.getenv("CI") == "true"
+		effort = "max"
+		reportLevel = "medium"
+	}
+
+	tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach { task ->
+		task.ignoreFailures = (System.getenv("CI") == "true")
+		task.reports {
+			xml.required = true
+			html.required = false
+		}
+	}
+
+	jacoco {
+		toolVersion = "0.8.12"
+	}
+
+	tasks.withType(Test).configureEach {
+		finalizedBy jacocoTestReport
+	}
+
+	jacocoTestReport {
+		dependsOn test
+		reports {
+			xml.required = true
+			html.required = true
+			csv.required = false
+		}
+	}
 
 	configurations {
 		deployerJars

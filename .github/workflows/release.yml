@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+env:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+  LANGUAGE: "en_US"
+  LIB_NAME: "PDF-AS 4"
+  PROJECT_PATH: '.'
+  PROJECT_NAME: 'pdf-as-4'
+
+jobs:
+  release:
+    name: Release
+    environment: release
+    runs-on: [self-hosted, linux]
+    if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: gradle
+
+      - name: Set VERSION and SHORT_SHA
+        run: |
+          echo "SHORT_SHA=${GITHUB_SHA:0:8}" >> "$GITHUB_ENV"
+          VERSION=$(./gradlew -q properties --console=plain | grep "^version:" | awk '{print $2}')
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Build Release Package
+        run: |
+          echo "Releasing version ${{ env.VERSION }} of ${{ env.LIB_NAME }}"
+          echo "Publishing version ${{ env.VERSION }} to public EGIZ maven"
+          ./gradlew release
+
+      - name: Upload Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-${{ env.SHORT_SHA }}-release
+          path: |
+            release/${VERSION}/pdf-as-lib-${VERSION}.zip
+            release/${VERSION}/pdf-as-web-${VERSION}.war

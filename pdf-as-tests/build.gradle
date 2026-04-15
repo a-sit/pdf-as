@@ -8,7 +8,7 @@ jar {
 }
 
 repositories {	
-	maven { url "https://apps.egiz.gv.at/maven-internal/" }
+	maven { url = "https://apps.egiz.gv.at/maven-internal/" }
 //	mavenLocal()
 //	mavenCentral()
 //	maven { url "https://repository.jboss.org/maven2/" }	
@@ -18,11 +18,15 @@ repositories {
 
 configurations{
 	pdfBox2Compile
+	pdfBox3Compile
 }
 
 sourceSets{
 	pdfBox2{
 		compileClasspath = configurations.pdfBox2Compile
+	}
+	pdfBox3{
+		compileClasspath = configurations.pdfBox3Compile
 	}
 }
 
@@ -33,10 +37,11 @@ dependencies {
 	implementation project (':signature-standards:sigs-pkcs7detached')
 	implementation project (':signature-standards:sigs-pades')
 
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
-	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+	implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: jakartaActivationVersion
 
-	implementation project (':pdf-as-pdfbox-2')
+	implementation project (':pdf-as-pdfbox-3')
+	implementation group: 'org.apache.pdfbox', name: 'preflight', version: pdfboxVersion
 
 }
 
@@ -52,63 +57,68 @@ suiteDir.eachDir {	File subDir ->
 	def dirname = subDir.name
 	logger.info("Test Suite " + subDir.name + " found in " + subDir.absolutePath)
 
-	task "runTestSuite${dirname.capitalize()}"(type: Test) {
+    tasks.register("runTestSuite${dirname.capitalize()}", Test) { test ->
 
-		description "runs tests from Test Suite: " + dirname
+		description = "runs tests from Test Suite: " + dirname
 		systemProperties 'test.dir': subDir.absolutePath
 
-		if(dirname =="public_pdfbox2"){
+        testClassesDirs = testing.suites.test.sources.output.classesDirs
+        classpath = testing.suites.test.sources.runtimeClasspath
+
+		if (dirname =="public_pdfbox2"){
 			classpath += sourceSets.pdfBox2.compileClasspath
 			compileTestJava.classpath += sourceSets.pdfBox2.compileClasspath
+		} else if (dirname == "public_pdfbox3") {
+			classpath += sourceSets.pdfBox3.compileClasspath
+			compileTestJava.classpath += sourceSets.pdfBox3.compileClasspath
 		}
 
 		include '**/ParameterizedSignatureTestSuite.class'
 
 		beforeSuite { TestDescriptor descriptor ->
-
 			if(descriptor.getParent() == null) {
-				logger.quiet("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+				test.logger.quiet("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 			}
 			if(descriptor.getClassName().equals("at.gv.egiz.param_tests.ParameterizedSignatureTestSuite")) {
-				logger.quiet("Starting suite: " + dirname + " (" + descriptor.getName() + ")")
+				test.logger.quiet("Starting suite: " + dirname + " (" + descriptor.getName() + ")")
 			}
 		}
 
 		afterSuite { TestDescriptor descriptor, TestResult result ->
 			if(descriptor.getClassName().equals("at.gv.egiz.param_tests.ParameterizedSignatureTestSuite")) {
-				logger.quiet("------------------");
-				logger.quiet("Ending suite: " + dirname);
-				logger.quiet("\tResult (SUCCESS/ERROR/SKIPPED/TOTAL): " +
+				test.logger.quiet("------------------");
+				test.logger.quiet("Ending suite: " + dirname);
+				test.logger.quiet("\tResult (SUCCESS/ERROR/SKIPPED/TOTAL): " +
 					result.getSuccessfulTestCount() + "/" +
 					result.getFailedTestCount() + "/" +
 					result.getSkippedTestCount() + "/" +
 					result.getTestCount());
 				float duration_ms = result.getEndTime() - result.getStartTime()
 				float duration_sec = duration_ms / 1000.0f
-				logger.quiet("\tDuration: " + duration_sec + " s [" + duration_ms + " ms]")
-				logger.quiet("\tReport @ file://" + subDir.absolutePath + "/index.html")
+				test.logger.quiet("\tDuration: " + duration_sec + " s [" + duration_ms + " ms]")
+				test.logger.quiet("\tReport @ file://" + subDir.absolutePath + "/index.html")
 			}
 			if(descriptor.getParent() == null) {
-				logger.quiet("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+				test.logger.quiet("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 			}
 		}
 
 		beforeTest { TestDescriptor descriptor ->
-			logger.quiet("------------------");
-			logger.info("Running test: " + descriptor.getName())
+			test.logger.quiet("------------------");
+			test.logger.info("Running test: " + descriptor.getName())
 		}
 
 		afterTest { TestDescriptor descriptor, TestResult result ->
 			float duration_ms = result.getEndTime() - result.getStartTime()
 			float duration_sec = duration_ms / 1000.0f
-			logger.quiet(result.getResultType().toString() + " => [" + 
+			test.logger.quiet(result.getResultType().toString() + " => [" +
 				descriptor.getName() + "] took " + duration_sec + " s [" + duration_ms + " ms]")
 			if(TestResult.ResultType.FAILURE.equals(result.getResultType())) {
 				if(result.getException() != null) {
-					logger.error("Failed test: " + result.getException().getMessage());
+					test.logger.error("Failed test: " + result.getException().getMessage());
 					result.getException().printStackTrace();
 				} else {
-					logger.error("Failed test provided no exception");
+					test.logger.error("Failed test provided no exception");
 				}
 			}
 		}
@@ -121,13 +131,13 @@ suiteDir.eachDir {	File subDir ->
 	
 	
 
-	task "cleanTestSuite${dirname.capitalize()}"(type: Delete) {
+	tasks.register("cleanTestSuite${dirname.capitalize()}", Delete) {
 		outputs.upToDateWhen { false }
 		delete fileTree (dir: subDir.absolutePath, include: "index.html")
 		delete fileTree (dir: subDir.absolutePath, include: "**/test_result.html")
 	}
 	
-	task "cleanOutFolders${dirname.capitalize()}"() {
+	tasks.register("cleanOutFolders${dirname.capitalize()}") {
 		doLast {
 			subDir.eachDir { File tcDir -> 
 				File outDir = new File(tcDir, "out");
@@ -148,6 +158,7 @@ suiteDir.eachDir {	File subDir ->
 tasks.getByPath(":pdf-as-lib:test").dependsOn test
 
 test {
+    failOnNoDiscoveredTests = false
 	include '**/DummyTest.class'
 
 	beforeTest { TestDescriptor descriptor ->

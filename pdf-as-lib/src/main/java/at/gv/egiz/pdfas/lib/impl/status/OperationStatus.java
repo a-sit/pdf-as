@@ -35,6 +35,9 @@ import at.gv.egiz.pdfas.lib.backend.PDFASBackend;
 import at.gv.egiz.pdfas.lib.impl.configuration.GlobalConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
+import at.gv.egiz.pdfas.lib.util.TimedFunction;
+import lombok.Getter;
+import lombok.Setter;
 
 public class OperationStatus implements Serializable {
 
@@ -44,24 +47,35 @@ public class OperationStatus implements Serializable {
 	private static final long serialVersionUID = -2985007198666388528L;
 
 	private SignParameter signParamter;
-	private PDFObject pdfObject;
+	@Setter
+    @Getter
+    private PDFObject pdfObject;
 
-	private ISettings configuration;
+	private final ISettings configuration;
 	private PlaceholderConfiguration placeholderConfiguration = null;
-	private GlobalConfiguration gloablConfiguration = null;
-	private Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<String, SignatureProfileConfiguration>();
+	private GlobalConfiguration globalConfiguration = null;
+	private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<String, SignatureProfileConfiguration>();
 	private TempFileHelper helper;
-	private RequestedSignature requestedSignature;
-	private Calendar signingDate;
-	private PDFASBackend backend;
-	private Map<String, String> metaInformations = new HashMap<String, String>();
+	@Setter
+    @Getter
+    private RequestedSignature requestedSignature;
+	@Setter
+    @Getter
+    private Calendar signingDate;
+	@Getter
+    private final PDFASBackend backend;
+	@Getter
+    private final Map<String, String> metaInformations = new HashMap<String, String>();
+    @Getter
+    private final TimedFunction.Context signTimer;
 
 //	private HashMap<String, String> requestParameters = new HashMap<String, String>();
 
-	public OperationStatus(ISettings configuration, SignParameter signParameter, PDFASBackend backend) {
+	public OperationStatus(ISettings configuration, SignParameter signParameter, PDFASBackend backend, TimedFunction.Context timer) {
 		this.configuration = configuration;
 		this.signParamter = signParameter;
 		this.backend = backend;
+        this.signTimer = timer;
 		helper = new TempFileHelper(configuration);
 	}
 
@@ -70,7 +84,7 @@ public class OperationStatus implements Serializable {
 		if (this.helper != null) {
 			try {
 				this.helper.clear();
-			} catch (Throwable e) {
+			} catch (Throwable ignored) {
 			}
 		}
 		super.finalize();
@@ -82,40 +96,28 @@ public class OperationStatus implements Serializable {
 		if (this.helper != null) {
 			try {
 				this.helper.clear();
-			} catch (Throwable e) {
+			} catch (Throwable ignored) {
 			}
 		}
 		if(pdfObject != null) {
 			pdfObject.close();
 		}
 	}
-	
-	public PDFASBackend getBackend() {
-		return backend;
-	}
 
-	public RequestedSignature getRequestedSignature() {
-		return requestedSignature;
-	}
-
-	public void setRequestedSignature(RequestedSignature requestedSignature) {
-		this.requestedSignature = requestedSignature;
-	}
-
-	public PlaceholderConfiguration getPlaceholderConfiguration() {
-		if (this.placeholderConfiguration == null) {
-			this.placeholderConfiguration = new PlaceholderConfiguration(
-					this.configuration);
-		}
-		return this.placeholderConfiguration;
+    public PlaceholderConfiguration getPlaceholderConfiguration() {
+      if (this.placeholderConfiguration == null) {
+          this.placeholderConfiguration = new PlaceholderConfiguration(
+                  this.configuration);
+      }
+      return this.placeholderConfiguration;
 	}
 
 	public GlobalConfiguration getGlobalConfiguration() {
-		if (this.gloablConfiguration == null) {
-			this.gloablConfiguration = new GlobalConfiguration(
+		if (this.globalConfiguration == null) {
+			this.globalConfiguration = new GlobalConfiguration(
 					this.configuration);
 		}
-		return this.gloablConfiguration;
+		return this.globalConfiguration;
 	}
 
 	public SignatureProfileConfiguration getSignatureProfileConfiguration(
@@ -134,20 +136,8 @@ public class OperationStatus implements Serializable {
 
 	// ========================================================================
 
-	public PDFObject getPdfObject() {
-		return pdfObject;
-	}
-
-	public void setPdfObject(PDFObject pdfObject) {
-		this.pdfObject = pdfObject;
-	}
-
-	public SignParameter getSignParamter() {
+    public SignParameter getSignParameter() {
 		return signParamter;
-	}
-
-	public void setSignParamter(SignParameter signParamter) {
-		this.signParamter = signParamter;
 	}
 
 	public TempFileHelper getTempFileHelper() {
@@ -158,26 +148,10 @@ public class OperationStatus implements Serializable {
 		return this.configuration;
 	}
 
-	public Calendar getSigningDate() {
-		return signingDate;
+    public String getTransactionId() {
+      if(this.signParamter != null) {
+          return this.signParamter.getTransactionId();
+      }
+      return null;
 	}
-
-	public void setSigningDate(Calendar signingDate) {
-		this.signingDate = signingDate;
-	}
-
-	public String getTransactionId() {
-		if(this.signParamter != null) {
-			return this.signParamter.getTransactionId();
-		}
-		return null;
-	}
-
-	public Map<String, String> getMetaInformations() {
-		return metaInformations;
-	}
-
-//	public HashMap<String, String> getRequestParameters() {
-//		return requestParameters;
-//	}
 }

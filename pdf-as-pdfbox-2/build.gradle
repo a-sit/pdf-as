@@ -30,21 +30,23 @@ releases.dependsOn jar
 releases.dependsOn sourcesJar
 
 dependencies {
+	var pdfbox2Version = '2.0.35'
 	implementation project (':pdf-as-lib')
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
-	implementation 'org.slf4j:jcl-over-slf4j:1.7.36'
-	api group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.35'
-	api group: 'org.apache.pdfbox', name: 'pdfbox-tools', version: '2.0.35'
-	api group: 'org.apache.pdfbox', name: 'preflight', version: '2.0.35'
-	implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'
-	implementation group: 'ognl', name: 'ognl', version: '3.3.5'	
+	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: slf4jVersion
+	api group: 'org.apache.pdfbox', name: 'pdfbox', version: pdfbox2Version
+	api group: 'org.apache.pdfbox', name: 'pdfbox-tools', version: pdfbox2Version
+	api group: 'org.apache.pdfbox', name: 'preflight', version: pdfbox2Version
+	implementation group: 'commons-io', name: 'commons-io', version: commonsIoVersion
+	implementation group: 'ognl', name: 'ognl', version: ognlVersion	
 	api group: 'com.github.jai-imageio', name: 'jai-imageio-jpeg2000', version: '1.4.0'
 	api group: 'com.github.jai-imageio', name: 'jai-imageio-core', version: '1.4.0'
 	api group: 'com.levigo.jbig2', name: 'levigo-jbig2-imageio', version: '2.0'
+	implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: jakartaActivationVersion
 	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
 	
-	testImplementation 'ch.qos.logback:logback-classic:1.2.13'
-	testImplementation 'ch.qos.logback:logback-core:1.2.13'
+	testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+	testImplementation group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
 
 }
 

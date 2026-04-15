@@ -29,7 +29,6 @@ import at.gv.egiz.pdfas.common.utils.DNUtils;
 import at.gv.egiz.pdfas.common.utils.OgnlUtils;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
 import iaik.x509.X509Certificate;
-import ognl.AbstractMemberAccess;
 import ognl.MemberAccess;
 import ognl.OgnlContext;
 import org.slf4j.Logger;
@@ -78,7 +77,7 @@ public class CertificateAndRequestParameterResolver implements IResolver {
         this.ctx = new OgnlContext(null, null, memberAccess);
 
         this.ctx = new OgnlContext(null, null, memberAccess);
-        Map<String, String> map = operationStatus.getSignParamter().getDynamicSignatureBlockArguments();
+        Map<String, String> map = operationStatus.getSignParameter().getDynamicSignatureBlockArguments();
         if(map == null)
             map = new HashMap<>();
         this.ctx.put(IProfileConstants.SIGNATURE_BLOCK_PARAMETER, map);

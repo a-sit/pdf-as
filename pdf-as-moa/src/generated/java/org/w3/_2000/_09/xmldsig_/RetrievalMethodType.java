@@ -1,32 +1,32 @@
 
 package org.w3._2000._09.xmldsig_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für RetrievalMethodType complex type.
+ * <p>Java class for RetrievalMethodType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="RetrievalMethodType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="Transforms" type="{http://www.w3.org/2000/09/xmldsig#}TransformsType" minOccurs="0"/&gt;
- *       &lt;/sequence&gt;
- *       &lt;attribute name="URI" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
- *       &lt;attribute name="Type" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="RetrievalMethodType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="Transforms" type="{http://www.w3.org/2000/09/xmldsig#}TransformsType" minOccurs="0"/>
+ *       </sequence>
+ *       <attribute name="URI" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *       <attribute name="Type" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -46,7 +46,7 @@ public class RetrievalMethodType {
     protected String type;
 
     /**
-     * Ruft den Wert der transforms-Eigenschaft ab.
+     * Gets the value of the transforms property.
      * 
      * @return
      *     possible object is
@@ -58,7 +58,7 @@ public class RetrievalMethodType {
     }
 
     /**
-     * Legt den Wert der transforms-Eigenschaft fest.
+     * Sets the value of the transforms property.
      * 
      * @param value
      *     allowed object is
@@ -70,7 +70,7 @@ public class RetrievalMethodType {
     }
 
     /**
-     * Ruft den Wert der uri-Eigenschaft ab.
+     * Gets the value of the uri property.
      * 
      * @return
      *     possible object is
@@ -82,7 +82,7 @@ public class RetrievalMethodType {
     }
 
     /**
-     * Legt den Wert der uri-Eigenschaft fest.
+     * Sets the value of the uri property.
      * 
      * @param value
      *     allowed object is
@@ -94,7 +94,7 @@ public class RetrievalMethodType {
     }
 
     /**
-     * Ruft den Wert der type-Eigenschaft ab.
+     * Gets the value of the type property.
      * 
      * @return
      *     possible object is
@@ -106,7 +106,7 @@ public class RetrievalMethodType {
     }
 
     /**
-     * Legt den Wert der type-Eigenschaft fest.
+     * Sets the value of the type property.
      * 
      * @param value
      *     allowed object is

@@ -23,6 +23,10 @@ import iaik.x509.X509Certificate;
 public class SignatureUtils implements ErrorConstants {
   private static final Logger logger = LoggerFactory.getLogger(SignatureUtils.class);
 
+    /**
+     * Verifies the CMS signature for the given input.
+     * Throws if the signature is invalid.
+     */
   public static VerifyResult verifySignature(byte[] signature, byte[] input)
       throws PDFASError {
     // List<VerifyResult> results = new ArrayList<VerifyResult>();

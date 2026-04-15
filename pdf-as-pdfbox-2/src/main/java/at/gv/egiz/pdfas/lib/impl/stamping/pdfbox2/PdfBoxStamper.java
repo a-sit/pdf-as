@@ -35,7 +35,7 @@ import at.gv.egiz.pdfas.lib.impl.status.PDFObject;
 import at.knowcenter.wag.egov.egiz.pdf.PositioningInstruction;
 import at.knowcenter.wag.egov.egiz.table.Table;
 
-public class PdfBoxStamper implements IPDFStamper {
+public class PdfBoxStamper implements IPDFStamper<PDFBOXObject> {
 
 //	private static final Logger logger = LoggerFactory.getLogger(PdfBoxStamper.class);
 
@@ -45,23 +45,12 @@ public class PdfBoxStamper implements IPDFStamper {
 //		this.pdfBuilder = new PDVisibleSigBuilder();
 	}
 	
-	public IPDFVisualObject createVisualPDFObject(PDFObject pdf, Table table) throws IOException {
+	public IPDFVisualObject createVisualPDFObject(PDFBOXObject pdfboxObject, Table table) throws IOException {
 		try {
-			PDFBOXObject pdfboxObject = (PDFBOXObject)pdf;
-			return new PdfBoxVisualObject(table, pdf.getStatus().getSettings(), pdfboxObject);
+			return new PdfBoxVisualObject(table, pdfboxObject.getStatus().getSettings(), pdfboxObject);
 		} catch (PdfAsException e) {
 			throw new PdfAsWrappedIOException(e);
 		}
-	}
-
-	public byte[] writeVisualObject(IPDFVisualObject visualObject,
-			PositioningInstruction positioningInstruction, byte[] pdfData,
-			String placeholderName) throws PdfAsException {
-		return null;
-	}
-
-	public void setSettings(ISettings settings) {
-		// not needed currently
 	}
 
 }

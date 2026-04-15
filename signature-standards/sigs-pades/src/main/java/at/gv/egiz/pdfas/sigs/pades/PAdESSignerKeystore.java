@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import iaik.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +63,6 @@ import iaik.asn1.UTF8String;
 import iaik.asn1.structures.AlgorithmID;
 import iaik.asn1.structures.Attribute;
 import iaik.asn1.structures.ChoiceOfTime;
-import iaik.cms.ContentInfo;
-import iaik.cms.IssuerAndSerialNumber;
-import iaik.cms.SignedData;
-import iaik.cms.SignerInfo;
 import iaik.smime.ess.ESSCertID;
 import iaik.smime.ess.ESSCertIDv2;
 import iaik.x509.X509Certificate;
@@ -127,8 +124,6 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 		} else {
 			try {
 				this.cert = new X509Certificate(cert.getEncoded());
-			} catch (CertificateEncodingException e) {
-				throw new PDFASError(PDFASError.ERROR_INVALID_CERTIFICATE, e);
 			} catch (CertificateException e) {
 				throw new PDFASError(PDFASError.ERROR_INVALID_CERTIFICATE, e);
 			}
@@ -146,10 +141,12 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	    try {
 	      logger.info("Creating PAdES signature.");
 
-	      requestedSignature.getStatus().getMetaInformations()
-	      .put(ErrorConstants.STATUS_INFO_SIGDEVICE, SIGNATURE_DEVICE);
-	      requestedSignature.getStatus().getMetaInformations()
-	      .put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION, PdfAsFactory.getVersion());
+		  if (requestedSignature != null) {
+			  requestedSignature.getStatus().getMetaInformations()
+					  .put(ErrorConstants.STATUS_INFO_SIGDEVICE, SIGNATURE_DEVICE);
+			  requestedSignature.getStatus().getMetaInformations()
+					  .put(ErrorConstants.STATUS_INFO_SIGDEVICEVERSION, PdfAsFactory.getVersion());
+		  }
 	      
 	      IssuerAndSerialNumber issuer = new IssuerAndSerialNumber(cert);
 
@@ -163,7 +160,7 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 
 
 	      //Check PAdES Flag
-	      if (parameter.getConfiguration().hasValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG))
+	      if (parameter != null && parameter.getConfiguration().hasValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG))
 	      {
 	        if (IConfigurationConstants.TRUE.equalsIgnoreCase(parameter.getConfiguration().getValue(IConfigurationConstants.SIG_PADES_FORCE_FLAG)))
 	        {
@@ -193,20 +190,11 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	          signature, input);
 	      
 	      return signature;
-	    } catch (NoSuchAlgorithmException e) {
-	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
-	    } catch (iaik.cms.CMSException e) {
-	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
-	    } catch (IOException e) {
-	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
-	    } catch (CertificateException e) {
-	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
-	    } catch (CodingException e) {
-	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
-	    } catch (PDFASError e) {
+	    } catch (NoSuchAlgorithmException | CMSException | IOException | PDFASError | CodingException |
+                 CertificateException e) {
 	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
 	    }
-	  }
+     }
 
 	  public String getPDFSubFilter() {
 	    return SUBFILTER_ETSI_CADES_DETACHED;

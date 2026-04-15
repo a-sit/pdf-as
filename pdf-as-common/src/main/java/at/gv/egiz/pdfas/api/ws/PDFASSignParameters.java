@@ -26,9 +26,9 @@ package at.gv.egiz.pdfas.api.ws;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlEnumValue;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name="SignParameters")
 public class PDFASSignParameters implements Serializable {

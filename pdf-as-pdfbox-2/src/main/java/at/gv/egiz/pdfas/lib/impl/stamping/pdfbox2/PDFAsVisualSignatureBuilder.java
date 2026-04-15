@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -377,9 +378,9 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 	public void createSignature(PDSignatureField pdSignatureField, PDPage page,
 			String signatureName) throws IOException {
 		PDSignature pdSignature = new PDSignature();
-		pdSignatureField.setSignature(pdSignature);
-		pdSignatureField.getWidget().setPage(page);
-		page.getAnnotations().add(pdSignatureField.getWidget());
+		pdSignatureField.setValue(pdSignature);
+		pdSignatureField.getWidgets().get(0).setPage(page);
+		page.getAnnotations().add(pdSignatureField.getWidgets().get(0));
 		pdSignature.setName(signatureName);
 		pdSignature.setByteRange(new int[] { 0, 0, 0, 0 });
 		pdSignature.setContents(new byte[4096]);
@@ -389,7 +390,6 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 
 	public void createAcroFormDictionary(PDAcroForm acroForm,
 			PDSignatureField signatureField) throws IOException {
-		@SuppressWarnings("unchecked")
 		List<PDField> acroFormFields = acroForm.getFields();
 		COSDictionary acroFormDict = acroForm.getCOSObject();
 		acroFormDict.setDirect(true);
@@ -481,7 +481,7 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 		rect.setLowerLeftX((float) llDst.getX());
 		logger.debug("rectangle of signature has been created: {}",
 				rect.toString());
-		signatureField.getWidget().setRectangle(rect);
+		signatureField.getWidgets().get(0).setRectangle(rect);
 		getStructure().setSignatureRectangle(rect);
 		logger.debug("rectangle of signature has been created");
 	}
@@ -553,13 +553,13 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 		appearance.getCOSObject().setDirect(true);
 
 		PDAppearanceStream appearanceStream = new PDAppearanceStream(
-				holderForml.getCOSStream());
+				holderForml.getCOSObject());
 		AffineTransform transform = new AffineTransform();
 		transform.setToIdentity();
 		transform.rotate(Math.toRadians(degrees));
 		appearanceStream.setMatrix(transform);
 		appearance.setNormalAppearance(appearanceStream);
-		signatureField.getWidget().setAppearance(appearance);
+		signatureField.getWidgets().get(0).setAppearance(appearance);
 
 		getStructure().setAppearanceDictionary(appearance);
 		logger.debug("PDF appereance Dictionary has been created");
@@ -586,7 +586,7 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 			PDResources holderFormResources) {
 		COSName name = holderFormResources.add(innerForm, "FRM");//TODO: pdfbox2 - is this right?
 		getStructure().setInnerFormName(name);
-		logger.debug("Alerady inserted inner form  inside holder form");
+		logger.debug("Already inserted inner form  inside holder form");
 	}
 
 	public void createImageFormStream(PDDocument template) {
@@ -637,7 +637,7 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 
 	public void appendRawCommands(OutputStream os, String commands)
 			throws IOException {
-		os.write(commands.getBytes("UTF-8"));
+		os.write(commands.getBytes(StandardCharsets.UTF_8));
 		os.close();
 	}
 
@@ -678,8 +678,7 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
                     COSName fontName = cosNameIterator.next();
                     PDFont pdFont = page.getResources().getFont(fontName);
 
-                    if (pdFont instanceof PDType0Font) {
-                        PDType0Font typedFont = (PDType0Font) pdFont;
+                    if (pdFont instanceof PDType0Font typedFont) {
 
                         if (typedFont.getDescendantFont() != null) {
                             if (typedFont.getDescendantFont().getFontDescriptor() != null) {

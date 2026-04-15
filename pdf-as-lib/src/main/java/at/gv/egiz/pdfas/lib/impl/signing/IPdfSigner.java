@@ -36,21 +36,18 @@ import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
 import at.gv.egiz.pdfas.lib.impl.status.PDFObject;
 import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
 
-public interface IPdfSigner {
+public interface IPdfSigner<PDFObjectT extends PDFObject, SignerT extends PDFASSignatureExtractor>  {
 
-	PDFASSignatureInterface buildSignaturInterface(IPlainSigner signer,
-			SignParameter parameters, RequestedSignature requestedSignature);
-
-	PDFASSignatureExtractor buildBlindSignaturInterface(
+	SignerT buildBlindSignaturInterface(
 			X509Certificate certificate, String filter, String subfilter,
 			Calendar date);
 
-	PDFObject buildPDFObject(OperationStatus operationStatus);
+	PDFObjectT buildPDFObject(OperationStatus operationStatus);
 
-	void checkPDFPermissions(PDFObject object) throws PdfAsException;
+	void checkPDFPermissions(PDFObjectT object) throws PdfAsException;
 	
-	void signPDF(PDFObject pdfObject, RequestedSignature requestedSignature,
-			PDFASSignatureInterface signer) throws PdfAsException;
+	void signPDF(PDFObjectT pdfObject, RequestedSignature requestedSignature,
+			SignerT signer) throws PdfAsException;
 	
 	byte[] rewritePlainSignature(byte[] plainSignature);
 	

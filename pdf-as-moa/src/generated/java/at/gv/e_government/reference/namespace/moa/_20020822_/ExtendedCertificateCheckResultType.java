@@ -1,29 +1,29 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für ExtendedCertificateCheckResultType complex type.
+ * <p>Java class for ExtendedCertificateCheckResultType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="ExtendedCertificateCheckResultType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="Major" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}IndicationResultType"/&gt;
- *         &lt;element name="Minor" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}IndicationResultType" minOccurs="0"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="ExtendedCertificateCheckResultType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="Major" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}IndicationResultType"/>
+ *         <element name="Minor" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}IndicationResultType" minOccurs="0"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -40,7 +40,7 @@ public class ExtendedCertificateCheckResultType {
     protected IndicationResultType minor;
 
     /**
-     * Ruft den Wert der major-Eigenschaft ab.
+     * Gets the value of the major property.
      * 
      * @return
      *     possible object is
@@ -52,7 +52,7 @@ public class ExtendedCertificateCheckResultType {
     }
 
     /**
-     * Legt den Wert der major-Eigenschaft fest.
+     * Sets the value of the major property.
      * 
      * @param value
      *     allowed object is
@@ -64,7 +64,7 @@ public class ExtendedCertificateCheckResultType {
     }
 
     /**
-     * Ruft den Wert der minor-Eigenschaft ab.
+     * Gets the value of the minor property.
      * 
      * @return
      *     possible object is
@@ -76,7 +76,7 @@ public class ExtendedCertificateCheckResultType {
     }
 
     /**
-     * Legt den Wert der minor-Eigenschaft fest.
+     * Sets the value of the minor property.
      * 
      * @param value
      *     allowed object is

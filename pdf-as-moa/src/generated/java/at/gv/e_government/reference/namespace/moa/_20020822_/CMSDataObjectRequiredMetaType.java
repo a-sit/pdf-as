@@ -1,30 +1,30 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für CMSDataObjectRequiredMetaType complex type.
+ * <p>Java class for CMSDataObjectRequiredMetaType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="CMSDataObjectRequiredMetaType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="MetaInfo" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}MetaInfoType"/&gt;
- *         &lt;element name="Content" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}CMSContentBaseType"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="CMSDataObjectRequiredMetaType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element name="MetaInfo" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}MetaInfoType"/>
+ *         <element name="Content" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}CMSContentBaseType"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -44,7 +44,7 @@ public class CMSDataObjectRequiredMetaType {
     protected CMSContentBaseType content;
 
     /**
-     * Ruft den Wert der metaInfo-Eigenschaft ab.
+     * Gets the value of the metaInfo property.
      * 
      * @return
      *     possible object is
@@ -56,7 +56,7 @@ public class CMSDataObjectRequiredMetaType {
     }
 
     /**
-     * Legt den Wert der metaInfo-Eigenschaft fest.
+     * Sets the value of the metaInfo property.
      * 
      * @param value
      *     allowed object is
@@ -68,7 +68,7 @@ public class CMSDataObjectRequiredMetaType {
     }
 
     /**
-     * Ruft den Wert der content-Eigenschaft ab.
+     * Gets the value of the content property.
      * 
      * @return
      *     possible object is
@@ -80,7 +80,7 @@ public class CMSDataObjectRequiredMetaType {
     }
 
     /**
-     * Legt den Wert der content-Eigenschaft fest.
+     * Sets the value of the content property.
      * 
      * @param value
      *     allowed object is

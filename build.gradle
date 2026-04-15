@@ -1,33 +1,131 @@
-buildscript {
-	repositories {
-		gradlePluginPortal()
-		mavenCentral()
-	}
-	
-	dependencies {
-		 classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
-		 classpath "org.owasp:dependency-check-gradle:6.5.0.1"
-	}
+plugins {
+	id "com.github.ben-manes.versions" version "0.51.0" apply false
+	id "com.github.spotbugs" version "6.0.0"
 }
 
 allprojects {
 	apply plugin: "com.github.ben-manes.versions"
+
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs += ['-Xlint:deprecation']
+    }
+
+	dependencyUpdates {
+        gradleReleaseChannel = "current"
+        outputFormatter = "json"
+    }
+
 	repositories {  
 		mavenCentral()
 		maven {
-        	url "https://repo.spring.io/milestone/"
+        	url = "https://repo.spring.io/milestone/"
     	}  
     }
-	version = '4.4.4-SNAPSHOT'
+	version = '5.0.0-SNAPSHOT'
+
+	project.ext{
+		releaseRepoUrl = "file://${project(':').projectDir}/../mvn-repo/releases"
+		snapshotRepoUrl = "file://${project(':').projectDir}/../mvn-repo/snapshots"
+		version = version
+		pdfasversion = version
+		revision = getCheckedOutGitCommitHash()
+		//tomcatVersion = '7.0.54';
+		//tomcatVersion = '8.0.36';
+		//tomcatVersion = '9.0.115';
+		tomcatVersion = '10.1.54';
+		slf4jVersion = '2.0.16'
+		cxfVersion = '4.2.0'
+		bouncyCastleVersion = '1.82'
+		commonsCollectionsVersion = '4.5.0'
+		commonsLang3Version = '3.20.0'
+		commonsIoVersion = '2.21.0'
+		commonsCodecVersion = '1.21.0'
+		commonsTextVersion = '1.14.0'
+		commonsCliVersion = '1.11.0'
+		jettyVersion = '11.0.24'
+		logbackVersion = '1.5.25'
+		gsonVersion = '2.13.2'
+		zxingVersion = '3.5.0'
+		ognlVersion = '3.3.5'
+		jsonVersion = '20250517'
+		micrometerVersion = '1.15.4'
+		springBootVersion = '3.5.13'
+		junitVersion = '4.13.2'
+		jakartaActivationVersion = '2.1.4'
+		jakartaJwsVersion = '3.0.0'
+		jakartaXmlWsVersion = '4.0.3'
+		jakartaServletVersion = '6.1.0'
+		jaxbApiVersion = '4.0.4'
+		jaxbRuntimeVersion = '4.0.7'
+		pdfboxVersion = '3.0.6'
+		ztZipVersion = '1.17'
+		lombokVersion = '1.18.38'
+	}
 }
 
 subprojects {
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven-publish'
-	apply plugin: 'maven'
-	apply plugin: 'org.owasp.dependencycheck'
+	apply plugin: 'checkstyle'
+	apply plugin: 'pmd'
+	apply plugin: 'jacoco'
+	apply plugin: 'com.github.spotbugs'
 	group = 'at.gv.egiz.pdfas'
+
+	pmd {
+		ignoreFailures = System.getenv("CI") == "true"
+	}
+
+	def checkstyleConfig = rootProject.file("config/checkstyle/egiz_checks.xml")
+	def isCi = (System.getenv("CI") ?: "false").toBoolean()
+
+	checkstyle {
+		toolVersion = "8.26"
+		configFile = checkstyleConfig
+		ignoreFailures = isCi
+	}
+
+	tasks.withType(Checkstyle).configureEach { task ->
+		task.ignoreFailures = isCi
+		task.onlyIf { checkstyleConfig.exists() }
+		task.reports {
+			xml.required = true
+			html.required = false
+		}
+	}
+
+	spotbugs {
+		ignoreFailures = System.getenv("CI") == "true"
+		effort = "max"
+		reportLevel = "medium"
+	}
+
+	tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach { task ->
+		task.ignoreFailures = (System.getenv("CI") == "true")
+		task.reports {
+			xml.required = true
+			html.required = false
+		}
+	}
+
+	jacoco {
+		toolVersion = "0.8.12"
+	}
+
+	tasks.withType(Test).configureEach {
+		finalizedBy jacocoTestReport
+	}
+
+	jacocoTestReport {
+		dependsOn test
+		reports {
+			xml.required = true
+			html.required = true
+			csv.required = false
+		}
+	}
+	
 
 	configurations {
 		deployerJars
@@ -38,25 +136,25 @@ subprojects {
     mavenLocal()
     
     maven {
-       	url "https://repo.spring.io/milestone/"
+       	url = "https://repo.spring.io/milestone/"
        	mavenContent {
            	releasesOnly()
        	}
     }      
     maven {
-       	url "https://apps.egiz.gv.at/maven/"     	
+       	url = "https://apps.egiz.gv.at/maven/"     	
        	mavenContent {
            	releasesOnly()
        	}
     }
     maven {
-       	url "https://apps.egiz.gv.at/maven-internal/"     	
+       	url = "https://apps.egiz.gv.at/maven-internal/"     	
        	mavenContent {
            	releasesOnly()
        	}
     }
     maven {
-       	url "https://apps.egiz.gv.at/maven-snapshot/"
+       	url = "https://apps.egiz.gv.at/maven-snapshot/"
        	mavenContent {
            	snapshotsOnly()
        	}
@@ -64,14 +162,14 @@ subprojects {
   }
 
 	dependencies { 
-		implementation "org.projectlombok:lombok:1.18.28"    
-		annotationProcessor "org.projectlombok:lombok:1.18.28"
-		testAnnotationProcessor "org.projectlombok:lombok:1.18.28"
-		testImplementation 'junit:junit:4.13.2' 
+		implementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+		testImplementation group: 'junit', name: 'junit', version: junitVersion
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {
-	    classifier = 'sources'
+	    archiveClassifier.set('sources')
 	    from sourceSets.main.allSource
 	}
 
@@ -79,29 +177,22 @@ subprojects {
 	    archives sourcesJar
 	}
 
-	sourceCompatibility = 1.8
+	java {
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
+	}
 	compileJava.options.encoding = "UTF-8"
 	compileTestJava.options.encoding = "UTF-8"
-	project.ext{
-		releaseRepoUrl = "file://${project(':').projectDir}/../mvn-repo/releases"
-		snapshotRepoUrl = "file://${project(':').projectDir}/../mvn-repo/snapshots"
-		version = version
-		pdfasversion = version
-		revision = getCheckedOutGitCommitHash()
-		tomcatVersion = '9.0.115';
-		slf4jVersion = '1.7.36'
-		cxfVersion = '3.5.11'
-	  }
 	
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }
 	
 	task copyDeps(type: Copy) {
-		from configurations.runtime
+		from configurations.runtimeClasspath
 		into (new File(rootDir, 'build/alldependencies')).toString()
 	}
 	
 	task copyDepsLocal(type: Copy) {
-		from configurations.runtime
+		from configurations.runtimeClasspath
 		into 'build/alldependencies'
 	}
 
@@ -120,24 +211,8 @@ subprojects {
     	}
 	}	
 	
-	dependencies {
-    	deployerJars "org.apache.maven.wagon:wagon-ssh:3.4.3"
-    	
-	}
-
-	uploadArchives {
-    	repositories.mavenDeployer {        	
-        	configuration = configurations.deployerJars        	        	
-        	repository(url: "sftp://apps.egiz.gv.at/maven") {
-            	authentication(userName: System.getenv("EGIZ_MAVEN_USER"), password: System.getenv("EGIZ_MAVEN_PASSWORD"))
-            	
-        	}
-        	snapshotRepository(url: "sftp://apps.egiz.gv.at/maven-snapshot") {
-            	authentication(userName: System.getenv("EGIZ_MAVEN_USER"), password: System.getenv("EGIZ_MAVEN_PASSWORD"))
-            	
-        	}
-    	}
-	}  
+	// Legacy uploadArchives replaced with modern Maven publishing
+	// Configure remote repositories in publishing block above  
 	
 	
 	task(internalRelease) {
@@ -162,17 +237,18 @@ subprojects {
 }
 
 task(doFullRelease) {
+	def projectVer = version
 	doLast {
-		println "done building all distribution stuff for " + project.version
+		println "done building all distribution stuff for " + projectVer
 	}
 }
 
 task copyLicenses {
 	doLast {
    		mkdir("releases/"+ version +"/licenses");
-   		def target = project.projectDir.toString() + "/releases/" + version + "/licenses"
-		subprojects{
-	    	def src=project.projectDir.toString() + "/licenses"
+   		def target = rootProject.projectDir.toString() + "/releases/" + version + "/licenses"
+		subprojects{ subproject ->
+	    	def src = subproject.projectDir.toString() + "/licenses"
 	    	copy{
 				from src
 				into target
@@ -193,8 +269,13 @@ task releases(type: Copy) {
 
 def getCheckedOutGitCommitHash() {
     def takeFromHash = 40
-    'git rev-parse --verify HEAD'.execute().text.trim().take takeFromHash
-
+    try {
+		return providers.exec {
+			commandLine('git', 'rev-parse', '--verify', 'HEAD')
+		}.standardOutput.asText.get().trim().take(takeFromHash)
+    } catch (Exception e) {
+        return "unknown"
+    }
 }
 /*
 task docs(type: Javadoc) {

@@ -2,7 +2,7 @@ package at.gv.egiz.pdfas.lib.impl.pdfbox2;
 
 import java.io.IOException;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
@@ -28,21 +28,15 @@ public class PDFBOXObject extends PDFObject {
 		super(operationStatus);
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		if(doc != null) {
-			doc.close();
-		}
-	}
+	// Note: finalize() method removed as it's deprecated in Java 9+
+	// Resource cleanup should be handled explicitly via close() method
 	
 	public void close() {
 		if(doc != null) {
 			try {
 				doc.close();
-				//System.gc();
 			} catch(Throwable e) {
-				// ignore!
+				// Ignore Throwables during close
 			}
 			doc = null;
 		}

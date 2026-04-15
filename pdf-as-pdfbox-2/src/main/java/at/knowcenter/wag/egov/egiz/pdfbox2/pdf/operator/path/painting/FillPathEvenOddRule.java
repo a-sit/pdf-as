@@ -94,8 +94,7 @@ public class FillPathEvenOddRule extends PathPaintingOperatorProcessor {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "f*";
 	}
 
 }

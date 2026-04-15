@@ -231,11 +231,10 @@ public class SL20JSONExtractorUtils {
 					//dummy code
 					try {
 						String[] signedPayload = encryptedResult.toString().split("\\.");
-						JsonElement payLoad = new JsonParser().parse(new String(Base64Url.decodeToUtf8String(signedPayload[1])));
-						return payLoad;
+                        return JsonParser.parseString(Base64Url.decodeToUtf8String(signedPayload[1]));
 						
 					} catch (Exception e1) {
-						log.debug("DummyCode FAILED, Reason: " + e1.getMessage() + " Ignore it ...");
+                        log.debug("DummyCode FAILED, Reason: {} Ignore it ...", e1.getMessage());
 						throw new SL20Exception(e.getMessage(), e);
 						
 					}
@@ -290,7 +289,7 @@ public class SL20JSONExtractorUtils {
 						+ " Starting backup process ... ");
 					String[] split = sl20SignedPayload.getAsString().split("\\.");
 					if (split.length == 3) {
-						JsonElement payLoad = new JsonParser().parse(new String(Base64Url.decodeToUtf8String(split[1])));
+						JsonElement payLoad = JsonParser.parseString(Base64Url.decodeToUtf8String(split[1]));
 						log.info("Signature verification FAILED with reason: " + e.getMessage() + " Use plain result as it is");
 						return new VerificationResult(payLoad.getAsJsonObject());
 						
@@ -308,7 +307,7 @@ public class SL20JSONExtractorUtils {
 			log.info("Received signed SL20 response, but verification IS NOT required and NOT CONFIGURATED. Skip signature verification ... ");
 			String[] split = sl20SignedPayload.getAsString().split("\\.");
 			if (split.length == 3) {
-				JsonElement payLoad = new JsonParser().parse(new String(Base64Url.decodeToUtf8String(split[1])));
+				JsonElement payLoad = JsonParser.parseString(Base64Url.decodeToUtf8String(split[1]));
 				return new VerificationResult(payLoad.getAsJsonObject());
 				
 			} else {
@@ -345,7 +344,7 @@ public class SL20JSONExtractorUtils {
 			
 				}
 				String sl20RespString = new URIBuilder(locationHeader[0].getValue()).getQueryParams().get(0).getValue();
-				sl20Resp = new JsonParser().parse(Base64Url.encode((sl20RespString.getBytes()))).getAsJsonObject();
+				sl20Resp = JsonParser.parseString(Base64Url.encode((sl20RespString.getBytes()))).getAsJsonObject();
 			
 			} else if (httpResp.getStatusLine().getStatusCode() == 200) {
 				if (!httpResp.getEntity().getContentType().getValue().startsWith("application/json")) {
@@ -383,7 +382,7 @@ public class SL20JSONExtractorUtils {
 		if (resp != null && resp.getContent() != null) {
 			String htmlRespBody = EntityUtils.toString(resp);
 			try {
-				JsonElement sl20Resp = new JsonParser().parse(htmlRespBody);
+				JsonElement sl20Resp = JsonParser.parseString(htmlRespBody);
 				if (sl20Resp != null && sl20Resp.isJsonObject()) {
 					return sl20Resp.getAsJsonObject();
 				

@@ -26,6 +26,7 @@ package at.gv.egiz.pdfas.lib.impl.stamping.pdfbox2;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -486,22 +487,18 @@ public class TableDrawUtils {
 		float[] colsSizes = new float[max_cols];
 		if (origcolsSizes == null) {
 			// set the column ratio for all columns to 1
-			for (int cols_idx = 0; cols_idx < colsSizes.length; cols_idx++) {
-				colsSizes[cols_idx] = 1;
-			}
+            Arrays.fill(colsSizes, 1);
 		} else {
 			// set the column ratio for all columns to 1
-			for (int cols_idx = 0; cols_idx < colsSizes.length; cols_idx++) {
-				colsSizes[cols_idx] = origcolsSizes[cols_idx];
-			}
+           System.arraycopy(origcolsSizes, 0, colsSizes, 0, colsSizes.length);
 		}
 
 		// adapt
 		float total = 0;
 
-		for (int cols_idx = 0; cols_idx < colsSizes.length; cols_idx++) {
-			total += colsSizes[cols_idx];
-		}
+        for (float colsSize : colsSizes) {
+          total += colsSize;
+        }
 
 		for (int cols_idx = 0; cols_idx < colsSizes.length; cols_idx++) {
 			colsSizes[cols_idx] = (colsSizes[cols_idx] / total)
@@ -510,9 +507,9 @@ public class TableDrawUtils {
 
 		float sum = 0;
 
-		for (int cols_idx = 0; cols_idx < colsSizes.length; cols_idx++) {
-			sum += colsSizes[cols_idx];
-		}
+        for (float colsSize : colsSizes) {
+          sum += colsSize;
+        }
 
 		logger.debug("Table Col Sizes SUM {} Table Width {}", sum,
 				abstractTable.getWidth());
@@ -520,6 +517,14 @@ public class TableDrawUtils {
 
 		return colsSizes;
 	}
+
+    private static void drawLine(PDPageContentStream stream, float startX, float startY, float endX, float endY)
+            throws IOException
+    {
+        stream.moveTo(startX, startY);
+        stream.lineTo(endX, endY);
+        stream.stroke();
+    }
 
 	public static void drawBorder(PDPage page,
 			PDPageContentStream contentStream, float x, float y, float width,
@@ -545,7 +550,7 @@ public class TableDrawUtils {
 				// draw first line
 				logger.debug("ROW LINE: {} {} {} {}", x_from, y_from, x_to,
 						y_from);
-				contentStream.drawLine(x, y_from, x_to, y_from);
+				drawLine(contentStream, x, y_from, x_to, y_from);
 
 				// Draw all row borders
 				for (int i = 0; i < rows; i++) {
@@ -554,7 +559,7 @@ public class TableDrawUtils {
 					// Draw row border!
 					logger.debug("ROW LINE: {} {} {} {}", x_from, y_from, x_to,
 							y_from);
-					contentStream.drawLine(x, y_from, x_to, y_from);
+					drawLine(contentStream, x, y_from, x_to, y_from);
 
 				}
 
@@ -573,7 +578,7 @@ public class TableDrawUtils {
 					logger.debug("COL LINE: {} {} {} {}", x_from, y_from,
 							x_from, y_to);
 
-					contentStream.drawLine(x_from, y_from, x_from, y_to);
+					drawLine(contentStream, x_from, y_from, x_from, y_to);
 
 					for (int j = 0; j < row.size(); j++) {
 						Entry cell = (Entry) row.get(j);
@@ -585,7 +590,7 @@ public class TableDrawUtils {
 						}
 						logger.debug("COL LINE: {} {} {} {}", x_from, y_from,
 								x_from, y_to);
-						contentStream.drawLine(x_from, y_from, x_from, y_to);
+						drawLine(contentStream, x_from, y_from, x_from, y_to);
 					}
 
 					if (i + 1 < rows) {
@@ -608,8 +613,9 @@ public class TableDrawUtils {
 		try {
 			if (abstractTable.getBGColor() != null) {
 				contentStream.setNonStrokingColor(abstractTable.getBGColor());
-				contentStream.fillRect(x, y, abstractTable.getWidth(),
-						abstractTable.getHeight());
+				contentStream
+                        .addRect(x, y, abstractTable.getWidth(), abstractTable.getHeight());
+                contentStream.fill();
 				contentStream.setNonStrokingColor(Color.BLACK);
 			}
 		} catch (Throwable e) {
@@ -623,13 +629,13 @@ public class TableDrawUtils {
 		if ("true".equals(settings.getValue(TABLE_DEBUG))) {
 			try {
 				contentStream.setStrokingColor(Color.RED);
-				contentStream.drawLine(x, y, x + width, y);
+				drawLine(contentStream, x, y, x + width, y);
 				contentStream.setStrokingColor(Color.BLUE);
-				contentStream.drawLine(x, y, x, y - height);
+				drawLine(contentStream, x, y, x, y - height);
 				contentStream.setStrokingColor(Color.GREEN);
-				contentStream.drawLine(x + width, y, x + width, y - height);
+				drawLine(contentStream, x + width, y, x + width, y - height);
 				contentStream.setStrokingColor(Color.ORANGE);
-				contentStream.drawLine(x, y - height, x + width, y - height);
+				drawLine(contentStream, x, y - height, x + width, y - height);
 
 				contentStream.setStrokingColor(Color.BLACK);
 			} catch (Throwable e) {
@@ -643,15 +649,15 @@ public class TableDrawUtils {
 		if ("true".equals(settings.getValue(TABLE_DEBUG))) {
 			try {
 				contentStream.setStrokingColor(Color.RED);
-				contentStream.drawLine(x, y, x + width, y);
+				drawLine(contentStream, x, y, x + width, y);
 				contentStream.setStrokingColor(Color.BLUE);
-				contentStream.drawLine(x, y, x, y - height);
+				drawLine(contentStream, x, y, x, y - height);
 				contentStream.setStrokingColor(Color.GREEN);
-				contentStream.drawLine(x + width, y, x + width, y - height);
+				drawLine(contentStream, x + width, y, x + width, y - height);
 				contentStream.setStrokingColor(Color.ORANGE);
-				contentStream.drawLine(x, y - height, x + width, y - height);
+				drawLine(contentStream, x, y - height, x + width, y - height);
 				contentStream.setStrokingColor(Color.MAGENTA);
-				contentStream.drawLine(x, y + (descent * (-1)) - height, x + width, y + (descent * (-1)) - height);
+				drawLine(contentStream, x, y + (descent * (-1)) - height, x + width, y + (descent * (-1)) - height);
 
 				contentStream.setStrokingColor(Color.BLACK);
 			} catch (Throwable e) {
@@ -666,12 +672,12 @@ public class TableDrawUtils {
 		if ("true".equals(settings.getValue(TABLE_DEBUG))) {
 			try {
 				contentStream.setStrokingColor(Color.RED);
-				contentStream.drawLine(x, y, x + padding, y - padding);
-				contentStream.drawLine(x + width, y, x + width - padding, y
+				drawLine(contentStream, x, y, x + padding, y - padding);
+				drawLine(contentStream, x + width, y, x + width - padding, y
 						- padding);
-				contentStream.drawLine(x + width, y - height, x + width
+				drawLine(contentStream, x + width, y - height, x + width
 						- padding, y - height + padding);
-				contentStream.drawLine(x, y - height, x + padding, y - height
+				drawLine(contentStream, x, y - height, x + padding, y - height
 						+ padding);
 				contentStream.setStrokingColor(Color.BLACK);
 			} catch (Throwable e) {

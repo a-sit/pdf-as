@@ -29,12 +29,12 @@ public class IntegrityVerifier implements IVerifier {
 	private static final Logger logger = LoggerFactory
 			.getLogger(IntegrityVerifier.class);
 
-	public List<VerifyResult> verify(byte[] signature, byte[] signatureContent,
+	public List<VerifyResult> verify(byte[] signature, SignatureInputData inputData,
 			Date verificationTime) throws PdfAsException {
 		try {
 			List<VerifyResult> result = new ArrayList<VerifyResult>();
 
-			SignedData signedData = new SignedData(signatureContent,
+			SignedData signedData = new SignedData(inputData.getSignatureInputBytes(),
 					new AlgorithmID[] { 
 					    AlgorithmID.sha512, AlgorithmID.sha384, 
 					    AlgorithmID.sha256, 

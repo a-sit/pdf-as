@@ -1,30 +1,30 @@
 
 package at.gv.e_government.reference.namespace.moa._20020822_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import org.w3._2000._09.xmldsig_.TransformsType;
 
 
 /**
- * <p>Java-Klasse für TransformsInfoType complex type.
+ * <p>Java class for TransformsInfoType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="TransformsInfoType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Transforms" minOccurs="0"/&gt;
- *         &lt;element name="FinalDataMetaInfo" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}FinalDataMetaInfoType"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="TransformsInfoType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <element ref="{http://www.w3.org/2000/09/xmldsig#}Transforms" minOccurs="0"/>
+ *         <element name="FinalDataMetaInfo" type="{http://reference.e-government.gv.at/namespace/moa/20020822#}FinalDataMetaInfoType"/>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -41,7 +41,7 @@ public class TransformsInfoType {
     protected FinalDataMetaInfoType finalDataMetaInfo;
 
     /**
-     * Ruft den Wert der transforms-Eigenschaft ab.
+     * Gets the value of the transforms property.
      * 
      * @return
      *     possible object is
@@ -53,7 +53,7 @@ public class TransformsInfoType {
     }
 
     /**
-     * Legt den Wert der transforms-Eigenschaft fest.
+     * Sets the value of the transforms property.
      * 
      * @param value
      *     allowed object is
@@ -65,7 +65,7 @@ public class TransformsInfoType {
     }
 
     /**
-     * Ruft den Wert der finalDataMetaInfo-Eigenschaft ab.
+     * Gets the value of the finalDataMetaInfo property.
      * 
      * @return
      *     possible object is
@@ -77,7 +77,7 @@ public class TransformsInfoType {
     }
 
     /**
-     * Legt den Wert der finalDataMetaInfo-Eigenschaft fest.
+     * Sets the value of the finalDataMetaInfo property.
      * 
      * @param value
      *     allowed object is

@@ -32,6 +32,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,20 +41,21 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.xml.bind.JAXBElement;
-import javax.xml.ws.WebServiceException;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.WebServiceException;
 
+import lombok.val;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.http.entity.ContentType;
 
 import com.google.gson.JsonArray;
@@ -594,7 +596,7 @@ public class PdfAsHelper {
             
   }
 	
-  private static StatusRequest initializeSigningContextForNewDocument(HttpServletRequest request, String connector, PdfasSignRequest pdfAsRequest) 
+  private static StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, String connector, PdfasSignRequest pdfAsRequest)
       throws PdfAsWebException, WriterException, IOException, PdfAsException, PDFASError {   
     HttpSession session = request.getSession();
     
@@ -619,7 +621,7 @@ public class PdfAsHelper {
         
   }
 
-  private static StatusRequest buildPdfasStatusRequestToSignSingleDocument(DocumentToSign pdfToSign, HttpSession session, IPlainSigner signer, 
+  private static StatusRequest.Stage1 buildPdfasStatusRequestToSignSingleDocument(DocumentToSign pdfToSign, HttpSession session, IPlainSigner signer,
       CoreSignParams coreSignParams, String qrCodeContent, Configuration config) throws WriterException, IOException, PdfAsException, PDFASError {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     session.setAttribute(PDF_OUTPUT, baos);
@@ -738,7 +740,7 @@ public class PdfAsHelper {
 					.getAttribute(PDF_STATUS);
 			if(statusObject != null && statusObject instanceof StatusRequest) {
 				StatusRequest statusRequest = (StatusRequest)statusObject;
-				if(statusRequest.needCertificate() || statusRequest.needSignature()) {
+				if (statusRequest instanceof StatusRequest.Stage1 || statusRequest instanceof StatusRequest.Stage2) {
 					return true;
 				}
 			}
@@ -756,21 +758,19 @@ public class PdfAsHelper {
 		StatusRequest statusRequest = (StatusRequest) session
 				.getAttribute(PDF_STATUS);
 
-		if (statusRequest == null) {
+		if (!(statusRequest instanceof StatusRequest.Stage1 statusRequest1)) {
 			throw new PdfAsWebException("No Signature running in session:"
 					+ session.getId());
 		}
-
-		statusRequest.setCertificate(certificate);
-		statusRequest = pdfAs.process(statusRequest);
-		session.setAttribute(PDF_STATUS, statusRequest);
+		val statusRequest2 = statusRequest1.setCertificate(certificate);
+		session.setAttribute(PDF_STATUS, statusRequest2);
 
 		PdfAsHelper.process(request, response, context);
 	}
 
 	public static void injectSignature(HttpServletRequest request,
 			HttpServletResponse response,
-			byte[] cmsSginature,
+			byte[] cmsSignature,
 			ServletContext context) throws Exception {
 
 		log.debug("Got CMS Signature Response");
@@ -779,14 +779,13 @@ public class PdfAsHelper {
 		StatusRequest statusRequest = (StatusRequest) session
 				.getAttribute(PDF_STATUS);
 
-		if (statusRequest == null) {
+		if (!(statusRequest instanceof StatusRequest.Stage2 statusRequest2)) {
 			throw new PdfAsWebException("No Signature running in session:"
 					+ session.getId());
 		}
 
-		statusRequest.setSigature(cmsSginature);
-		statusRequest = pdfAs.process(statusRequest);
-		session.setAttribute(PDF_STATUS, statusRequest);
+		val statusRequest3 = statusRequest2.setSignature(cmsSignature);
+		session.setAttribute(PDF_STATUS, statusRequest3);
 
 		PdfAsHelper.process(request, response, context);
 	}
@@ -807,7 +806,7 @@ public class PdfAsHelper {
 			BKUSLConnector bkuSLConnector = (BKUSLConnector) session
 					.getAttribute(PDF_SL_CONNECTOR);
 
-			if (statusRequest.needCertificate()) {
+			if (statusRequest instanceof StatusRequest.Stage1) {
 				log.debug("Needing Certificate from BKU");
 				// build SL Request to read certificate
 				InfoboxReadRequestType readCertificateRequest = bkuSLConnector
@@ -833,7 +832,7 @@ public class PdfAsHelper {
 			throws Exception {
 
 		HttpSession session = request.getSession();
-		StatusRequest statusRequest = (StatusRequest) session.getAttribute(PDF_STATUS);
+		StatusRequest statusRequestGeneric = (StatusRequest) session.getAttribute(PDF_STATUS);
 		PdfasSignRequest pdfAsRequest = (PdfasSignRequest) session.getAttribute(PDF_PROCESSING_REQUEST);
 		
 		
@@ -849,7 +848,7 @@ public class PdfAsHelper {
 		if (!joseTools.isInitialized())
 			joseTools = null;
 		
-		if (statusRequest.needCertificate()) {
+		if (statusRequestGeneric instanceof StatusRequest.Stage1 statusRequest) {
 			log.debug("Needing Certificate from BKU");
 			// build SL Request to read certificate
 			InfoboxReadRequestType readCertificateRequest = slConnector
@@ -888,11 +887,10 @@ public class PdfAsHelper {
 				response.setContentType("text/html");
 				response.getWriter().close();
 				
-			} else if (slConnector instanceof SL20Connector) {
-				//generate request for getCertificate command 
-				SL20Connector sl20Connector = (SL20Connector)slConnector;
-				
-				//use 'SecureSigningKeypair' per default
+			} else if (slConnector instanceof SL20Connector sl20Connector) {
+				//generate request for getCertificate command
+
+                //use 'SecureSigningKeypair' per default
 				String keyId = SL20Connector.SecureSignatureKeypair;
 				
 				java.security.cert.X509Certificate x5cEnc = null;
@@ -976,7 +974,7 @@ public class PdfAsHelper {
 			} else
 				throw new PdfAsWebException("Invalid connector: " + slConnector.getClass().getName());
 			
-		} else if (statusRequest.needSignature()) {
+		} else if (statusRequestGeneric instanceof StatusRequest.Stage2 statusRequest) {
 			log.debug("Needing Signature from BKU");
 			// build SL Request for cms signature
 			RequestPackage pack = slConnector.createCMSRequest(
@@ -1077,7 +1075,7 @@ public class PdfAsHelper {
 				log.trace("Write 'createCAdES' command to VDA: " + sl20CreateCAdES.toString());
 				StringWriter writer = new StringWriter();
 				writer.write(sl20CreateCAdES.toString());						
-				final byte[] content = writer.toString().getBytes("UTF-8");
+				final byte[] content = writer.toString().getBytes(StandardCharsets.UTF_8);
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentLength(content.length);
 				response.setContentType(ContentType.APPLICATION_JSON.toString());						
@@ -1088,9 +1086,9 @@ public class PdfAsHelper {
 				
 			}
 								
-		} else if (statusRequest.isReady()) {
+		} else if (statusRequestGeneric instanceof StatusRequest.Stage3 statusRequest) {
 			log.debug("Single document is ready. Perform post-processing ... ");
-			SignResult result = pdfAs.finishSign(statusRequest);
+			SignResult result = statusRequest.finishSign();
 
 			ByteArrayOutputStream baos = (ByteArrayOutputStream) session.getAttribute(PDF_OUTPUT);
 			baos.close();
@@ -1112,7 +1110,7 @@ public class PdfAsHelper {
 					.getCode());
 					
 			SignedDocument signPdfDoc = SignedDocument.builder()
-			    .signingTimestamp(Long.valueOf(System.currentTimeMillis()))
+			    .signingTimestamp(System.currentTimeMillis())
 			    .outputData(baos.toByteArray())
 			    .fileName(PdfAsHelper.getPDFFileName(request))
 			    .verificationResponse(verResponse)
@@ -1125,28 +1123,28 @@ public class PdfAsHelper {
 			// check if more files are available
 			if (pdfAsRequest.hasNext()) {
 			  log.debug("Find additional file, restarting signing process again ... ");			  
-			  StatusRequestImpl nextStatusRequest = (StatusRequestImpl)initializeSigningContextForNewDocument(request, connector, pdfAsRequest);			  
-			  nextStatusRequest.setCertificate(((StatusRequestImpl)statusRequest).getCertificate().getEncoded());
-			  nextStatusRequest.setNeedCertificate(true);
-		    
-			  statusRequest = pdfAs.process(nextStatusRequest);
-			  session.setAttribute(PDF_STATUS, nextStatusRequest);
+			  StatusRequest.Stage1 nextStatusRequest1 = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
+			  StatusRequest.Stage2 nextStatusRequest2 = nextStatusRequest1.setCertificate(
+                  statusRequest.getRequestedSignature().getCertificate().getEncoded());
 
-			  PdfAsHelper.process(request, response, context);			  			 
-			  session.setAttribute(PDF_STATUS, nextStatusRequest);
+			  session.setAttribute(PDF_STATUS, nextStatusRequest2);
+
+              // recurse
+			  PdfAsHelper.process(request, response, context);
 			  		    			  			  
 			} else {
-	      if (slConnector instanceof BKUSLConnector) {
-	        PdfAsHelper.gotoProvidePdf(context, request, response);
-	        
-	      } else if (slConnector instanceof SL20Connector) {
-	        //TODO: add code to send SL20 redirect command to redirect the user from DataURL connection to App Front-End connection
-	        String callUrl = generateProvideURL(request, response);
-	        String transactionId = (String) request.getAttribute(PdfAsHelper.PDF_SESSION_PREFIX + SL20Constants.SL20_TRANSACTIONID);
-	        buildSL20RedirectResponse(request, response, transactionId, callUrl);
-	        
-	      } else
-	        throw new PdfAsWebException("Invalid connector: " + slConnector.getClass().getName());
+              if (slConnector instanceof BKUSLConnector) {
+                PdfAsHelper.gotoProvidePdf(context, request, response);
+
+              } else if (slConnector instanceof SL20Connector) {
+                //TODO: add code to send SL20 redirect command to redirect the user from DataURL connection to App Front-End connection
+                String callUrl = generateProvideURL(request, response);
+                String transactionId = (String) request.getAttribute(PdfAsHelper.PDF_SESSION_PREFIX + SL20Constants.SL20_TRANSACTIONID);
+                buildSL20RedirectResponse(request, response, transactionId, callUrl);
+
+              } else {
+                throw new PdfAsWebException("Invalid connector: " + slConnector.getClass().getName());
+              }
 	     			  
 			}
 			
@@ -1154,52 +1152,54 @@ public class PdfAsHelper {
       throw new PdfAsWebException("Invalid state!");
       
     }
-	}
+  }
 
   private static String getTemplateSL() throws IOException {
 		String xml = FileUtils.readFileToString(
-		    FileUtils.toFile(PdfAsHelper.class.getResource("/template_sl.html")));
+		    FileUtils.toFile(PdfAsHelper.class.getResource("/template_sl.html")),
+                StandardCharsets.UTF_8);
 		return xml;
 	}
 
 	public static String getErrorRedirectTemplateSL() throws IOException {
-		String xml = FileUtils.readFileToString(FileUtils
-				.toFile(PdfAsHelper.class
-						.getResource("/template_error_redirect.html")));
+		String xml = FileUtils.readFileToString(
+            FileUtils.toFile(PdfAsHelper.class.getResource("/template_error_redirect.html")),
+                StandardCharsets.UTF_8);
 		return xml;
 	}
 
 	public static String getProvideTemplate() throws IOException {
-		String xml = FileUtils
-				.readFileToString(FileUtils.toFile(PdfAsHelper.class
-						.getResource("/template_provide.html")));
+		String xml = FileUtils.readFileToString(
+            FileUtils.toFile(PdfAsHelper.class.getResource("/template_provide.html")),
+                StandardCharsets.UTF_8);
 		return xml;
 	}
 
 	public static String getErrorTemplate() throws IOException {
-		String xml = FileUtils.readFileToString(FileUtils
-				.toFile(PdfAsHelper.class.getResource("/template_error.html")));
+		String xml = FileUtils.readFileToString(
+            FileUtils.toFile(PdfAsHelper.class.getResource("/template_error.html")),
+                StandardCharsets.UTF_8);
 		return xml;
 	}
 
 	public static String getGenericTemplate() throws IOException {
-		String xml = FileUtils.readFileToString(FileUtils
-				.toFile(PdfAsHelper.class
-						.getResource("/template_generic_param.html")));
+		String xml = FileUtils.readFileToString(
+            FileUtils.toFile(PdfAsHelper.class.getResource("/template_generic_param.html")),
+                StandardCharsets.UTF_8);
 		return xml;
 	}
 
 	public static String getInvokeRedirectTemplateSL() throws IOException {
-		String xml = FileUtils.readFileToString(FileUtils
-				.toFile(PdfAsHelper.class
-						.getResource("/template_invoke_redirect.html")));
+		String xml = FileUtils.readFileToString(
+            FileUtils.toFile(PdfAsHelper.class.getResource("/template_invoke_redirect.html")),
+                StandardCharsets.UTF_8);
 		return xml;
 	}
 
   public static String getInvokeRedirectTemplateMoreFiles() throws IOException {
-    String xml = FileUtils.readFileToString(FileUtils
-        .toFile(PdfAsHelper.class
-            .getResource("/template_invoke_redirect_more_files.html")));
+    String xml = FileUtils.readFileToString(
+            FileUtils.toFile(PdfAsHelper.class.getResource("/template_invoke_redirect_more_files.html")),
+                StandardCharsets.UTF_8);
     return xml;
   }
 	
@@ -1602,7 +1602,7 @@ public class PdfAsHelper {
 	public static void setSignatureActive(HttpServletRequest request,
 			boolean value) {
 		HttpSession session = request.getSession();
-		session.setAttribute(SIGNATURE_ACTIVE, new Boolean(value));
+		session.setAttribute(SIGNATURE_ACTIVE, Boolean.valueOf(value));
 	}
 
 	public static boolean isSignatureActive(HttpServletRequest request) {

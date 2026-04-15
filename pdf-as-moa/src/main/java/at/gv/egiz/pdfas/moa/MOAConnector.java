@@ -30,11 +30,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.security.cert.CertificateException;
 
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.soap.SOAPBinding;
+import at.gv.egiz.pdfas.common.exceptions.*;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.SOAPBinding;
 
+import lombok.val;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -51,13 +56,6 @@ import at.gv.e_government.reference.namespace.moa._20020822_.MOAFault;
 import at.gv.e_government.reference.namespace.moa._20020822_.MetaInfoType;
 import at.gv.e_government.reference.namespace.moa._20020822_.SignatureCreationPortType;
 import at.gv.e_government.reference.namespace.moa._20020822_.SignatureCreationService;
-import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
-import at.gv.egiz.pdfas.common.exceptions.PDFASError;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsErrorCarrier;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsMOAException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.common.utils.SettingsUtils;
 import at.gv.egiz.pdfas.common.utils.StreamUtils;
@@ -134,18 +132,22 @@ public class MOAConnector implements ISignatureConnector,
 					URL certificateURL = new URL(certificateValue);
 					is = certificateURL.openStream();
 					this.certificate = new X509Certificate(is);
-					
+
 				} catch (MalformedURLException e) {
 					logger.error(certificateValue + " is not a valid url but starts with http!");
 					throw new PdfAsWrappedIOException(new PdfAsException(certificateValue + " is not a valid url but!"));
-					
+
 				} finally {
-          if (is != null) {
-            is.close();
-            
-          }
-        }
-				
+					if (is != null) {
+						is.close();
+
+					}
+				}
+			} else if (certificateValue.startsWith("base64:")) {
+				logger.debug("Loading base64 certificate: {}", certificateValue);
+
+				val cert = java.util.Base64.getDecoder().decode(certificateValue.substring(7));
+				this.certificate = new X509Certificate(cert);
 			} else {
 
 				File certFile = new File(certificateValue);
@@ -256,6 +258,9 @@ public class MOAConnector implements ISignatureConnector,
 				throw new PdfAsMOAException("", e.getMessage(), "", "");
 				
 			}
+		} catch (WebServiceException e) {
+			val cause = (e.getCause() != null) ? e.getCause() : e;
+			throw new SLPdfAsException((int) ErrorConstants.ERROR_SIG_CONNECT_ERROR, cause.getMessage());
 		}
 
 		if (response.getCMSSignatureOrErrorResponse().size() != 1) {

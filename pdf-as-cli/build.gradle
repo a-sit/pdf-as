@@ -2,7 +2,9 @@ apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
-mainClassName = "at.gv.egiz.pdfas.cli.Main"
+application {
+    mainClass = "at.gv.egiz.pdfas.cli.Main"
+}
 
 repositories {
 	mavenLocal()
@@ -16,13 +18,13 @@ task releases(type: Copy) {
 }
 
 configurations { 
-	pdfBox2Compile
+	pdfBox3Compile
 }
 
 sourceSets{
-	pdfBox2{
-		compileClasspath = configurations.pdfBox2Compile
-		runtimeClasspath = configurations.pdfBox2Compile + main.runtimeClasspath
+	pdfBox3{
+		compileClasspath = configurations.pdfBox3Compile
+		runtimeClasspath = configurations.pdfBox3Compile + main.runtimeClasspath
 	}
 }
 			   
@@ -31,22 +33,22 @@ dependencies {
 	implementation project (':signature-standards:sigs-pkcs7detached')
 	implementation project (':signature-standards:sigs-pades')
 	implementation project (':pdf-as-moa')
-    implementation project (':pdf-as-pdfbox-2')
-    implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
-	implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
-	implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
-	implementation 'ch.qos.logback:logback-classic:1.2.13'
-    testImplementation group: 'junit', name: 'junit', version: '4.+'
+    implementation project (':pdf-as-pdfbox-3')
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: commonsCollectionsVersion
+	implementation group: 'commons-cli', name: 'commons-cli', version: commonsCliVersion
+	implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: jakartaActivationVersion
+	implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+	testImplementation group: 'junit', name: 'junit', version: junitVersion
 }
 
 
 startScripts{
-	classpath+=sourceSets.pdfBox2.compileClasspath
+	classpath+=sourceSets.pdfBox3.compileClasspath
 }
 
 compileJava{
     classpath=sourceSets.main.compileClasspath
-	classpath+=sourceSets.pdfBox2.compileClasspath
+	classpath+=sourceSets.pdfBox3.compileClasspath
 }
 
 

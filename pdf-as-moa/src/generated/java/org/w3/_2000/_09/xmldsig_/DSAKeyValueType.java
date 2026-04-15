@@ -1,38 +1,38 @@
 
 package org.w3._2000._09.xmldsig_;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für DSAKeyValueType complex type.
+ * <p>Java class for DSAKeyValueType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="DSAKeyValueType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;sequence minOccurs="0"&gt;
- *           &lt;element name="P" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/&gt;
- *           &lt;element name="Q" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/&gt;
- *         &lt;/sequence&gt;
- *         &lt;element name="J" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary" minOccurs="0"/&gt;
- *         &lt;element name="G" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary" minOccurs="0"/&gt;
- *         &lt;element name="Y" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/&gt;
- *         &lt;sequence minOccurs="0"&gt;
- *           &lt;element name="Seed" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/&gt;
- *           &lt;element name="PgenCounter" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/&gt;
- *         &lt;/sequence&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="DSAKeyValueType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <sequence>
+ *         <sequence minOccurs="0">
+ *           <element name="P" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/>
+ *           <element name="Q" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/>
+ *         </sequence>
+ *         <element name="J" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary" minOccurs="0"/>
+ *         <element name="G" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary" minOccurs="0"/>
+ *         <element name="Y" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/>
+ *         <sequence minOccurs="0">
+ *           <element name="Seed" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/>
+ *           <element name="PgenCounter" type="{http://www.w3.org/2000/09/xmldsig#}CryptoBinary"/>
+ *         </sequence>
+ *       </sequence>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -64,7 +64,7 @@ public class DSAKeyValueType {
     protected String pgenCounter;
 
     /**
-     * Ruft den Wert der p-Eigenschaft ab.
+     * Gets the value of the p property.
      * 
      * @return
      *     possible object is
@@ -76,7 +76,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Legt den Wert der p-Eigenschaft fest.
+     * Sets the value of the p property.
      * 
      * @param value
      *     allowed object is
@@ -88,7 +88,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Ruft den Wert der q-Eigenschaft ab.
+     * Gets the value of the q property.
      * 
      * @return
      *     possible object is
@@ -100,7 +100,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Legt den Wert der q-Eigenschaft fest.
+     * Sets the value of the q property.
      * 
      * @param value
      *     allowed object is
@@ -112,7 +112,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Ruft den Wert der j-Eigenschaft ab.
+     * Gets the value of the j property.
      * 
      * @return
      *     possible object is
@@ -124,7 +124,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Legt den Wert der j-Eigenschaft fest.
+     * Sets the value of the j property.
      * 
      * @param value
      *     allowed object is
@@ -136,7 +136,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Ruft den Wert der g-Eigenschaft ab.
+     * Gets the value of the g property.
      * 
      * @return
      *     possible object is
@@ -148,7 +148,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Legt den Wert der g-Eigenschaft fest.
+     * Sets the value of the g property.
      * 
      * @param value
      *     allowed object is
@@ -160,7 +160,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Ruft den Wert der y-Eigenschaft ab.
+     * Gets the value of the y property.
      * 
      * @return
      *     possible object is
@@ -172,7 +172,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Legt den Wert der y-Eigenschaft fest.
+     * Sets the value of the y property.
      * 
      * @param value
      *     allowed object is
@@ -184,7 +184,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Ruft den Wert der seed-Eigenschaft ab.
+     * Gets the value of the seed property.
      * 
      * @return
      *     possible object is
@@ -196,7 +196,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Legt den Wert der seed-Eigenschaft fest.
+     * Sets the value of the seed property.
      * 
      * @param value
      *     allowed object is
@@ -208,7 +208,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Ruft den Wert der pgenCounter-Eigenschaft ab.
+     * Gets the value of the pgenCounter property.
      * 
      * @return
      *     possible object is
@@ -220,7 +220,7 @@ public class DSAKeyValueType {
     }
 
     /**
-     * Legt den Wert der pgenCounter-Eigenschaft fest.
+     * Sets the value of the pgenCounter property.
      * 
      * @param value
      *     allowed object is

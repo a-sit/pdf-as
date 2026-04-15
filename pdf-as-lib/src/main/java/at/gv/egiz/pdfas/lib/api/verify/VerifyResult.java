@@ -25,10 +25,11 @@ package at.gv.egiz.pdfas.lib.api.verify;
 
 import java.security.cert.X509Certificate;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.lib.impl.verify.SignatureInputData;
 
 public interface VerifyResult {
 	/**
-	 * Returns if the verification was possible or could not even be startet.
+	 * Returns if the verification was possible or could not even be started.
 	 * see {@link #getVerificationException()} for details.
 	 * 
 	 * @return
@@ -82,5 +83,5 @@ public interface VerifyResult {
 	 * Gets the signed data for the signature
 	 * @return
 	 */
-	public byte[] getSignatureData();
+	public SignatureInputData getSignatureData();
 }

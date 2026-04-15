@@ -27,7 +27,7 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 
 import java.util.Map;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 public interface PdfAsParameter {
 

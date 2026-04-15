@@ -3,42 +3,42 @@ package at.gv.e_government.reference.namespace.moa._20020822_;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlType;
 import org.w3c.dom.Element;
 
 
 /**
- * <p>Java-Klasse für CreateXMLSignatureResponseType complex type.
+ * <p>Java class for CreateXMLSignatureResponseType complex type</p>.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.</p>
  * 
- * <pre>
- * &lt;complexType name="CreateXMLSignatureResponseType"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;choice maxOccurs="unbounded"&gt;
- *         &lt;element name="SignatureEnvironment"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;sequence&gt;
- *                   &lt;any processContents='lax'/&gt;
- *                 &lt;/sequence&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}ErrorResponse"/&gt;
- *       &lt;/choice&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
+ * <pre>{@code
+ * <complexType name="CreateXMLSignatureResponseType">
+ *   <complexContent>
+ *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       <choice maxOccurs="unbounded">
+ *         <element name="SignatureEnvironment">
+ *           <complexType>
+ *             <complexContent>
+ *               <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 <sequence>
+ *                   <any processContents='lax'/>
+ *                 </sequence>
+ *               </restriction>
+ *             </complexContent>
+ *           </complexType>
+ *         </element>
+ *         <element ref="{http://reference.e-government.gv.at/namespace/moa/20020822#}ErrorResponse"/>
+ *       </choice>
+ *     </restriction>
+ *   </complexContent>
+ * </complexType>
+ * }</pre>
  * 
  * 
  */
@@ -48,6 +48,11 @@ import org.w3c.dom.Element;
 })
 public class CreateXMLSignatureResponseType {
 
+    /**
+     * KardinalitÃ¤t 1..oo erlaubt die Antwort auf eine
+     * 					Stapelsignatur-Anfrage
+     * 
+     */
     @XmlElements({
         @XmlElement(name = "SignatureEnvironment", type = CreateXMLSignatureResponseType.SignatureEnvironment.class),
         @XmlElement(name = "ErrorResponse", type = ErrorResponseType.class)
@@ -55,18 +60,21 @@ public class CreateXMLSignatureResponseType {
     protected List<Object> signatureEnvironmentOrErrorResponse;
 
     /**
+     * KardinalitÃ¤t 1..oo erlaubt die Antwort auf eine
+     * 					Stapelsignatur-Anfrage
+     * 
      * Gets the value of the signatureEnvironmentOrErrorResponse property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
+     * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the signatureEnvironmentOrErrorResponse property.
+     * This is why there is not a <CODE>set</CODE> method for the signatureEnvironmentOrErrorResponse property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * </p>
      * <pre>
-     *    getSignatureEnvironmentOrErrorResponse().add(newItem);
+     * getSignatureEnvironmentOrErrorResponse().add(newItem);
      * </pre>
      * 
      * 
@@ -74,33 +82,36 @@ public class CreateXMLSignatureResponseType {
      * Objects of the following type(s) are allowed in the list
      * {@link CreateXMLSignatureResponseType.SignatureEnvironment }
      * {@link ErrorResponseType }
+     * </p>
      * 
      * 
+     * @return
+     *     The value of the signatureEnvironmentOrErrorResponse property.
      */
     public List<Object> getSignatureEnvironmentOrErrorResponse() {
         if (signatureEnvironmentOrErrorResponse == null) {
-            signatureEnvironmentOrErrorResponse = new ArrayList<Object>();
+            signatureEnvironmentOrErrorResponse = new ArrayList<>();
         }
         return this.signatureEnvironmentOrErrorResponse;
     }
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type</p>.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.</p>
      * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;sequence&gt;
-     *         &lt;any processContents='lax'/&gt;
-     *       &lt;/sequence&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
+     * <pre>{@code
+     * <complexType>
+     *   <complexContent>
+     *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       <sequence>
+     *         <any processContents='lax'/>
+     *       </sequence>
+     *     </restriction>
+     *   </complexContent>
+     * </complexType>
+     * }</pre>
      * 
      * 
      */
@@ -114,7 +125,7 @@ public class CreateXMLSignatureResponseType {
         protected Object any;
 
         /**
-         * Ruft den Wert der any-Eigenschaft ab.
+         * Gets the value of the any property.
          * 
          * @return
          *     possible object is
@@ -127,7 +138,7 @@ public class CreateXMLSignatureResponseType {
         }
 
         /**
-         * Legt den Wert der any-Eigenschaft fest.
+         * Sets the value of the any property.
          * 
          * @param value
          *     allowed object is

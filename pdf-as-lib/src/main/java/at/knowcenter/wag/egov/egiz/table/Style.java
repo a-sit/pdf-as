@@ -54,6 +54,7 @@ import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
 import java.awt.color.ICC_ProfileRGB;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * This class implements an abstract style definiton used in tables or table entrys. Predefined
@@ -202,6 +203,20 @@ public class Style implements Serializable {
    */
   public final static String STRIKETHRU = "STRIKETHRU";
   
+  /**
+   * Valid horizontal alignment values
+   */
+  private static final Set<String> VALID_HALIGN_VALUES = Set.of(LEFT, CENTER, RIGHT);
+  
+  /**
+   * Valid vertical alignment values
+   */
+  private static final Set<String> VALID_VALIGN_VALUES = Set.of(TOP, MIDDLE, BOTTOM);
+  
+  /**
+   * Valid value horizontal alignment values (includes LINECENTER)
+   */
+  private static final Set<String> VALID_VALUE_HALIGN_VALUES = Set.of(LEFT, CENTER, RIGHT, LINECENTER);
 
   /**
    * all paddings initialized with the default padding value (1)
@@ -286,33 +301,33 @@ public class Style implements Serializable {
     }
 
     if (HALIGN.equals(id)) {
-      if (LEFT.equals(value) || CENTER.equals(value) || RIGHT.equals(value)) {
+      if (VALID_HALIGN_VALUES.contains(value)) {
         hAlign_ = value;
       }
     }
     if (VALIGN.equals(id)) {
-      if (TOP.equals(value) || MIDDLE.equals(value) || BOTTOM.equals(value)) {
+      if (VALID_VALIGN_VALUES.contains(value)) {
         vAlign_ = value;
       }
     }
     //Set new align for horziontal valign of lineCenter
     if (VALUEHALIGN.equals(id)) {
-      if (LEFT.equals(value) || CENTER.equals(value) || RIGHT.equals(value)||LINECENTER.equals(value)) {
+      if (VALID_VALUE_HALIGN_VALUES.contains(value)) {
         valueHAlign_ = value;
       }
     }
     if (VALUEVALIGN.equals(id)) {
-      if (TOP.equals(value) || MIDDLE.equals(value) || BOTTOM.equals(value)) {
+      if (VALID_VALIGN_VALUES.contains(value)) {
         valueVAlign_ = value;
       }
     }
     if (IMAGEHALIGN.equals(id)) {
-      if (LEFT.equals(value) || CENTER.equals(value) || RIGHT.equals(value)) {
+      if (VALID_HALIGN_VALUES.contains(value)) {
         imageHAlign_ = value;
       }
     }
     if (IMAGEVALIGN.equals(id)) {
-      if (TOP.equals(value) || MIDDLE.equals(value) || BOTTOM.equals(value)) {
+      if (VALID_VALIGN_VALUES.contains(value)) {
         imageVAlign_ = value;
       }
     }

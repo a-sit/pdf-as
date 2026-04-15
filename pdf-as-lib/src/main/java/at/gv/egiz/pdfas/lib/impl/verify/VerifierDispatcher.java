@@ -128,11 +128,10 @@ public class VerifierDispatcher {
 			for (int i = 0; i < currentClasses.length; i++) {
 				String clsName = currentClasses[i];
 				Class<?> cls = Class.forName(clsName);
-				Object f = cls.newInstance();
+				Object f = cls.getDeclaredConstructor().newInstance();
 				if (!(f instanceof IVerifyFilter))
 					throw new ClassCastException();
 				IVerifyFilter filter = (IVerifyFilter) f;
-				filter.setConfiguration((Configuration) settings);
 				List<FilterEntry> entries = filter.getFiters();
 				Iterator<FilterEntry> it = entries.iterator();
 				while (it.hasNext()) {

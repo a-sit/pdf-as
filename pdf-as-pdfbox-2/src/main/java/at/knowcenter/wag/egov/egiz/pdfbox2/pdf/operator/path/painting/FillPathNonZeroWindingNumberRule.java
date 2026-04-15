@@ -68,9 +68,11 @@ import at.knowcenter.wag.egov.egiz.pdfbox2.pdf.operator.path.PathPaintingOperato
 public class FillPathNonZeroWindingNumberRule extends PathPaintingOperatorProcessor {
 
 	private Log log = LogFactory.getLog(getClass());
+    private final boolean lowercase;
 
-	public FillPathNonZeroWindingNumberRule(PDFPage context) {
+	public FillPathNonZeroWindingNumberRule(PDFPage context, boolean lowercase) {
 		super(context);
+        this.lowercase = lowercase;
 	}
 
 	@Override
@@ -95,8 +97,7 @@ public class FillPathNonZeroWindingNumberRule extends PathPaintingOperatorProces
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return lowercase ? "f" : "F";
 	}
 
 }

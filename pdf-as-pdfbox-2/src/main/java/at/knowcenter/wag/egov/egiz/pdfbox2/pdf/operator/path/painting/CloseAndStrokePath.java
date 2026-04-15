@@ -82,8 +82,7 @@ public class CloseAndStrokePath extends PathPaintingOperatorProcessor {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "s";
 	}
 
 }

@@ -28,10 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.MTOM;
+import at.gv.egiz.pdfas.lib.impl.ErrorExtractor;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.MTOM;
 
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
 import at.gv.egiz.pdfas.api.processing.CoreSignParams;
@@ -142,20 +144,20 @@ public class PDFASSigningImpl implements PDFASSigning {
       }
     } catch (final Throwable e) {
 
+      val pdfAsError = ErrorExtractor.searchPdfAsError(e, null);
+
       statisticEvent.setStatus(Status.ERROR);
       statisticEvent.setException(e);
-      if (e instanceof PDFASError) {
-        statisticEvent.setErrorCode(((PDFASError) e).getCode());
-      }
+      statisticEvent.setErrorCode(pdfAsError.getCode());
       statisticEvent.setEndNow();
       statisticEvent.setTimestampNow();
       StatisticFrontend.getInstance().storeEvent(statisticEvent);
       statisticEvent.setLogged(true);
 
       log.warn("Error in Soap Service", e);
+      response.setErrorCode(pdfAsError.getCode());
       if (e.getCause() != null) {
         response.setError(e.getCause().getMessage());
-
       } else {
         response.setError(e.getMessage());
 

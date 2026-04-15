@@ -67,7 +67,7 @@ import at.knowcenter.wag.egov.egiz.pdfbox2.pdf.operator.path.PathConstructionOpe
  * @see "PDF 1.7 specification, Section 8.5.2 'Path Construction Operators'"
  * @author PdfBox, modified by Datentechnik Innovation GmbH
  */
-public class MoveTo  extends PathConstructionOperatorProcessor{
+public class MoveTo extends PathConstructionOperatorProcessor{
 
 	public MoveTo(PDFPage context) {
 		super(context);
@@ -82,7 +82,7 @@ public class MoveTo  extends PathConstructionOperatorProcessor{
 
 			COSNumber x = (COSNumber) operands.get(0);
 			COSNumber y = (COSNumber) operands.get(1);
-			Point2D p = transform(x.doubleValue(), y.doubleValue());
+			Point2D p = transform(x.floatValue(), y.floatValue());
 
 			pdfPage.getCurrentPath().moveTo((float) p.getX(), (float) p.getY());
 
@@ -97,8 +97,7 @@ public class MoveTo  extends PathConstructionOperatorProcessor{
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "m";
 	}
 
 }

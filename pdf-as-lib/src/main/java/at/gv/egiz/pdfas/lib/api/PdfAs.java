@@ -63,31 +63,13 @@ public interface PdfAs {
 	/**
 	 * Starts a signature process
 	 * 
-	 * After the process has to be startet the status request has to be services by the user application
+	 * After the process has to be started the status request has to be services by the user application
 	 * 
 	 * @param parameter The sign parameter
 	 * @return A status request
 	 * @throws PdfAsException
 	 */
-	public StatusRequest startSign(SignParameter parameter) throws PDFASError;
-	
-	/**
-	 * Continues an ongoing signature process 
-	 * 
-	 * @param statusRequest The current status
-	 * @return A status request
-	 * @throws PdfAsException
-	 */
-	public StatusRequest process(StatusRequest statusRequest) throws PDFASError;
-	
-	/**
-	 * Finishes a signature process
-	 * 
-	 * @param statusRequest The current status
-	 * @return A signature result
-	 * @throws PdfAsException
-	 */
-	public SignResult    finishSign(StatusRequest statusRequest) throws PDFASError;
+	public StatusRequest.Stage1 startSign(SignParameter parameter) throws PDFASError;
 	
 	/**
 	 * Generates a Image of the visual signatur block as Preview

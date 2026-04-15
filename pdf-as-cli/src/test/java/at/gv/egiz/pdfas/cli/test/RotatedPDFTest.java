@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import junit.framework.Assert;
 

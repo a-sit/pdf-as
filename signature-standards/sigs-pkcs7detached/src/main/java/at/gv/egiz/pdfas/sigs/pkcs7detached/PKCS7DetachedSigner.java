@@ -76,6 +76,11 @@ public class PKCS7DetachedSigner implements IPlainSigner, PKCS7DetachedConstants
 		}
 	}
 
+	public PKCS7DetachedSigner(PrivateKey key, X509Certificate cert) {
+		this.privKey = key;
+		this.cert = cert;
+	}
+
 	public X509Certificate getCertificate(SignParameter parameter) {
 		return cert;
 	}

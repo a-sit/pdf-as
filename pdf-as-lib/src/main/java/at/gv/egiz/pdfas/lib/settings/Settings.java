@@ -89,8 +89,9 @@ public class Settings implements ISettings, IProfileConstants {
     contextFolder = includeInstruction.getParentFile();
     final String includeName = includeInstruction.getName();
 
-    final WildcardFileFilter fileFilter = new WildcardFileFilter(
-        includeName, IOCase.SENSITIVE);
+
+    final WildcardFileFilter fileFilter = WildcardFileFilter.builder()
+            .setWildcards(includeName).setIoCase(IOCase.SENSITIVE).get();
     Collection<File> includeFiles = null;
 
     if (contextFolder != null && contextFolder.exists()

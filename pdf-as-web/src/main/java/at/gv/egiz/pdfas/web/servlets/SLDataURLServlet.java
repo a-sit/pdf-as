@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jose4j.base64url.Base64Url;
@@ -97,8 +97,7 @@ public class SLDataURLServlet extends HttpServlet {
 			
 			//parse SL2.0 command/result into JSON				
 			try {
-				JsonParser jsonParser = new JsonParser();
-				JsonElement sl20Req = jsonParser.parse(Base64Url.decodeToUtf8String(sl20Result));
+				JsonElement sl20Req = JsonParser.parseString(Base64Url.decodeToUtf8String(sl20Result));
 				sl20ReqObj = sl20Req.getAsJsonObject();
 				
 			} catch (JsonSyntaxException e) {

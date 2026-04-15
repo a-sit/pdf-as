@@ -25,6 +25,7 @@ package at.gv.egiz.pdfas.web.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -131,15 +132,23 @@ public class WebConfiguration implements IConfigurationConstants {
 
 	private static List<String> whiteListregEx = new ArrayList<String>();
 	private static List<String> overwritewhiteListregEx = new ArrayList<String>();
+
+	public static void configure(String configFile) {
+		try (InputStream is = new FileInputStream(configFile)) {
+			configure(is);
+		} catch (Exception e) {
+			logger.error("Failed to load configuration {}", configFile, e);
+		}
+	}
 	
-	public static void configure(String config) {
+	public static void configure(InputStream config) {
 
 		properties.clear();
 		whiteListregEx.clear();
 		overwritewhiteListregEx.clear();
 
 		try {
-			properties.load(new FileInputStream(config));
+			properties.load(config);
 		} catch (Exception e) {
 			logger.error("Failed to load configuration: " + e.getMessage());
 			throw new RuntimeException(e);

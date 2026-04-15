@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.junit.Assume;
@@ -323,10 +324,10 @@ public class SignaturePositionTest extends SignatureTest {
      */
     private BufferedImage captureImage(String fileName, int pageNumber) throws InterruptedException {             
       try {        
-        PDDocument signedPdf = PDDocument.load(new File(fileName));
-        PDFRenderer renderer = new PDFRenderer(signedPdf);        
-        return renderer.renderImage(pageNumber - 1, ZOOM);
-              
+        try (PDDocument signedPdf = Loader.loadPDF(new File(fileName))) {
+            PDFRenderer renderer = new PDFRenderer(signedPdf);
+            return renderer.renderImage(pageNumber - 1, ZOOM);
+        }
       } catch (IOException e) {
         fail(String
             .format("Not possible to capture page %d of file %s, because of %s.",

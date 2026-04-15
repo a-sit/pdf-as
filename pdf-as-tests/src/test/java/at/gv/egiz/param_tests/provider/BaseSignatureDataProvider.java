@@ -148,8 +148,7 @@ public abstract class BaseSignatureDataProvider {
         } else {
             String[] wildcards = testFilter.split(";");
             childFiles = testDirFile
-                    .listFiles((FilenameFilter) new WildcardFileFilter(
-                            wildcards));
+                    .listFiles((FilenameFilter)WildcardFileFilter.builder().setWildcards(wildcards).get());
         }
         int idx = 0;
         for (File child : childFiles) {

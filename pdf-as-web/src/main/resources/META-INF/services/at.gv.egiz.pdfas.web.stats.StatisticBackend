@@ -1,1 +1,2 @@
 at.gv.egiz.pdfas.web.stats.impl.StatisticFileBackend
+at.gv.egiz.pdfas.web.stats.impl.StatisticMicrometerBackend

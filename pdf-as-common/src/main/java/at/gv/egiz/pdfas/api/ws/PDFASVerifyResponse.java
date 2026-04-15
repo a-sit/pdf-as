@@ -3,8 +3,8 @@ package at.gv.egiz.pdfas.api.ws;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name="VerifyResponse")
 public class PDFASVerifyResponse implements Serializable {

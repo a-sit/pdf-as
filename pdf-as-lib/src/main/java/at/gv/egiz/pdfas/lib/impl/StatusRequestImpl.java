@@ -23,6 +23,9 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl;
 
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
+import at.gv.egiz.pdfas.lib.api.sign.SignResult;
+import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
 import iaik.x509.X509Certificate;
 
 import java.security.cert.CertificateException;
@@ -30,86 +33,67 @@ import java.security.cert.CertificateException;
 import at.gv.egiz.pdfas.lib.api.StatusRequest;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 public class StatusRequestImpl implements StatusRequest {
 
-	private boolean needCertificate = false;
-	private boolean needSignature = false;
-	private boolean isReady = false;
-	private X509Certificate certificate;
-	private byte[] encodedSignature;
-	private byte[] signatureData;
-	private int[] byteRange;
-	
-	private OperationStatus status;
-	
-	public OperationStatus getStatus() {
-		return status;
-	}
+  private final PdfAsImpl pdfAs;
+  @Getter
+  private final OperationStatus status;
 
-	public void setStatus(OperationStatus status) {
-		this.status = status;
-	}
+  private StatusRequestImpl(PdfAsImpl pdfAs, OperationStatus status ) { this.pdfAs = pdfAs; this.status = status; }
+  static StatusRequestImpl.Stage1 create(PdfAsImpl pdfAs, OperationStatus status) {
+    return new StatusRequestImpl(pdfAs, status).new Stage1();
+  }
 
-	public void setSignatureData(byte[] signatureData) {
-		this.signatureData = signatureData;
-	}
+  @Setter @Getter
+  private byte[] signatureData;
+  @Setter
+  private int[] byteRange;
 
-	public void setByteRange(int[] byteRange) {
-		this.byteRange = byteRange;
-	}
+  @Override public int[] getSignatureDataByteRange() {
+      return byteRange;
+  }
 
-	public X509Certificate getCertificate() {
-		return this.certificate;
-	}
-	
-	public byte[] getSignature() {
-		return this.encodedSignature;
-	}
-	
-	public void setNeedSignature(boolean value) {
-		this.needSignature = value;
-	}
-	
-	public void setNeedCertificate(boolean value) {
-		this.needCertificate = value;
-	}
-	
-	public boolean needCertificate() {
-		return needCertificate;
-	}
+  @Override public SignParameter getSignParameter() {
+      return this.status.getSignParameter();
+  }
 
-	public boolean needSignature() {
-		return needSignature;
-	}
+  @Override public RequestedSignature getRequestedSignature() { return this.status.getRequestedSignature(); }
 
-	public boolean isReady() {
-		return isReady;
-	}
-	
-	public void setIsReady(boolean value) {
-		this.isReady = value;
-	}
+  class StageBase implements StatusRequest {
+    public OperationStatus getStatus() { return status; }
+    @Override public byte[] getSignatureData() { return signatureData; }
+    @Override public int[] getSignatureDataByteRange() { return byteRange; }
+    @Override public SignParameter getSignParameter() { return status.getSignParameter(); }
+    @Override public RequestedSignature getRequestedSignature() { return status.getRequestedSignature(); }
+  }
 
-	public byte[] getSignatureData() {
-		return signatureData;
-	}
+  class Stage1 extends StageBase implements StatusRequest.Stage1 {
+    public StatusRequestImpl.Stage2 setCertificate(X509Certificate certificate) throws PDFASError {
+      pdfAs.processCertificate(StatusRequestImpl.this, certificate);
+      return new StatusRequestImpl.Stage2();
+    }
+    @Override
+    public StatusRequestImpl.Stage2 setCertificate(byte[] encodedCertificate) throws CertificateException, PDFASError {
+      return setCertificate(new X509Certificate(encodedCertificate));
+    }
+  }
 
-	public int[] getSignatureDataByteRange() {
-		return byteRange;
-	}
+  class Stage2 extends StageBase implements StatusRequest.Stage2 {
+    @Override
+    public StatusRequestImpl.Stage3 setSignature(byte[] signatureValue) throws PDFASError {
+      pdfAs.processSignature(StatusRequestImpl.this, signatureValue);
+      return new StatusRequestImpl.Stage3();
+    }
+  }
 
-	public void setCertificate(byte[] encodedCertificate) throws CertificateException {
-		this.certificate = new X509Certificate(encodedCertificate);
-	}
-
-	public void setSigature(byte[] signatureValue) {
-		this.encodedSignature = signatureValue;
-	}
-
-	public SignParameter getSignParameter() {
-		return this.status.getSignParamter();
-	}
-	
-	
+  class Stage3 extends StageBase implements StatusRequest.Stage3 {
+    @Override
+    public SignResult finishSign() throws PDFASError {
+      return pdfAs.finishSign(StatusRequestImpl.this);
+    }
+  }
 }

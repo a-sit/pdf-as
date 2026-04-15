@@ -27,10 +27,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public class PDFSignatureData extends HttpServlet {
 						"inline;filename=signed_data_" + id + ".pdf");
 				response.setContentType("application/pdf");
 				OutputStream os = response.getOutputStream();
-				os.write(res.getSignatureData());
+				os.write(res.getSignatureData().getBaseData());
 				os.close();
 			} else {
 				logger.warn("Verification DATA not found! for id " + request.getParameter(SIGN_ID) + " in session " + request.getSession().getId());

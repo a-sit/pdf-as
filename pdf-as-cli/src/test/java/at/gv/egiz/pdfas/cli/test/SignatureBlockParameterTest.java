@@ -34,6 +34,7 @@ import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.api.sign.SignResult;
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore;
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
@@ -42,7 +43,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -129,7 +130,7 @@ public class SignatureBlockParameterTest {
     SignResult result = pdfas.sign(signParameter);
 
     fos.close();
-    String name = getName(outFile, "PDF-AS Signatur1");
+    String name = getName(outFile, "PDF-AS Signatur 1");
     Assert.assertEquals("TEST123 test bar 123 c TEST123 Andreas Fitzek ECC", name);
 
 
@@ -147,7 +148,7 @@ public class SignatureBlockParameterTest {
 		result = pdfas.sign(signParameter);
 
 		fos.close();
-		name = getName(outFile, "PDF-AS Signatur1");
+		name = getName(outFile, "PDF-AS Signatur 1");
 		Assert.assertEquals("TEST123 test null 123 c TEST123 Andreas Fitzek ECC", name);
 
 		outFile = getPath("out") + "/" + profile + "-2.pdf";
@@ -161,7 +162,7 @@ public class SignatureBlockParameterTest {
 		signParameter.setSignatureProfileId(profile);
 		result = pdfas.sign(signParameter);
 		fos.close();
-		name = getName(outFile, "PDF-AS Signatur1");
+		name = getName(outFile, "PDF-AS Signatur 1");
 		Assert.assertEquals("null test bar 123 c null Andreas Fitzek ECC", name);
 
 		outFile = getPath("out") + "/" + profile + "-3.pdf";
@@ -173,7 +174,7 @@ public class SignatureBlockParameterTest {
 		signParameter.setSignatureProfileId(profile);
 		result = pdfas.sign(signParameter);
 		fos.close();
-		name = getName(outFile, "PDF-AS Signatur1");
+		name = getName(outFile, "PDF-AS Signatur 1");
     Assert.assertEquals("null test null 123 c null Andreas Fitzek ECC", name);
 //		Assert.assertEquals("{sbp.subject} test {sbp.foo} 123 {subject.T != null ? (subject.T + \" a \"+sbp.subject) : " +
 //				"\"c \"+sbp.subject+\" \"}Andreas Fitzek ECC", name);
@@ -190,7 +191,7 @@ public class SignatureBlockParameterTest {
 		signParameter.setSignatureProfileId(profile);
 		result = pdfas.sign(signParameter);
 		fos.close();
-		name = getName(outFile, "PDF-AS Signatur1");
+		name = getName(outFile, "PDF-AS Signatur 1");
 		Assert.assertEquals("null test null 123 c null Andreas Fitzek ECC", name);
 
 
@@ -226,7 +227,7 @@ public class SignatureBlockParameterTest {
     SignResult result = pdfas.sign(signParameter);
 
     fos.close();
-    String name = getName(outFile, "PDF-AS Signatur1");
+    String name = getName(outFile, "PDF-AS Signatur 1");
     Assert.assertEquals("TEST123 test baräöÜ 123 c TEST123 Andreas Fitzek ECC", name);
     //expected:<TEST123 test bar[] 123 c TEST123 Andre...> but was:<TEST123 test bar[äöÜ] 123 c TEST123 Andre...>
   }
@@ -262,31 +263,32 @@ public class SignatureBlockParameterTest {
     SignResult result = pdfas.sign(signParameter);
 
     fos.close();
-    String name = getName(outFile, "PDF-AS Signatur1");
+    String name = getName(outFile, "PDF-AS Signatur 1");
     Assert.assertEquals("Andreas Fitzek ECC text after variable", name);
     //expected:<TEST123 test bar[] 123 c TEST123 Andre...> but was:<TEST123 test bar[äöÜ] 123 c TEST123 Andre...>
   }
 
   private String getName(String fileName, String sigFieldName) throws IOException {
-    PDDocument pdDoc = PDDocument.load(new File(fileName));
-    PDSignature signature = null;
-    PDSignatureField signatureField;
-    PDAcroForm acroForm = pdDoc.getDocumentCatalog().getAcroForm();
-    if (acroForm != null) {
-      List<PDField> aa = acroForm.getFields();
-      signatureField = (PDSignatureField) acroForm.getField(sigFieldName);
-      if (signatureField != null) {
-        // retrieve signature dictionary
-        signature = signatureField.getSignature();
-        if (signature != null) {
-          String name = signature.getName();
-          return name;
+    try (PDDocument pdDoc = Loader.loadPDF(new File(fileName))) {
+      PDSignature signature = null;
+      PDSignatureField signatureField;
+      PDAcroForm acroForm = pdDoc.getDocumentCatalog().getAcroForm();
+      if (acroForm != null) {
+        List<PDField> aa = acroForm.getFields();
+        signatureField = (PDSignatureField) acroForm.getField(sigFieldName);
+        if (signatureField != null) {
+          // retrieve signature dictionary
+          signature = signatureField.getSignature();
+          if (signature != null) {
+            String name = signature.getName();
+            return name;
+
+          }
 
         }
-
       }
+      return null;
     }
-    return null;
   }
 
 }

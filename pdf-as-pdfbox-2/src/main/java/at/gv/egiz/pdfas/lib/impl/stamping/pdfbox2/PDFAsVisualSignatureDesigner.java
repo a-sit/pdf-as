@@ -284,7 +284,7 @@ public class PDFAsVisualSignatureDesigner {
 
 	/**
 	 * 
-	 * @param imgageStream
+	 * @param imageStream
 	 *            - stream of your visible signature image
 	 * @return Visible Signature Configuration Object
 	 * @throws IOException

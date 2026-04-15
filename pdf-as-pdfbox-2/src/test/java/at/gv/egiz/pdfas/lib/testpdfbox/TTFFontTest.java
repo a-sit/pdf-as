@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.pdfbox.cos.COSBase;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -21,9 +22,9 @@ public class TTFFontTest {
 			
 			while(cosObjectIt.hasNext()) {
 				COSObject cosObject = cosObjectIt.next();
-				COSBase subType = cosObject.getItem(COSName.SUBTYPE);
-				COSBase baseFont = cosObject.getItem(COSName.BASE_FONT);
-				COSBase aTest = cosObject.getItem(COSName.A);
+				COSBase subType = ((COSDictionary)cosObject.getObject()).getItem(COSName.SUBTYPE);
+				COSBase baseFont = ((COSDictionary)cosObject.getObject()).getItem(COSName.BASE_FONT);
+				COSBase aTest = ((COSDictionary)cosObject.getObject()).getItem(COSName.A);
 				
 				System.out.println(aTest);
 				

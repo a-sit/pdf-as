@@ -55,6 +55,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.contentstream.operator.OperatorProcessor;
@@ -127,8 +129,21 @@ public class PDFPage extends PDFTextStripper{
 
 	/**
 	 * The path currently being constructed.
-	 */
-	private GeneralPath currentPath = new GeneralPath();
+     * -- SETTER --
+     *  Sets the current path.
+     *
+     *
+     * -- GETTER --
+     *  Returns the path currently being constructed.
+     *
+     @param currentPath
+     *            The new current path.
+      * @return The path currently being constructed.
+
+     */
+	@Getter
+    @Setter
+    private GeneralPath currentPath = new GeneralPath();
 
 	private boolean legacy40;
 	
@@ -155,8 +170,7 @@ public class PDFPage extends PDFTextStripper{
 		this.effectivePageHeight = effectivePageHeight;
 
 		OperatorProcessor newInvoke = new MyInvoke(this);
-		newInvoke.setContext(this);
-		this.registerOperatorProcessor("Do", newInvoke);
+		this.addOperator(newInvoke);
 
 		if (!legacy32) {
 			registerCustomPathOperators();
@@ -172,32 +186,26 @@ public class PDFPage extends PDFTextStripper{
 	private void registerCustomPathOperators() {
 
 		// *** path construction
-		this.registerOperatorProcessor("m", new MoveTo(this));
-		this.registerOperatorProcessor("l", new LineTo(this));
-		this.registerOperatorProcessor("c", new CurveTo(this));
-		this.registerOperatorProcessor("y",
-				new CurveToReplicateFinalPoint(this));
-		this.registerOperatorProcessor("v", new CurveToReplicateInitialPoint(
-				this));
-		this.registerOperatorProcessor("h", new ClosePath(this));
+        this.addOperator(new MoveTo(this));
+        this.addOperator(new LineTo(this));
+        this.addOperator(new CurveTo(this));
+		this.addOperator(new CurveToReplicateFinalPoint(this));
+		this.addOperator(new CurveToReplicateInitialPoint(this));
+		this.addOperator(new ClosePath(this));
 
 		// *** path painting
 
 		// "S": stroke path
-		this.registerOperatorProcessor("S", new StrokePath(this));
-		this.registerOperatorProcessor("s", new CloseAndStrokePath(this));
-		this.registerOperatorProcessor("f",
-				new FillPathNonZeroWindingNumberRule(this));
-		this.registerOperatorProcessor("F",
-				new FillPathNonZeroWindingNumberRule(this));
-		this.registerOperatorProcessor("f*", new FillPathEvenOddRule(this));
-		this.registerOperatorProcessor("b", new CloseFillNonZeroAndStrokePath(
-				this));
-		this.registerOperatorProcessor("B", new FillNonZeroAndStrokePath(this));
-		this.registerOperatorProcessor("b*", new CloseFillEvenOddAndStrokePath(
-				this));
-		this.registerOperatorProcessor("B*", new FillEvenOddAndStrokePath(this));
-		this.registerOperatorProcessor("n", new EndPath(this));
+		this.addOperator(new StrokePath(this));
+		this.addOperator(new CloseAndStrokePath(this));
+		this.addOperator(new FillPathNonZeroWindingNumberRule(this, true));
+		this.addOperator(new FillPathNonZeroWindingNumberRule(this, false));
+		this.addOperator(new FillPathEvenOddRule(this));
+		this.addOperator(new CloseFillNonZeroAndStrokePath(this));
+		this.addOperator(new FillNonZeroAndStrokePath(this));
+		this.addOperator(new CloseFillEvenOddAndStrokePath(this));
+		this.addOperator(new FillEvenOddAndStrokePath(this));
+		this.addOperator(new EndPath(this));
 
 		// Note: The graphic context
 		// (org.pdfbox.pdmodel.graphics.PDGraphicsState) of the underlying
@@ -209,26 +217,7 @@ public class PDFPage extends PDFTextStripper{
 
 	}
 
-	/**
-	 * Returns the path currently being constructed.
-	 * 
-	 * @return The path currently being constructed.
-	 */
-	public GeneralPath getCurrentPath() {
-		return currentPath;
-	}
-
-	/**
-	 * Sets the current path.
-	 * 
-	 * @param currentPath
-	 *            The new current path.
-	 */
-	public void setCurrentPath(GeneralPath currentPath) {
-		this.currentPath = currentPath;
-	}
-
-	/**
+    /**
 	 * Registers a rectangle that bounds the path currently being drawn.
 	 * 
 	 * @param bounds
@@ -448,8 +437,8 @@ public class PDFPage extends PDFTextStripper{
 
 			PDXObject xobject = context.getResources().getXObject(name);
 
-			PDStream stream = xobject.getPDStream();
-			COSStream cos_stream = stream.getStream();
+			PDStream stream = xobject.getStream();
+			COSStream cos_stream = stream.getCOSObject();
 
 			COSName subtype = (COSName) cos_stream
 					.getDictionaryObject(COSName.SUBTYPE);
@@ -550,8 +539,7 @@ public class PDFPage extends PDFTextStripper{
 
 		@Override
 		public String getName() {
-			// TODO Auto-generated method stub
-			return null;
+			return "Do";
 		}
 	}
 

@@ -91,8 +91,7 @@ public class ClosePath extends PathConstructionOperatorProcessor {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "h";
 	}
 
 }

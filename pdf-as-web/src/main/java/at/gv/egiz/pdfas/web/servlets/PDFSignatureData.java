@@ -94,15 +94,16 @@ public class PDFSignatureData extends HttpServlet {
 						"Content-Disposition",
 						"inline;filename=signed_data_" + id + ".pdf");
 				response.setContentType("application/pdf");
+				response.setHeader("X-Content-Type-Options", "nosniff");
 				OutputStream os = response.getOutputStream();
 				os.write(res.getSignatureData().getBaseData());
 				os.close();
 			} else {
-				logger.warn("Verification DATA not found! for id " + request.getParameter(SIGN_ID) + " in session " + request.getSession().getId());
+				logger.warn("Verification DATA not found! for id {} in session {}", request.getParameter(SIGN_ID), request.getSession().getId());
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 		} catch (NumberFormatException e) {
-			logger.warn("Verification DATA not found! for id " + request.getParameter(SIGN_ID) + " in session " + request.getSession().getId());
+			logger.warn("Verification DATA not found! for id {} in session {}", request.getParameter(SIGN_ID), request.getSession().getId());
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		} catch (PdfAsException e) {
 			logger.warn("Verification DATA not found:", e);

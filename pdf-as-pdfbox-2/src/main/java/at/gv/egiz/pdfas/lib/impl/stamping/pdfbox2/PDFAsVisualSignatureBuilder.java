@@ -127,9 +127,9 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 
 	public String createHashedId(String value) {
 		try {
-			MessageDigest md = MessageDigest.getInstance("SHA-1");
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			md.reset();
-			return Hex.encodeHexString(md.digest(value.getBytes("UTF-8")));
+			return Hex.encodeHexString(md.digest(value.getBytes(StandardCharsets.UTF_8)));
 		} catch (Throwable e) {
 			logger.warn("Failed to generate ID for Image using value", e);
 			return value;

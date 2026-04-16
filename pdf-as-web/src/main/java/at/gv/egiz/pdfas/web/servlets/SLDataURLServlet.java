@@ -93,7 +93,7 @@ public class SLDataURLServlet extends HttpServlet {
 				
 			}
 
-			logger.trace("Received SL2.0 command: " + sl20Result);		
+			logger.trace("Received SL2.0 command: {}", sl20Result);
 			
 			//parse SL2.0 command/result into JSON				
 			try {
@@ -102,7 +102,7 @@ public class SLDataURLServlet extends HttpServlet {
 				
 			} catch (JsonSyntaxException e) {
 				logger.warn("SL2.0 command or result is NOT valid JSON.", e);
-				logger.debug("SL2.0 msg: " + sl20Result);
+				logger.debug("SL2.0 msg: {}", sl20Result);
 				throw new SL20Exception("sl20.02", e);
 				
 			}

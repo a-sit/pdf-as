@@ -72,6 +72,7 @@ public class VisBlockServlet extends HttpServlet {
 				response.setHeader("Content-Disposition", "inline;filename="
 						+ profile + "_" + resolution + ".png");
 				response.setContentType("image/png");
+				response.setHeader("X-Content-Type-Options", "nosniff");
 				OutputStream os = response.getOutputStream();
 				os.write(imageData);
 				os.close();

@@ -82,7 +82,7 @@ public class StatusServlet extends HttpServlet {
 			content = ContentType.HTML.toString();
 		} 
 
-		log.debug("Producing Content: " + content);
+		log.debug("Producing Content: {}", content);
 		
 		// Parameter to force execution
 		boolean force = true;

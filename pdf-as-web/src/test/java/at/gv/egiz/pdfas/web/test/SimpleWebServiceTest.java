@@ -4,8 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.UUID;
 
+import at.gv.egiz.pdfas.api.ws.PDFASSigning;
+import at.gv.egiz.pdfas.web.servlets.ExternSignServlet;
+import at.gv.egiz.pdfas.web.servlets.SimpleVerifyServletTest;
+import jakarta.xml.ws.Service;
+import lombok.val;
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,8 +29,15 @@ import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.ws.PDFASSigningImpl;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(BlockJUnit4ClassRunner.class)
+import javax.xml.namespace.QName;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SimpleWebServiceTest {
 
   @BeforeClass
@@ -32,28 +45,20 @@ public class SimpleWebServiceTest {
     final String current = new java.io.File(".").getCanonicalPath();
     System.setProperty("pdf-as-web.conf", 
         current + "/src/test/resources/config/pdfas/pdf-as-web.properties");
-    
-    String webconfig = System.getProperty("pdf-as-web.conf");
-    
-    if(webconfig == null) {
-      throw new RuntimeException("No web configuration provided!");
-    }
-    
-    WebConfiguration.configure(webconfig);
-    PdfAsHelper.init();
-    
-    try {
-      PdfAsFactory.validateConfiguration((ISettings)PdfAsHelper.getPdfAsConfig());
-      
-    } catch (PdfAsSettingsValidationException e) {
-      e.printStackTrace();
-    } 
   }
+
+  @BeforeClass
+  public static void jceWorkaround() {
+    System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+  }
+
+  @LocalServerPort
+  int port;
   
   @Test
   @SneakyThrows
   public void sign() {     
-    byte[] pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream("/data/enc_own.pdf"));   
+    byte[] pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream("/data/enc_own.pdf"));
     PDFASSignResponse resp = executeTest(pdf);
     assertNotNull("signed doc", resp.getSignedPDF());
     assertEquals("sign check", 0, resp.getVerificationResponse().getValueCode());
@@ -64,7 +69,7 @@ public class SimpleWebServiceTest {
   @Test
   @SneakyThrows
   public void withSignatureFields() {     
-    byte[] pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream("/data/placeholder_sigfield_and_qr.pdf"));   
+    byte[] pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream("/data/placeholder_sigfield_and_qr.pdf"));
     PDFASSignResponse resp = executeTest(pdf);
     assertNotNull("signed doc", resp.getSignedPDF());
     assertEquals("sign check", 0, resp.getVerificationResponse().getValueCode());
@@ -74,7 +79,11 @@ public class SimpleWebServiceTest {
   
   @SneakyThrows
   private PDFASSignResponse executeTest(byte[] pdf) {
-    PDFASSigningImpl service = new PDFASSigningImpl();
+    val wsdl = new URL("http://localhost:"+port+"/services/wssign?wsdl");
+    val serviceName = new QName(
+        "http://ws.web.pdfas.egiz.gv.at/",
+        "PDFASSigningImplService");
+    val proxy = Service.create(wsdl, serviceName).getPort(PDFASSigning.class);
     
     PDFASSignRequest req = new PDFASSignRequest();
     req.setRequestID(UUID.randomUUID().toString());
@@ -82,9 +91,9 @@ public class SimpleWebServiceTest {
     PDFASSignParameters signParams = new PDFASSignParameters();
     signParams.setConnector(Connector.JKS);
     signParams.setTransactionId(UUID.randomUUID().toString());
-    req.setParameters(signParams );
+    req.setParameters(signParams);
         
-    PDFASSignResponse resp = service.signPDFDokument(req);    
+    PDFASSignResponse resp = proxy.signPDFDokument(req);
     assertNotNull(resp);         
     return resp;
     

@@ -18,14 +18,6 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> signServlet() {
-    return new ServletRegistrationBean<>(
-        new ExternSignServlet(),
-        "/Sign"
-    );
-  }
-
-  @Bean
   public ServletRegistrationBean<Servlet> visBlockServlet() {
     return new ServletRegistrationBean<>(
         new VisBlockServlet(),
@@ -42,14 +34,6 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> reloadServlet() {
-    return new ServletRegistrationBean<>(
-      new ReloadServlet(),
-        "/Reload"
-    );
-  }
-
-  @Bean
   public ServletRegistrationBean<Servlet> dataURLServlet() {
     return new ServletRegistrationBean<>(
         new DataURLServlet(),
@@ -62,14 +46,6 @@ public class ServletBridge {
     return new ServletRegistrationBean<>(
         new SLDataURLServlet(),
         "/DataURLSL20"
-    );
-  }
-
-  @Bean
-  public ServletRegistrationBean<Servlet> verifyServlet() {
-    return new ServletRegistrationBean<>(
-        new VerifyServlet(),
-        "/Verify"
     );
   }
 

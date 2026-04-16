@@ -433,11 +433,13 @@ public class PdfAsHelper {
 				}
 
 				String url = WebConfiguration.getMoaURL(keyIdentifier);
+				String timeout = WebConfiguration.getMoaTimeout(keyIdentifier);
 				String keyId = WebConfiguration.getMoaKeyID(keyIdentifier);
 				String certificate = WebConfiguration
 						.getMoaCertificate(keyIdentifier);
 
 				config.setValue(IConfigurationConstants.MOA_SIGN_URL, url);
+				config.setValue(IConfigurationConstants.MOA_SIGN_TIMEOUT, timeout);
 				config.setValue(IConfigurationConstants.MOA_SIGN_KEY_ID, keyId);
 				config.setValue(IConfigurationConstants.MOA_SIGN_CERTIFICATE,
 						certificate);

@@ -140,6 +140,7 @@ public class MockMoaSigningTest {
       injectProperties(Map.of(
           "moal."+keyIdentifier+".enabled", "true",
           "moal."+keyIdentifier+".url", endpointURL,
+          "moal."+keyIdentifier+".timeout", "5000",
           "moal."+keyIdentifier+".KeyIdentifier", "KG_TEST",
           "moal."+keyIdentifier+".Certificate",
             "base64:"+Base64.getEncoder().encodeToString(signer.getCertificate(null).getEncoded())
@@ -230,7 +231,7 @@ public class MockMoaSigningTest {
       @SneakyThrows
       public CreateCMSSignatureResponseType createCMSSignature(CreateCMSSignatureRequest body) throws MOAFault {
         // this will cause a timeout
-        Thread.sleep(300 * 1000);
+        Thread.sleep(10 * 1000);
         throw new RuntimeException("unreachable");
       }
     }) {

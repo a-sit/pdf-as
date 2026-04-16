@@ -63,6 +63,7 @@ import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Servlet implementation class Sign
@@ -227,9 +228,10 @@ public class ExternSignServlet extends HttpServlet {
                       if (item.getFieldName().equals(UPLOAD_PDF_DATA)) {
                         filecontent = item.getInputStream().readAllBytes();
                         try {
-                          File f = new File(item.getName());
+						  val filename = FilenameUtils.getName(item.getName());
+                          File f = new File(filename);
                           String name = f.getName();
-                          log.debug("Got upload: " + item.getName());
+                          log.debug("Got upload: {}", filename);
                           if (!(name.endsWith(".pdf") || name.endsWith(".PDF"))) {
                             name += ".pdf";
                           }

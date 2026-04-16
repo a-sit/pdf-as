@@ -38,6 +38,7 @@ import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -209,10 +210,10 @@ public class VerifyServlet extends HttpServlet {
                       if (item.getFieldName().equals(UPLOAD_PDF_DATA)) {
                         filecontent = item.getInputStream().readAllBytes();
                         try {
-                          File f = new File(item.getName());
+						  val filename = FilenameUtils.getName(item.getName());
+                          File f = new File(filename);
                           String name = f.getName();
-                          logger.debug("Got upload: "
-                              + item.getName());
+                          logger.debug("Got upload: {}", filename);
                           if (!(name.endsWith(".pdf") || name
                               .endsWith(".PDF"))) {
                             name += ".pdf";

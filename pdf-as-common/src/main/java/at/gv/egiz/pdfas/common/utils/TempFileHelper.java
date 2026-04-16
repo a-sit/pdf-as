@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.Lombok;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,15 +48,21 @@ public class TempFileHelper implements IProfileConstants {
 
     private String tmpDir = "tmp";
 
-    private MessageDigest messageDigest = null;
+    private static final MessageDigest messageDigest;
 
-    private List<String> tmpFiles = new ArrayList<String>();
+    static {
+        try {
+          messageDigest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+          throw Lombok.sneakyThrow(e);
+        }
+    }
+
+  private List<String> tmpFiles = new ArrayList<String>();
     
     private boolean needsDeletion = false;
     
     public TempFileHelper(ISettings settings) {
-    	initializeMD();
-    	
     	String myTmpDir = settings.getValue(TMP_DIR);
     	if(myTmpDir != null) {
     		File myTmpDirFile = new File(myTmpDir);
@@ -104,22 +112,6 @@ public class TempFileHelper implements IProfileConstants {
         } catch (Throwable e) {
             logger.error("Failed to create temporary directory: " + tmpDir, e);
         }
-    }
-
-    private void initializeMD() {
-        try {
-            messageDigest = MessageDigest.getInstance("SHA1");
-            return;
-        } catch (NoSuchAlgorithmException e) {
-            logger.warn("SHA1 not available", e);
-        }
-        try {
-            messageDigest = MessageDigest.getInstance("MD5");
-            return;
-        } catch (NoSuchAlgorithmException e) {
-            logger.warn("MD5 not available", e);
-        }
-        throw new RuntimeException("Need at least SHA1 or MD5 Message Digest, none available!");
     }
 
 

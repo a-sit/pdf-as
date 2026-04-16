@@ -95,15 +95,16 @@ public class PDFSignatureCertificateData  extends HttpServlet {
 						"Content-Disposition",
 						"inline;filename=cert_" + id + ".cer");
 				response.setContentType("application/pkix-cert");
+				response.setHeader("X-Content-Type-Options", "nosniff");
 				OutputStream os = response.getOutputStream();
 				os.write(res.getSignerCertificate().getEncoded());
 				os.close();
 			} else {
-				logger.warn("Verification CERT not found! for id " + request.getParameter(SIGN_ID) + " in session " + request.getSession().getId());
+				logger.warn("Verification CERT not found! for id {} in session {}", request.getParameter(SIGN_ID), request.getSession().getId());
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 		} catch (NumberFormatException e) {
-			logger.warn("Verification CERT not found! for id " + request.getParameter(SIGN_ID) + " in session " + request.getSession().getId());
+			logger.warn("Verification CERT not found! for id {} in session {}", request.getParameter(SIGN_ID), request.getSession().getId());
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		} catch (PdfAsException e) {
 			logger.warn("Verification CERT not found:", e);

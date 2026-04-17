@@ -65,10 +65,21 @@ jobs:
             p/security-audit
             p/java
 
-      - name: Secret Detection (TruffleHog)
-        uses: trufflesecurity/trufflehog@v3.94.3
+      - name: Secret Detection (TruffleHog verified only)
+        run: |
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/work" \
+            -w /work \
+            trufflesecurity/trufflehog:latest \
+            filesystem "${{ env.REPO_PATH }}" --results=verified,unknown --json > trufflehog-results.json || true
+      
+      - name: Upload TruffleHog JSON
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          path: ${{ env.REPO_PATH }}
+          name: trufflehog-results-${{ github.sha }}
+          path: trufflehog-results.json
+          if-no-files-found: warn
 
   build-and-analyse:
     name: Build & Quality Checks

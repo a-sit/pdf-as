@@ -83,6 +83,12 @@ jobs:
         working-directory: ${{ env.REPO_PATH }}
 
     steps:
+      - name: Clean old run folders
+        working-directory: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          find . -maxdepth 1 -type d -name 'repo-*-*' -print -exec rm -rf {} +
+
       - name: Checkout
         uses: actions/checkout@v4
         with:

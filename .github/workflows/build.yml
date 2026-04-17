@@ -38,16 +38,8 @@ jobs:
           path: ${{ env.REPO_PATH }}
           fetch-depth: 0
           
-      - name: Install jq (local)
-        run: |
-          command -v jq >/dev/null || {
-            mkdir -p "$HOME/.local/bin"
-            curl -fsSL -o "$HOME/.local/bin/jq" https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64
-            chmod +x "$HOME/.local/bin/jq"
-            echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-            export PATH="$HOME/.local/bin:$PATH"
-          }
-          jq --version
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v3
 
       - name: Dependency Scanning (OWASP Dependency-Check)
         uses: dependency-check/Dependency-Check_Action@main
@@ -169,7 +161,6 @@ jobs:
     runs-on: [self-hosted, linux]
     needs: build-and-analyse
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-    environment: release
     env:
       REPO_PATH: repo-${{ github.run_id }}-${{ github.job }}
       
@@ -188,9 +179,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-
-      - name: Set SHORT_SHA
-        run: echo "SHORT_SHA=${GITHUB_SHA:0:8}" >> "$GITHUB_ENV"
+          cache: gradle
 
       - name: Setup SSH known_hosts
         env:
@@ -200,12 +189,5 @@ jobs:
           echo $DEPLOY_EGIZ | base64 --decode > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      - name: Assemble & Upload Archives
-        run: ./gradlew --stacktrace -x test assemble uploadArchives
-
-      - name: Upload variables.env
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ${{ github.event.repository.name }}-${{ env.SHORT_SHA }}
-          path: ${{ env.REPO_PATH }}/variables.env
+      - name: Build and Publish
+        run: ./gradlew --stacktrace -x test publish

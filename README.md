@@ -20,7 +20,7 @@ Release folder needs to be uploaded to https://apps.egiz.gv.at/releases/pdf-as/r
 
 Create mvn repo folder by running:
 
-`./gradlew uploadArchives`
+`./gradlew publish`
 
 The generated mvn repo needs to be uploaded to https://apps.egiz.gv.at/maven/at/gv/egiz/pdfas/
 

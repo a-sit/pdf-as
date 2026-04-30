@@ -3,7 +3,9 @@ name: Build
 on:
   push:
     branches:
-      - '**'
+      - 'main'
+      - 'master'
+      - 'development'
     tags:
       - 'v*'
   pull_request:

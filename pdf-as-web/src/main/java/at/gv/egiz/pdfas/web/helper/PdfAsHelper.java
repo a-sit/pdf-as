@@ -181,33 +181,6 @@ public class PdfAsHelper {
 		return pdfAsConfig;
 	}
 
-	private static void validatePdfSize(HttpServletRequest request,
-			HttpServletResponse response, byte[] pdfData)
-			throws PdfAsWebException {
-		// Try to check num-bytes
-		String pdfSizeString = PdfAsParameterExtractor.getNumBytes(request);
-		if (pdfSizeString != null) {
-			long pdfSize = -1;
-			try {
-				pdfSize = Long.parseLong(pdfSizeString);
-			} catch (NumberFormatException e) {
-				throw new PdfAsWebException(
-						PdfAsParameterExtractor.PARAM_NUM_BYTES
-								+ " parameter has to be a positiv number!", e);
-			}
-			if (pdfSize <= 0) {
-				throw new PdfAsWebException(
-						"Invalid PDF Size! Has to bigger than zero!");
-			}
-
-			if (pdfData.length != pdfSize) {
-				throw new PdfAsWebException("Signature Data Size and "
-						+ PdfAsParameterExtractor.PARAM_NUM_BYTES
-						+ " missmatch!");
-			}
-		}
-	}
-
 	public static String buildPosString(HttpServletRequest request,
 			HttpServletResponse response) throws PdfAsWebException {
 		String posP = PdfAsParameterExtractor.getSigPosP(request);

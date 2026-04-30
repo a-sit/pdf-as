@@ -87,7 +87,7 @@ public abstract class PDFUtilities implements IConfigurationConstants{
 	   * Only used if background color should be determined automatically.
 	   * That can be necessary of PDF contains page-size images.
 	   */
-		Color bgColor = "true".equals(settings.getValue(BG_COLOR_DETECTION))
+		Color bgColor = Boolean.parseBoolean(settings.getValue(BG_COLOR_DETECTION))
 		    ? determineBackgroundColor(bim)
 		    : MAGIC_COLOR;
 			

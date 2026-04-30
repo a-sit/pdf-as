@@ -117,7 +117,7 @@ public class WebConfiguration implements IConfigurationConstants {
 
 	public static final String UPLOAD_FILESIZE_THRESHOLD = "web.upload.filesizeThreshold";
 	public static final String UPLOAD_MAX_FILESIZE = "web.upload.filesizeMax";
-	public static final String UPLOAD_MAX_REQUESTSIZE = "web.upload.RequestsizeMax";
+	public static final String UPLOAD_MAX_REQUESTSIZE = "web.upload.requestsizeMax";
 	
 	public static final String PLACEHOLDER_GENERATOR_ENABLED = "qr.placeholder.generator.enabled";
 	

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,17 +65,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.boot.web.servlet.ServletRegistration;
+import org.springframework.stereotype.Component;
 
 /**
  * Servlet implementation class Sign
  */
 @Slf4j
+@Component
+@ServletRegistration(urlMappings = "/Sign")
 public class ExternSignServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-
-	// TODO: get this from spring instead of -D
-	public static final String PDF_AS_WEB_CONF = "pdf-as-web.conf";
 	
 	private static final String UPLOAD_PDF_DATA = "pdf-file";
 	private static final String UPLOAD_DIRECTORY = "upload";
@@ -83,15 +85,8 @@ public class ExternSignServlet extends HttpServlet {
 	 * Default constructor.
 
 	 */
-	public ExternSignServlet(){
-		String webconfig = System.getProperty(PDF_AS_WEB_CONF);
-		
-		if(webconfig == null) {
-			log.error("No web configuration provided! Please specify: " + PDF_AS_WEB_CONF);
-			throw new RuntimeException("No web configuration provided! Please specify: " + PDF_AS_WEB_CONF);
-		}
-		
-		WebConfiguration.configure(webconfig);
+	public ExternSignServlet(final PdfAsWebSpringConfiguration config) {
+		WebConfiguration.configure(config.getPdfAsWebConfPath());
 		PdfAsHelper.init();
 		
 		try {

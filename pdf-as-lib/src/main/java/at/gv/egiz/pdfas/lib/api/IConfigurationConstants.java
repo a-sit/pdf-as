@@ -95,6 +95,7 @@ public interface IConfigurationConstants {
 	 * MOA Sign URL configuration Key
 	 */
 	public static final String MOA_SIGN_URL = "moa.sign.url";
+	public static final String MOA_SIGN_TIMEOUT = "moa.sign.timeout";
 	
 	public static final String KEEP_INVALID_SIGNATURE = "report.invalidSign";
 	

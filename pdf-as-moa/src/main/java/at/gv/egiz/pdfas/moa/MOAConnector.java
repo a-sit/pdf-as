@@ -77,7 +77,8 @@ public class MOAConnector implements ISignatureConnector,
 	public static final String SIGNATURE_DEVICE = "MOA";
 	
 	private X509Certificate certificate;
-	private String moaEndpoint;
+	private final String moaEndpoint;
+	private final Long moaTimeout;
 	private String keyIdentifier;
   private boolean mtomEnabled;
 
@@ -85,27 +86,15 @@ public class MOAConnector implements ISignatureConnector,
 	public MOAConnector(Configuration config,
 			java.security.cert.Certificate certificate)
 			throws CertificateException, FileNotFoundException, IOException {
-		if(certificate != null) {
-			if(certificate instanceof X509Certificate) {
+
+      if (certificate != null) {
+			if (certificate instanceof X509Certificate) {
 				this.certificate = (X509Certificate)certificate;
 			} else {
 				this.certificate = new X509Certificate(certificate.getEncoded());
 			}
-		}
-		init(config);
-	}
-
-	public MOAConnector(Configuration config) throws CertificateException,
-			FileNotFoundException, IOException {
-		init(config);
-	}
-
-	private void init(Configuration config) throws CertificateException,
-			FileNotFoundException, IOException {
-
-		// Load certificate if not set otherwise
-		if (this.certificate == null) {
-
+		} else {
+			// Load certificate if not set otherwise
 			if (config.getValue(MOA_SIGN_CERTIFICATE) == null) {
 				logger.error(MOA_SIGN_CERTIFICATE
 						+ " not configured for MOA connector");
@@ -114,34 +103,24 @@ public class MOAConnector implements ISignatureConnector,
 								+ " to use MOA connector"));
 			}
 
-			if (!(config instanceof ISettings)) {
+			if (!(config instanceof ISettings settings)) {
 				logger.error("Configuration is no instance of ISettings");
 				throw new PdfAsWrappedIOException(new PdfAsException(
 						"Configuration is no instance of ISettings"));
 			}
 
-			ISettings settings = (ISettings) config;
-
-			String certificateValue = config.getValue(MOA_SIGN_CERTIFICATE);
+          String certificateValue = config.getValue(MOA_SIGN_CERTIFICATE);
 
 			if (certificateValue.startsWith("http")) {
 				logger.debug("Loading certificate from url: " + certificateValue);
 
-				InputStream is = null;
-				try {
-					URL certificateURL = new URL(certificateValue);
-					is = certificateURL.openStream();
+				try (val is = new URL(certificateValue).openStream()) {
 					this.certificate = new X509Certificate(is);
 
 				} catch (MalformedURLException e) {
-					logger.error(certificateValue + " is not a valid url but starts with http!");
+					logger.error("{} is not a valid url but starts with http!", certificateValue);
 					throw new PdfAsWrappedIOException(new PdfAsException(certificateValue + " is not a valid url but!"));
 
-				} finally {
-					if (is != null) {
-						is.close();
-
-					}
 				}
 			} else if (certificateValue.startsWith("base64:")) {
 				logger.debug("Loading base64 certificate: {}", certificateValue);
@@ -157,19 +136,33 @@ public class MOAConnector implements ISignatureConnector,
 					certFile = new File(certificateValue);
 				}
 
-				logger.debug("Loading certificate from file: "
-						+ certificateValue);
+				logger.debug("Loading certificate from file: {}", certificateValue);
 
-				this.certificate = new X509Certificate(new FileInputStream(
-						certFile));
+				try (val is = new FileInputStream(certFile)) {
+					this.certificate = new X509Certificate(is);
+				}
 			}
 		}
-		
+
 		this.moaEndpoint = config.getValue(MOA_SIGN_URL);
-		this.keyIdentifier = config.getValue(MOA_SIGN_KEY_ID);
+		val timeout = config.getValue(MOA_SIGN_TIMEOUT);
+		Long moaTimeout = null;
+		if (timeout != null) {
+			try {
+				moaTimeout = Long.valueOf(timeout);
+			} catch (NumberFormatException e) {
+				logger.warn("Failed to convert MOA timeout '{}' to a number", timeout, e);
+			}
+		}
+      this.moaTimeout = moaTimeout;
+      this.keyIdentifier = config.getValue(MOA_SIGN_KEY_ID);
 		this.mtomEnabled = parseConfigToBoolean(config.getValue(MOA_MTOM_ENABLED), false);
 		logger.info("MOA client {} SOAP with MTOM", this.mtomEnabled ? "enabled" : "disabled");
-		
+	}
+
+	public MOAConnector(Configuration config) throws CertificateException,
+			FileNotFoundException, IOException {
+		this(config, null);
 	}
 
   public X509Certificate getCertificate(SignParameter parameter)
@@ -192,6 +185,10 @@ public class MOAConnector implements ISignatureConnector,
 		SignatureCreationPortType creationPort = service.getSignatureCreationPort();
 		BindingProvider provider = (BindingProvider) creationPort;
 		provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, this.moaEndpoint);
+		if (moaTimeout != null) {
+			provider.getRequestContext().put("jakarta.xml.ws.client.connectionTimeout", moaTimeout);
+			provider.getRequestContext().put("jakarta.xml.ws.client.receiveTimeout", moaTimeout);
+		}
 
 		if (this.mtomEnabled) {
 	    if (provider.getBinding() instanceof SOAPBinding) {

@@ -9,6 +9,7 @@ import at.gv.egiz.pdfas.lib.impl.configuration.ConfigurationImpl;
 import at.gv.egiz.pdfas.moa.MOAConnector;
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore;
 import at.gv.egiz.pdfas.sigs.pkcs7detached.PKCS7DetachedSigner;
+import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.servlets.ExternSignServlet;
@@ -42,11 +43,8 @@ import java.security.PrivateKey;
 import java.util.*;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
@@ -57,6 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class MockMoaSigningTest {
   @Autowired MockMvc mvc;
   @Autowired ObjectMapper om;
+  @Autowired PdfAsWebSpringConfiguration config;
 
   static {
     try {
@@ -78,7 +77,7 @@ public class MockMoaSigningTest {
       targetNamespace = "http://reference.e-government.gv.at/namespace/moa/20020822#",
       endpointInterface =
           "at.gv.e_government.reference.namespace.moa._20020822_.SignatureCreationPortType")
-  static class MockMoa implements AutoCloseable, SignatureCreationPortType {
+  class MockMoa implements AutoCloseable, SignatureCreationPortType {
     @SneakyThrows
     private static int freePort() {
       try (ServerSocket socket = new ServerSocket(0)) {
@@ -100,8 +99,8 @@ public class MockMoaSigningTest {
     public final IPlainSigner signer;
 
     @SneakyThrows
-    private static Properties getBaseProperties() {
-      try (InputStream in = new FileInputStream(System.getProperty(ExternSignServlet.PDF_AS_WEB_CONF))) {
+    private Properties getBaseProperties() {
+      try (InputStream in = new FileInputStream(config.getPdfAsWebConfPath())) {
         val props = new Properties();
         props.load(in);
         return props;
@@ -109,7 +108,7 @@ public class MockMoaSigningTest {
     }
 
     @SneakyThrows
-    private static void injectProperties(Map<String, String> overlay) {
+    private void injectProperties(Map<String, String> overlay) {
       val props = getBaseProperties();
       if (overlay != null) overlay.forEach(props::setProperty);
       try (val out = new ByteArrayOutputStream()) {
@@ -141,6 +140,7 @@ public class MockMoaSigningTest {
       injectProperties(Map.of(
           "moal."+keyIdentifier+".enabled", "true",
           "moal."+keyIdentifier+".url", endpointURL,
+          "moal."+keyIdentifier+".timeout", "5000",
           "moal."+keyIdentifier+".KeyIdentifier", "KG_TEST",
           "moal."+keyIdentifier+".Certificate",
             "base64:"+Base64.getEncoder().encodeToString(signer.getCertificate(null).getEncoded())
@@ -231,7 +231,7 @@ public class MockMoaSigningTest {
       @SneakyThrows
       public CreateCMSSignatureResponseType createCMSSignature(CreateCMSSignatureRequest body) throws MOAFault {
         // this will cause a timeout
-        Thread.sleep(300 * 1000);
+        Thread.sleep(10 * 1000);
         throw new RuntimeException("unreachable");
       }
     }) {

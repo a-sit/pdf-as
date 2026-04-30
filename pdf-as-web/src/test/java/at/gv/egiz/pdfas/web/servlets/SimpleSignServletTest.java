@@ -1,33 +1,37 @@
-package at.gv.egiz.pdfas.web.test;
+package at.gv.egiz.pdfas.web.servlets;
 
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Enumeration;
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
+
+import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import at.gv.egiz.pdfas.web.filter.UserAgentFilter;
-import at.gv.egiz.pdfas.web.servlets.ExternSignServlet;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Operation;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Source;
+import org.springframework.mock.web.MockServletConfig;
+import org.springframework.mock.web.MockServletContext;
+import org.springframework.stereotype.Component;
+import org.springframework.test.context.junit4.SpringRunner;
 
 //@Ignore
-@RunWith(BlockJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class SimpleSignServletTest {
 
 	
@@ -38,11 +42,22 @@ public class SimpleSignServletTest {
 				current + "/src/test/resources/config/pdfas/pdf-as-web.properties");
 		
 	}
-	
-	
+
+	@Before
+	@SneakyThrows
+	public void setup() {
+		servlet.init(
+			new MockServletConfig(
+					new MockServletContext("src/main/webapp"),
+					"ExternSignServlet")
+		);
+	}
+
+	@Autowired private ExternSignServlet servlet;
+
 	@Test
-	public void sigBlockParameterTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, 
-			IllegalArgumentException, InvocationTargetException, IOException, ServletException {	
+	@SneakyThrows
+	public void sigBlockParameterTest()  {
 		
 		byte[] pdf = IOUtils.toByteArray(SimpleSignServletTest.class.getResourceAsStream("/data/enc_own.pdf"));		
 		MockHttpServletRequest httpReq = new MockHttpServletRequest("POST", "https://localhost/pdfas");
@@ -64,55 +79,14 @@ public class SimpleSignServletTest {
 		
 	}
 
-
-	private void performTest(HttpServletRequest httpReq, HttpServletResponse httpResp, byte[] pdf) throws NoSuchMethodException, 
-			SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ServletException {
-		ExternSignServlet servlet = new ExternSignServlet();
-		ServletConfig servletConfig = buildServletConfig();
-		servlet.init(servletConfig);
-		
-		Method method = servlet.getClass().getDeclaredMethod("doSignature", 
-				HttpServletRequest.class, HttpServletResponse.class, byte[].class, StatisticEvent.class);
-		method.setAccessible(true);
+	@SneakyThrows
+	private void performTest(HttpServletRequest httpReq, HttpServletResponse httpResp, byte[] pdf)  {
 		StatisticEvent statisticEvent = new StatisticEvent();
 		statisticEvent.setStartNow();
 		statisticEvent.setSource(Source.WEB);
 		statisticEvent.setOperation(Operation.SIGN);
 		statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
+		servlet.doSignature(httpReq, httpResp, pdf, statisticEvent);
 		
-		method.invoke(servlet, httpReq, httpResp, pdf, statisticEvent);
-		
-	}
-
-
-	private ServletConfig buildServletConfig() {
-		
-		return new ServletConfig() {
-			
-			private ServletContext servletContext = null; 
-			
-			@Override
-			public String getServletName() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public ServletContext getServletContext() {
-				return servletContext;
-			}
-			
-			@Override
-			public Enumeration<String> getInitParameterNames() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public String getInitParameter(String name) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		};
 	}
 }

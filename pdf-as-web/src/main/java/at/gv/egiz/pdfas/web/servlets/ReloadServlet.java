@@ -3,17 +3,26 @@ package at.gv.egiz.pdfas.web.servlets;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.ServletRegistration;
+import org.springframework.stereotype.Component;
 
+@Slf4j
+@Component
+@ServletRegistration(urlMappings = "/Reload")
 public class ReloadServlet extends HttpServlet {
 
 	/**
@@ -21,17 +30,12 @@ public class ReloadServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 6108555300743896727L;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ReloadServlet.class);
-
-	public static final String PDF_AS_WEB_CONF = "pdf-as-web.conf";
 	public static final String PARAM_PASSWD = "PASSWD";
 	
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public ReloadServlet() {
+	private final PdfAsWebSpringConfiguration config;
+	public ReloadServlet(final PdfAsWebSpringConfiguration config) {
 		super();
+		this.config = config;
 	}
 	
 	/**
@@ -42,15 +46,15 @@ public class ReloadServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		
 		if(!WebConfiguration.getReloadEnabled()) {
-			logger.info("Reload Servlet disabled. " + request.getRemoteAddr() + " tried to call it");
+			log.info("Reload Servlet disabled. " + request.getRemoteAddr() + " tried to call it");
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			response.setContentLength(0);
 			return;
 		}
 		
-		logger.info("Called Reload Servlet from: " + request.getRemoteAddr());
+		log.info("Called Reload Servlet from: " + request.getRemoteAddr());
 		
-		logger.info("Checking Password!");
+		log.info("Checking Password!");
 		
 		String pwd = request.getParameter(PARAM_PASSWD);
 		
@@ -66,17 +70,11 @@ public class ReloadServlet extends HttpServlet {
 			return;
 		}
 		
-		String webconfig = System.getProperty(PDF_AS_WEB_CONF);
-		
-		if(webconfig == null) {
-			logger.error("No web configuration provided! Please specify: " + PDF_AS_WEB_CONF);
-			throw new RuntimeException("No web configuration provided! Please specify: " + PDF_AS_WEB_CONF);
-		}
-		
+		String webconfig = config.getPdfAsWebConfPath();
 		WebConfiguration.configure(webconfig);
 		PdfAsHelper.reloadConfig();
 		
-		logger.info("Reloaded!");
+		log.info("Reloaded!");
 		
 		StringBuilder sb = new StringBuilder();
 		

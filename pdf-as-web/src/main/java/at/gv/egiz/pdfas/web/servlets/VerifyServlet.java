@@ -58,10 +58,15 @@ import at.gv.egiz.pdfas.web.stats.StatisticEvent.Operation;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Source;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Status;
 import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
+import org.springframework.boot.web.servlet.ServletRegistration;
+import org.springframework.stereotype.Component;
 
 /**
  * Servlet implementation class VerifyServlet
  */
+
+@Component
+@ServletRegistration(urlMappings = "/Verify")
 public class VerifyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

@@ -68,6 +68,7 @@ public class WebConfiguration implements IConfigurationConstants {
 
 	public static final String MOA_LIST = "moal";
 	public static final String MOA_URL = "url";
+	public static final String MOA_TIMEOUT = "timeout";
 	public static final String MOA_KEYID = "KeyIdentifier";
 	public static final String MOA_CERT = "Certificate";
 	
@@ -393,6 +394,10 @@ public class WebConfiguration implements IConfigurationConstants {
 	
 	public static String getMoaURL(String keyIdentifier) {
 		return properties.getProperty(MOA_LIST + "." + keyIdentifier + "." + MOA_URL);
+	}
+
+	public static String getMoaTimeout(String keyIdentifier) {
+		return properties.getProperty(MOA_LIST + "." + keyIdentifier + "." + MOA_TIMEOUT);
 	}
 	
 	public static String getMoaKeyID(String keyIdentifier) {

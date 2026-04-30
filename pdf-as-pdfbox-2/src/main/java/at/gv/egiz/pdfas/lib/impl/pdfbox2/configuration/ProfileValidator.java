@@ -102,7 +102,7 @@ public class ProfileValidator implements ConfigurationValidator{
 
 	@Override
 	public boolean usedAsDefault() {
-		return true;
+		return false;
 	}
 
 	@Override

@@ -69,7 +69,11 @@ public class PDFASVerificationImpl implements PDFASVerification {
 			}
 			statisticEvent.setFilesize(request.getInputData().length);
 			statisticEvent.setProfileId(null);
-			statisticEvent.setDevice(request.getVerificationLevel().toString());
+			statisticEvent.setDevice(
+					(lvl == SignatureVerificationLevel.FULL_VERIFICATION ?
+							VerificationLevel.FULL_CERT_PATH :
+							VerificationLevel.INTEGRITY_ONLY)
+							.toString());
 			
 			List<VerifyResult> results = PdfAsHelper.synchronousVerify(
 					request.getInputData(), sigIdx, lvl, preProcessor);

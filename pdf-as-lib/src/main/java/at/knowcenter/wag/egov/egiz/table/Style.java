@@ -194,14 +194,6 @@ public class Style implements Serializable {
    * Font type BOLDITALIC
    */
   public final static String BOLDITALIC = "BOLDITALIC";
-  /**
-   * Font type UNDERLINE
-   */
-  public final static String UNDERLINE = "UNDERLINE";
-  /**
-   * Font type STRIKETHRU
-   */
-  public final static String STRIKETHRU = "STRIKETHRU";
   
   /**
    * Valid horizontal alignment values

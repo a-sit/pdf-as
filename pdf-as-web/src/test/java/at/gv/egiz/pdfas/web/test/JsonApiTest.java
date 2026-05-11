@@ -12,6 +12,8 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RunWith(SpringRunner.class)
+@Execution(ExecutionMode.SAME_THREAD)
 @SpringBootTest(properties = {
     "management.endpoint.metrics.enabled=true",
     "management.endpoints.web.exposure.include=metrics"

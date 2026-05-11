@@ -14,6 +14,8 @@ import lombok.val;
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
@@ -36,6 +38,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.xml.namespace.QName;
 
 @RunWith(SpringRunner.class)
+@Execution(ExecutionMode.SAME_THREAD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SimpleWebServiceWithoutVerificationTest {
 

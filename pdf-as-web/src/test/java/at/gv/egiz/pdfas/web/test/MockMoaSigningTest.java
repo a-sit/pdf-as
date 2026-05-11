@@ -47,6 +47,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
+@Execution(ExecutionMode.SAME_THREAD)
 @SpringBootTest(properties = {
     "management.endpoint.metrics.enabled=true",
     "management.endpoints.web.exposure.include=metrics"

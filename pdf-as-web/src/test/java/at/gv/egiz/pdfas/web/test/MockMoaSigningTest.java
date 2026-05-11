@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "management.endpoints.web.exposure.include=metrics"
 })
 @AutoConfigureMockMvc
-public class MockMoaSigningTest {
+public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
   @Autowired MockMvc mvc;
   @Autowired ObjectMapper om;
   @Autowired PdfAsWebSpringConfiguration config;
@@ -182,42 +182,40 @@ public class MockMoaSigningTest {
   @Test
   @SneakyThrows
   public void signWithMockMOA() {
-    try (val watcher = TestUtils.OperationCountWatcher(mvc, "operation:sign", "status:ok")) {
-      try (MockMoa moa = new MockMoa()) {
+    try (MockMoa moa = new MockMoa(); val watcher = OperationCountWatcher("operation:sign", "status:ok")) {
 
-        final String pdf = Base64.getEncoder().encodeToString(
-            IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/enc_own.pdf")));
+      final String pdf = Base64.getEncoder().encodeToString(
+          IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/enc_own.pdf")));
 
-        final String signRequestID = UUID.randomUUID().toString();
-        final String signRequest = om.writeValueAsString(
-            Map.of(
-                "requestID", signRequestID,
-                "inputData", pdf,
-                "parameters", Map.of(
-                    "connector", "moa",
-                    "keyIdentifier", moa.keyIdentifier,
-                    "transactionId", UUID.randomUUID().toString()
-                )
-            )
-        );
+      final String signRequestID = UUID.randomUUID().toString();
+      final String signRequest = om.writeValueAsString(
+          Map.of(
+              "requestID", signRequestID,
+              "inputData", pdf,
+              "parameters", Map.of(
+                  "connector", "moa",
+                  "keyIdentifier", moa.keyIdentifier,
+                  "transactionId", UUID.randomUUID().toString()
+              )
+          )
+      );
 
-        final String signResponse = mvc.perform(
-                post("/api/v2/sign/single")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(signRequest)
-            )
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.requestID").value(signRequestID))
-            .andExpect(jsonPath("$.signedPDF").isNotEmpty())
-            .andExpect(jsonPath("$.verificationResponse").exists())
-            .andReturn().getResponse().getContentAsString();
+      final String signResponse = mvc.perform(
+              post("/api/v2/sign/single")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON)
+                  .content(signRequest)
+          )
+          .andExpect(status().isOk())
+          .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+          .andExpect(jsonPath("$.requestID").value(signRequestID))
+          .andExpect(jsonPath("$.signedPDF").isNotEmpty())
+          .andExpect(jsonPath("$.verificationResponse").exists())
+          .andReturn().getResponse().getContentAsString();
 
-        final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
-        assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
-            new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
-      }
+      final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
+      assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
+          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
     }
   }
 

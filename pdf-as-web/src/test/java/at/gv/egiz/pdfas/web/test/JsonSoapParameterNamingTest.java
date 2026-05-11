@@ -19,11 +19,8 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 import lombok.Lombok;
 import org.junit.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +38,6 @@ import org.springframework.test.context.junit4.SpringRunner;
  * names as aliases when implementing the fix so existing clients remain compatible.
  */
 @RunWith(SpringRunner.class)
-@Execution(ExecutionMode.SAME_THREAD)
 @SpringBootTest(properties = {
     "management.endpoint.metrics.enabled=true",
     "management.endpoints.web.exposure.include=metrics"

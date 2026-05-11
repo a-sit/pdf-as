@@ -3,10 +3,7 @@ package at.gv.egiz.pdfas.web.servlets;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
-import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
@@ -14,8 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,12 +23,10 @@ import at.gv.egiz.pdfas.web.stats.StatisticEvent.Operation;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Source;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
 //@Ignore
 @RunWith(SpringRunner.class)
-@Execution(ExecutionMode.SAME_THREAD)
 @SpringBootTest
 public class SimpleSignServletTest {
 

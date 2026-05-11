@@ -9,9 +9,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -21,21 +18,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsValidationException;
-import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.lib.api.PdfAsFactory;
-import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.filter.UserAgentFilter;
-import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Operation;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Source;
@@ -45,7 +34,6 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@Execution(ExecutionMode.SAME_THREAD)
 @SpringBootTest
 public class SimpleVerifyServletTest {
 

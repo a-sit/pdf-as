@@ -190,10 +190,6 @@ public class SignatureProfileSettings implements IProfileConstants {
     return this.getValue(SIGNING_REASON);
   }
 
-  public String getSignFieldValue() {
-    return this.getValue(SIGNFIELD_VALUE);
-  }
-
   public String getProfileTimeZone() {
     return this.getValue(TIMEZONE_BASE);
   }

@@ -7,30 +7,25 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 @Slf4j
 public class StatisticMicrometerBackend implements StatisticBackend {
   /** bridge between ServiceLoader component and Boot's beans */
   @Component
-  public static class SpringContextProxy implements ApplicationContextAware {
-    private static volatile ApplicationContext applicationContext;
-    @Override public void setApplicationContext(@NonNull ApplicationContext ctx) { applicationContext = ctx; }
-    public static <T> T getBean(Class<T> type) {
-      try {
-        return (applicationContext != null) ? applicationContext.getBean(type) : null;
-      } catch (BeansException ex) {
-        log.warn("Spring MeterRegistry not available, skipped micrometer metric logging", ex);
-        return null;
-      }
-    }
+  public static class SpringContextProxy {
+    public static MeterRegistry meterRegistry;
+    SpringContextProxy(MeterRegistry registry) { meterRegistry = registry; }
   }
   public static final String NAME = "StatisticMicrometerBackend";
   @Override public String getName() { return NAME; }
@@ -39,8 +34,11 @@ public class StatisticMicrometerBackend implements StatisticBackend {
   public void storeEvent(StatisticEvent e) {
     if (e == null) return;
 
-    MeterRegistry registry = SpringContextProxy.getBean(MeterRegistry.class);
-    if (registry == null) return;
+    MeterRegistry registry = SpringContextProxy.meterRegistry;
+    if (registry == null) {
+      log.warn("Spring MeterRegistry not available, skipped micrometer metric logging");
+      return;
+    }
 
     Tags baseTags = Tags.of(
         "operation", safeName(e.getOperation(), v -> v.getName()),

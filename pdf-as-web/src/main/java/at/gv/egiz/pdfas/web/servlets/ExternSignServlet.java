@@ -309,6 +309,9 @@ public class ExternSignServlet extends HttpServlet {
 		
 		// Get Connector
 		String connector = PdfAsParameterExtractor.getConnector(request);
+		if (connector == null) {
+			throw new PdfAsException("No connector specified");
+		}
 		
 		String transactionId = PdfAsParameterExtractor.getTransactionId(request);
 		
@@ -460,7 +463,7 @@ public class ExternSignServlet extends HttpServlet {
 			return;
 			
 		} else {
-			throw new PdfAsWebException("Invalid connector (bku | moa | jks)");
+			throw new PdfAsWebException("Invalid connector (bku | moa | jks | onlinebku | mobilebku)");
 			
 		}
 	}

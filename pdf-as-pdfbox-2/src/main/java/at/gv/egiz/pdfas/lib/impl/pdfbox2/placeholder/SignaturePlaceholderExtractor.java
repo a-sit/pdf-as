@@ -401,7 +401,7 @@ public class SignaturePlaceholderExtractor extends PDFStreamEngine implements Pl
     try {
       Integer firstIdInt = Integer.valueOf(first);
       Integer secondIdInt = Integer.valueOf(second);
-      return firstIdInt == secondIdInt;
+      return firstIdInt.equals(secondIdInt);
                   
     } catch (NumberFormatException e) {
       log.trace("Can not compare placeholderId's on integer level. Using String compare ... ");

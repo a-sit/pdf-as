@@ -41,7 +41,6 @@ public class PdfAsParameterExtractor {
 
 	public static final String PARAM_CONNECTOR = "connector";
 	public static final String PARAM_TRANSACTION_ID = "transactionId";
-	public static final String PARAM_CONNECTOR_DEFAULT = "bku";
 	
 	public static final String PARAM_FORMAT = "format";
 	public static final String PARAM_HTML = "html";
@@ -63,7 +62,6 @@ public class PdfAsParameterExtractor {
 	public static final String PARAM_VERIFY_LEVEL_OPTION_INT_ONLY = "intOnly";
 	
 	public static final String PARAM_LOCALE = "locale";
-	public static final String PARAM_NUM_BYTES = "num-bytes";
 	public static final String PARAM_PDF_URL = "pdf-url";
 	public static final String PARAM_SIG_TYPE = "sig-type";
 	public static final String PARAM_SIG_TYPE_ALIAS = "sig_type";
@@ -85,11 +83,7 @@ public class PdfAsParameterExtractor {
 			.getLogger(PdfAsParameterExtractor.class);
 
 	public static String getConnector(HttpServletRequest request) {
-		String connector = (String)request.getAttribute(PARAM_CONNECTOR);
-		if(connector != null) {
-			return connector;
-		} 
-		return PARAM_CONNECTOR_DEFAULT;
+		return (String)request.getAttribute(PARAM_CONNECTOR);
 	}
 
 	public static Map<String,String> getDynamicSignatureBlockParameters(HttpServletRequest request) throws Exception {
@@ -232,10 +226,6 @@ public class PdfAsParameterExtractor {
 			}
 		}
 		return null;
-	}
-	
-	public static String getNumBytes(HttpServletRequest request) {
-		return (String)request.getAttribute(PARAM_NUM_BYTES);
 	}
 	
 	public static String getPdfUrl(HttpServletRequest request) {

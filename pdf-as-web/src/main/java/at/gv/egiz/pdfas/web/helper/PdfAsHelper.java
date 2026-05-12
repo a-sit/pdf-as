@@ -181,33 +181,6 @@ public class PdfAsHelper {
 		return pdfAsConfig;
 	}
 
-	private static void validatePdfSize(HttpServletRequest request,
-			HttpServletResponse response, byte[] pdfData)
-			throws PdfAsWebException {
-		// Try to check num-bytes
-		String pdfSizeString = PdfAsParameterExtractor.getNumBytes(request);
-		if (pdfSizeString != null) {
-			long pdfSize = -1;
-			try {
-				pdfSize = Long.parseLong(pdfSizeString);
-			} catch (NumberFormatException e) {
-				throw new PdfAsWebException(
-						PdfAsParameterExtractor.PARAM_NUM_BYTES
-								+ " parameter has to be a positiv number!", e);
-			}
-			if (pdfSize <= 0) {
-				throw new PdfAsWebException(
-						"Invalid PDF Size! Has to bigger than zero!");
-			}
-
-			if (pdfData.length != pdfSize) {
-				throw new PdfAsWebException("Signature Data Size and "
-						+ PdfAsParameterExtractor.PARAM_NUM_BYTES
-						+ " missmatch!");
-			}
-		}
-	}
-
 	public static String buildPosString(HttpServletRequest request,
 			HttpServletResponse response) throws PdfAsWebException {
 		String posP = PdfAsParameterExtractor.getSigPosP(request);
@@ -270,19 +243,19 @@ public class PdfAsHelper {
 					sb.append("w:auto;");
 				}
 			}
-			sb.append("w:" + posW.trim() + ";");
+			sb.append("w:").append(posW.trim()).append(";");
 		} else {
 			sb.append("w:auto;");
 		}
 
 		if (posP != null) {
-			if (!(posP.equals("auto") || posP.equals("new"))) {
+			if (!(posP.equals("auto") || posP.equals("new") || posP.equals("last"))) {
 				try {
 					Integer.parseInt(posP);
 				} catch (NumberFormatException e) {
 					throw new PdfAsWebException(
 							PdfAsParameterExtractor.PARAM_SIG_POS_P
-									+ " has invalid value! (auto | new )");
+									+ " has invalid value! (auto | new | last)");
 				}
 			}
 			sb.append("p:" + posP.trim() + ";");

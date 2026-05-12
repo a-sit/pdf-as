@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.UUID;
 
 import at.gv.egiz.pdfas.api.ws.PDFASSigning;
-import at.gv.egiz.pdfas.web.servlets.ExternSignServlet;
 import at.gv.egiz.pdfas.web.servlets.SimpleVerifyServletTest;
 import jakarta.xml.ws.Service;
 import lombok.val;
@@ -16,20 +15,12 @@ import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
 import at.gv.egiz.pdfas.api.ws.PDFASSignRequest;
 import at.gv.egiz.pdfas.api.ws.PDFASSignResponse;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsValidationException;
-import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.lib.api.PdfAsFactory;
-import at.gv.egiz.pdfas.web.config.WebConfiguration;
-import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
-import at.gv.egiz.pdfas.web.ws.PDFASSigningImpl;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;

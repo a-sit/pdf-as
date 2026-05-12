@@ -2,17 +2,11 @@ package at.gv.egiz.pdfas.web.test;
 
 import at.gv.e_government.reference.namespace.moa._20020822_.*;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.lib.api.Configuration;
-import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
-import at.gv.egiz.pdfas.lib.impl.configuration.ConfigurationImpl;
-import at.gv.egiz.pdfas.moa.MOAConnector;
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore;
-import at.gv.egiz.pdfas.sigs.pkcs7detached.PKCS7DetachedSigner;
 import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
-import at.gv.egiz.pdfas.web.servlets.ExternSignServlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import iaik.x509.X509Certificate;
@@ -25,14 +19,11 @@ import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -52,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "management.endpoints.web.exposure.include=metrics"
 })
 @AutoConfigureMockMvc
-public class MockMoaSigningTest {
+public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
   @Autowired MockMvc mvc;
   @Autowired ObjectMapper om;
   @Autowired PdfAsWebSpringConfiguration config;
@@ -184,42 +175,40 @@ public class MockMoaSigningTest {
   @Test
   @SneakyThrows
   public void signWithMockMOA() {
-    try (val watcher = TestUtils.OperationCountWatcher(mvc, "operation:sign", "status:ok")) {
-      try (MockMoa moa = new MockMoa()) {
+    try (MockMoa moa = new MockMoa(); val watcher = OperationCountWatcher("operation:sign", "status:ok")) {
 
-        final String pdf = Base64.getEncoder().encodeToString(
-            IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/enc_own.pdf")));
+      final String pdf = Base64.getEncoder().encodeToString(
+          IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/enc_own.pdf")));
 
-        final String signRequestID = UUID.randomUUID().toString();
-        final String signRequest = om.writeValueAsString(
-            Map.of(
-                "requestID", signRequestID,
-                "inputData", pdf,
-                "parameters", Map.of(
-                    "connector", "moa",
-                    "keyIdentifier", moa.keyIdentifier,
-                    "transactionId", UUID.randomUUID().toString()
-                )
-            )
-        );
+      final String signRequestID = UUID.randomUUID().toString();
+      final String signRequest = om.writeValueAsString(
+          Map.of(
+              "requestID", signRequestID,
+              "inputData", pdf,
+              "parameters", Map.of(
+                  "connector", "moa",
+                  "keyIdentifier", moa.keyIdentifier,
+                  "transactionId", UUID.randomUUID().toString()
+              )
+          )
+      );
 
-        final String signResponse = mvc.perform(
-                post("/api/v2/sign/single")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(signRequest)
-            )
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.requestID").value(signRequestID))
-            .andExpect(jsonPath("$.signedPDF").isNotEmpty())
-            .andExpect(jsonPath("$.verificationResponse").exists())
-            .andReturn().getResponse().getContentAsString();
+      final String signResponse = mvc.perform(
+              post("/api/v2/sign/single")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON)
+                  .content(signRequest)
+          )
+          .andExpect(status().isOk())
+          .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+          .andExpect(jsonPath("$.requestID").value(signRequestID))
+          .andExpect(jsonPath("$.signedPDF").isNotEmpty())
+          .andExpect(jsonPath("$.verificationResponse").exists())
+          .andReturn().getResponse().getContentAsString();
 
-        final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
-        assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
-            new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
-      }
+      final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
+      assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
+          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
     }
   }
 

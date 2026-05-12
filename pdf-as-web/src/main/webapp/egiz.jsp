@@ -207,16 +207,16 @@
 							<div class="extratext">
 								<h2>Detailinformationen</h2>
 								<p>Unter folgenden Links finden Sie detaillierte
-									Informationen wie Sie zu OpenID Connect, der Bürgerkarte und
-									der Handy-Signatur.</p>
+									Informationen wie Sie zu OpenID Connect und
+									der ID Austria.</p>
 								<a href="http://openid.net/connect/" target="_blank">OpenID
 									Connect</a> <br />
 								<br />
 								<a href="http://www.buergerkarte.at" target="_blank">Bürgerkarte.at</a>
 								<br />
 								<br />
-								<a href="https://www.handy-signatur.at/" target="_blank"
-									title="Handy-Signatur.at">Handy-Signatur.at</a>
+								<a href="https://www.oesterreich.gv.at/id-austria/haeufige-fragen.html" target="_blank"
+									title="ID Austria - Häufige Fragen">ID Austria - Häufige Fragen</a>
 							</div>
 							<div class="clear"></div>
 						</div>

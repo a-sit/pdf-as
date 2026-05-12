@@ -11,6 +11,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import jakarta.xml.ws.BindingProvider;
 
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
@@ -39,9 +40,11 @@ public class MOAVerifier implements IVerifier {
 			.getLogger(MOAVerifier.class);
 
 	private static final String MOA_VERIFY_URL = "moa.verify.url";
+	private static final String MOA_VERIFY_TIMEOUT = "moa.verify.timeout";
 	private static final String MOA_VERIFY_TRUSTPROFILE = "moa.verify.TrustProfileID";
 
 	private String moaEndpoint;
+	private Long moaTimeout;
 	private String moaTrustProfile;
 
 	
@@ -58,6 +61,11 @@ public class MOAVerifier implements IVerifier {
 			SignatureVerificationPortType verificationPort = service.getSignatureVerificationPort();
 			BindingProvider provider = (BindingProvider) verificationPort;
 			provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, this.moaEndpoint);
+			if (this.moaTimeout != null) {
+				provider.getRequestContext().put("jakarta.xml.ws.client.connectionTimeout", this.moaTimeout);
+				provider.getRequestContext().put("jakarta.xml.ws.client.receiveTimeout", this.moaTimeout);
+			}
+
 			VerifyCMSSignatureRequest verifyCMSSignatureRequest = new VerifyCMSSignatureRequest();
 			verifyCMSSignatureRequest.setTrustProfileID(this.moaTrustProfile);
 			verifyCMSSignatureRequest.setCMSSignature(signature);
@@ -185,6 +193,14 @@ public class MOAVerifier implements IVerifier {
 	public void setConfiguration(Configuration config) {
 		this.moaEndpoint = config.getValue(MOA_VERIFY_URL);
 		this.moaTrustProfile = config.getValue(MOA_VERIFY_TRUSTPROFILE);
+		val timeout = config.getValue(MOA_VERIFY_TIMEOUT);
+		if (timeout != null) {
+			try {
+				this.moaTimeout = Long.valueOf(timeout);
+			} catch (NumberFormatException e) {
+				logger.warn("Failed to convert MOA verification timeout '{}' to a number", timeout, e);
+			}
+		}
 	}
 
 	@Override

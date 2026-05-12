@@ -151,7 +151,7 @@ public class MOAConnector implements ISignatureConnector,
 			try {
 				moaTimeout = Long.valueOf(timeout);
 			} catch (NumberFormatException e) {
-				logger.warn("Failed to convert MOA timeout '{}' to a number", timeout, e);
+				logger.warn("Failed to convert MOA signing timeout '{}' to a number", timeout, e);
 			}
 		}
       this.moaTimeout = moaTimeout;
@@ -185,16 +185,16 @@ public class MOAConnector implements ISignatureConnector,
 		SignatureCreationPortType creationPort = service.getSignatureCreationPort();
 		BindingProvider provider = (BindingProvider) creationPort;
 		provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, this.moaEndpoint);
-		if (moaTimeout != null) {
-			provider.getRequestContext().put("jakarta.xml.ws.client.connectionTimeout", moaTimeout);
-			provider.getRequestContext().put("jakarta.xml.ws.client.receiveTimeout", moaTimeout);
+		if (this.moaTimeout != null) {
+			provider.getRequestContext().put("jakarta.xml.ws.client.connectionTimeout", this.moaTimeout);
+			provider.getRequestContext().put("jakarta.xml.ws.client.receiveTimeout", this.moaTimeout);
 		}
 
 		if (this.mtomEnabled) {
-	    if (provider.getBinding() instanceof SOAPBinding) {
-	      ((SOAPBinding) provider.getBinding()).setMTOMEnabled(true);
-	      
-	    }		  
+			if (provider.getBinding() instanceof SOAPBinding) {
+			  ((SOAPBinding) provider.getBinding()).setMTOMEnabled(true);
+
+			}
 		}
 						
 		CreateCMSSignatureRequest request = new CreateCMSSignatureRequest();

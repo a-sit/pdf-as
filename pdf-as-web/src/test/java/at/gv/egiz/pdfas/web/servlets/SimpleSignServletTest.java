@@ -3,10 +3,7 @@ package at.gv.egiz.pdfas.web.servlets;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
-import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
@@ -26,7 +23,6 @@ import at.gv.egiz.pdfas.web.stats.StatisticEvent.Operation;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent.Source;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
 //@Ignore

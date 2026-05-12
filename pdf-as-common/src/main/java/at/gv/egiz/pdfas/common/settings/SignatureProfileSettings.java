@@ -190,10 +190,6 @@ public class SignatureProfileSettings implements IProfileConstants {
     return this.getValue(SIGNING_REASON);
   }
 
-  public String getSignFieldValue() {
-    return this.getValue(SIGNFIELD_VALUE);
-  }
-
   public String getProfileTimeZone() {
     return this.getValue(TIMEZONE_BASE);
   }
@@ -211,13 +207,13 @@ public class SignatureProfileSettings implements IProfileConstants {
     SignatureProfileEntry entry = profileInformations.get(SIG_PDFA_VALID);
     if (entry != null) {
       final String value = entry.getCaption();
-      return "true".equals(value);
+      return Boolean.parseBoolean(value);
     }
 
     entry = profileInformations.get(SIG_PDFA1B_VALID);
     if (entry != null) {
       final String value = entry.getCaption();
-      return "true".equals(value);
+      return Boolean.parseBoolean(value);
     }
     return false;
   }
@@ -226,7 +222,7 @@ public class SignatureProfileSettings implements IProfileConstants {
     final SignatureProfileEntry entry = profileInformations.get(SIG_PDFUA_FORCE);
     if (entry != null) {
       final String value = entry.getCaption();
-      return "true".equals(value);
+      return Boolean.parseBoolean(value);
     }
     return false;
   }
@@ -235,7 +231,7 @@ public class SignatureProfileSettings implements IProfileConstants {
     final SignatureProfileEntry entry = profileInformations.get(LATIN1_ENCODING);
     if (entry != null) {
       final String value = entry.getCaption();
-      return "true".equals(value);
+      return Boolean.parseBoolean(value);
     }
     return false;
   }
@@ -248,7 +244,7 @@ public class SignatureProfileSettings implements IProfileConstants {
     final SignatureProfileEntry entry = profileInformations.get(SIG_PDFA_VALID);
     if (entry != null) {
       final String value = entry.getCaption();
-      return "true".equals(value);
+      return Boolean.parseBoolean(value);
     }
     return false;
   }

@@ -34,12 +34,12 @@ moc.sign.url=http://127.0.0.1:8080/bkuonline/http-security-layer-request
 ##
 # Handy-Signatur
 # Signaturservice URL
-mobile.sign.url=https://www.handy-signatur.at/mobile/https-security-layer-request/default.aspx
+mobile.sign.url=https://service.a-trust.at/mobile/https-security-layer-request/default.aspx
 
 ##
 # Handy Signatur (Test)
 # Signaturservice URL
-mobiletest.sign.url=https://test1.a-trust.at/https-security-layer-request/default.aspx
+mobiletest.sign.url=https://hs-abnahme.a-trust.at/mobile/https-security-layer-request/default.aspx
 
 ##
 # MOA Signatur

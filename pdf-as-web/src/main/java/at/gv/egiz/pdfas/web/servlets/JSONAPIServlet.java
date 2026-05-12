@@ -243,14 +243,14 @@ public class JSONAPIServlet extends HttpServlet {
                     }
 
                     if (PDFASSignParameters.Connector.ONLINEBKU.equals(connectorEnum)) {
-                        if (WebConfiguration.getLocalBKUURL() == null) {
+                        if (WebConfiguration.getOnlineBKUURL() == null) {
                             throw new PdfAsWebException(
                                     "Invalid connector onlinebku is not supported");
                         }
                     }
 
                     if (PDFASSignParameters.Connector.MOBILEBKU.equals(connectorEnum)) {
-                        if (WebConfiguration.getLocalBKUURL() == null) {
+                        if (WebConfiguration.getHandyBKUURL() == null) {
                             throw new PdfAsWebException(
                                     "Invalid connector mobilebku is not supported");
                         }

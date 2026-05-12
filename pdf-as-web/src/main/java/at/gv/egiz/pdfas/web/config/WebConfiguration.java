@@ -117,7 +117,7 @@ public class WebConfiguration implements IConfigurationConstants {
 
 	public static final String UPLOAD_FILESIZE_THRESHOLD = "web.upload.filesizeThreshold";
 	public static final String UPLOAD_MAX_FILESIZE = "web.upload.filesizeMax";
-	public static final String UPLOAD_MAX_REQUESTSIZE = "web.upload.RequestsizeMax";
+	public static final String UPLOAD_MAX_REQUESTSIZE = "web.upload.requestsizeMax";
 	
 	public static final String PLACEHOLDER_GENERATOR_ENABLED = "qr.placeholder.generator.enabled";
 	
@@ -125,14 +125,14 @@ public class WebConfiguration implements IConfigurationConstants {
 	private static final int MAX_FILE_SIZE = 1024 * 1024 * 40; // 40MB
 	private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50; // 50MB
 	
-	private static Properties properties = new Properties();
-	private static Properties hibernateProps = new Properties();
+	private static final Properties properties = new Properties();
+	private static final Properties hibernateProps = new Properties();
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(WebConfiguration.class);
 
-	private static List<String> whiteListregEx = new ArrayList<String>();
-	private static List<String> overwritewhiteListregEx = new ArrayList<String>();
+	private static final List<String> whiteListregEx = new ArrayList<String>();
+	private static final List<String> overwritewhiteListregEx = new ArrayList<String>();
 
 	public static void configure(String configFile) {
 		try (InputStream is = new FileInputStream(configFile)) {
@@ -145,6 +145,7 @@ public class WebConfiguration implements IConfigurationConstants {
 	public static void configure(InputStream config) {
 
 		properties.clear();
+		hibernateProps.clear();
 		whiteListregEx.clear();
 		overwritewhiteListregEx.clear();
 
@@ -324,12 +325,7 @@ public class WebConfiguration implements IConfigurationConstants {
 	
 	public static boolean isAllowExtOverwrite() {
 		String value = properties.getProperty(ALLOW_EXT_OVERWRITE);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 	
 	public static synchronized boolean isOverwriteAllowed(String key) {
@@ -354,42 +350,22 @@ public class WebConfiguration implements IConfigurationConstants {
 
 	public static boolean isJSONAPIEnabled() {
 		String value = properties.getProperty(JSON_API_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	public static boolean isKeepSignedDocument() {
 		String value = properties.getProperty(KEEP_SIGNED_DOCUMENT);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	public static boolean isMoaEnabled(String keyIdentifier) {
 		String value = properties.getProperty(MOA_LIST + "." + keyIdentifier + ".enabled");
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 	
 	public static boolean isQRPlaceholderGenerator() {
 		String value = properties.getProperty(PLACEHOLDER_GENERATOR_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 	
 	public static String getMoaURL(String keyIdentifier) {
@@ -443,121 +419,57 @@ public class WebConfiguration implements IConfigurationConstants {
 	
 	public static boolean getMOASSEnabled() {
 		String value = properties.getProperty(MOA_SS_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	public static boolean getKeystoreDefaultEnabled() {
 		String value = properties.getProperty(KEYSTORE_DEFAULT_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 	
 	public static boolean getKeystoreEnabled(String keyIdentifier) {
 		String value = properties.getProperty(KEYSTORE_LIST + "." + keyIdentifier + "." + KEYSTORE_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	public static boolean getLocalBKUEnabled() {
-		String value = properties.getProperty(LOCAL_BKU_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(LOCAL_BKU_ENABLED));
 	}
 	
 	public static boolean getMobileBKUEnabled() {
-		String value = properties.getProperty(MOBILE_BKU_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(MOBILE_BKU_ENABLED));
 	}
 
 	public static boolean getOnlineBKUEnabled() {
-		String value = properties.getProperty(ONLINE_BKU_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(ONLINE_BKU_ENABLED));
 	}
 
 	public static boolean getSL20Enabled() {
-		String value = properties.getProperty(SL20_BKU_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(SL20_BKU_ENABLED));
 	}
 	
 	public static boolean getSoapSignEnabled() {
-		String value = properties.getProperty(SOAP_SIGN_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(SOAP_SIGN_ENABLED));
 	}
 	
 	 public static boolean isSoapSignWithVerifyEnabled() {
 	    String value = properties.getProperty(SOAP_SIGN_WITH_VERIFY_ENABLED);
 	    if (value != null) {
-	      return value.equals("true");
-	      
+	      return Boolean.parseBoolean(value);
 	    }
 	    return getSoapSignEnabled();
 	  }
 	
 	public static boolean getSoapVerifyEnabled() {
-		String value = properties.getProperty(SOAP_VERIFY_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(SOAP_VERIFY_ENABLED));
 	}
 
 	public static boolean isShowErrorDetails() {
-		String value = properties.getProperty(ERROR_DETAILS);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(ERROR_DETAILS));
 	}
 
 	public static boolean isWhiteListEnabled() {
-		String value = properties.getProperty(WHITELIST_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(WHITELIST_ENABLED));
 	}
 
 	public static synchronized boolean isProvidePdfURLinWhitelist(String url) {
@@ -612,13 +524,7 @@ public class WebConfiguration implements IConfigurationConstants {
 	}
 	
 	public static boolean getReloadEnabled() {
-		String value = properties.getProperty(RELOAD_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(RELOAD_ENABLED));
 	}
 	
 	public static int getFilesizeThreshold() {

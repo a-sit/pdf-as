@@ -32,7 +32,7 @@ import java.util.UUID;
     "management.endpoints.web.exposure.include=metrics"
 })
 @AutoConfigureMockMvc
-public class JsonApiTest {
+public class JsonApiTest extends TestUtils.CanWatchOperationCount {
   @Autowired MockMvc mvc;
   @Autowired ObjectMapper om;
 
@@ -48,7 +48,7 @@ public class JsonApiTest {
   @Test
   @SneakyThrows
   public void sign_single_jks() {
-    try (val watcher = TestUtils.OperationCountWatcher(mvc, "operation:sign", "status:ok")) {
+    try (val watcher = OperationCountWatcher("operation:sign", "status:ok")) {
       final String pdf = Base64.getEncoder().encodeToString(
           IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/enc_own.pdf")));
 
@@ -86,7 +86,7 @@ public class JsonApiTest {
   @Test
   @SneakyThrows
   public void verify_single() {
-    try (val watcher = TestUtils.OperationCountWatcher(mvc, "operation:verify", "status:ok")) {
+    try (val watcher = OperationCountWatcher("operation:verify", "status:ok")) {
       final String pdf = Base64.getEncoder().encodeToString(
           IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/dummy-pdf-signed.pdf")));
 

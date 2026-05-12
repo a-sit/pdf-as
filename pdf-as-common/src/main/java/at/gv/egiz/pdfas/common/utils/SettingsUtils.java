@@ -6,9 +6,9 @@ public class SettingsUtils {
 	public static boolean getBooleanValue(ISettings setting, String key, boolean defaultValue) {
 		String theValue = setting.getValue(key);
 		if(theValue != null) {
-			if(theValue.equals("true")) {
+			if(theValue.equalsIgnoreCase("true")) {
 				return true;
-			} else if(theValue.equals("false")) {
+			} else if(theValue.equalsIgnoreCase("false")) {
 				return false;
 			} else {
 				return defaultValue;

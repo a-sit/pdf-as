@@ -2,6 +2,7 @@ package at.gv.egiz.pdfas.lib.impl.pdfbox3
 
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus
 import at.gv.egiz.pdfas.lib.impl.status.PDFObject
+import at.knowcenter.wag.egov.egiz.table.Style
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.font.PDFont
@@ -65,11 +66,16 @@ class PDFBOXObject(status: OperationStatus) : PDFObject(status) {
 }
 
 private val DEFAULT_FONT_DESCRIPTORS = mapOf(
-    "HELVETICA:NORMAL" to Standard14Fonts.FontName.HELVETICA,
-    "HELVETICA:BOLD" to Standard14Fonts.FontName.HELVETICA_BOLD,
-    "COURIER:NORMAL" to Standard14Fonts.FontName.COURIER,
-    "COURIER:BOLD" to Standard14Fonts.FontName.COURIER_BOLD,
-    "TIMES_ROMAN:NORMAL" to Standard14Fonts.FontName.TIMES_ROMAN,
-    "TIMES_ROMAN:BOLD" to Standard14Fonts.FontName.TIMES_BOLD,
-    "TIMES_ROMAN:ITALIC" to Standard14Fonts.FontName.TIMES_ITALIC,
+    "${Style.HELVETICA}:${Style.NORMAL}" to Standard14Fonts.FontName.HELVETICA,
+    "${Style.HELVETICA}:${Style.BOLD}" to Standard14Fonts.FontName.HELVETICA_BOLD,
+    "${Style.HELVETICA}:${Style.ITALIC}" to Standard14Fonts.FontName.HELVETICA_OBLIQUE,
+    "${Style.HELVETICA}:${Style.BOLDITALIC}" to Standard14Fonts.FontName.HELVETICA_BOLD_OBLIQUE,
+    "${Style.COURIER}:${Style.NORMAL}" to Standard14Fonts.FontName.COURIER,
+    "${Style.COURIER}:${Style.BOLD}" to Standard14Fonts.FontName.COURIER_BOLD,
+    "${Style.COURIER}:${Style.ITALIC}" to Standard14Fonts.FontName.COURIER_OBLIQUE,
+    "${Style.COURIER}:${Style.BOLDITALIC}" to Standard14Fonts.FontName.COURIER_BOLD_OBLIQUE,
+    "${Style.TIMES_ROMAN}:${Style.NORMAL}" to Standard14Fonts.FontName.TIMES_ROMAN,
+    "${Style.TIMES_ROMAN}:${Style.BOLD}" to Standard14Fonts.FontName.TIMES_BOLD,
+    "${Style.TIMES_ROMAN}:${Style.ITALIC}" to Standard14Fonts.FontName.TIMES_ITALIC,
+    "${Style.TIMES_ROMAN}:${Style.BOLDITALIC}" to Standard14Fonts.FontName.TIMES_BOLD_ITALIC,
 )

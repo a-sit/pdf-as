@@ -169,12 +169,11 @@ public abstract class BaseSLConnector implements ISLConnector,
 		{
 			String value = parameter.getConfiguration().getValue(WHITELIST_VERSION_ENABLED);
 
-			if (value != null) {
-				if (value.equals("true")) {
-					whiteListregEx.add(parameter.getConfiguration().getValue(WHITELIST_VALUE_PRE));
-					return true;
-				}
-			}}
+			if (Boolean.parseBoolean(value)) {
+				whiteListregEx.add(parameter.getConfiguration().getValue(WHITELIST_VALUE_PRE));
+				return true;
+			}
+		}
 		return false;
 
 	}

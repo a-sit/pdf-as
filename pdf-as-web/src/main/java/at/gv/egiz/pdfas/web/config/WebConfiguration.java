@@ -325,12 +325,7 @@ public class WebConfiguration implements IConfigurationConstants {
 	
 	public static boolean isAllowExtOverwrite() {
 		String value = properties.getProperty(ALLOW_EXT_OVERWRITE);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 	
 	public static synchronized boolean isOverwriteAllowed(String key) {
@@ -355,42 +350,22 @@ public class WebConfiguration implements IConfigurationConstants {
 
 	public static boolean isJSONAPIEnabled() {
 		String value = properties.getProperty(JSON_API_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	public static boolean isKeepSignedDocument() {
 		String value = properties.getProperty(KEEP_SIGNED_DOCUMENT);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	public static boolean isMoaEnabled(String keyIdentifier) {
 		String value = properties.getProperty(MOA_LIST + "." + keyIdentifier + ".enabled");
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 	
 	public static boolean isQRPlaceholderGenerator() {
 		String value = properties.getProperty(PLACEHOLDER_GENERATOR_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 	
 	public static String getMoaURL(String keyIdentifier) {
@@ -444,32 +419,17 @@ public class WebConfiguration implements IConfigurationConstants {
 	
 	public static boolean getMOASSEnabled() {
 		String value = properties.getProperty(MOA_SS_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	public static boolean getKeystoreDefaultEnabled() {
 		String value = properties.getProperty(KEYSTORE_DEFAULT_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 	
 	public static boolean getKeystoreEnabled(String keyIdentifier) {
 		String value = properties.getProperty(KEYSTORE_LIST + "." + keyIdentifier + "." + KEYSTORE_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(value);
 	}
 
 	public static boolean getLocalBKUEnabled() {

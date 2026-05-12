@@ -32,7 +32,7 @@ public class PDFBOXBackend implements PDFASBackend {
 
 	@Override
 	public boolean usedAsDefault() {
-		return true;
+		return false;
 	}
 
 	@Override

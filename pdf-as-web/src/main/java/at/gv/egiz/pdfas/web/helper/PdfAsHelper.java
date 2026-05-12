@@ -243,19 +243,19 @@ public class PdfAsHelper {
 					sb.append("w:auto;");
 				}
 			}
-			sb.append("w:" + posW.trim() + ";");
+			sb.append("w:").append(posW.trim()).append(";");
 		} else {
 			sb.append("w:auto;");
 		}
 
 		if (posP != null) {
-			if (!(posP.equals("auto") || posP.equals("new"))) {
+			if (!(posP.equals("auto") || posP.equals("new") || posP.equals("last"))) {
 				try {
 					Integer.parseInt(posP);
 				} catch (NumberFormatException e) {
 					throw new PdfAsWebException(
 							PdfAsParameterExtractor.PARAM_SIG_POS_P
-									+ " has invalid value! (auto | new )");
+									+ " has invalid value! (auto | new | last)");
 				}
 			}
 			sb.append("p:" + posP.trim() + ";");

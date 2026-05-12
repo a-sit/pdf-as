@@ -472,92 +472,43 @@ public class WebConfiguration implements IConfigurationConstants {
 	}
 
 	public static boolean getLocalBKUEnabled() {
-		String value = properties.getProperty(LOCAL_BKU_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(LOCAL_BKU_ENABLED));
 	}
 	
 	public static boolean getMobileBKUEnabled() {
-		String value = properties.getProperty(MOBILE_BKU_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(MOBILE_BKU_ENABLED));
 	}
 
 	public static boolean getOnlineBKUEnabled() {
-		String value = properties.getProperty(ONLINE_BKU_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(ONLINE_BKU_ENABLED));
 	}
 
 	public static boolean getSL20Enabled() {
-		String value = properties.getProperty(SL20_BKU_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(SL20_BKU_ENABLED));
 	}
 	
 	public static boolean getSoapSignEnabled() {
-		String value = properties.getProperty(SOAP_SIGN_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(SOAP_SIGN_ENABLED));
 	}
 	
 	 public static boolean isSoapSignWithVerifyEnabled() {
 	    String value = properties.getProperty(SOAP_SIGN_WITH_VERIFY_ENABLED);
 	    if (value != null) {
-	      return value.equals("true");
-	      
+	      return Boolean.parseBoolean(value);
 	    }
 	    return getSoapSignEnabled();
 	  }
 	
 	public static boolean getSoapVerifyEnabled() {
-		String value = properties.getProperty(SOAP_VERIFY_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(SOAP_VERIFY_ENABLED));
 	}
 
 	public static boolean isShowErrorDetails() {
-		String value = properties.getProperty(ERROR_DETAILS);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(ERROR_DETAILS));
 	}
 
 	public static boolean isWhiteListEnabled() {
-		String value = properties.getProperty(WHITELIST_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(WHITELIST_ENABLED));
 	}
 
 	public static synchronized boolean isProvidePdfURLinWhitelist(String url) {
@@ -612,13 +563,7 @@ public class WebConfiguration implements IConfigurationConstants {
 	}
 	
 	public static boolean getReloadEnabled() {
-		String value = properties.getProperty(RELOAD_ENABLED);
-		if (value != null) {
-			if (value.equals("true")) {
-				return true;
-			}
-		}
-		return false;
+		return Boolean.parseBoolean(properties.getProperty(RELOAD_ENABLED));
 	}
 	
 	public static int getFilesizeThreshold() {

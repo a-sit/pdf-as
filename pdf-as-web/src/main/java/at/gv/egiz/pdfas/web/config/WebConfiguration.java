@@ -125,14 +125,14 @@ public class WebConfiguration implements IConfigurationConstants {
 	private static final int MAX_FILE_SIZE = 1024 * 1024 * 40; // 40MB
 	private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50; // 50MB
 	
-	private static Properties properties = new Properties();
-	private static Properties hibernateProps = new Properties();
+	private static final Properties properties = new Properties();
+	private static final Properties hibernateProps = new Properties();
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(WebConfiguration.class);
 
-	private static List<String> whiteListregEx = new ArrayList<String>();
-	private static List<String> overwritewhiteListregEx = new ArrayList<String>();
+	private static final List<String> whiteListregEx = new ArrayList<String>();
+	private static final List<String> overwritewhiteListregEx = new ArrayList<String>();
 
 	public static void configure(String configFile) {
 		try (InputStream is = new FileInputStream(configFile)) {
@@ -145,6 +145,7 @@ public class WebConfiguration implements IConfigurationConstants {
 	public static void configure(InputStream config) {
 
 		properties.clear();
+		hibernateProps.clear();
 		whiteListregEx.clear();
 		overwritewhiteListregEx.clear();
 

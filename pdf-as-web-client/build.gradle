@@ -3,7 +3,7 @@ apply plugin: 'eclipse'
 
 jar {
 	manifest {
-		attributes 'Implementation-Title': 'PDF-AS-4 WEB CLIENT', 'JARMANIFEST': 'PDF-AS-WEB-CLIENT'
+		attributes 'Implementation-Title': 'PDF-AS-5 WEB CLIENT', 'JARMANIFEST': 'PDF-AS-WEB-CLIENT'
 	}
 }
 

@@ -52,8 +52,8 @@ public class PGPDataType {
      * <p>
      * You are getting this "catch-all" property because of the following reason: 
      * The field name "PGPKeyPacket" is used by two different parts of a schema. See: 
-     * line 184 of file:/home/gpalfinger/Documents/pdf-as-4-kiro/pdf-as-moa/src/main/resources/wsdl/W3C-XMLDSig.xsd
-     * line 180 of file:/home/gpalfinger/Documents/pdf-as-4-kiro/pdf-as-moa/src/main/resources/wsdl/W3C-XMLDSig.xsd
+     * line 184 of file:/home/gpalfinger/Documents/pdf-as-5-kiro/pdf-as-moa/src/main/resources/wsdl/W3C-XMLDSig.xsd
+     * line 180 of file:/home/gpalfinger/Documents/pdf-as-5-kiro/pdf-as-moa/src/main/resources/wsdl/W3C-XMLDSig.xsd
      * <p>
      * To get rid of this property, apply a property customization to one 
      * of both of the following declarations to change their names:
@@ -72,8 +72,8 @@ public class PGPDataType {
      * <p>
      * You are getting this "catch-all" property because of the following reason: 
      * The field name "PGPKeyPacket" is used by two different parts of a schema. See: 
-     * line 184 of file:/home/gpalfinger/Documents/pdf-as-4-kiro/pdf-as-moa/src/main/resources/wsdl/W3C-XMLDSig.xsd
-     * line 180 of file:/home/gpalfinger/Documents/pdf-as-4-kiro/pdf-as-moa/src/main/resources/wsdl/W3C-XMLDSig.xsd
+     * line 184 of file:/home/gpalfinger/Documents/pdf-as-5-kiro/pdf-as-moa/src/main/resources/wsdl/W3C-XMLDSig.xsd
+     * line 180 of file:/home/gpalfinger/Documents/pdf-as-5-kiro/pdf-as-moa/src/main/resources/wsdl/W3C-XMLDSig.xsd
      * <p>
      * To get rid of this property, apply a property customization to one 
      * of both of the following declarations to change their names:

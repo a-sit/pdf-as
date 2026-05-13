@@ -4,7 +4,7 @@ apply plugin: 'java-library-distribution'
 
 jar {
 	manifest {
-		attributes 'Implementation-Title': 'PDF-AS-4 Library', 'JARMANIFEST': 'PDF-AS-LIB'
+		attributes 'Implementation-Title': 'PDF-AS-5 Library', 'JARMANIFEST': 'PDF-AS-LIB'
 	}
 }
 

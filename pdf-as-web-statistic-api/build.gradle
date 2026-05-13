@@ -7,7 +7,7 @@ plugins {
 
 jar {
 	manifest {
-		attributes 'Implementation-Title': 'PDF-AS-4 Web Statistic Library', 'JARMANIFEST': 'PDF-AS-LIB'
+		attributes 'Implementation-Title': 'PDF-AS-5 Web Statistic Library', 'JARMANIFEST': 'PDF-AS-LIB'
 	}
 }
 

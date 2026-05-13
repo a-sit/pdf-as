@@ -32,7 +32,7 @@ https://joinup.ec.europa.eu/collection/e-government-innovation-center-egiz/solut
 
 #### 2. Push source code to public git
 
-Run git push with tag also to  https://git.egiz.gv.at/pdf-as-4/ (this is the public EGIZ GIT REPO) 
+Run git push with tag also to  https://git.egiz.gv.at/pdf-as/ (this is the public EGIZ GIT REPO) 
 
 #### 3. Add release notes to EGIZ or ASIT website! 
 
@@ -64,8 +64,8 @@ arguments:
 #### 4. Intellij Config for testing:
 
 * Main class: at.gv.egiz.pdfas.cli.Main
-* Classpath: pdf-as-4-pdf-as-cli.pdfbox2
-* Parameters: -p SIGNATURBLOCK_DE_NOTE_DYNAMIC -c bku -m sign /Users/user/Documents/pdf-as-4/unsigned.pdf
+* Classpath: pdf-as-5-pdf-as-cli.pdfbox3
+* Parameters: -p SIGNATURBLOCK_DE_NOTE_DYNAMIC -c bku -m sign /Users/user/Documents/pdf-as-5/unsigned.pdf
 * Needs local BKU (e.g. Mocca)
 * Uses configuration from /Users/user/.pdfas/
 

@@ -78,9 +78,10 @@ dependencies {
 	compileOnly group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: jakartaServletVersion
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+	providedRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: springBootVersion
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.16'
-	implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: tomcatVersion
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17'
+	providedRuntime group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: tomcatVersion
 	implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.2'
 	implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
 	implementation 'com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations'

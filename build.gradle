@@ -49,7 +49,7 @@ allprojects {
 		ognlVersion = '3.3.5'
 		jsonVersion = '20250517'
 		micrometerVersion = '1.15.4'
-		springBootVersion = '3.5.13'
+		springBootVersion = '3.5.14'
 		junitVersion = '4.13.2'
 		jakartaActivationVersion = '2.1.4'
 		jakartaJwsVersion = '3.0.0'

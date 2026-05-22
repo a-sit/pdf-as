@@ -7,7 +7,33 @@ buildscript {
 	dependencies {
 		 classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
 		 classpath "org.owasp:dependency-check-gradle:6.5.0.1"
+		 classpath "com.github.jk1:gradle-license-report:1.19"
 	}
+}
+
+import com.github.jk1.license.render.*
+import com.github.jk1.license.filter.*
+
+apply plugin: 'com.github.jk1.dependency-license-report'
+
+licenseReport {
+    outputDir = file("$buildDir/reports/dependency-license")
+
+    // Root + alle Subprojekte, passend zu pdf-as-4
+    projects = [project] + subprojects
+
+    configurations = ['runtimeClasspath']
+
+    renderers = [
+        new InventoryHtmlReportRenderer(),
+        new CsvReportRenderer()
+    ]
+
+    filters = [
+        new LicenseBundleNormalizer()
+    ]
+
+    excludeOwnGroup = true
 }
 
 allprojects {
@@ -167,22 +193,24 @@ task(doFullRelease) {
 	}
 }
 
-task copyLicenses {
-	doLast {
-   		mkdir("releases/"+ version +"/licenses");
-   		def target = project.projectDir.toString() + "/releases/" + version + "/licenses"
-		subprojects{
-	    	def src=project.projectDir.toString() + "/licenses"
-	    	copy{
-				from src
-				into target
-			}
-		}
-	}
+task assembleLicenses(type: Copy) {
+    dependsOn generateLicenseReport
+
+    // eigene Projekt-Lizenzen
+    from("${rootProject.projectDir}/license") {
+        into "project"
+    }
+
+    // generierter Third-Party-Report
+    from("${rootProject.buildDir}/reports/dependency-license") {
+        into "third-party"
+    }
+
+    into "${rootProject.projectDir}/releases/${version}/licenses"
 }
 
 task releases(type: Copy) {
-    dependsOn copyLicenses
+    dependsOn assembleLicenses
 	from ('doc') {
         include '*.pdf'
     }

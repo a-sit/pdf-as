@@ -18,7 +18,7 @@ dependencies {
     implementation("org.apache.pdfbox", "pdfbox-tools", pdfboxVersion)
     implementation("org.apache.pdfbox", "xmpbox", pdfboxVersion)
     implementation("org.apache.pdfbox", "preflight", pdfboxVersion)
-    implementation("org.apache.pdfbox", "jbig2-imageio")
+    implementation("org.apache.pdfbox", "jbig2-imageio", "3.0.5")
 
     testImplementation("ch.qos.logback", "logback-classic", project.ext["logbackVersion"] as String)
     testImplementation(project(":signature-standards:sigs-pades"))

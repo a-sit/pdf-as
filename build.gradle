@@ -32,9 +32,10 @@ allprojects {
 		//tomcatVersion = '7.0.54';
 		//tomcatVersion = '8.0.36';
 		//tomcatVersion = '9.0.115';
-		tomcatVersion = '10.1.54';
+		//tomcatVersion = '10.1.54';
+		tomcatVersion = '11.0.22'
 		slf4jVersion = '2.0.16'
-		cxfVersion = '4.2.0'
+		cxfVersion = '4.2.1'
 		bouncyCastleVersion = '1.82'
 		commonsCollectionsVersion = '4.5.0'
 		commonsLang3Version = '3.20.0'
@@ -49,7 +50,7 @@ allprojects {
 		ognlVersion = '3.3.5'
 		jsonVersion = '20250517'
 		micrometerVersion = '1.15.4'
-		springBootVersion = '3.5.14'
+		springBootVersion = '4.0.6'
 		junitVersion = '4.13.2'
 		jakartaActivationVersion = '2.1.4'
 		jakartaJwsVersion = '3.0.0'
@@ -114,6 +115,7 @@ subprojects {
 	}
 
 	tasks.withType(Test).configureEach {
+		useJUnitPlatform()
 		finalizedBy jacocoTestReport
 	}
 
@@ -166,6 +168,7 @@ subprojects {
 		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 		testImplementation group: 'junit', name: 'junit', version: junitVersion
+		testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:'
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {

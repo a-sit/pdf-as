@@ -55,14 +55,11 @@ set JVM_XMS=128
 rem Maximum memory pool size in MB
 set JVM_XMX=2048
 
-rem Maximum PermGenSize in M
-set JVM_MAXPERMSIZE=256
-
 rem COMMAND LINE OPTIONS
-set JAVA_OPTS=-server -Xss%JVM_XSS%k -Xms%JVM_XMS%m -Xmx%JVM_XMX%m -XX:MaxPermSize=%JVM_MAXPERMSIZE%m -Dfile.encoding=UTF8
+set JAVA_OPTS=-server -Xss%JVM_XSS%k -Xms%JVM_XMS%m -Xmx%JVM_XMX%m -Dfile.encoding=UTF8
 set CATALINA_OPTS=%PDFAS_WORK_DIR_PARAM%
 
 rem SERVICE OPTIONS
-set SERVICE_OPTS=%PDFAS_WORK_DIR_PARAM%;-XX:MaxPermSize=%JVM_MAXPERMSIZE%m -Dfile.encoding=UTF8
+set SERVICE_OPTS=%PDFAS_WORK_DIR_PARAM%;-Dfile.encoding=UTF8
 
 :END

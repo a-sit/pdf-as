@@ -13,18 +13,16 @@ import at.gv.egiz.pdfas.api.ws.PdfasSignMultipleRequest;
 import at.gv.egiz.pdfas.api.ws.PdfasSignMultipleResponse;
 import at.gv.egiz.pdfas.api.ws.PdfasSignedDocument;
 import at.gv.egiz.pdfas.api.ws.VerificationLevel;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import lombok.Lombok;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Verifies that the JSON API wire names match the SOAP/JAXB wire names.
@@ -34,16 +32,15 @@ import org.springframework.test.context.junit4.SpringRunner;
  * {@code invoke-url}, {@code preprocessorArguments}, {@code configurationOverrides}, and {@code documents}.
  *
  * <p>Expected current-state behavior: this test fails until the SOAP DTOs either carry explicit Jackson
- * annotations or the web ObjectMapper is configured to honor JAXB annotations for JSON naming. Keep old JSON
+ * annotations or the web JsonMapper is configured to honor JAXB annotations for JSON naming. Keep old JSON
  * names as aliases when implementing the fix so existing clients remain compatible.
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
     "management.endpoint.metrics.enabled=true",
     "management.endpoints.web.exposure.include=metrics"
 })
 public class JsonSoapParameterNamingTest {
-  @Autowired ObjectMapper om;
+  @Autowired JsonMapper om;
 
   static {
     try {

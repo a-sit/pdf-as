@@ -76,18 +76,16 @@ dependencies {
 	api group: 'org.json', name: 'json', version: jsonVersion
 	api group: 'jakarta.jws', name: 'jakarta.jws-api', version: jakartaJwsVersion
 	compileOnly group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: jakartaServletVersion
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webmvc', version: springBootVersion
 	providedRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: springBootVersion
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
 	providedRuntime group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: tomcatVersion
 	implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.2'
 	implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
-	implementation 'com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations'
+	implementation 'tools.jackson.module:jackson-module-jakarta-xmlbind-annotations'
     testImplementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: jakartaServletVersion
-    testImplementation 'org.springframework:spring-test'
-	testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+	testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-webmvc-test', version: springBootVersion
 	testImplementation group: 'org.apache.cxf', name: 'cxf-rt-transports-http-jetty', version: cxfVersion
 }
 

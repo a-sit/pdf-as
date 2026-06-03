@@ -12,9 +12,8 @@ import at.gv.egiz.pdfas.web.servlets.SimpleVerifyServletTest;
 import jakarta.xml.ws.Service;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
@@ -23,22 +22,20 @@ import at.gv.egiz.pdfas.api.ws.PDFASSignResponse;
 import lombok.SneakyThrows;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.xml.namespace.QName;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SimpleWebServiceTest {
+class SimpleWebServiceTest {
 
-  @BeforeClass
+  @BeforeAll
   public static void classInitializer() throws IOException {
     final String current = new java.io.File(".").getCanonicalPath();
     System.setProperty("pdf-as-web.conf", 
         current + "/src/test/resources/config/pdfas/pdf-as-web.properties");
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void jceWorkaround() {
     System.setProperty("javax.net.ssl.trustStoreType", "JKS");
   }

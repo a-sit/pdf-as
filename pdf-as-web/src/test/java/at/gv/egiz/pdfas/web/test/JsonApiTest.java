@@ -2,9 +2,9 @@ package at.gv.egiz.pdfas.web.test;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.junit.jupiter.api.Assertions;
 import tools.jackson.databind.json.JsonMapper;
 import com.jayway.jsonpath.JsonPath;
 import lombok.Lombok;
@@ -75,8 +75,9 @@ public class JsonApiTest extends TestUtils.CanWatchOperationCount {
           .andReturn().getResponse().getContentAsString();
 
       final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
-      assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
-          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
+      Assertions.assertArrayEquals(
+          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5),
+          "Signed data looks PDF-ish (%PDF- header)");
     }
   }
 

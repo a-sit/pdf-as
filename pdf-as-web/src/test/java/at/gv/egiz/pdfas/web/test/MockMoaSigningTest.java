@@ -31,7 +31,6 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.*;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -204,8 +203,9 @@ public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
           .andReturn().getResponse().getContentAsString();
 
       final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
-      assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
-          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
+      Assertions.assertArrayEquals(
+          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5),
+          "Signed data looks PDF-ish (%PDF- header)");
     }
   }
 

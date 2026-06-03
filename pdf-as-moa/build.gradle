@@ -61,8 +61,6 @@ dependencies {
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
     api group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
 
-	testImplementation group: 'junit', name: 'junit', version: junitVersion
-
 	// Apache CXF tools for WSDL processing - updated to Jakarta EE compatible version
 	ws group: 'org.apache.cxf', name: 'cxf-tools', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-databinding-jaxb', version: cxfVersion

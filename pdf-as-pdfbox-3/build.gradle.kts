@@ -32,9 +32,6 @@ tasks.register("releases", Copy::class) {
     into(rootDir.resolve("releases/$version"))
 }
 
-tasks.test {
-    useJUnit()
-}
 kotlin {
     jvmToolchain(17)
 }

@@ -28,7 +28,6 @@ dependencies {
 	api group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
     api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: jaxbRuntimeVersion
     api group: 'jakarta.jws', name: 'jakarta.jws-api', version: jakartaJwsVersion
-    testImplementation group: 'junit', name: 'junit', version: junitVersion
 }
 
 test {

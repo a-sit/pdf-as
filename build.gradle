@@ -1,3 +1,5 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
 plugins {
 	id "com.github.ben-manes.versions" version "0.51.0" apply false
 	id "com.github.spotbugs" version "6.0.0"
@@ -51,7 +53,8 @@ allprojects {
 		jsonVersion = '20250517'
 		micrometerVersion = '1.15.4'
 		springBootVersion = '4.0.6'
-		junitVersion = '4.13.2'
+		junit4Version = '4.13.2'
+		junitVersion = '6.1.0'
 		jakartaActivationVersion = '2.1.4'
 		jakartaJwsVersion = '3.0.0'
 		jakartaXmlWsVersion = '4.0.3'
@@ -102,7 +105,7 @@ subprojects {
 		reportLevel = "medium"
 	}
 
-	tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach { task ->
+	tasks.withType(SpotBugsTask).configureEach { task ->
 		task.ignoreFailures = (System.getenv("CI") == "true")
 		task.reports {
 			xml.required = true
@@ -167,8 +170,11 @@ subprojects {
 		implementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
-		testImplementation group: 'junit', name: 'junit', version: junitVersion
-		testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+		testImplementation group: 'junit', name: 'junit', version: junit4Version
+		testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+		testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitVersion
+		testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+		testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitVersion
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {

@@ -168,7 +168,7 @@ subprojects {
 		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 		testImplementation group: 'junit', name: 'junit', version: junitVersion
-		testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:'
+		testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
 	}
 
 	task sourcesJar(type: Jar, dependsOn: classes) {

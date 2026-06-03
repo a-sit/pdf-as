@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.UUID;
 
 import at.gv.egiz.pdfas.api.ws.PDFASSigning;
-import at.gv.egiz.pdfas.web.servlets.SimpleVerifyServletTest;
 import jakarta.xml.ws.Service;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
@@ -46,7 +45,7 @@ class SimpleWebServiceTest {
   @Test
   @SneakyThrows
   public void sign() {     
-    byte[] pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream("/data/enc_own.pdf"));
+    byte[] pdf = IOUtils.toByteArray(SimpleWebServiceTest.class.getResourceAsStream("/data/enc_own.pdf"));
     PDFASSignResponse resp = executeTest(pdf);
     assertNotNull("signed doc", resp.getSignedPDF());
     assertEquals("sign check", 0, resp.getVerificationResponse().getValueCode());
@@ -57,7 +56,7 @@ class SimpleWebServiceTest {
   @Test
   @SneakyThrows
   public void withSignatureFields() {     
-    byte[] pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream("/data/placeholder_sigfield_and_qr.pdf"));
+    byte[] pdf = IOUtils.toByteArray(SimpleWebServiceTest.class.getResourceAsStream("/data/placeholder_sigfield_and_qr.pdf"));
     PDFASSignResponse resp = executeTest(pdf);
     assertNotNull("signed doc", resp.getSignedPDF());
     assertEquals("sign check", 0, resp.getVerificationResponse().getValueCode());

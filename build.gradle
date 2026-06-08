@@ -1,8 +1,31 @@
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.CsvReportRenderer
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
 import com.github.spotbugs.snom.SpotBugsTask
 
 plugins {
 	id "com.github.ben-manes.versions" version "0.51.0" apply false
 	id "com.github.spotbugs" version "6.0.0"
+	id "com.github.jk1.dependency-license-report" version "3.1.2" 
+}
+
+licenseReport {
+	outputDir = file("$buildDir/reports/dependency-license")
+
+	projects = [project] + subprojects
+
+	configurations = ['runtimeClasspath']
+
+	renderers = [
+		new InventoryHtmlReportRenderer(),
+		new CsvReportRenderer()
+	]
+
+	filters = [
+	    new LicenseBundleNormalizer()
+	]
+
+	excludeOwnGroup = true
 }
 
 allprojects {
@@ -177,9 +200,10 @@ subprojects {
 		testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitVersion
 	}
 
-	task sourcesJar(type: Jar, dependsOn: classes) {
-	    archiveClassifier.set('sources')
-	    from sourceSets.main.allSource
+	tasks.register('sourcesJar', Jar) {
+		dependsOn('classes')
+		archiveClassifier.set('sources')
+		from sourceSets.main.allSource
 	}
 
 	artifacts {
@@ -194,13 +218,13 @@ subprojects {
 	compileTestJava.options.encoding = "UTF-8"
 	
 	jar { manifest.attributes provider: 'EGIZ', 'Specification-Version': getCheckedOutGitCommitHash(), 'Implementation-Version': project.version  }
-	
-	task copyDeps(type: Copy) {
+
+	tasks.register('copyDeps', Copy) {
 		from configurations.runtimeClasspath
-		into (new File(rootDir, 'build/alldependencies')).toString()
+		into(new File(rootDir, 'build/alldependencies')).toString()
 	}
-	
-	task copyDepsLocal(type: Copy) {
+
+	tasks.register('copyDepsLocal', Copy) {
 		from configurations.runtimeClasspath
 		into 'build/alldependencies'
 	}
@@ -222,11 +246,11 @@ subprojects {
 	
 	// Legacy uploadArchives replaced with modern Maven publishing
 	// Configure remote repositories in publishing block above  
-	
-	
-	task(internalRelease) {
+
+
+	tasks.register('internalRelease') {
 		doLast {
-		
+
 		}
 	}
 	
@@ -245,20 +269,36 @@ subprojects {
 
 }
 
-task(doFullRelease) {
+tasks.register('doFullRelease') {
 	def projectVer = version
 	doLast {
 		println "done building all distribution stuff for " + projectVer
 	}
 }
 
-task copyLicenses {
+tasks.register('assembleLicenses', Copy) {
+	dependsOn('generateLicenseReport')
+
+	// eigene projekt-lizenzen
+	from("${rootProject.projectDir}/license") {
+		into "project"
+	}
+
+	// generierter third-party-report
+	from("${rootProject.buildDir}/reports/dependency-license") {
+		into "third-party"
+	}
+
+	into "${rootProject.projectDir}/releases/${version}/licenses"
+}
+
+tasks.register('copyLicenses') {
 	doLast {
-   		mkdir("releases/"+ version +"/licenses");
-   		def target = rootProject.projectDir.toString() + "/releases/" + version + "/licenses"
-		subprojects{ subproject ->
-	    	def src = subproject.projectDir.toString() + "/licenses"
-	    	copy{
+		mkdir("releases/" + version + "/licenses");
+		def target = rootProject.projectDir.toString() + "/releases/" + version + "/licenses"
+		subprojects { subproject ->
+			def src = subproject.projectDir.toString() + "/licenses"
+			copy {
 				from src
 				into target
 			}
@@ -266,12 +306,12 @@ task copyLicenses {
 	}
 }
 
-task releases(type: Copy) {
-    dependsOn copyLicenses
-	from ('doc') {
-        include '*.pdf'
-    }
-	
+tasks.register('releases', Copy) {
+	dependsOn('assembleLicenses')
+	from('doc') {
+		include '*.pdf'
+	}
+
 	into "releases/" + version + "/docs"
 }
 

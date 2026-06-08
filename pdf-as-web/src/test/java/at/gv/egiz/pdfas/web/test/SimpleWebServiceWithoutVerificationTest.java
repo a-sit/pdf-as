@@ -8,13 +8,11 @@ import java.net.URL;
 import java.util.UUID;
 
 import at.gv.egiz.pdfas.api.ws.PDFASSigning;
-import at.gv.egiz.pdfas.web.servlets.SimpleVerifyServletTest;
 import jakarta.xml.ws.Service;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
@@ -23,22 +21,20 @@ import at.gv.egiz.pdfas.api.ws.PDFASSignResponse;
 import lombok.SneakyThrows;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.xml.namespace.QName;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SimpleWebServiceWithoutVerificationTest {
+class SimpleWebServiceWithoutVerificationTest {
 
-  @BeforeClass
+  @BeforeAll
   public static void classInitializer() throws IOException {
     final String current = new java.io.File(".").getCanonicalPath();
     System.setProperty("pdf-as-web.conf", 
         current + "/src/test/resources/config/pdfas/pdf-as-web-verify-disabled.properties");
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void jceWorkaround() {
     System.setProperty("javax.net.ssl.trustStoreType", "JKS");
   }
@@ -49,7 +45,7 @@ public class SimpleWebServiceWithoutVerificationTest {
   @Test
   @SneakyThrows
   public void sign() {     
-    byte[] pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream("/data/enc_own.pdf"));
+    byte[] pdf = IOUtils.toByteArray(SimpleWebServiceWithoutVerificationTest.class.getResourceAsStream("/data/enc_own.pdf"));
     PDFASSignResponse resp = executeTest(pdf);
     assertNotNull("signed doc", resp.getSignedPDF());
     assertEquals("sign check", 0, resp.getVerificationResponse().getValueCode());
@@ -60,7 +56,7 @@ public class SimpleWebServiceWithoutVerificationTest {
   @Test
   @SneakyThrows
   public void withSignatureFields() {     
-    byte[] pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream("/data/placeholder_sigfield_and_qr.pdf"));
+    byte[] pdf = IOUtils.toByteArray(SimpleWebServiceWithoutVerificationTest.class.getResourceAsStream("/data/placeholder_sigfield_and_qr.pdf"));
     PDFASSignResponse resp = executeTest(pdf);
     assertNotNull("signed doc", resp.getSignedPDF());
     assertEquals("sign check", 0, resp.getVerificationResponse().getValueCode());

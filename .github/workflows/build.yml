@@ -22,9 +22,9 @@ env:
   LC_ALL: "en_US.UTF-8"
   LANG: "en_US.UTF-8"
   LANGUAGE: "en_US"
-  LIB_NAME: "PDF-AS 4"
+  LIB_NAME: "PDF-AS 5"
   PROJECT_PATH: '.'
-  PROJECT_NAME: 'pdf-as-4'
+  PROJECT_NAME: 'pdf-as'
 
 jobs:
   security-checks:

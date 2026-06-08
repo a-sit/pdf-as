@@ -50,6 +50,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.ws.WebServiceException;
 
+import lombok.Getter;
 import lombok.val;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -157,7 +158,8 @@ public class PdfAsHelper {
 
 	private static PdfAs pdfAs;
 	private static ObjectFactory of = new ObjectFactory();
-	private static Configuration pdfAsConfig;
+	@Getter
+    private static Configuration pdfAsConfig;
 
 	static {
 		reloadConfig();
@@ -171,17 +173,17 @@ public class PdfAsHelper {
 
 	public static synchronized void reloadConfig() {
 		log.info("Creating PDF-AS");
-		pdfAs = PdfAsFactory.createPdfAs(new File(WebConfiguration
-				.getPdfASDir()));
+		val workdir = WebConfiguration.getPdfASDir();
+		if (workdir == null) {
+			throw new IllegalStateException(
+					"WebConfiguration is not yet initialized. This is an application start-up order bug.");
+		}
+		pdfAs = PdfAsFactory.createPdfAs(new File(workdir));
 		pdfAsConfig = pdfAs.getConfiguration();
 		log.info("Creating PDF-AS done");
 	}
 
-	public static Configuration getPdfAsConfig() {
-		return pdfAsConfig;
-	}
-
-	public static String buildPosString(HttpServletRequest request,
+  public static String buildPosString(HttpServletRequest request,
 			HttpServletResponse response) throws PdfAsWebException {
 		String posP = PdfAsParameterExtractor.getSigPosP(request);
 		String posX = PdfAsParameterExtractor.getSigPosX(request);
@@ -258,7 +260,7 @@ public class PdfAsHelper {
 									+ " has invalid value! (auto | new | last)");
 				}
 			}
-			sb.append("p:" + posP.trim() + ";");
+			sb.append("p:").append(posP.trim()).append(";");
 		} else {
 			sb.append("p:auto;");
 		}
@@ -273,7 +275,7 @@ public class PdfAsHelper {
 									+ " has invalid value!", e);
 				}
 			}
-			sb.append("r:" + posR.trim() + ";");
+			sb.append("r:").append(posR.trim()).append(";");
 		} else {
 			sb.append("r:0;");
 		}
@@ -290,7 +292,7 @@ public class PdfAsHelper {
 					sb.append("f:0;");
 				}
 			}
-			sb.append("f:" + posF.trim() + ";");
+			sb.append("f:").append(posF.trim()).append(";");
 		} else {
 			sb.append("f:0;");
 		}
@@ -324,9 +326,7 @@ public class PdfAsHelper {
 		verifyParameter.setConfiguration(config);
 		verifyParameter.setWhichSignature(signIdx);
 
-		List<VerifyResult> results = pdfAs.verify(verifyParameter);
-
-		return results;
+        return pdfAs.verify(verifyParameter);
 	}
 
 	public static List<VerifyResult> synchronousVerify(byte[] pdfData,
@@ -347,9 +347,7 @@ public class PdfAsHelper {
 		verifyParameter.setConfiguration(config);
 		verifyParameter.setWhichSignature(signIdx);
 
-		List<VerifyResult> results = pdfAs.verify(verifyParameter);
-
-		return results;
+        return pdfAs.verify(verifyParameter);
 	}
 	
   public static PdfasSignResponse synchronousServerSignature(PdfasSignRequest internalReq) throws Exception {
@@ -359,10 +357,9 @@ public class PdfAsHelper {
     respBuilder.transactionId(internalReq.getCoreParams().getTransactionId());
     
     // sign each document
-    Iterator<DocumentToSign> docsToSign = internalReq.getInput().iterator();
-    while(docsToSign.hasNext()) {
-      respBuilder.signedPdf(synchronousServerSignature(docsToSign.next(), internalReq.getCoreParams()));
-      
+    for (DocumentToSign documentToSign : internalReq.getInput()) {
+      respBuilder.signedPdf(synchronousServerSignature(documentToSign, internalReq.getCoreParams()));
+
     }
        
     log.debug("Signing process finished.");
@@ -529,19 +526,17 @@ public class PdfAsHelper {
 		SignResult signResult = pdfAs.sign(signParameter);
 
 		
-    PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
-    verResponse.setSignerCertificate(signResult.getSignerCertificate().getEncoded());
+		PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
+		verResponse.setSignerCertificate(signResult.getSignerCertificate().getEncoded());
 
-		
-    SignedDocument signPdfDoc = SignedDocument.builder()
-        .signingTimestamp(Long.valueOf(System.currentTimeMillis()))
-        .outputData(baos.toByteArray())
-        .fileName(documentToSign.getFileName())
-        .verificationResponse(verResponse)
-        .signerCertificate(Base64.encodeBase64String(signResult.getSignerCertificate().getEncoded()))
-        .build(); 
 
-		return signPdfDoc;
+		return SignedDocument.builder()
+			.signingTimestamp(System.currentTimeMillis())
+			.outputData(baos.toByteArray())
+			.fileName(documentToSign.getFileName())
+			.verificationResponse(verResponse)
+			.signerCertificate(Base64.encodeBase64String(signResult.getSignerCertificate().getEncoded()))
+			.build();
 		
 	}
 

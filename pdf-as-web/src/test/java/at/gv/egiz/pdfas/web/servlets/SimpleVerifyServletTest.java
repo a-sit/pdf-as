@@ -5,9 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Enumeration;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,10 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -31,21 +26,19 @@ import at.gv.egiz.pdfas.web.stats.StatisticEvent.Source;
 import lombok.SneakyThrows;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
-public class SimpleVerifyServletTest {
+class SimpleVerifyServletTest {
 
 	
-	@BeforeClass
+	@BeforeAll
 	public static void classInitializer() throws IOException {
 		final String current = new java.io.File(".").getCanonicalPath();
 		System.setProperty("pdf-as-web.conf", 
 				current + "/src/test/resources/config/pdfas/pdf-as-web.properties");
 	}
 
-	@Before
+	@BeforeEach
 	@SneakyThrows
 	public void setup() {
 		servlet.init(
@@ -92,10 +85,10 @@ public class SimpleVerifyServletTest {
 	    performTest(httpReq, httpResp, pdf);
 	      
 	    //validate state
-	    assertNotNull("httpResp", httpResp);
-	    assertEquals("httpStatus", 200, httpResp.getStatus());
+	    Assertions.assertNotNull(httpResp, "httpResp");
+	    Assertions.assertEquals(200, httpResp.getStatus(), "httpStatus");
 	    String body = httpResp.getContentAsString();
-	    assertFalse("Empty body", StringUtils.isEmpty(body));
+	    Assertions.assertFalse(StringUtils.isEmpty(body), "Empty body");
 	    
 	    return httpResp;
 	  

@@ -2,22 +2,20 @@ package at.gv.egiz.pdfas.web.test;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
+import tools.jackson.databind.json.JsonMapper;
 import com.jayway.jsonpath.JsonPath;
 import lombok.Lombok;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.File;
@@ -26,7 +24,6 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
     "management.endpoint.metrics.enabled=true",
     "management.endpoints.web.exposure.include=metrics"
@@ -34,7 +31,7 @@ import java.util.UUID;
 @AutoConfigureMockMvc
 public class JsonApiTest extends TestUtils.CanWatchOperationCount {
   @Autowired MockMvc mvc;
-  @Autowired ObjectMapper om;
+  @Autowired JsonMapper om;
 
   static {
     try {
@@ -78,8 +75,9 @@ public class JsonApiTest extends TestUtils.CanWatchOperationCount {
           .andReturn().getResponse().getContentAsString();
 
       final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
-      assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
-          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
+      Assertions.assertArrayEquals(
+          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5),
+          "Signed data looks PDF-ish (%PDF- header)");
     }
   }
 

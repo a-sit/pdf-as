@@ -22,6 +22,6 @@
  * that you distribute must include a readable copy of the "NOTICE" text file.
  ******************************************************************************/
 /**
- * PDF-AS 4.0 Main package name
+ * PDF-AS 5.0 Main package name
  */
 package at.gv.egiz.pdfas.lib;

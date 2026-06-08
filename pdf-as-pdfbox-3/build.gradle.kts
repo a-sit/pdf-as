@@ -18,6 +18,7 @@ dependencies {
     implementation("org.apache.pdfbox", "pdfbox-tools", pdfboxVersion)
     implementation("org.apache.pdfbox", "xmpbox", pdfboxVersion)
     implementation("org.apache.pdfbox", "preflight", pdfboxVersion)
+    implementation("org.apache.pdfbox", "jbig2-imageio", "3.0.5")
 
     testImplementation("ch.qos.logback", "logback-classic", project.ext["logbackVersion"] as String)
     testImplementation(project(":signature-standards:sigs-pades"))
@@ -31,9 +32,6 @@ tasks.register("releases", Copy::class) {
     into(rootDir.resolve("releases/$version"))
 }
 
-tasks.test {
-    useJUnit()
-}
 kotlin {
     jvmToolchain(17)
 }

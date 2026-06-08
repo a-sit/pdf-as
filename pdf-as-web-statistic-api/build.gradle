@@ -7,7 +7,7 @@ plugins {
 
 jar {
 	manifest {
-		attributes 'Implementation-Title': 'PDF-AS-4 Web Statistic Library', 'JARMANIFEST': 'PDF-AS-LIB'
+		attributes 'Implementation-Title': 'PDF-AS-5 Web Statistic Library', 'JARMANIFEST': 'PDF-AS-LIB'
 	}
 }
 
@@ -25,7 +25,6 @@ sourceSets.test.runtimeClasspath += configurations.providedCompile
 dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
-	testImplementation group: 'junit', name: 'junit', version: junitVersion
 }
 
 task releases(type: Copy) {

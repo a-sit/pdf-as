@@ -4,11 +4,11 @@ import at.gv.egiz.pdfas.web.stats.impl.StatisticMicrometerBackend;
 import com.jayway.jsonpath.JsonPath;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.val;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -22,7 +22,7 @@ public class TestUtils {
     val result =
         mvc.perform(builder).andReturn().getResponse();
     if (result.getStatus() == 404) return 0.0;
-    Assert.assertEquals(200, result.getStatus());
+    Assertions.assertEquals(200, result.getStatus());
     return JsonPath.<List<Double>>read(
         result.getContentAsString(),
         "$.measurements[?(@.statistic == 'COUNT')].value")
@@ -34,13 +34,13 @@ public class TestUtils {
   public static abstract class CanWatchOperationCount {
     @Autowired MockMvc mvc;
     @Autowired private MeterRegistry meterRegistry;
-    @Before
+    @BeforeEach
     public void rebindStatisticsBackend() {
       StatisticMicrometerBackend.SpringContextProxy.meterRegistry = meterRegistry;
     }
     protected AutoCloseable OperationCountWatcher(String... tags) throws Exception {
       val initialCount = TestUtils.getOperationCount(mvc, tags);
-      return () -> Assert.assertEquals(initialCount+1.0, TestUtils.getOperationCount(mvc, tags), 0.0001);
+      return () -> Assertions.assertEquals(initialCount+1.0, TestUtils.getOperationCount(mvc, tags), 0.0001);
     }
   }
 }

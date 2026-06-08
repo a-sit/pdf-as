@@ -7,7 +7,8 @@ import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore;
 import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
+import tools.jackson.databind.json.JsonMapper;
 import com.jayway.jsonpath.JsonPath;
 import iaik.x509.X509Certificate;
 import jakarta.jws.WebService;
@@ -16,15 +17,12 @@ import lombok.Lombok;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.*;
@@ -33,11 +31,9 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.*;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
     "management.endpoint.metrics.enabled=true",
     "management.endpoints.web.exposure.include=metrics"
@@ -45,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
   @Autowired MockMvc mvc;
-  @Autowired ObjectMapper om;
+  @Autowired JsonMapper om;
   @Autowired PdfAsWebSpringConfiguration config;
 
   static {
@@ -57,7 +53,7 @@ public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
     }
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void jceWorkaround() {
     System.setProperty("javax.net.ssl.trustStoreType", "JKS");
   }
@@ -207,8 +203,9 @@ public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
           .andReturn().getResponse().getContentAsString();
 
       final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
-      assertArrayEquals("Signed data looks PDF-ish (%PDF- header)",
-          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5));
+      Assertions.assertArrayEquals(
+          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5),
+          "Signed data looks PDF-ish (%PDF- header)");
     }
   }
 

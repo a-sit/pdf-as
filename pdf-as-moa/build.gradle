@@ -4,7 +4,7 @@ apply plugin: 'java-library-distribution'
 
 jar {
 	manifest {
-		attributes 'Implementation-Title': 'PDF-AS-4 MOA Library', 'JARMANIFEST': 'PDF-AS-LIB'
+		attributes 'Implementation-Title': 'PDF-AS-5 MOA Library', 'JARMANIFEST': 'PDF-AS-LIB'
 	}
 }
 
@@ -60,8 +60,6 @@ dependencies {
 	implementation group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
     api group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
-
-	testImplementation group: 'junit', name: 'junit', version: junitVersion
 
 	// Apache CXF tools for WSDL processing - updated to Jakarta EE compatible version
 	ws group: 'org.apache.cxf', name: 'cxf-tools', version: cxfVersion

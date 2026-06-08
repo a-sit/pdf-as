@@ -4,7 +4,7 @@ variables:
   LC_ALL: "en_US.UTF-8"
   LANG: "en_US.UTF-8"
   LANGUAGE: "en_US"
-  LIB_NAME: "PDF-AS 4"
+  LIB_NAME: "PDF-AS 5"
   GIT_DEPTH: "2"
   SECURE_LOG_LEVEL: "debug"
 

@@ -39,7 +39,7 @@ public class SimpleTestSOAPInvalidParameter {
 
 	public static void main(String[] args) {
 		try {
-			String file = "/Users/amarsalek/Documents/pdf-as-4/unsigned.pdf";
+			String file = "/Users/amarsalek/Documents/pdf-as-5/unsigned.pdf";
 			FileInputStream fis = new FileInputStream(file);
 			byte[] inputData = IOUtils.toByteArray(fis);
  

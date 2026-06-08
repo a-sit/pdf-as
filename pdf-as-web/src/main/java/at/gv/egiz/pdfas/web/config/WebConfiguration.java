@@ -136,9 +136,14 @@ public class WebConfiguration implements IConfigurationConstants {
 
 	public static void configure(String configFile) {
 		try (InputStream is = new FileInputStream(configFile)) {
+			logger.info("Loading PDF-AS Web configuration from '{}'...", configFile);
 			configure(is);
 		} catch (Exception e) {
 			logger.error("Failed to load configuration {}", configFile, e);
+			if (e instanceof RuntimeException ex)
+				throw ex;
+			else
+				throw new RuntimeException(e);
 		}
 	}
 	
@@ -152,14 +157,30 @@ public class WebConfiguration implements IConfigurationConstants {
 		try {
 			properties.load(config);
 		} catch (Exception e) {
-			logger.error("Failed to load configuration: " + e.getMessage());
+			logger.error("Failed to load configuration.", e);
 			throw new RuntimeException(e);
 		}
 
+		{ // validate
+			if (properties.isEmpty()) {
+				logger.error("No properties were loaded from web configuration. You likely did not specify `pdf-as-web.conf` correctly.");
+				throw new RuntimeException("No properties were loaded from the web configuration. Check if you specified `pdf-as-web.conf` correctly.");
+			}
+			String pdfASDir = getPdfASDir();
+			if (pdfASDir == null) {
+				logger.error("Please configure the PDF-AS working directory in the web configuration");
+				throw new RuntimeException(
+						"Please configure PDF-AS working directory in the web configuration");
+			}
+			File f = new File(pdfASDir);
+			if (!f.exists() || !f.isDirectory()) {
+				logger.error("PDF-AS working directory does not exist or is not a directory!: {}", pdfASDir);
+				throw new RuntimeException("PDF-AS working directory does not exists or is not a directory!");
+			}
+		}
+
 		if (isWhiteListEnabled()) {
-			Iterator<Object> keyIt = properties.keySet().iterator();
-			while (keyIt.hasNext()) {
-				Object keyObj = keyIt.next();
+			for (Object keyObj : properties.keySet()) {
 				if (keyObj != null) {
 					String key = keyObj.toString();
 					if (key.startsWith(WHITELIST_VALUE_PRE)) {
@@ -174,9 +195,7 @@ public class WebConfiguration implements IConfigurationConstants {
 		}
 		
 		if (isAllowExtOverwrite()) {
-			Iterator<Object> keyIt = properties.keySet().iterator();
-			while (keyIt.hasNext()) {
-				Object keyObj = keyIt.next();
+			for (Object keyObj : properties.keySet()) {
 				if (keyObj != null) {
 					String key = keyObj.toString();
 					if (key.startsWith(ALLOW_EXT_WHITELIST_VALUE_PRE)) {
@@ -190,9 +209,7 @@ public class WebConfiguration implements IConfigurationConstants {
 			}
 		}
 
-		Iterator<Object> keyIt = properties.keySet().iterator();
-		while (keyIt.hasNext()) {
-			Object keyObj = keyIt.next();
+		for (Object keyObj : properties.keySet()) {
 			if (keyObj != null) {
 				String key = keyObj.toString();
 				if (key.startsWith(HIBERNATE_PREFIX)) {
@@ -207,31 +224,13 @@ public class WebConfiguration implements IConfigurationConstants {
 
 		if (hibernateProps.size() != 0) {
 			logger.debug("DB Properties: ");
-			Iterator<Object> hibkeyIt = hibernateProps.keySet().iterator();
-			while (hibkeyIt.hasNext()) {
-				Object keyObj = hibkeyIt.next();
+			for (Object keyObj : hibernateProps.keySet()) {
 				if (keyObj != null) {
 					String key = keyObj.toString();
 					String value = hibernateProps.getProperty(key);
 					logger.debug("  {}: {}", key, value);
 				}
 			}
-		}
-
-		String pdfASDir = getPdfASDir();
-		if (pdfASDir == null) {
-			logger.error("Please configure pdf as working directory in the web configuration");
-			throw new RuntimeException(
-					"Please configure pdf as working directory in the web configuration");
-		}
-
-		File f = new File(pdfASDir);
- 
-		if (!f.exists() || !f.isDirectory()) {
-			logger.error("Pdf As working directory does not exists or is not a directory!: "
-					+ pdfASDir);
-			throw new RuntimeException(
-					"Pdf As working directory does not exists or is not a directory!");
 		}
 	}
 

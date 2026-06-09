@@ -43,7 +43,7 @@ public class SoapServiceServlet extends CXFNonSpringServlet {
 		}
 	}
 
-	private List<EndpointImpl> endpoints = new LinkedList<>();
+	private final List<EndpointImpl> endpoints = new LinkedList<>();
 	@Override
 	protected void loadBus(ServletConfig sc) {
 		// You could add the endpoint publish codes here
@@ -65,6 +65,7 @@ public class SoapServiceServlet extends CXFNonSpringServlet {
 		endpoints.forEach(p -> {
 			try { p.close(); } catch (Exception e) { log.warn("Failed to close endpoint cleanly", e); }
 		});
+		endpoints.clear();
 		super.destroyBus();
 	}
 }

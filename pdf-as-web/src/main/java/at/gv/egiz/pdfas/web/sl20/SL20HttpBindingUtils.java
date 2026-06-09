@@ -3,6 +3,7 @@ package at.gv.egiz.pdfas.web.sl20;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +28,7 @@ public class SL20HttpBindingUtils {
 			log.debug("Client request containts 'native client' header ... ");												
 			StringWriter writer = new StringWriter();
 			writer.write(sl20Forward.toString());						
-			final byte[] content = writer.toString().getBytes("UTF-8");
+			final byte[] content = writer.toString().getBytes(StandardCharsets.UTF_8);
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentLength(content.length);
 			response.setContentType(ContentType.APPLICATION_JSON.toString());						

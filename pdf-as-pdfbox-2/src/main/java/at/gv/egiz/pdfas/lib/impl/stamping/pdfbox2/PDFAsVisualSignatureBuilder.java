@@ -334,7 +334,7 @@ public class PDFAsVisualSignatureBuilder extends PDVisibleSigBuilder implements
 		// " Do Q\n";
 
 		//String innerFormComment = new String(getStructure().getInnerFormStream().toByteArray(), "ISO-8859-1");
-		String innerFormComment = new String(getStructure().getInnerFormStream().toByteArray(), "UTF-8");
+		String innerFormComment = new String(getStructure().getInnerFormStream().toByteArray(), StandardCharsets.UTF_8);
 
 		//		.getInputStreamAsString();//TODO: pdfbox2 - get the string from the stream
 

@@ -35,7 +35,7 @@ public class XMLGenerator implements ContentGenerator {
 		} else {
 			response.setStatus(HttpServletResponse.SC_OK);
 		}
-		response.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding(StandardCharsets.UTF_8);
 		response.setContentType("application/xml");
 		
 		StringBuilder sb = new StringBuilder();

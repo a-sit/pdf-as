@@ -1,6 +1,7 @@
 package at.gv.egiz.pdfas.web.servlets;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class JSONAPIServlet extends HttpServlet {
             return;
         }
 
-        String jsonString = IOUtils.toString(req.getInputStream(), "UTF-8");
+        String jsonString = IOUtils.toString(req.getInputStream(), StandardCharsets.UTF_8);
 
         logger.debug("Reading json String {}", jsonString);
 
@@ -279,7 +280,7 @@ public class JSONAPIServlet extends HttpServlet {
             }
 
             response.setContentType("application/json");
-            IOUtils.write(jsonResponse.toString(), response.getOutputStream(), "UTF-8");
+            IOUtils.write(jsonResponse.toString(), response.getOutputStream(), StandardCharsets.UTF_8);
 
         } catch (Throwable e) {
 

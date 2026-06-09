@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 
 public class StreamUtils {
   
@@ -108,7 +109,7 @@ public class StreamUtils {
    * a <code>String</code>.
    * @throws IOException on any exception thrown
    */
-  public static String readStream(InputStream in, String encoding) throws IOException {
+  public static String readStream(InputStream in, Charset encoding) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     copyStream(in, out, null);
 

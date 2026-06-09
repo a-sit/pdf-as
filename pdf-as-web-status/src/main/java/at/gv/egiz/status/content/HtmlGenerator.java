@@ -1,6 +1,7 @@
 package at.gv.egiz.status.content;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -77,7 +78,7 @@ public class HtmlGenerator implements ContentGenerator {
 		
 		sb.append("</body></html>");
 		
-		response.getOutputStream().write(sb.toString().getBytes("UTF-8"));
+		response.getOutputStream().write(sb.toString().getBytes(StandardCharsets.UTF_8));
 		response.getOutputStream().close();
 	}
 

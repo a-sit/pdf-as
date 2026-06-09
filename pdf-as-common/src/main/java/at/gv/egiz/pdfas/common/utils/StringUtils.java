@@ -25,6 +25,7 @@ package at.gv.egiz.pdfas.common.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Formatter;
 
 import org.slf4j.Logger;
@@ -74,7 +75,7 @@ public class StringUtils {
 		String restored_value = unapplyWinAnsiEncoding(replace_bytes);
 		if (!value.equals(restored_value)) {
 			// Cannot encode String with CP1252 have to use URL encoding ...
-			return URLEncoder.encode(value, "UTF-8");
+			return URLEncoder.encode(value, StandardCharsets.UTF_8);
 		}
 		
 		return replaceSpecialCharacters(value);

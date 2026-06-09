@@ -6,7 +6,7 @@ import com.github.spotbugs.snom.SpotBugsTask
 plugins {
 	id "com.github.ben-manes.versions" version "0.51.0" apply false
 	id "com.github.spotbugs" version "6.0.0"
-	id "com.github.jk1.dependency-license-report" version "3.1.2" 
+	id "com.github.jk1.dependency-license-report" version "3.1.2"
 }
 
 licenseReport {

@@ -38,6 +38,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
@@ -90,22 +91,25 @@ public class ExceptionCatchFilter implements Filter {
 			throws IOException, ServletException {
 		try {
 
-			if (request instanceof HttpServletRequest) {
-				HttpServletRequest httpRequest = (HttpServletRequest) request;				
-				
-				HttpSession session = httpRequest.getSession(isStatefull(httpRequest.getServletPath()));
+			if (request instanceof HttpServletRequest httpRequest) {
+
+              HttpSession session = httpRequest.getSession(isStatefull(httpRequest.getServletPath()));
 				String sessionId = session != null ? session.getId() : "-";												
 				MDC.put("SESSION_ID", sessionId);				  
 				log.info("Access from IP: {}", getClientIpAddr(httpRequest));
 				log.info("Access to: {} in Session: {}", httpRequest.getServletPath(), sessionId);
-				
-				log.debug("Processing Parameters into Attributes");
-				@SuppressWarnings("unchecked")
-				Enumeration<String> parameterNames = httpRequest.getParameterNames();
-				while (parameterNames.hasMoreElements()) {
-					String name = parameterNames.nextElement();
-					String value = httpRequest.getParameter(name);
-					request.setAttribute(name, value);
+
+				if (!JakartaServletFileUpload.isMultipartContent(httpRequest)) {
+					log.debug("Processing Parameters into Attributes");
+					@SuppressWarnings("unchecked")
+					Enumeration<String> parameterNames = httpRequest.getParameterNames();
+					while (parameterNames.hasMoreElements()) {
+						String name = parameterNames.nextElement();
+						String value = httpRequest.getParameter(name);
+						request.setAttribute(name, value);
+					}
+				} else {
+					log.debug("Skipping global parameter parsing for multipart request");
 				}
 			}
 

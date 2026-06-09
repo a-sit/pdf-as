@@ -57,7 +57,7 @@ public class PDFASSignParameters implements Serializable {
 		
 		private final String name;       
 
-	    private Connector(String s) {
+	    Connector(String s) {
 	        name = s;
 	    }
 
@@ -76,6 +76,13 @@ public class PDFASSignParameters implements Serializable {
 			  .orElse(null);
 	      
 	    }
+
+		public static boolean isAsynchronous(Connector c) {
+			return switch (c) {
+				case JKS, MOA -> false;
+				case BKU, MOBILEBKU, ONLINEBKU, SECLAYER20 -> true;
+			};
+		}
 	    
 	}
 	

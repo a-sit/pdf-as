@@ -90,6 +90,7 @@ public class UIEntryPointServlet extends HttpServlet {
 			PdfAsHelper.setStatisticEvent(req, resp, statisticEvent);
 			
 			Connector connector = pdfAsRequest.getCoreParams().getConnector();
+			PdfAsHelper.checkConnectorSupported(connector);
 
 			String invokeUrl = pdfAsRequest.getCoreParams().getInvokeUrl();
 			PdfAsHelper.setInvokeURL(req, resp, invokeUrl);
@@ -125,13 +126,8 @@ public class UIEntryPointServlet extends HttpServlet {
 			log.debug("Starting signature creation with: " + connector);
 
 			// IPlainSigner signer;
-			if (connector.equals(Connector.BKU)
-					|| connector.equals(Connector.ONLINEBKU)
-					|| connector.equals(Connector.MOBILEBKU)
-					|| connector.equals(Connector.SECLAYER20)) {
+			if (Connector.isAsynchronous(connector)) {
 				// start asynchronous signature creation
-
-				PdfAsHelper.checkConnectorSupported(connector);
 				
 				PdfAsHelper.startSignature(req, resp, getServletContext(), connector, pdfAsRequest);
 				

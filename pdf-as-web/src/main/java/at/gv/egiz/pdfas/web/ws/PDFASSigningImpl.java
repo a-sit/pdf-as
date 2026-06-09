@@ -91,6 +91,10 @@ public class PDFASSigningImpl implements PDFASSigning {
       log.warn("SOAP Sign Request is null!");
       return null;
     }
+    if (request.getParameters() == null) {
+      log.warn("SOAP Sign Request parameters are missing");
+      return null;
+    }
 
     // map request into internal data-structure
     final PdfasSignRequest internalReq = buildOperationRequest(request);
@@ -111,7 +115,7 @@ public class PDFASSigningImpl implements PDFASSigning {
     try {
       PdfAsHelper.checkConnectorSupported(connector);
 
-      if (connector.equals(Connector.MOA) || connector.equals(Connector.JKS)) {
+      if (!Connector.isAsynchronous(connector)) {
 
         // perform technical signing process
         final PdfasSignResponse internalResp = PdfAsHelper.synchronousServerSignature(internalReq);
@@ -227,7 +231,7 @@ public class PDFASSigningImpl implements PDFASSigning {
     try {
       PdfAsHelper.checkConnectorSupported(connector);
 
-      if (connector.equals(Connector.MOA) || connector.equals(Connector.JKS)) {
+      if (!Connector.isAsynchronous(connector)) {
 
         // perform technical signing process
         final PdfasSignResponse internalResp = PdfAsHelper.synchronousServerSignature(internalReq);
@@ -370,16 +374,18 @@ public class PDFASSigningImpl implements PDFASSigning {
     coreParams.setTransactionId(request.getTransactionId());
     data.setCoreParams(coreParams);
 
-    request.getInput().forEach(el -> {
-      final DocumentToSign document = new DocumentToSign();
-      document.setInputData(el.getInputData());
-      document.setPosition(el.getPosition());
-      document.setProfile(el.getProfile());
-      document.setQrCodeContent(el.getQrCodeContent());
-      document.setFileName(el.getFileName());
-      data.addDocumentToSign(document);
+    if (request.getInput() != null) {
+      request.getInput().forEach(el -> {
+        final DocumentToSign document = new DocumentToSign();
+        document.setInputData(el.getInputData());
+        document.setPosition(el.getPosition());
+        document.setProfile(el.getProfile());
+        document.setQrCodeContent(el.getQrCodeContent());
+        document.setFileName(el.getFileName());
+        data.addDocumentToSign(document);
 
-    });
+      });
+    }
 
     return data;
 

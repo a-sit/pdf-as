@@ -391,7 +391,7 @@ public class PdfAsHelper {
 		PdfAsHelper.checkConnectorSupported(connector);
 
 		IPlainSigner signer;
-		if (connector.equals(Connector.MOA)) {
+		if (connector == Connector.MOA) {
 			String keyIdentifier = coreParams.getKeyIdentifier();
 
 			if (keyIdentifier != null) {
@@ -416,7 +416,7 @@ public class PdfAsHelper {
 			signer = new PAdESSigner(new MOAConnector(config));
 		
 		
-		} else if (connector.equals(Connector.JKS)) {
+		} else if (connector == Connector.JKS) {
 			String keyIdentifier = coreParams.getKeyIdentifier();
 
 			boolean ksEnabled = false;
@@ -638,22 +638,13 @@ public class PdfAsHelper {
   }
 
   private static IPlainSigner getSignerFromConnector(Connector connector, Configuration config, HttpSession session) throws PdfAsWebException {
-    if (connector.equals(Connector.BKU) || connector.equals(Connector.ONLINEBKU)
-        || connector.equals(Connector.MOBILEBKU)) {
-      BKUSLConnector conn = new BKUSLConnector(config);
-      session.setAttribute(PDF_SL_CONNECTOR, conn);
-      return new PAdESSigner(conn);
-      
-
-    } else if (connector.equals(Connector.SECLAYER20)) {
-      SL20Connector conn = new SL20Connector(config);
-      session.setAttribute(PDF_SL_CONNECTOR, conn);
-      return new PAdESSigner(conn);
-            
-    } else {
-      throw new PdfAsWebException(
-          "Invalid connector (bku | onlinebku | mobilebku | moa | jks | sl20)");
-    }    
+	val slConnector = switch(connector) {
+		case BKU, ONLINEBKU, MOBILEBKU -> new BKUSLConnector(config);
+		case SECLAYER20 -> new SL20Connector(config);
+		default -> throw new PdfAsWebException("Invalid connector (bku | onlinebku | mobilebku | sl20)");
+	};
+	session.setAttribute(PDF_SL_CONNECTOR, slConnector);
+	return new PAdESSigner(slConnector);
   }
 	
 	public static byte[] getCertificate(
@@ -764,9 +755,9 @@ public class PdfAsHelper {
 		// .getAttribute(PDF_SIGNER);
 
 		Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
+		PdfAsHelper.checkConnectorSupported(connector);
 
-		if (connector.equals(Connector.BKU) || connector.equals(Connector.ONLINEBKU)
-				|| connector.equals(Connector.MOBILEBKU)) {
+		if (connector == Connector.BKU || connector == Connector.ONLINEBKU || connector == Connector.MOBILEBKU) {
 			BKUSLConnector bkuSLConnector = (BKUSLConnector) session
 					.getAttribute(PDF_SL_CONNECTOR);
 
@@ -803,7 +794,8 @@ public class PdfAsHelper {
 		// IPlainSigner plainSigner = (IPlainSigner) session
 		// .getAttribute(PDF_SIGNER);
 
-		Connector connector = Objects.requireNonNull((Connector) session.getAttribute(PDF_SL_INTERACTIVE));
+		Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
+		PdfAsHelper.checkConnectorSupported(connector);
 
 		//load connector
 		ISLConnector slConnector = (ISLConnector) session.getAttribute(PDF_SL_CONNECTOR);
@@ -1644,35 +1636,35 @@ public class PdfAsHelper {
 	public static void checkConnectorSupported(Connector connector) throws PdfAsWebException {
 		if (connector == null) {
 			throw new PdfAsWebException("Invalid or unknown connector value");
-		} else if (connector.equals(Connector.BKU)) {
+		} else if (connector == Connector.BKU) {
 			if (!WebConfiguration.getLocalBKUEnabled()) {
 				throw new PdfAsWebException("Connector bku is not enabled in configuration");
 			}
 			if (WebConfiguration.getLocalBKUURL() == null) {
 				throw new PdfAsWebException("Connector bku is not properly configured");
 			}
-		} else if (connector.equals(Connector.ONLINEBKU)) {
+		} else if (connector == Connector.ONLINEBKU) {
 			if (!WebConfiguration.getOnlineBKUEnabled()) {
 				throw new PdfAsWebException("Connector onlinebku is not enabled in configuration");
 			}
 			if (WebConfiguration.getOnlineBKUURL() == null) {
 				throw new PdfAsWebException("Connector onlinebku is not properly configured");
 			}
-		} else if (connector.equals(Connector.MOBILEBKU)) {
+		} else if (connector == Connector.MOBILEBKU) {
 			if (!WebConfiguration.getMobileBKUEnabled()) {
 				throw new PdfAsWebException("Connector mobilebku is not enabled in configuration");
 			}
 			if (WebConfiguration.getHandyBKUURL() == null) {
 				throw new PdfAsWebException("Connector mobilebku is not properly configured");
 			}
-		} else if (connector.equals(Connector.SECLAYER20)) {
+		} else if (connector == Connector.SECLAYER20) {
 			if (!WebConfiguration.getSL20Enabled()) {
 				throw new PdfAsWebException("Connector sl20 is not enabled in configuration");
 			}
 			if (WebConfiguration.getSecurityLayer20URL() == null) {
 				throw new PdfAsWebException("Connector sl20 is not properly configured");
 			}
-		} else if (connector.equals(Connector.MOA)) {
+		} else if (connector == Connector.MOA) {
 			if (!WebConfiguration.getMOASSEnabled()) {
 				throw new PdfAsWebException("Connector moa is not enabled in configuration");
 			}

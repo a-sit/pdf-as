@@ -152,8 +152,7 @@ public class JSONAPIServlet extends HttpServlet {
             
             
             
-            if (PDFASSignParameters.Connector.MOA.equals(connector)
-                    || PDFASSignParameters.Connector.JKS.equals(connector)) {
+            if (!Connector.isAsynchronous(connector)) {
                 // Plain server based signatures!!
               
                                                                   

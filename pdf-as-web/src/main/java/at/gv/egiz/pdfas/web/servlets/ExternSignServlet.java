@@ -382,8 +382,7 @@ public class ExternSignServlet extends HttpServlet {
 		
 		
 		//IPlainSigner signer;
-		if (connector.equals(Connector.BKU) || connector.equals(Connector.ONLINEBKU)
-				|| connector.equals(Connector.MOBILEBKU) || connector.equals(Connector.SECLAYER20)) {
+		if (Connector.isAsynchronous(connector)) {
 			// start asynchronous signature creation
 
 			PdfAsHelper.setStatisticEvent(request, response, statisticEvent);
@@ -393,11 +392,11 @@ public class ExternSignServlet extends HttpServlet {
 
 			return;
 			
-		} else if (connector.equals(Connector.JKS) || connector.equals(Connector.MOA)) {
+		} else {
 			// start synchronous siganture creation
 			
-			if(connector.equals(Connector.JKS)) {
-				
+			if(connector == Connector.JKS) {
+
 				String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
 
 				boolean ksEnabled = false;
@@ -432,9 +431,6 @@ public class ExternSignServlet extends HttpServlet {
 			
 			PdfAsHelper.gotoProvidePdf(getServletContext(), request, response);
 			return;
-			
-		} else {
-			throw new PdfAsWebException("Invalid connector (bku | moa | jks | onlinebku | mobilebku)");
 			
 		}
 	}

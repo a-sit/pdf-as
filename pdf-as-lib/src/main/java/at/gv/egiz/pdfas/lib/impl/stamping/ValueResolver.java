@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -57,8 +58,8 @@ public class ValueResolver implements IProfileConstants, IResolver {
 
 	public static final String EXP_START = "${";
 	public static final String EXP_END = "}";
-	private static final Charset ISO = Charset.forName("ISO-8859-1");
-	private static final Charset UTF_8 = Charset.forName("UTF-8");
+	private static final Charset ISO = StandardCharsets.ISO_8859_1;
+	private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
 
 	private IResolver internalResolver;

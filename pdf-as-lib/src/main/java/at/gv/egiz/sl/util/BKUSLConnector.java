@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -133,9 +134,9 @@ public class BKUSLConnector extends BaseSLConnector {
 
 			MultipartEntityBuilder entityBuilder = MultipartEntityBuilder
 					.create();
-			entityBuilder.setCharset(Charset.forName("UTF-8"));
+			entityBuilder.setCharset(StandardCharsets.UTF_8);
 			entityBuilder.addTextBody(XMLREQUEST, xmlRequest,
-					ContentType.TEXT_XML.withCharset(Charset.forName("UTF-8")));
+					ContentType.TEXT_XML.withCharset(StandardCharsets.UTF_8));
 
 			if (parameter != null) {
 				String transactionId = parameter.getTransactionId();

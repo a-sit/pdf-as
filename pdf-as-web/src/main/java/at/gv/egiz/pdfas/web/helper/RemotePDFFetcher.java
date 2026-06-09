@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -108,7 +109,7 @@ public class RemotePDFFetcher {
 					
 					if(fetchInfos.length == 3) {
 					    String userpass = fetchInfos[1] + ":" + fetchInfos[2];
-					    String basicAuth = "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes("UTF-8"));
+					    String basicAuth = "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes(StandardCharsets.UTF_8));
 					    uc.setRequestProperty("Authorization", basicAuth);
 					}
 					

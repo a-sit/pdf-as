@@ -1,6 +1,7 @@
 package at.gv.egiz.pdfas.web.servlets;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -81,7 +82,7 @@ public class SLDataURLServlet extends HttpServlet {
 			String sl20Result = request.getParameter(SL20Constants.PARAM_SL20_REQ_COMMAND_PARAM);
 			if (StringUtils.isEmpty(sl20Result)) {
 				//Workaround for SIC Handy-Signature, because it sends result in InputStream
-				String isReqInput = StreamUtils.readStream(request.getInputStream(), "UTF-8");					
+				String isReqInput = StreamUtils.readStream(request.getInputStream(), StandardCharsets.UTF_8);
 				if (StringUtils.isNotEmpty(isReqInput)) {
 					logger.info("Use SIC Handy-Signature work-around!");
 					sl20Result = isReqInput.substring("slcommand=".length());

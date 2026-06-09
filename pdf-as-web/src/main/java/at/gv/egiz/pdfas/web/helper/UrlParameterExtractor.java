@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,8 +21,8 @@ public class UrlParameterExtractor {
 			for (String pair : pairs) {
 				int idx = pair.indexOf("=");
 				query_pairs.put(
-						URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
-						URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+						URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8),
+						URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8));
 			}
 		}
 		return query_pairs;

@@ -26,6 +26,7 @@ package at.gv.egiz.pdfas.web.servlets;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
@@ -214,8 +215,8 @@ public class ProvidePDFServlet extends HttpServlet {
     template = template.replace("##TARGET##", StringEscapeUtils.escapeHtml4(target));
     
     template = template.replace("##PDFURL##",
-        URLEncoder.encode(PdfAsHelper.generatePdfURL(request, response), 
-            "UTF-8"));
+        URLEncoder.encode(PdfAsHelper.generatePdfURL(request, response),
+            StandardCharsets.UTF_8));
     response.setContentType("text/html");
     response.getWriter().write(template);
     response.getWriter().close();

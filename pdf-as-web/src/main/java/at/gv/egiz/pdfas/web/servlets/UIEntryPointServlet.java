@@ -131,35 +131,9 @@ public class UIEntryPointServlet extends HttpServlet {
 					|| connector.equals(Connector.SECLAYER20)) {
 				// start asynchronous signature creation
 
-				if (connector.equals(Connector.BKU)) {
-					if (WebConfiguration.getLocalBKUURL() == null) {
-						throw new PdfAsWebException(
-								"Invalid connector bku is not supported");
-					}
-				}
-
-				if (connector.equals(Connector.ONLINEBKU)) {
-					if (WebConfiguration.getOnlineBKUURL() == null) {
-						throw new PdfAsWebException(
-								"Invalid connector onlinebku is not supported");
-					}
-				}
-
-				if (connector.equals(Connector.MOBILEBKU)) {
-					if (WebConfiguration.getHandyBKUURL() == null) {
-						throw new PdfAsWebException(
-								"Invalid connector mobilebku is not supported");
-					}
-				}
+				PdfAsHelper.checkConnectorSupported(connector);
 				
-				if (connector.equals(Connector.SECLAYER20)) {
-					if (WebConfiguration.getSecurityLayer20URL() == null) {
-						throw new PdfAsWebException(
-								"Invalid connector mobilebku is not supported");
-					}
-				}
-				
-				PdfAsHelper.startSignature(req, resp, getServletContext(), connector.toString(), pdfAsRequest);
+				PdfAsHelper.startSignature(req, resp, getServletContext(), connector, pdfAsRequest);
 				
 			} else {
 				throw new PdfAsWebException("Invalid connector ("

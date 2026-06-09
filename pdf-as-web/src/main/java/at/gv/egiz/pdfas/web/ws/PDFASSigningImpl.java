@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import at.gv.egiz.pdfas.lib.api.PdfAs;
 import at.gv.egiz.pdfas.lib.impl.ErrorExtractor;
 import jakarta.jws.WebService;
 import jakarta.xml.ws.WebServiceException;
@@ -94,24 +95,23 @@ public class PDFASSigningImpl implements PDFASSigning {
     // map request into internal data-structure
     final PdfasSignRequest internalReq = buildOperationRequest(request);
 
+    val connector = request.getParameters().getConnector();
+
     final StatisticEvent statisticEvent = new StatisticEvent();
     statisticEvent.setSource(Source.SOAP);
     statisticEvent.setOperation(Operation.SIGN);
     statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
     statisticEvent.setProfileId(request.getParameters().getProfile());
-    statisticEvent.setDevice(request.getParameters().getConnector().toString());
+    if (connector != null) {
+      statisticEvent.setDevice(connector.toString());
+    }
     statisticEvent.setStartNow();
 
     PDFASSignResponse response = new PDFASSignResponse();
     try {
-      if (request.getParameters().getConnector() == null) {
-        throw new WebServiceException(
-            "Invalid connector value!");
-      }
+      PdfAsHelper.checkConnectorSupported(connector);
 
-      if (request.getParameters().getConnector().equals(Connector.MOA)
-          || request.getParameters().getConnector()
-              .equals(Connector.JKS)) {
+      if (connector.equals(Connector.MOA) || connector.equals(Connector.JKS)) {
 
         // perform technical signing process
         final PdfasSignResponse internalResp = PdfAsHelper.synchronousServerSignature(internalReq);
@@ -212,24 +212,22 @@ public class PDFASSigningImpl implements PDFASSigning {
 
     // map request into internal data-structure
     final PdfasSignRequest internalReq = buildOperationRequest(request);
+    val connector = internalReq.getCoreParams().getConnector();
 
     final StatisticEvent statisticEvent = new StatisticEvent();
     statisticEvent.setSource(Source.SOAP);
     statisticEvent.setOperation(Operation.SIGNBULK);
     statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
-    statisticEvent.setDevice(internalReq.getCoreParams().getConnector().toString());
+    if (connector != null) {
+      statisticEvent.setDevice(connector.toString());
+    }
     statisticEvent.setStartNow();
 
     PdfasSignMultipleResponse response = new PdfasSignMultipleResponse();
     try {
-      if (internalReq.getCoreParams().getConnector() == null) {
-        throw new WebServiceException(
-            "Invalid connector value!");
-      }
+      PdfAsHelper.checkConnectorSupported(connector);
 
-      if (internalReq.getCoreParams().getConnector().equals(Connector.MOA)
-          || internalReq.getCoreParams().getConnector()
-              .equals(Connector.JKS)) {
+      if (connector.equals(Connector.MOA) || connector.equals(Connector.JKS)) {
 
         // perform technical signing process
         final PdfasSignResponse internalResp = PdfAsHelper.synchronousServerSignature(internalReq);

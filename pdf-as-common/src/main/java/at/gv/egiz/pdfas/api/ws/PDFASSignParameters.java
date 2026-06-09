@@ -70,10 +70,10 @@ public class PDFASSignParameters implements Serializable {
 	    }
 	    
 	    public static Connector fromString(String value) {
-	      return Arrays.asList(Connector.values()).stream()
+	      return Arrays.stream(Connector.values())
 	        .filter(el -> el.toString().equalsIgnoreCase(value))
 	        .findFirst()
-	        .get();
+			  .orElse(null);
 	      
 	    }
 	    

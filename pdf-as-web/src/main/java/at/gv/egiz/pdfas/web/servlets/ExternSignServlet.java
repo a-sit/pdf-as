@@ -308,16 +308,14 @@ public class ExternSignServlet extends HttpServlet {
 		}
 		
 		// Get Connector
-		String connector = PdfAsParameterExtractor.getConnector(request);
-		if (connector == null) {
-			throw new PdfAsException("No connector specified");
-		}
+		Connector connector = PdfAsParameterExtractor.getConnector(request);
+		PdfAsHelper.checkConnectorSupported(connector);
 		
 		String transactionId = PdfAsParameterExtractor.getTransactionId(request);
 		
 		statisticEvent.setFilesize(pdfData.length);
 		statisticEvent.setProfileId(null);
-		statisticEvent.setDevice(connector);
+		statisticEvent.setDevice(connector.toString());
 
 		String invokeUrl = PdfAsParameterExtractor.getInvokeURL(request);
 		PdfAsHelper.setInvokeURL(request, response, invokeUrl);
@@ -361,7 +359,7 @@ public class ExternSignServlet extends HttpServlet {
               
     CoreSignParams coreParams = new CoreSignParams();                   
     coreParams.setSignatureBlockParameters(dynamicSignatureBlockArguments);    
-    coreParams.setConnector(Connector.fromString(connector));
+    coreParams.setConnector(connector);
     coreParams.setKeyIdentifier(PdfAsParameterExtractor.getKeyIdentifier(request));
     coreParams.setOverrides(PdfAsParameterExtractor.getOverwriteMap(request));        
     coreParams.setPreprocessor(PdfAsParameterExtractor.getPreProcessorMap(request));
@@ -384,42 +382,21 @@ public class ExternSignServlet extends HttpServlet {
 		
 		
 		//IPlainSigner signer;
-		if (connector.equals("bku") || connector.equals("onlinebku") || connector.equals("mobilebku")
-				|| connector.equals("sl20")) {
+		if (connector.equals(Connector.BKU) || connector.equals(Connector.ONLINEBKU)
+				|| connector.equals(Connector.MOBILEBKU) || connector.equals(Connector.SECLAYER20)) {
 			// start asynchronous signature creation
-			
-			if(connector.equals("bku")) {
-				if(WebConfiguration.getLocalBKUURL() == null) {
-					throw new PdfAsWebException("Invalid connector bku is not supported");
-				}
-			}
-			if(connector.equals("mobilebku")) {
-				if(WebConfiguration.getHandyBKUURL() == null) {
-					throw new PdfAsWebException("Invalid connector mobilebku is not supported");
-				}
-			}
-			if(connector.equals("onlinebku")) {
-				if(WebConfiguration.getOnlineBKUURL() == null) {
-					throw new PdfAsWebException("Invalid connector bku is not supported");
-				}
-			}
-			if (connector.equals("sl20")) {
-				if(WebConfiguration.getSecurityLayer20URL() == null) {
-					throw new PdfAsWebException("Invalid connector bku is not supported");
-				}
-			}
 
 			PdfAsHelper.setStatisticEvent(request, response, statisticEvent);
 			
-	    // sign document
+	    	// sign document
 			PdfAsHelper.startSignature(request, response, getServletContext(), connector, data);
 
 			return;
 			
-		} else if (connector.equals("jks") || connector.equals("moa")) {
+		} else if (connector.equals(Connector.JKS) || connector.equals(Connector.MOA)) {
 			// start synchronous siganture creation
 			
-			if(connector.equals("jks")) {
+			if(connector.equals(Connector.JKS)) {
 				
 				String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
 
@@ -437,12 +414,6 @@ public class ExternSignServlet extends HttpServlet {
 					} else {
 						throw new PdfAsWebException("DEFAULT JKS connector disabled.");
 					}
-				}
-			}
-			
-			if(connector.equals("moa")) {
-				if(!WebConfiguration.getMOASSEnabled()) {
-					throw new PdfAsWebException("Invalid connector moa is not supported");
 				}
 			}
 

@@ -28,6 +28,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -82,8 +83,8 @@ public class PdfAsParameterExtractor {
 	private static final Logger logger = LoggerFactory
 			.getLogger(PdfAsParameterExtractor.class);
 
-	public static String getConnector(HttpServletRequest request) {
-		return (String)request.getAttribute(PARAM_CONNECTOR);
+	public static Connector getConnector(HttpServletRequest request) {
+		return Connector.fromString((String)request.getAttribute(PARAM_CONNECTOR));
 	}
 
 	public static Map<String,String> getDynamicSignatureBlockParameters(HttpServletRequest request) throws Exception {

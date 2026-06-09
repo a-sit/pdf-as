@@ -90,6 +90,7 @@ public class UIEntryPointServlet extends HttpServlet {
 			PdfAsHelper.setStatisticEvent(req, resp, statisticEvent);
 			
 			Connector connector = pdfAsRequest.getCoreParams().getConnector();
+			PdfAsHelper.checkConnectorSupported(connector, null);
 
 			String invokeUrl = pdfAsRequest.getCoreParams().getInvokeUrl();
 			PdfAsHelper.setInvokeURL(req, resp, invokeUrl);
@@ -125,41 +126,10 @@ public class UIEntryPointServlet extends HttpServlet {
 			log.debug("Starting signature creation with: " + connector);
 
 			// IPlainSigner signer;
-			if (connector.equals(Connector.BKU)
-					|| connector.equals(Connector.ONLINEBKU)
-					|| connector.equals(Connector.MOBILEBKU)
-					|| connector.equals(Connector.SECLAYER20)) {
+			if (Connector.isAsynchronous(connector)) {
 				// start asynchronous signature creation
-
-				if (connector.equals(Connector.BKU)) {
-					if (WebConfiguration.getLocalBKUURL() == null) {
-						throw new PdfAsWebException(
-								"Invalid connector bku is not supported");
-					}
-				}
-
-				if (connector.equals(Connector.ONLINEBKU)) {
-					if (WebConfiguration.getOnlineBKUURL() == null) {
-						throw new PdfAsWebException(
-								"Invalid connector onlinebku is not supported");
-					}
-				}
-
-				if (connector.equals(Connector.MOBILEBKU)) {
-					if (WebConfiguration.getHandyBKUURL() == null) {
-						throw new PdfAsWebException(
-								"Invalid connector mobilebku is not supported");
-					}
-				}
 				
-				if (connector.equals(Connector.SECLAYER20)) {
-					if (WebConfiguration.getSecurityLayer20URL() == null) {
-						throw new PdfAsWebException(
-								"Invalid connector mobilebku is not supported");
-					}
-				}
-				
-				PdfAsHelper.startSignature(req, resp, getServletContext(), connector.toString(), pdfAsRequest);
+				PdfAsHelper.startSignature(req, resp, getServletContext(), connector, pdfAsRequest);
 				
 			} else {
 				throw new PdfAsWebException("Invalid connector ("

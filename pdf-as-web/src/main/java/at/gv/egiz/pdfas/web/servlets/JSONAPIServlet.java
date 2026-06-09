@@ -87,7 +87,7 @@ public class JSONAPIServlet extends HttpServlet {
 
         String profile = jsonObject.has(JSON_PROFILE) ? jsonObject.getString(JSON_PROFILE) : null;
         String position = jsonObject.has(JSON_POSITION) ? jsonObject.getString(JSON_POSITION) : null;
-        String connector = jsonObject.getString(JSON_CONNECTOR);
+        Connector connector = Connector.fromString(jsonObject.getString(JSON_CONNECTOR));
         String input = jsonObject.getString(JSON_INPUT);
         String requestID = jsonObject.has(JSON_REQUEST_ID) ? jsonObject.getString(JSON_REQUEST_ID) : null;
 
@@ -106,40 +106,14 @@ public class JSONAPIServlet extends HttpServlet {
 
         try {
 
-            if(connector == null) {
-                throw new ServletException(
-                        "Invalid connector value!");
-            }
-
-            PDFASSignParameters.Connector connectorEnum = null;
-
-            if(PDFASSignParameters.Connector.MOA.equalsName(connector)) {
-                connectorEnum = PDFASSignParameters.Connector.MOA;
-            } else if(PDFASSignParameters.Connector.JKS.equalsName(connector)) {
-                connectorEnum = PDFASSignParameters.Connector.JKS;
-            } else if(PDFASSignParameters.Connector.BKU.equalsName(connector)) {
-                connectorEnum = PDFASSignParameters.Connector.BKU;
-            } else if(PDFASSignParameters.Connector.MOBILEBKU.equalsName(connector)) {
-                connectorEnum = PDFASSignParameters.Connector.MOBILEBKU;
-            } else if(PDFASSignParameters.Connector.ONLINEBKU.equalsName(connector)) {
-                connectorEnum = PDFASSignParameters.Connector.ONLINEBKU;
-            } else if(PDFASSignParameters.Connector.SECLAYER20.equalsName(connector)) {
-                connectorEnum = PDFASSignParameters.Connector.SECLAYER20;
-            } 
-
-            if(connectorEnum == null) {
-                throw new ServletException(
-                        "Invalid connector value!");
-            }
-
-            // TODO: check connector is enabled!
+            PdfAsHelper.checkConnectorSupported(connector, null);
 
             statisticEvent.setFilesize(inputDocument.length);
             statisticEvent.setProfileId(profile);
-            statisticEvent.setDevice(connector);
+            statisticEvent.setDevice(connector.toString());
 
             PDFASSignParameters parameters = new PDFASSignParameters();
-            parameters.setConnector(connectorEnum);
+            parameters.setConnector(connector);
             parameters.setPosition(position);
             parameters.setProfile(profile);
 
@@ -156,8 +130,8 @@ public class JSONAPIServlet extends HttpServlet {
                         signatureBlockParametersMap.put(values[0], values[1]);
                     }
                 }
-            }catch(Exception e){
-                e.printStackTrace();
+            } catch(Exception e) {
+                logger.warn("Failed to process JSON sbp parameter", e);
             }
             
             
@@ -167,7 +141,7 @@ public class JSONAPIServlet extends HttpServlet {
             
             CoreSignParams coreParams = new CoreSignParams();                   
             coreParams.setSignatureBlockParameters(signatureBlockParametersMap);    
-            coreParams.setConnector(Connector.fromString(connector));
+            coreParams.setConnector(connector);
             data.setCoreParams(coreParams);
 
             DocumentToSign document = new DocumentToSign();
@@ -178,8 +152,7 @@ public class JSONAPIServlet extends HttpServlet {
             
             
             
-            if (PDFASSignParameters.Connector.MOA.equals(connectorEnum)
-                    || PDFASSignParameters.Connector.JKS.equals(connectorEnum)) {
+            if (!Connector.isAsynchronous(connector)) {
                 // Plain server based signatures!!
               
                                                                   
@@ -236,36 +209,8 @@ public class JSONAPIServlet extends HttpServlet {
 
                 // start asynchronous signature creation
 
-                    if (PDFASSignParameters.Connector.BKU.equals(connectorEnum)) {
-                        if (WebConfiguration.getLocalBKUURL() == null) {
-                            throw new PdfAsWebException(
-                                    "Invalid connector bku is not supported");
-                        }
-                    }
-
-                    if (PDFASSignParameters.Connector.ONLINEBKU.equals(connectorEnum)) {
-                        if (WebConfiguration.getOnlineBKUURL() == null) {
-                            throw new PdfAsWebException(
-                                    "Invalid connector onlinebku is not supported");
-                        }
-                    }
-
-                    if (PDFASSignParameters.Connector.MOBILEBKU.equals(connectorEnum)) {
-                        if (WebConfiguration.getHandyBKUURL() == null) {
-                            throw new PdfAsWebException(
-                                    "Invalid connector mobilebku is not supported");
-                        }
-                    }
-                    
-                    if (PDFASSignParameters.Connector.SECLAYER20.equals(connectorEnum)) {
-                        if (WebConfiguration.getSecurityLayer20URL() == null) {
-                            throw new PdfAsWebException(
-                                    "Invalid connector mobilebku is not supported");
-                        }
-                    }
-
-                    PdfAsHelper.startSignatureJson(request, response, getServletContext(),
-                        connectorEnum.toString(), data);
+                PdfAsHelper.startSignatureJson(request, response, getServletContext(),
+                    connector, data);
 
                 JSONStartResponse jsonStartResponse = PdfAsHelper.startJsonProcess(request, response, getServletContext());
 

@@ -25,10 +25,12 @@ package at.gv.egiz.pdfas.api.ws;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlEnumValue;
 import jakarta.xml.bind.annotation.XmlType;
+import lombok.NonNull;
 
 @XmlType(name="SignParameters")
 public class PDFASSignParameters implements Serializable {
@@ -57,7 +59,7 @@ public class PDFASSignParameters implements Serializable {
 		
 		private final String name;       
 
-	    private Connector(String s) {
+	    Connector(String s) {
 	        name = s;
 	    }
 
@@ -70,12 +72,19 @@ public class PDFASSignParameters implements Serializable {
 	    }
 	    
 	    public static Connector fromString(String value) {
-	      return Arrays.asList(Connector.values()).stream()
+	      return Arrays.stream(Connector.values())
 	        .filter(el -> el.toString().equalsIgnoreCase(value))
 	        .findFirst()
-	        .get();
+			  .orElse(null);
 	      
 	    }
+
+		public static boolean isAsynchronous(@NonNull Connector c) {
+			return switch (Objects.requireNonNull(c)) {
+				case JKS, MOA -> false;
+				case BKU, MOBILEBKU, ONLINEBKU, SECLAYER20 -> true;
+			};
+		}
 	    
 	}
 	

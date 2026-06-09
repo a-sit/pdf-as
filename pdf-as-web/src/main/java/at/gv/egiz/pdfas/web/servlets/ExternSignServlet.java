@@ -308,16 +308,15 @@ public class ExternSignServlet extends HttpServlet {
 		}
 		
 		// Get Connector
-		String connector = PdfAsParameterExtractor.getConnector(request);
-		if (connector == null) {
-			throw new PdfAsException("No connector specified");
-		}
+		Connector connector = PdfAsParameterExtractor.getConnector(request);
+		String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
+		PdfAsHelper.checkConnectorSupported(connector, keyIdentifier);
 		
 		String transactionId = PdfAsParameterExtractor.getTransactionId(request);
 		
 		statisticEvent.setFilesize(pdfData.length);
 		statisticEvent.setProfileId(null);
-		statisticEvent.setDevice(connector);
+		statisticEvent.setDevice(connector.toString());
 
 		String invokeUrl = PdfAsParameterExtractor.getInvokeURL(request);
 		PdfAsHelper.setInvokeURL(request, response, invokeUrl);
@@ -361,8 +360,8 @@ public class ExternSignServlet extends HttpServlet {
               
     CoreSignParams coreParams = new CoreSignParams();                   
     coreParams.setSignatureBlockParameters(dynamicSignatureBlockArguments);    
-    coreParams.setConnector(Connector.fromString(connector));
-    coreParams.setKeyIdentifier(PdfAsParameterExtractor.getKeyIdentifier(request));
+    coreParams.setConnector(connector);
+    coreParams.setKeyIdentifier(keyIdentifier);
     coreParams.setOverrides(PdfAsParameterExtractor.getOverwriteMap(request));        
     coreParams.setPreprocessor(PdfAsParameterExtractor.getPreProcessorMap(request));
     coreParams.setInvokeErrorUrl(errorUrl);
@@ -384,67 +383,18 @@ public class ExternSignServlet extends HttpServlet {
 		
 		
 		//IPlainSigner signer;
-		if (connector.equals("bku") || connector.equals("onlinebku") || connector.equals("mobilebku")
-				|| connector.equals("sl20")) {
+		if (Connector.isAsynchronous(connector)) {
 			// start asynchronous signature creation
-			
-			if(connector.equals("bku")) {
-				if(WebConfiguration.getLocalBKUURL() == null) {
-					throw new PdfAsWebException("Invalid connector bku is not supported");
-				}
-			}
-			if(connector.equals("mobilebku")) {
-				if(WebConfiguration.getHandyBKUURL() == null) {
-					throw new PdfAsWebException("Invalid connector mobilebku is not supported");
-				}
-			}
-			if(connector.equals("onlinebku")) {
-				if(WebConfiguration.getOnlineBKUURL() == null) {
-					throw new PdfAsWebException("Invalid connector bku is not supported");
-				}
-			}
-			if (connector.equals("sl20")) {
-				if(WebConfiguration.getSecurityLayer20URL() == null) {
-					throw new PdfAsWebException("Invalid connector bku is not supported");
-				}
-			}
 
 			PdfAsHelper.setStatisticEvent(request, response, statisticEvent);
 			
-	    // sign document
+	    	// sign document
 			PdfAsHelper.startSignature(request, response, getServletContext(), connector, data);
 
 			return;
 			
-		} else if (connector.equals("jks") || connector.equals("moa")) {
-			// start synchronous siganture creation
-			
-			if(connector.equals("jks")) {
-				
-				String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
-
-				boolean ksEnabled = false;
-
-				if (keyIdentifier != null) {
-					ksEnabled = WebConfiguration.getKeystoreEnabled(keyIdentifier);
-				} else {
-					ksEnabled = WebConfiguration.getKeystoreDefaultEnabled();
-				}
-
-				if (!ksEnabled) {
-					if(keyIdentifier != null) {
-						throw new PdfAsWebException("JKS connector [" + keyIdentifier + "] disabled or not existing.");
-					} else {
-						throw new PdfAsWebException("DEFAULT JKS connector disabled.");
-					}
-				}
-			}
-			
-			if(connector.equals("moa")) {
-				if(!WebConfiguration.getMOASSEnabled()) {
-					throw new PdfAsWebException("Invalid connector moa is not supported");
-				}
-			}
+		} else {
+			// start synchronous signature creation
 
 			// sign document
 			PdfasSignResponse pdfSignedData = PdfAsHelper.synchronousServerSignature(data);
@@ -461,9 +411,6 @@ public class ExternSignServlet extends HttpServlet {
 			
 			PdfAsHelper.gotoProvidePdf(getServletContext(), request, response);
 			return;
-			
-		} else {
-			throw new PdfAsWebException("Invalid connector (bku | moa | jks | onlinebku | mobilebku)");
 			
 		}
 	}

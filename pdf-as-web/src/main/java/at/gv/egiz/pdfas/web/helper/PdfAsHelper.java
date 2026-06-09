@@ -34,11 +34,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import jakarta.servlet.RequestDispatcher;
@@ -391,17 +387,14 @@ public class PdfAsHelper {
 				new ByteArrayDataSource(documentToSign.getInputData()), baos);
 
 		// Get Connector
+		val connector = coreParams.getConnector();
+		val keyIdentifier = coreParams.getKeyIdentifier();
+		PdfAsHelper.checkConnectorSupported(connector, keyIdentifier);
 
 		IPlainSigner signer;
-		if (coreParams.getConnector().equals(Connector.MOA)) {
-			String keyIdentifier = coreParams.getKeyIdentifier();
+		if (connector == Connector.MOA) {
 
 			if (keyIdentifier != null) {
-				if (!WebConfiguration.isMoaEnabled(keyIdentifier)) {
-					throw new PdfAsWebException("MOA connector ["
-							+ keyIdentifier + "] disabled or not existing.");
-				}
-
 				String url = WebConfiguration.getMoaURL(keyIdentifier);
 				String timeout = WebConfiguration.getMoaTimeout(keyIdentifier);
 				String keyId = WebConfiguration.getMoaKeyID(keyIdentifier);
@@ -413,19 +406,12 @@ public class PdfAsHelper {
 				config.setValue(IConfigurationConstants.MOA_SIGN_KEY_ID, keyId);
 				config.setValue(IConfigurationConstants.MOA_SIGN_CERTIFICATE,
 						certificate);
-			} else {
-				if (!WebConfiguration.getMOASSEnabled()) {
-					throw new PdfAsWebException("MOA connector disabled.");
-				}
 			}
 
 			signer = new PAdESSigner(new MOAConnector(config));
 		
 		
-		} else if (coreParams.getConnector().equals(Connector.JKS)) {
-			String keyIdentifier = coreParams.getKeyIdentifier();
-
-			boolean ksEnabled = false;
+		} else if (connector == Connector.JKS) {
 			String ksFile = null;
 			String ksAlias = null;
 			String ksPass = null;
@@ -433,40 +419,17 @@ public class PdfAsHelper {
 			String ksType = null;
 
 			if (keyIdentifier != null) {
-				ksEnabled = WebConfiguration.getKeystoreEnabled(keyIdentifier);
 				ksFile = WebConfiguration.getKeystoreFile(keyIdentifier);
 				ksAlias = WebConfiguration.getKeystoreAlias(keyIdentifier);
 				ksPass = WebConfiguration.getKeystorePass(keyIdentifier);
 				ksKeyPass = WebConfiguration.getKeystoreKeyPass(keyIdentifier);
 				ksType = WebConfiguration.getKeystoreType(keyIdentifier);
 			} else {
-				ksEnabled = WebConfiguration.getKeystoreDefaultEnabled();
 				ksFile = WebConfiguration.getKeystoreDefaultFile();
 				ksAlias = WebConfiguration.getKeystoreDefaultAlias();
 				ksPass = WebConfiguration.getKeystoreDefaultPass();
 				ksKeyPass = WebConfiguration.getKeystoreDefaultKeyPass();
 				ksType = WebConfiguration.getKeystoreDefaultType();
-			}
-
-			if (!ksEnabled) {
-				if (keyIdentifier != null) {
-					throw new PdfAsWebException("JKS connector ["
-							+ keyIdentifier + "] disabled or not existing.");
-				} else {
-					throw new PdfAsWebException(
-							"DEFAULT JKS connector disabled.");
-				}
-			}
-
-			if (ksFile == null || ksAlias == null || ksPass == null
-					|| ksKeyPass == null || ksType == null) {
-				if (keyIdentifier != null) {
-					throw new PdfAsWebException("JKS connector ["
-							+ keyIdentifier + "] not correctly configured.");
-				} else {
-					throw new PdfAsWebException(
-							"DEFAULT JKS connector not correctly configured.");
-				}
 			}
 
 			signer = new PAdESSignerKeystore(ksFile, ksAlias, ksPass,
@@ -541,11 +504,11 @@ public class PdfAsHelper {
 	}
 
 	public static void startSignatureJson(HttpServletRequest request, HttpServletResponse response, 
-	    ServletContext context, String connector, PdfasSignRequest pdfAsRequest) throws Exception {
+	    ServletContext context, Connector connector, PdfasSignRequest pdfAsRequest) throws Exception {
 	  HttpSession session = request.getSession();
         
     log.info("Starting signature in session: " + session.getId());    
-    session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);    
+    session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);
     
     StatusRequest statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);    
     session.setAttribute(PDF_STATUS, statusRequest);
@@ -553,7 +516,7 @@ public class PdfAsHelper {
 	}
 
   public static void startSignature(HttpServletRequest request, HttpServletResponse response,
-      ServletContext context, String connector, PdfasSignRequest pdfAsRequest) throws Exception {    
+      ServletContext context, Connector connector, PdfasSignRequest pdfAsRequest) throws Exception {
     HttpSession session = request.getSession();
     log.info("Starting signature in session: " + session.getId());    
     session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);    
@@ -566,7 +529,7 @@ public class PdfAsHelper {
             
   }
 	
-  private static StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, String connector, PdfasSignRequest pdfAsRequest)
+  private static StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest)
       throws PdfAsWebException, WriterException, IOException, PdfAsException, PDFASError {   
     HttpSession session = request.getSession();
     
@@ -643,23 +606,14 @@ public class PdfAsHelper {
     
   }
 
-  private static IPlainSigner getSignerFromConnector(String connector, Configuration config, HttpSession session) throws PdfAsWebException {
-    if (connector.equals("bku") || connector.equals("onlinebku")
-        || connector.equals("mobilebku")) {
-      BKUSLConnector conn = new BKUSLConnector(config);
-      session.setAttribute(PDF_SL_CONNECTOR, conn);
-      return new PAdESSigner(conn);
-      
-
-    } else if (connector.equals("sl20")) {
-      SL20Connector conn = new SL20Connector(config);
-      session.setAttribute(PDF_SL_CONNECTOR, conn);
-      return new PAdESSigner(conn);
-            
-    } else {
-      throw new PdfAsWebException(
-          "Invalid connector (bku | onlinebku | mobilebku | moa | jks | sl20)");
-    }    
+  private static IPlainSigner getSignerFromConnector(Connector connector, Configuration config, HttpSession session) throws PdfAsWebException {
+	val slConnector = switch(connector) {
+		case BKU, ONLINEBKU, MOBILEBKU -> new BKUSLConnector(config);
+		case SECLAYER20 -> new SL20Connector(config);
+		default -> throw new PdfAsWebException("Invalid connector (bku | onlinebku | mobilebku | sl20)");
+	};
+	session.setAttribute(PDF_SL_CONNECTOR, slConnector);
+	return new PAdESSigner(slConnector);
   }
 	
 	public static byte[] getCertificate(
@@ -769,10 +723,10 @@ public class PdfAsHelper {
 		// IPlainSigner plainSigner = (IPlainSigner) session
 		// .getAttribute(PDF_SIGNER);
 
-		String connector = (String) session.getAttribute(PDF_SL_INTERACTIVE);
+		Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
+		PdfAsHelper.checkConnectorSupported(connector, null);
 
-		if (connector.equals("bku") || connector.equals("onlinebku")
-				|| connector.equals("mobilebku")) {
+		if (connector == Connector.BKU || connector == Connector.ONLINEBKU || connector == Connector.MOBILEBKU) {
 			BKUSLConnector bkuSLConnector = (BKUSLConnector) session
 					.getAttribute(PDF_SL_CONNECTOR);
 
@@ -809,7 +763,8 @@ public class PdfAsHelper {
 		// IPlainSigner plainSigner = (IPlainSigner) session
 		// .getAttribute(PDF_SIGNER);
 
-		String connector = (String) session.getAttribute(PDF_SL_INTERACTIVE);
+		Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
+		PdfAsHelper.checkConnectorSupported(connector, null);
 
 		//load connector
 		ISLConnector slConnector = (ISLConnector) session.getAttribute(PDF_SL_CONNECTOR);
@@ -1412,28 +1367,19 @@ public class PdfAsHelper {
 		}
 
 		String baseURL = publicURL + PDF_USERENTRY_PAGE;
-		try {
-			return baseURL + "?" + UIEntryPointServlet.REQUEST_ID_PARAM + "="
-					+ URLEncoder.encode(storeId, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			log.warn("Encoding not supported for URL encoding", e);
-		}
-		return baseURL + "?" + UIEntryPointServlet.REQUEST_ID_PARAM + "="
-				+ storeId;
-	}
+      return baseURL + "?" + UIEntryPointServlet.REQUEST_ID_PARAM + "="
+              + URLEncoder.encode(storeId, StandardCharsets.UTF_8);
+    }
 
-	public static String generateBKUURL(String connector) {
-		if (connector.equals("bku")) {
-			return WebConfiguration.getLocalBKUURL();
-		} else if (connector.equals("onlinebku")) {
-			return WebConfiguration.getOnlineBKUURL();
-		} else if (connector.equals("mobilebku")) {
-			return WebConfiguration.getHandyBKUURL();
-		} else if (connector.equals("sl20")) {
-			return WebConfiguration.getSecurityLayer20URL();
-		}
-		return WebConfiguration.getLocalBKUURL();
-	}
+	public static String generateBKUURL(Connector connector) {
+      return switch (connector) {
+		case BKU -> WebConfiguration.getLocalBKUURL();
+		case ONLINEBKU -> WebConfiguration.getOnlineBKUURL();
+        case MOBILEBKU -> WebConfiguration.getHandyBKUURL();
+		case SECLAYER20 -> WebConfiguration.getSecurityLayer20URL();
+        default -> throw new IllegalStateException("Attempt to get BKU URL for connector: "+connector.name());
+      };
+    }
 
 	public static void setFromDataUrl(HttpServletRequest request) {
 		request.setAttribute(REQUEST_FROM_DU, (Boolean) true);
@@ -1443,7 +1389,7 @@ public class PdfAsHelper {
 		Object obj = request.getAttribute(REQUEST_FROM_DU);
 		if (obj != null) {
 			if (obj instanceof Boolean) {
-				return ((Boolean) obj).booleanValue();
+				return (Boolean) obj;
 			}
 		}
 		return false;
@@ -1642,7 +1588,7 @@ public class PdfAsHelper {
 			log.trace("SL20 response to VDA: " + respContainer);
 			StringWriter writer = new StringWriter();
 			writer.write(respContainer.toString());						
-			final byte[] content = writer.toString().getBytes("UTF-8");
+			final byte[] content = writer.toString().getBytes(StandardCharsets.UTF_8);
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentLength(content.length);
 			response.setContentType(ContentType.APPLICATION_JSON.toString());						
@@ -1653,6 +1599,84 @@ public class PdfAsHelper {
 			log.info("SL2.0 DataURL communication needs http header: '" + SL20Constants.HTTP_HEADER_SL20_CLIENT_TYPE + "'");
 			throw new SL20Exception("sl20.06");
 			
+		}
+	}
+
+	private static boolean anyNull(Object... any) {
+		return (Arrays.stream(any).anyMatch(Objects::isNull));
+	}
+
+	public static void checkConnectorSupported(Connector connector, String keyIdentifier) throws PdfAsWebException {
+		if (connector == null) {
+			throw new PdfAsWebException("Invalid or unknown connector value");
+		} else if (connector == Connector.BKU) {
+			if (!WebConfiguration.getLocalBKUEnabled()) {
+				throw new PdfAsWebException("Connector bku is not enabled in configuration");
+			}
+			if (WebConfiguration.getLocalBKUURL() == null) {
+				throw new PdfAsWebException("Connector bku is not properly configured");
+			}
+		} else if (connector == Connector.ONLINEBKU) {
+			if (!WebConfiguration.getOnlineBKUEnabled()) {
+				throw new PdfAsWebException("Connector onlinebku is not enabled in configuration");
+			}
+			if (WebConfiguration.getOnlineBKUURL() == null) {
+				throw new PdfAsWebException("Connector onlinebku is not properly configured");
+			}
+		} else if (connector == Connector.MOBILEBKU) {
+			if (!WebConfiguration.getMobileBKUEnabled()) {
+				throw new PdfAsWebException("Connector mobilebku is not enabled in configuration");
+			}
+			if (WebConfiguration.getHandyBKUURL() == null) {
+				throw new PdfAsWebException("Connector mobilebku is not properly configured");
+			}
+		} else if (connector == Connector.SECLAYER20) {
+			if (!WebConfiguration.getSL20Enabled()) {
+				throw new PdfAsWebException("Connector sl20 is not enabled in configuration");
+			}
+			if (WebConfiguration.getSecurityLayer20URL() == null) {
+				throw new PdfAsWebException("Connector sl20 is not properly configured");
+			}
+		} else if (connector == Connector.MOA) {
+			if (keyIdentifier != null) {
+				if (!WebConfiguration.isMoaEnabled(keyIdentifier)) {
+					throw new PdfAsWebException("Connector moa[keyId="+keyIdentifier+"] is not enabled in configuration");
+				}
+			} else {
+				if (!WebConfiguration.getMOASSEnabled()) {
+					throw new PdfAsWebException("Connector moa[default] is not enabled in configuration");
+				}
+			}
+		} else if (connector == Connector.JKS) {
+			if (keyIdentifier != null) {
+				if (!WebConfiguration.getKeystoreEnabled(keyIdentifier)) {
+					throw new PdfAsWebException("Connector jks[keyId="+keyIdentifier+"] is not enabled in configuration");
+				}
+				if (
+					anyNull(
+						WebConfiguration.getKeystoreFile(keyIdentifier),
+						WebConfiguration.getKeystoreAlias(keyIdentifier),
+						WebConfiguration.getKeystorePass(keyIdentifier),
+						WebConfiguration.getKeystoreKeyPass(keyIdentifier),
+						WebConfiguration.getKeystoreType(keyIdentifier)))
+				{
+					throw new PdfAsWebException("Connector jks[keyId="+keyIdentifier+"] is not properly configured");
+				}
+			} else {
+				if (!WebConfiguration.getKeystoreDefaultEnabled()) {
+					throw new PdfAsWebException("Connector jks[default] is not enabled in configuration");
+				}
+				if (
+					anyNull(
+						WebConfiguration.getKeystoreDefaultFile(),
+						WebConfiguration.getKeystoreDefaultAlias(),
+						WebConfiguration.getKeystoreDefaultPass(),
+						WebConfiguration.getKeystoreDefaultKeyPass(),
+						WebConfiguration.getKeystoreDefaultType()))
+				{
+					throw new PdfAsWebException("Connector jks[default] is not properly configured");
+				}
+			}
 		}
 	}
 

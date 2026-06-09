@@ -22,7 +22,7 @@ public class SoapServiceServlet extends CXFNonSpringServlet {
 		super.loadBus(sc);
 
 		// You could add the endpoint publish codes here
-        Bus bus = this.getBus();
+        Bus bus = BusFactory.newInstance(BusFactory.DEFAULT_BUS_FACTORY).createBus();
         BusFactory.setDefaultBus(bus);
         Endpoint signEp = Endpoint.publish("/wssign", new PDFASSigningImpl());
         /*

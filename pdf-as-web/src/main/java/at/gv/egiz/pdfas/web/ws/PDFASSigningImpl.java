@@ -376,18 +376,19 @@ public class PDFASSigningImpl implements PDFASSigning {
     coreParams.setTransactionId(request.getTransactionId());
     data.setCoreParams(coreParams);
 
-    if (request.getInput() != null) {
-      request.getInput().forEach(el -> {
-        final DocumentToSign document = new DocumentToSign();
-        document.setInputData(el.getInputData());
-        document.setPosition(el.getPosition());
-        document.setProfile(el.getProfile());
-        document.setQrCodeContent(el.getQrCodeContent());
-        document.setFileName(el.getFileName());
-        data.addDocumentToSign(document);
-
-      });
+    if (request.getInput() == null || request.getInput().isEmpty()) {
+      throw new WebServiceException("SignMultipleRequest contains no input documents");
     }
+    request.getInput().forEach(el -> {
+      final DocumentToSign document = new DocumentToSign();
+      document.setInputData(el.getInputData());
+      document.setPosition(el.getPosition());
+      document.setProfile(el.getProfile());
+      document.setQrCodeContent(el.getQrCodeContent());
+      document.setFileName(el.getFileName());
+      data.addDocumentToSign(document);
+
+    });
 
     return data;
 

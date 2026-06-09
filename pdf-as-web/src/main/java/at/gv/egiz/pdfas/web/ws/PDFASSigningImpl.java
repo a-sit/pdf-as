@@ -99,7 +99,8 @@ public class PDFASSigningImpl implements PDFASSigning {
     // map request into internal data-structure
     final PdfasSignRequest internalReq = buildOperationRequest(request);
 
-    val connector = request.getParameters().getConnector();
+    val connector = internalReq.getCoreParams().getConnector();
+    val keyIdentifier = internalReq.getCoreParams().getKeyIdentifier();
 
     final StatisticEvent statisticEvent = new StatisticEvent();
     statisticEvent.setSource(Source.SOAP);
@@ -113,7 +114,7 @@ public class PDFASSigningImpl implements PDFASSigning {
 
     PDFASSignResponse response = new PDFASSignResponse();
     try {
-      PdfAsHelper.checkConnectorSupported(connector);
+      PdfAsHelper.checkConnectorSupported(connector, keyIdentifier);
 
       if (!Connector.isAsynchronous(connector)) {
 
@@ -217,6 +218,7 @@ public class PDFASSigningImpl implements PDFASSigning {
     // map request into internal data-structure
     final PdfasSignRequest internalReq = buildOperationRequest(request);
     val connector = internalReq.getCoreParams().getConnector();
+    val keyIdentifier = internalReq.getCoreParams().getKeyIdentifier();
 
     final StatisticEvent statisticEvent = new StatisticEvent();
     statisticEvent.setSource(Source.SOAP);
@@ -229,7 +231,7 @@ public class PDFASSigningImpl implements PDFASSigning {
 
     PdfasSignMultipleResponse response = new PdfasSignMultipleResponse();
     try {
-      PdfAsHelper.checkConnectorSupported(connector);
+      PdfAsHelper.checkConnectorSupported(connector, keyIdentifier);
 
       if (!Connector.isAsynchronous(connector)) {
 

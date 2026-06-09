@@ -309,7 +309,8 @@ public class ExternSignServlet extends HttpServlet {
 		
 		// Get Connector
 		Connector connector = PdfAsParameterExtractor.getConnector(request);
-		PdfAsHelper.checkConnectorSupported(connector);
+		String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
+		PdfAsHelper.checkConnectorSupported(connector, keyIdentifier);
 		
 		String transactionId = PdfAsParameterExtractor.getTransactionId(request);
 		
@@ -360,7 +361,7 @@ public class ExternSignServlet extends HttpServlet {
     CoreSignParams coreParams = new CoreSignParams();                   
     coreParams.setSignatureBlockParameters(dynamicSignatureBlockArguments);    
     coreParams.setConnector(connector);
-    coreParams.setKeyIdentifier(PdfAsParameterExtractor.getKeyIdentifier(request));
+    coreParams.setKeyIdentifier(keyIdentifier);
     coreParams.setOverrides(PdfAsParameterExtractor.getOverwriteMap(request));        
     coreParams.setPreprocessor(PdfAsParameterExtractor.getPreProcessorMap(request));
     coreParams.setInvokeErrorUrl(errorUrl);
@@ -393,28 +394,7 @@ public class ExternSignServlet extends HttpServlet {
 			return;
 			
 		} else {
-			// start synchronous siganture creation
-			
-			if(connector == Connector.JKS) {
-
-				String keyIdentifier = PdfAsParameterExtractor.getKeyIdentifier(request);
-
-				boolean ksEnabled = false;
-
-				if (keyIdentifier != null) {
-					ksEnabled = WebConfiguration.getKeystoreEnabled(keyIdentifier);
-				} else {
-					ksEnabled = WebConfiguration.getKeystoreDefaultEnabled();
-				}
-
-				if (!ksEnabled) {
-					if(keyIdentifier != null) {
-						throw new PdfAsWebException("JKS connector [" + keyIdentifier + "] disabled or not existing.");
-					} else {
-						throw new PdfAsWebException("DEFAULT JKS connector disabled.");
-					}
-				}
-			}
+			// start synchronous signature creation
 
 			// sign document
 			PdfasSignResponse pdfSignedData = PdfAsHelper.synchronousServerSignature(data);

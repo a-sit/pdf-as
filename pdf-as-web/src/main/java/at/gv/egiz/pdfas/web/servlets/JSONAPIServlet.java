@@ -106,7 +106,7 @@ public class JSONAPIServlet extends HttpServlet {
 
         try {
 
-            PdfAsHelper.checkConnectorSupported(connector);
+            PdfAsHelper.checkConnectorSupported(connector, null);
 
             statisticEvent.setFilesize(inputDocument.length);
             statisticEvent.setProfileId(profile);

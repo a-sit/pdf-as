@@ -90,7 +90,7 @@ public class UIEntryPointServlet extends HttpServlet {
 			PdfAsHelper.setStatisticEvent(req, resp, statisticEvent);
 			
 			Connector connector = pdfAsRequest.getCoreParams().getConnector();
-			PdfAsHelper.checkConnectorSupported(connector);
+			PdfAsHelper.checkConnectorSupported(connector, null);
 
 			String invokeUrl = pdfAsRequest.getCoreParams().getInvokeUrl();
 			PdfAsHelper.setInvokeURL(req, resp, invokeUrl);

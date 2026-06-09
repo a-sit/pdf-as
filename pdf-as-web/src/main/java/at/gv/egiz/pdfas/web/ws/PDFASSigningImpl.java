@@ -92,8 +92,7 @@ public class PDFASSigningImpl implements PDFASSigning {
       return null;
     }
     if (request.getParameters() == null) {
-      log.warn("SOAP Sign Request parameters are missing");
-      return null;
+      throw new WebServiceException("SOAP Sign Request parameters are missing");
     }
 
     // map request into internal data-structure

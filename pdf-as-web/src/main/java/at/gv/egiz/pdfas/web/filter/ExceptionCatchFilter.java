@@ -113,13 +113,11 @@ public class ExceptionCatchFilter implements Filter {
 				chain.doFilter(request, response);
 				
 			} finally {
-  			if (response instanceof HttpServletResponse) {
-	  			HttpServletResponse resp = (HttpServletResponse) response;
-		  		log.debug("Got response status: {}", resp.getStatus());
-		  		
-			  } else {
-				  log.warn("Response is not a HttpServletResponse!");
-				  
+				if (response instanceof HttpServletResponse) {
+					HttpServletResponse resp = (HttpServletResponse) response;
+					log.debug("Got response status: {}", resp.getStatus());
+				} else {
+					log.warn("Response is not a HttpServletResponse!");
 				}
 			}
 		} catch (Throwable e) {

@@ -541,7 +541,7 @@ public class PdfAsHelper {
     session.setAttribute(PDF_SL_INTERACTIVE, connector);
         
     // prepare first document
-    IPlainSigner signer = getSignerFromConnector(connector, config, session);
+    IPlainSigner signer = getSignerFromConnector(connector, session);
     session.setAttribute(PDF_SIGNER, signer);
         
     String qrCodeContent = PdfAsHelper.getQRCodeContent(request);
@@ -606,10 +606,10 @@ public class PdfAsHelper {
     
   }
 
-  private static IPlainSigner getSignerFromConnector(Connector connector, Configuration config, HttpSession session) throws PdfAsWebException {
+  private static IPlainSigner getSignerFromConnector(Connector connector, HttpSession session) throws PdfAsWebException {
 	val slConnector = switch(connector) {
-		case BKU, ONLINEBKU, MOBILEBKU -> new BKUSLConnector(config);
-		case SECLAYER20 -> new SL20Connector(config);
+		case BKU, ONLINEBKU, MOBILEBKU -> new BKUSLConnector(generateBKUURL(connector));
+		case SECLAYER20 -> new SL20Connector(WebConfiguration.getSecurityLayer20URL());
 		default -> throw new PdfAsWebException("Invalid connector (bku | onlinebku | mobilebku | sl20)");
 	};
 	session.setAttribute(PDF_SL_CONNECTOR, slConnector);

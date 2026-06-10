@@ -35,7 +35,11 @@ import at.gv.egiz.sl20.utils.SL20JSONExtractorUtils;
 public class SL20Connector extends BaseSLConnector {
 	private static final Logger log = LoggerFactory.getLogger(SL20Connector.class);
 	
-	private String bkuUrl;
+	private final String bkuUrl;
+
+	public SL20Connector(String bkuUrl) {
+		this.bkuUrl = bkuUrl;
+	}
 	
 	public SL20Connector(Configuration config) {
 		this.bkuUrl = config.getValue(CONFIG_BKU_URL);

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this is for external tomcat deployments (spring-provided tomcat uses ContextXmlBridge instead) -->
+<Context>
+    <CookieProcessor
+            className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
+            sameSiteCookies="none" />
+</Context>

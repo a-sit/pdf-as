@@ -69,7 +69,11 @@ public class BKUSLConnector extends BaseSLConnector {
 	public static final String PATTERN_ERROR_CODE = "<.*:?ErrorCode>\\s*([0-9]+)\\s*</.*:?ErrorCode>";
 	public static final String PATTERN_ERROR_INFO = "<.*:?Info>\\s*(.*)\\s*</.*:?Info>";
 
-	private String bkuUrl;
+	private final String bkuUrl;
+
+	public BKUSLConnector(String bkuUrl) {
+		this.bkuUrl = bkuUrl;
+	}
 
 	public BKUSLConnector(Configuration config) {
 		this.bkuUrl = config.getValue(CONFIG_BKU_URL);

@@ -71,17 +71,11 @@ public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
         return socket.getLocalPort();
       }
     }
-    private static String azstring(int length) {
-      return
-          new Random().ints(97,123).limit(length)
-              .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-              .toString();
-    }
     public final int port = freePort();
     public final String endpointURL = "http://127.0.0.1:"+port+"/moa-spss/services/SignatureCreation";
     public final Endpoint endpoint =
         Endpoint.publish(endpointURL, this);
-    public final String keyIdentifier = azstring(16);
+    public final String keyIdentifier = TestUtils.azstring(16);
 
     public final IPlainSigner signer;
 

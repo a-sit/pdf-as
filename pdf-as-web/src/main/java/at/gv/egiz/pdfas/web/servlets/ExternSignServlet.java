@@ -336,7 +336,7 @@ public class ExternSignServlet extends HttpServlet {
 		String locale = PdfAsParameterExtractor.getLocale(request);
 		PdfAsHelper.setLocale(request, response, locale);
 
-		String responseMode = PdfAsParameterExtractor.getResonseMode(request);
+		String responseMode = PdfAsParameterExtractor.getResponseMode(request);
 		PdfAsHelper.setResponseMode(request, response, responseMode);
 		
 		String filename = PdfAsParameterExtractor.getFilename(request);

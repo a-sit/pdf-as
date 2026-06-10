@@ -269,7 +269,7 @@ public class PdfAsParameterExtractor {
 		return (String)request.getAttribute(PARAM_SIG_IDX);
 	}
 
-	public static String getResonseMode(HttpServletRequest request) {
+	public static String getResponseMode(HttpServletRequest request) {
 		return (String)request.getAttribute(PARAM_RESPONSE_MODE);
 	}
 }

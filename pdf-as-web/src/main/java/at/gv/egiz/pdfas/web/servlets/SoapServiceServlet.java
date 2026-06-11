@@ -66,6 +66,7 @@ public class SoapServiceServlet extends CXFNonSpringServlet {
 			try { p.close(); } catch (Exception e) { log.warn("Failed to close endpoint cleanly", e); }
 		});
 		endpoints.clear();
+		BusFactory.clearDefaultBusForAnyThread(getBus());
 		super.destroyBus();
 	}
 }

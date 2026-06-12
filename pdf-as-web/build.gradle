@@ -172,3 +172,7 @@ tasks.register('releases', Copy) {
 	from(tasks.named('buildTomcatTar').flatMap { it.archiveFile })
 	into(releasesDirectory)
 }
+
+tasks.named('clean', Delete) {
+	delete(releasesDirectory)
+}

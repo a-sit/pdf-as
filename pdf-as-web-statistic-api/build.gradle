@@ -27,7 +27,7 @@ dependencies {
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
 }
 
-task releases(type: Copy) {
+tasks.register('releases', Copy) {
 	from jar.outputs
 	from distZip.outputs
 	from distTar.outputs

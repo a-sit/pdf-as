@@ -24,7 +24,7 @@ dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 }
 
-task releases(type: Copy) {
+tasks.register('releases', Copy) {
 	from jar.outputs
 	from distZip.outputs
 	from distTar.outputs

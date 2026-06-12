@@ -11,9 +11,9 @@ repositories {
     mavenCentral()
 }
 
-task releases(type: Copy) {
-	from jar.outputs
-	into rootDir.toString() + "/releases/" + version
+tasks.register('releases', Copy) {
+    from jar.outputs
+    into rootDir.toString() + "/releases/" + version
 }
 
 releases.dependsOn jar

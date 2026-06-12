@@ -28,7 +28,7 @@ dependencies {
 	compileOnly group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: jakartaServletVersion
 }
 
-task releases(type: Copy) {
+tasks.register('releases', Copy) {
 	from jar.outputs
 	from distZip.outputs
 	from distTar.outputs

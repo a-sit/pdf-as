@@ -25,9 +25,10 @@ sourceSets.test.runtimeClasspath += configurations.providedCompile
 dependencies {
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
+	compileOnly "jakarta.persistence:jakarta.persistence-api:3.2.0"
 }
 
-task releases(type: Copy) {
+tasks.register('releases', Copy) {
 	from jar.outputs
 	from distZip.outputs
 	from distTar.outputs

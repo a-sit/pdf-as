@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import kotlin.Pair;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -21,7 +22,6 @@ import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.store.db.Request;
 import at.gv.egiz.pdfas.web.store.db.Response;
-import at.gv.egiz.pdfas.web.store.db.StatisticRequest;
 
 public class DBRequestStore implements IRequestStore {
 
@@ -34,7 +34,6 @@ public class DBRequestStore implements IRequestStore {
     final Configuration cfg = new Configuration();
     cfg.addAnnotatedClass(Request.class);
     cfg.addAnnotatedClass(Response.class);
-    cfg.addAnnotatedClass(StatisticRequest.class);
     cfg.setProperties(WebConfiguration.getHibernateProps());
 
     ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
@@ -77,11 +76,6 @@ public class DBRequestStore implements IRequestStore {
           query.setParameter("date", calendar.getTime());
           query.executeUpdate();
 
-          final MutationQuery queryStat = session.createMutationQuery("delete from StatisticRequest as req"
-                  + " where req.created < :date");
-          queryStat.setParameter("date", calendar.getTime());
-          queryStat.executeUpdate();
-
           final MutationQuery queryResponse = session.createMutationQuery("delete from Response as req"
                   + " where req.created < :date");
           queryResponse.setParameter("date", calendar.getTime());
@@ -100,13 +94,9 @@ public class DBRequestStore implements IRequestStore {
           tx = session.beginTransaction();
           final Request dbRequest = new Request();
           dbRequest.setSignRequest(request);
+          dbRequest.setStatisticEvent(event);
           dbRequest.setCreated(Calendar.getInstance().getTime());
           session.persist(dbRequest);
-
-          final StatisticRequest statisticRequest = new StatisticRequest();
-          statisticRequest.setStatisticEvent(event);
-          statisticRequest.setCreated(Calendar.getInstance().getTime());
-          session.persist(statisticRequest);
 
           tx.commit();
           return dbRequest.getId();
@@ -118,7 +108,7 @@ public class DBRequestStore implements IRequestStore {
   }
 
   @Override
-  public PdfasSignRequest fetchStoreEntry(String id) {
+  public Pair<PdfasSignRequest, StatisticEvent> fetchStoreEntry(String id) {
     // Clean Old Requests
     this.cleanOldRequests();
 
@@ -126,43 +116,20 @@ public class DBRequestStore implements IRequestStore {
       try (Session session = sessions.openSession()) {
           tx = session.beginTransaction();
           final Request dbRequest = session.get(Request.class, id);
+          if (dbRequest == null) return null;
 
           final PdfasSignRequest request = dbRequest.getSignRequest();
-
+          final StatisticEvent event = dbRequest.getStatisticEvent();
           session.remove(dbRequest);
 
           tx.commit();
-          return request;
+          return new Pair<>(request, event);
       } catch (final Throwable e) {
           logger.error("Failed to fetch Request", e);
           if (tx != null) tx.rollback();
           return null;
       }
 
-  }
-
-  @Override
-  public StatisticEvent fetchStatisticEntry(String id) {
-    // Clean Old Requests
-    this.cleanOldRequests();
-
-      Transaction tx = null;
-      try (Session session = sessions.openSession()) {
-          tx = session.beginTransaction();
-          final StatisticRequest dbRequest = session.get(
-                  StatisticRequest.class, id);
-
-          final StatisticEvent request = dbRequest.getStatisticEvent();
-
-          session.remove(dbRequest);
-
-          tx.commit();
-          return request;
-      } catch (final Throwable e) {
-          logger.error("Failed to fetch Request", e);
-          if (tx != null) tx.rollback();
-          return null;
-      }
   }
 
   @Override

@@ -22,9 +22,11 @@ dependencies {
 	api "org.hibernate:hibernate-core:6.6.44.Final"
 	implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+
+	testRuntimeOnly 'com.h2database:h2:2.4.240'
 }
 
-task releases(type: Copy) {
+tasks.register('releases', Copy) {
 	from jar.outputs
 	from distZip.outputs
 	from distTar.outputs

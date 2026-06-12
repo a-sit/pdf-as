@@ -97,7 +97,7 @@ dependencies {
     testImplementation group: 'org.zeroturnaround', name: 'zt-zip', version: ztZipVersion
 }
 
-task wsdl2Java() {
+tasks.register('wsdl2Java') {
 	if (!wsdlDir.listFiles()) {
 		// do nothing
 	} else {
@@ -111,25 +111,29 @@ task wsdl2Java() {
 					classpath configurations.ws
 					main = 'org.apache.cxf.tools.wsdlto.WSDLToJava'
 					args = argsin
-					systemProperties = ['exitOnFinish':'TRUE']
+					systemProperties = ['exitOnFinish': 'TRUE']
 				}
 			}
 		}
 	}
 }
 
-task releaseConfig(type: Copy) {
+tasks.register('releaseConfig', Copy) {
 	dependsOn createConf
 	from 'src/main/resources/config/config.zip'
 	into rootDir.toString() + "/releases/" + version + "/cfg"
 	rename 'config.zip', 'defaultConfig.zip'
 }
 
-task releases(type: Copy) {
+tasks.register('releases', Copy) {
 	from jar.outputs
 	from distZip.outputs
 	from distTar.outputs
 	into rootDir.toString() + "/releases/" + version
+}
+
+tasks.named('clean', Delete) {
+	delete "${rootDir}/releases"
 }
 
 releases.dependsOn jar
@@ -139,7 +143,7 @@ releases.dependsOn distTar
 
 releases.dependsOn releaseConfig
 
-task apidocs(type: Javadoc) {
+tasks.register('apidocs', Javadoc) {
 	classpath = configurations.compileClasspath
 	source = sourceSets.main.allJava
 	destinationDir = new File(rootDir.toString() + "/releases/" + version + "/docs/api")
@@ -156,7 +160,7 @@ task apidocs(type: Javadoc) {
 	include('at/gv/egiz/pdfas/lib/api/**')
 }
 
-task fulldocs(type: Javadoc) {
+tasks.register('fulldocs', Javadoc) {
 	classpath = configurations.compileClasspath
 	source = sourceSets.main.allJava
 	destinationDir = new File(rootDir.toString() + "/releases/" + version + "/docs/full")

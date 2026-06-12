@@ -1,6 +1,11 @@
 package at.gv.egiz.pdfas.web.stats;
 
+import jakarta.persistence.Column;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
+import jakarta.persistence.Transient;
 
 
 /**
@@ -25,15 +30,12 @@ public class StatisticEvent {
 		SIGN("sign"),
 		SIGNBULK("signBulk"),
 		VERIFY("verify");
+
+		@Getter
+		private final String name;
 		
-		private String name;
-		
-		private Operation(String name) {
+		Operation(String name) {
 			this.name = name;
-		}
-		
-		public String getName() {
-			return this.name;
 		}
 	}
 	
@@ -41,167 +43,72 @@ public class StatisticEvent {
 		WEB("web"),
 		SOAP("soap"),
 		JSON("json");
+
+		@Getter
+		private final String name;
 		
-		private String name;
-		
-		private Source(String name) {
+		Source(String name) {
 			this.name = name;
-		}
-		
-		public String getName() {
-			return this.name;
 		}
 	}
 	
 	public enum Status {
 		OK("ok"), 
 		ERROR("error");
+
+		@Getter
+		private final String name;
 		
-		private String name;
-		
-		private Status(String name) {
+		Status(String name) {
 			this.name = name;
 		}
-		
-		public String getName() {
-			return this.name;
-		}
 	}
-	
+
+	@Getter @Setter
 	private long timestamp;
+	@Getter @Setter
 	private Operation operation;
+	@Getter @Setter
 	private String device;
+	@Getter @Setter
 	private String profileId;
+	@Getter @Setter
 	private long filesize;
+	@Getter @Setter
 	private String userAgent;
+	@Getter @Setter
 	private Status status;
+	@Getter @Setter
 	private Throwable exception;
+	@Getter @Setter
 	private long errorCode;
+	@Getter(onMethod_ = @Column(name = "startTime")) @Setter
 	private long start;
+	@Getter(onMethod_ = @Column(name = "endTime")) @Setter
 	private long end;
+	@Getter @Setter
 	private Source source;
 	private boolean logged = false;
 	
-	public StatisticEvent() {
-		
-	}
-	
-	public long getStart() {
-		return start;
-	}
-
-	public void setStart(long start) {
-		this.start = start;
-	}
+	public StatisticEvent() {}
 	
 	public void setStartNow() {
 		this.start = (new Date()).getTime();
 	}
-
-	public long getEnd() {
-		return end;
-	}
-
-	public void setEnd(long end) {
-		this.end = end;
-	}
-	
 	public void setEndNow() {
 		this.end = (new Date()).getTime();
 	}
-
-	public Source getSource() {
-		return source;
-	}
-
-	public void setSource(Source source) {
-		this.source = source;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
-	
 	public void setTimestampNow() {
 		this.timestamp = (new Date()).getTime();
 	}
-
-	public Operation getOperation() {
-		return operation;
-	}
-
-	public void setOperation(Operation operation) {
-		this.operation = operation;
-	}
-
-	public String getDevice() {
-		return device;
-	}
-
-	public void setDevice(String device) {
-		this.device = device;
-	}
-
-	public String getProfileId() {
-		return profileId;
-	}
-
-	public void setProfileId(String profileId) {
-		this.profileId = profileId;
-	}
-
-	public long getFilesize() {
-		return filesize;
-	}
-
-	public void setFilesize(long filesize) {
-		this.filesize = filesize;
-	}
-
-	public String getUserAgent() {
-		return userAgent;
-	}
-
-	public void setUserAgent(String userAgent) {
-		this.userAgent = userAgent;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public void setStatus(Status status) {
-		this.status = status;
-	}
-
-	public Throwable getException() {
-		return exception;
-	}
-
-	public void setException(Throwable exception) {
-		this.exception = exception;
-	}
-
-	public long getErrorCode() {
-		return errorCode;
-	}
-
-	public void setErrorCode(long errorCode) {
-		this.errorCode = errorCode;
-	}
-
+	@Transient
 	public long getDuration() {
 		return this.end - this.start;
 	}
-
+	@Transient
 	public boolean isLogged() {
 		return logged;
 	}
-
 	public void setLogged(boolean logged) {
 		this.logged = logged;
 	}

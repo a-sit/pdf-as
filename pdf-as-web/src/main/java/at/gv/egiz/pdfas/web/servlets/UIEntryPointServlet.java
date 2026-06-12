@@ -42,6 +42,7 @@ import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.store.RequestStore;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 public class UIEntryPointServlet extends HttpServlet {
@@ -76,16 +77,16 @@ public class UIEntryPointServlet extends HttpServlet {
 				throw new PdfAsStoreException("Wrong Parameters");
 			}
 
-			PdfasSignRequest pdfAsRequest = RequestStore.getInstance()
+			val storeEntry = RequestStore.getInstance()
 					.fetchStoreEntry(storeId);
 
-			if (pdfAsRequest == null) {
+			if (storeEntry == null) {
 				throw new PdfAsStoreException("Invalid " + REQUEST_ID_PARAM
 						+ " value");
 			}
 
-			StatisticEvent statisticEvent = RequestStore.getInstance()
-					.fetchStatisticEntry(storeId);
+			val pdfAsRequest = storeEntry.getFirst();
+			val statisticEvent = storeEntry.getSecond();
 
 			PdfAsHelper.setStatisticEvent(req, resp, statisticEvent);
 			

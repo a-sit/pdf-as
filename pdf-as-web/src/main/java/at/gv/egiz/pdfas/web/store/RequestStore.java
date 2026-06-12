@@ -49,7 +49,7 @@ public class RequestStore {
 					throw new PdfAsStoreException("Failed to instantiate Request Store from " + storeClass);
 				}
 			} catch (Throwable e) {
-				e.printStackTrace();
+				logger.error("Failed to instantiate Request Store", e);
 				throw new PdfAsStoreException("Failed to instantiate Request Store", e);
 			}
 		}

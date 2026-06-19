@@ -36,6 +36,9 @@ bootJar { enabled = false }
 war { enabled = false }
 bootWar { enabled = true }
 
+springBoot {
+    buildInfo()
+}
 
 repositories {
 	mavenLocal()

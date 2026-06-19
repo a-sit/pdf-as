@@ -89,8 +89,13 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
                 load(PDFBoxPlaceholderExtractor::class.java.classLoader
                     .getResourceAsStream("placeholder/pdfbox-reader-2.properties"))
             }.values.forEach {
-                val klass = Class.forName(it as String)
-                addOperator(klass.getDeclaredConstructor().newInstance() as OperatorProcessor)
+              val klass = Class.forName(it as String)
+
+              val processor = klass
+                  .getDeclaredConstructor(PDFStreamEngine::class.java)
+                  .newInstance(this) as OperatorProcessor
+
+              addOperator(processor)
             }
         }
         var currentPageNumber: Int = 0

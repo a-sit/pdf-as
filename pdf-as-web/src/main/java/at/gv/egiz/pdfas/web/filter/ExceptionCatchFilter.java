@@ -28,6 +28,13 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
+
+import com.beust.jcommander.Strings;
+import com.beust.jcommander.internal.Lists;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -37,14 +44,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.MDC;
-
-import com.beust.jcommander.Strings;
-import com.beust.jcommander.internal.Lists;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -93,11 +92,11 @@ public class ExceptionCatchFilter implements Filter {
 
 			if (request instanceof HttpServletRequest httpRequest) {
 
-              HttpSession session = httpRequest.getSession(isStatefull(httpRequest.getServletPath()));
+        HttpSession session = httpRequest.getSession(isStatefull(httpRequest.getServletPath()));
 				String sessionId = session != null ? session.getId() : "-";												
 				MDC.put("SESSION_ID", sessionId);				  
-				log.info("Access from IP: {}", getClientIpAddr(httpRequest));
-				log.info("Access to: {} in Session: {}", httpRequest.getServletPath(), sessionId);
+				log.debug("Access from IP: {}", getClientIpAddr(httpRequest));
+				log.debug("Access to: {} in Session: {}", httpRequest.getServletPath(), sessionId);
 
 				if (!JakartaServletFileUpload.isMultipartContent(httpRequest)) {
 					log.debug("Processing Parameters into Attributes");
@@ -141,7 +140,10 @@ public class ExceptionCatchFilter implements Filter {
 	}
 
 	private boolean isStatefull(String contextPath) {
-	  boolean statefull = !statelessPaths.contains(contextPath);
+	  boolean statefull = !statelessPaths.stream()
+	      .filter(el -> contextPath.startsWith(el))
+	      .findFirst()
+	      .isPresent();	  
 	  log.trace("ServletPath: {} is marked as {}", contextPath, statefull ? "statefull" : "stateless");	  
     return statefull;
     

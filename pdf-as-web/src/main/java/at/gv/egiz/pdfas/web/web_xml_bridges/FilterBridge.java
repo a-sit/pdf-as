@@ -1,14 +1,16 @@
 package at.gv.egiz.pdfas.web.web_xml_bridges;
 
-import at.gv.egiz.pdfas.web.filter.ExceptionCatchFilter;
-import at.gv.egiz.pdfas.web.filter.UserAgentFilter;
-import com.thetransactioncompany.cors.CORSFilter;
-import jakarta.servlet.Filter;
-import lombok.val;
 import org.apache.catalina.filters.SetCharacterEncodingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.thetransactioncompany.cors.CORSFilter;
+
+import at.gv.egiz.pdfas.web.filter.ExceptionCatchFilter;
+import at.gv.egiz.pdfas.web.filter.UserAgentFilter;
+import jakarta.servlet.Filter;
+import lombok.val;
 
 /** Takes the old web.xml filter mappings and exposes them to Spring Boot */
 @Configuration
@@ -26,7 +28,7 @@ public class FilterBridge {
   public FilterRegistrationBean<Filter> exceptionCatchFilter() {
     val reg = new FilterRegistrationBean<Filter>(new ExceptionCatchFilter());
     reg.addUrlPatterns("/*");
-    reg.addInitParameter("statelessServlets", "/placeholder,/visblock");
+    reg.addInitParameter("statelessServlets", "/actuator,/placeholder,/visblock");
     reg.setOrder(2);
     return reg;
   }

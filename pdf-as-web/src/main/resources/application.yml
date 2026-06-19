@@ -2,3 +2,9 @@ server:
   servlet:
     session:
       timeout: 30m
+
+
+spring:
+  application.name: PDF-AS Web
+
+  boot.admin.client.enabled: false

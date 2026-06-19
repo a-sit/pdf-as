@@ -76,12 +76,14 @@ dependencies {
 	api group: 'org.json', name: 'json', version: jsonVersion
 	api group: 'jakarta.jws', name: 'jakarta.jws-api', version: jakartaJwsVersion
 	compileOnly group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: jakartaServletVersion
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webmvc', version: springBootVersion
-	providedRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat-runtime', version: springBootVersion
+	implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-webmvc', version: springBootVersion) {
+    	exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+	}
+	compileOnly "org.apache.tomcat.embed:tomcat-embed-core"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-web-server', version: springBootVersion		
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
 	implementation group: 'de.codecentric', name: 'spring-boot-admin-client', version: springBootAdminVersion
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
-	providedRuntime group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: tomcatVersion
 	implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.2'
 	implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
 	implementation 'tools.jackson.module:jackson-module-jakarta-xmlbind-annotations'

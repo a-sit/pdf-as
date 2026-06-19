@@ -191,6 +191,11 @@ subprojects {
   }
 
 	dependencies { 
+		implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+	    annotationProcessor platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+	    testImplementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+	    testRuntimeOnly platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
 		implementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion

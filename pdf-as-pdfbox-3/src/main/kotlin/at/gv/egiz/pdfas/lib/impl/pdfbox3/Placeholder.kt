@@ -17,6 +17,7 @@ import com.google.zxing.ReaderException
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import org.apache.pdfbox.contentstream.PDFStreamEngine
+import org.apache.pdfbox.contentstream.operator.Operator
 import org.apache.pdfbox.contentstream.operator.OperatorProcessor
 import org.apache.pdfbox.cos.COSBase
 import org.apache.pdfbox.cos.COSName
@@ -254,9 +255,9 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
                 yieldAll((1..Int.MAX_VALUE).asSequence().map { i -> "${baseName}_${i}"})
             }.first { !seenPlaceholderNames.contains(it) }
 
-        override fun processOperator(operation: String, arguments: List<COSBase>) {
+        override fun processOperator(operator: Operator, arguments: List<COSBase>) {
             run {
-                if (operation != "Do") return@run
+                if (operator.name != "Do") return@run
                 val objectName = arguments[0] as COSName
                 val xObject = resources.getXObject(objectName)
                 if (xObject !is PDImageXObject) return@run
@@ -308,7 +309,7 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
                 logger.debug("Found placeholder: {}", signaturePlaceholderData)
                 placeholders.add(signaturePlaceholderData)
             }
-            super.processOperator(operation, arguments)
+            super.processOperator(operator, arguments)
         }
     }
 

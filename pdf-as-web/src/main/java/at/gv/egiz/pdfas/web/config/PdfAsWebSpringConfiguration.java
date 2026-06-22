@@ -15,9 +15,4 @@ public class PdfAsWebSpringConfiguration {
   @Value("${pdf-as-web.conf}")
   @Getter
   @NonNull String pdfAsWebConfPath;
-
-  /** then also add pdf-as-web.properties itself as a spring property source (so it supplements application.properties) */
-  @Configuration
-  @PropertySource("file:${pdf-as-web.conf}")
-  public static class AsSpringPropertySource {}
 }

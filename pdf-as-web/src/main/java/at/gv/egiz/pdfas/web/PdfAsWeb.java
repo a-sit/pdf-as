@@ -15,7 +15,6 @@ public class PdfAsWeb extends SpringBootServletInitializer {
   @Override
   protected SpringApplicationBuilder createSpringApplicationBuilder() {
     SpringApplicationBuilder builder = new SpringApplicationBuilder();
-    builder.initializers(new PdfAsSpringBootApplicationContextInitializer());    
     builder.sources(PdfAsWeb.class);
     return builder;
     
@@ -24,7 +23,6 @@ public class PdfAsWeb extends SpringBootServletInitializer {
   public static void main(String[] args) {
     log.info("=============== Initializing Spring-Boot context! ===============");
     final SpringApplication springApp = new SpringApplication(PdfAsWeb.class);
-    springApp.addInitializers(new PdfAsSpringBootApplicationContextInitializer());
     
     log.debug("Run SpringBoot initialization process ... ");
     springApp.run(args);

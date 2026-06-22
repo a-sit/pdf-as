@@ -17,14 +17,10 @@ repositories {
 }
 
 configurations{
-	pdfBox2Compile
 	pdfBox3Compile
 }
 
 sourceSets{
-	pdfBox2{
-		compileClasspath = configurations.pdfBox2Compile
-	}
 	pdfBox3{
 		compileClasspath = configurations.pdfBox3Compile
 	}
@@ -65,10 +61,7 @@ suiteDir.eachDir {	File subDir ->
         testClassesDirs = testing.suites.test.sources.output.classesDirs
         classpath = testing.suites.test.sources.runtimeClasspath
 
-		if (dirname =="public_pdfbox2"){
-			classpath += sourceSets.pdfBox2.compileClasspath
-			compileTestJava.classpath += sourceSets.pdfBox2.compileClasspath
-		} else if (dirname == "public_pdfbox3") {
+		if (dirname == "public_pdfbox3") {
 			classpath += sourceSets.pdfBox3.compileClasspath
 			compileTestJava.classpath += sourceSets.pdfBox3.compileClasspath
 		}

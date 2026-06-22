@@ -95,5 +95,5 @@ release:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}-release"
     expire_in: never
     paths:
-      - "../release/${VERSION}/pdf-as-web-${VERSION}.war"
-      - "../release/${VERSION}/pdf-as-lib-${VERSION}.zip"
+      - "../releases/${VERSION}/pdf-as-web-${VERSION}.war"
+      - "../releases/${VERSION}/pdf-as-lib-${VERSION}.zip"

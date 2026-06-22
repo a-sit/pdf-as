@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PdfAsWeb extends SpringBootServletInitializer {
 
   @Override
-  protected SpringApplicationBuilder createSpringApplicationBuilder() {      
+  protected SpringApplicationBuilder createSpringApplicationBuilder() {
     SpringApplicationBuilder builder = new SpringApplicationBuilder();
     builder.initializers(new PdfAsSpringBootApplicationContextInitializer());    
     builder.sources(PdfAsWeb.class);

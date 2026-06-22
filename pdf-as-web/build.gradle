@@ -19,7 +19,6 @@ buildscript {
 
 configurations {
    tomcatDist
-   pdfbox2
    pdfbox3
 }
 dependencies {

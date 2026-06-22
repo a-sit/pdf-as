@@ -44,5 +44,5 @@ jobs:
         with:
           name: ${{ env.PROJECT_NAME }}-${{ env.SHORT_SHA }}-release
           path: |
-            release/${VERSION}/pdf-as-lib-${VERSION}.zip
-            release/${VERSION}/pdf-as-web-${VERSION}.war
+            releases/${VERSION}/pdf-as-lib-${VERSION}.zip
+            releases/${VERSION}/pdf-as-web-${VERSION}.war

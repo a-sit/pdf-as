@@ -88,7 +88,7 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
         init {
             Properties().apply {
                 load(PDFBoxPlaceholderExtractor::class.java.classLoader
-                    .getResourceAsStream("placeholder/pdfbox-reader-2.properties"))
+                    .getResourceAsStream("placeholder/pdfbox-reader-3.properties"))
             }.values.forEach {
               val klass = Class.forName(it as String)
 

@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-import at.gv.egiz.pdfas.web.config.PdfAsSpringBootApplicationContextInitializer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

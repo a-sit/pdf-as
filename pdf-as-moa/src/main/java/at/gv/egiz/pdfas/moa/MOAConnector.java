@@ -119,7 +119,7 @@ public class MOAConnector implements ISignatureConnector,
 
 				} catch (MalformedURLException e) {
 					logger.error("{} is not a valid url but starts with http!", certificateValue);
-					throw new PdfAsWrappedIOException(new PdfAsException(certificateValue + " is not a valid url but!"));
+					throw new PdfAsWrappedIOException(new PdfAsException(certificateValue + " is not a valid url but starts with http!"));
 
 				}
 			} else if (certificateValue.startsWith("base64:")) {

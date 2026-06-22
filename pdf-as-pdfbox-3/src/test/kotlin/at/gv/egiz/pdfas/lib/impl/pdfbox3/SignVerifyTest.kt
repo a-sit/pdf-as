@@ -7,6 +7,7 @@ import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore
+import jakarta.activation.DataSource
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.ClassRule
@@ -17,7 +18,6 @@ import org.junit.runners.BlockJUnit4ClassRunner
 import org.zeroturnaround.zip.ZipUtil
 import java.io.ByteArrayOutputStream
 import java.security.KeyStore
-import jakarta.activation.DataSource
 
 @RunWith(BlockJUnit4ClassRunner::class)
 class SignVerifyTest {

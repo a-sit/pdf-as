@@ -316,6 +316,7 @@ tasks.register('releases', Copy) {
 	dependsOn('assembleLicenses')
 	from('doc') {
 		include '*.pdf'
+		include '*.md'
 	}
 
 	into "releases/" + version + "/docs"

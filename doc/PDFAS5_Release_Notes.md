@@ -48,3 +48,5 @@ Der Security-Layer-Einsprungpunkt der ID Austria (`bku.mobile.url`) hat sich ge�
 Zum verbesserten Monitoring von PDF-AS-Web wird der Spring Boot Admin Client mit ausgeliefert, um eine Integration in einen Monitoring-Server zu ermöglichen. Im Standardzustand ist dieser deaktiviert. Um ihn zu aktivieren, sollten `spring.boot.admin.client.enabled` und `spring.boot.admin.client.url` entsprechend gesetzt werden.
 
 Der Parameter `web.upload.RequestsizeMax` wurde zur besseren Konsistenz zu `web.upload.requestsizeMax` umbenannt.
+
+Das Releasepacket wurde um einen separaten PDF-AS-Web Build `pdf-as-web-db-*`  ergänzt welcher das im Handbuch beschriebene Datenbank-Backend für die SOAP Schnittstelle bereits inkludiert.

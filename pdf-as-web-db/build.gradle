@@ -1,39 +1,148 @@
 plugins {
-	id 'java-library'
-	id 'eclipse'
-	id 'distribution'
+    id 'java-library'
+    id 'eclipse'
+    id 'distribution'
 }
 
-jar {
-	manifest {
-		attributes 'Implementation-Title': 'PDF-AS-5 Web Extension Library', 'JARMANIFEST': 'PDF-AS-LIB'
-	}
-}
-
-repositories {
-	mavenLocal()
-	mavenCentral()
+configurations {
+    tomcatDist
 }
 
 dependencies {
-	implementation project (':pdf-as-web')
-	implementation project (':pdf-as-web-status')
-	implementation project (':pdf-as-web-statistic-api')
-	api "org.hibernate:hibernate-core:6.6.44.Final"
-	implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+    tomcatDist "org.apache.tomcat:tomcat:${tomcatVersion}@zip"
+}
 
-	testRuntimeOnly 'com.h2database:h2:2.4.240'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'PDF-AS-5 Web Extension Library', 'JARMANIFEST': 'PDF-AS-LIB'
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation project (':pdf-as-web')
+    implementation project (':pdf-as-web-status')
+    implementation project (':pdf-as-web-statistic-api')
+    api "org.hibernate:hibernate-core:6.6.44.Final"
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.6'
+
+    testRuntimeOnly 'com.h2database:h2:2.4.240'
+}
+
+/*
+ * Release-Bundle analog zu :pdf-as-web, erweitert um die DB-Extension.
+ */
+def tomcatVer = tomcatVersion
+def tomcatDir = layout.buildDirectory.dir("tomcat-bundling")
+def tomcatHome = tomcatDir.map { it.dir("apache-tomcat-${tomcatVer}") }
+def releasesDirectory = layout.projectDirectory.dir("releases/${project.version}")
+def webProject = project(':pdf-as-web')
+def dbExtensionJar = tasks.named('jar', Jar)
+def dbExtensionRuntimeClasspath = configurations.named('runtimeClasspath')
+
+tasks.register('extractTomcat', Sync) {
+    from({
+        zipTree(configurations.tomcatDist.singleFile)
+    })
+    into(tomcatDir)
+}
+
+tasks.register('cleanWebAppsInTomcat', Delete) {
+    dependsOn('extractTomcat')
+    delete(tomcatHome.map { it.dir("webapps") })
+}
+
+tasks.register('putTemplateIntoTomcat', Copy) {
+    dependsOn('cleanWebAppsInTomcat')
+    from(webProject.layout.projectDirectory.dir("src/main/assembly/tomcat"))
+    into(tomcatHome)
+}
+
+tasks.register('putConfigIntoTomcat', Copy) {
+    dependsOn(':pdf-as-lib:processResources', 'putTemplateIntoTomcat')
+    from(zipTree(project(':pdf-as-lib').layout.buildDirectory.file('resources/main/config/config.zip')))
+    into(tomcatHome.map { it.dir("conf/pdf-as") })
+}
+
+tasks.register('putWebConfigIntoTomcat', Copy) {
+    dependsOn('putConfigIntoTomcat')
+    from(webProject.layout.projectDirectory.dir("src/main/configuration"))
+    into(tomcatHome.map { it.dir("conf/pdf-as") })
+}
+
+tasks.register('putDbExtensionIntoWebApp', Zip) {
+    dependsOn(dbExtensionJar, ':pdf-as-web:bootWar')
+    from(zipTree(webProject.tasks.named('bootWar').flatMap { it.archiveFile }))
+    from(dbExtensionJar.flatMap { it.archiveFile }) {
+        into 'WEB-INF/lib'
+    }
+    from(dbExtensionRuntimeClasspath) {
+        into 'WEB-INF/lib'
+    }
+    archiveFileName = "pdf-as-web-db-${project.version}.war"
+    destinationDirectory = layout.buildDirectory.dir('db-enhanced-webapp')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+/*
+ * DB-Extension weiterhin auch separat als Lib-Verzeichnis ablegen.
+ * Das entspricht dem bisherigen Extension-Artefakt: eigenes JAR + Runtime-Dependencies.
+ */
+tasks.register('putDbExtensionLibs', Copy) {
+    dependsOn(dbExtensionJar)
+    from(dbExtensionJar.flatMap { it.archiveFile })
+    from(dbExtensionRuntimeClasspath)
+    into(releasesDirectory.dir("pdf-as-web-db-extension-${project.version}/lib"))
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('injectPdfAsWebApp', Copy) {
+    dependsOn('putDbExtensionIntoWebApp', 'extractTomcat')
+    from(tasks.named('putDbExtensionIntoWebApp', Zip).flatMap { it.archiveFile }) {
+        rename { 'pdf-as-web.war' }
+    }
+    into(tomcatHome.map { it.dir("webapps") })
+}
+
+tasks.register('buildTomcatZip', Zip) {
+    dependsOn('injectPdfAsWebApp')
+    from(tomcatDir)
+    archiveFileName = "apache-tomcat-${tomcatVer}-pdf-as-web-db-${project.version}.zip"
+    destinationDirectory = layout.buildDirectory
+}
+
+tasks.register('buildTomcatTar', Tar) {
+    dependsOn('injectPdfAsWebApp')
+    from(tomcatDir)
+    archiveFileName = "apache-tomcat-${tomcatVer}-pdf-as-web-db-${project.version}.tar"
+    destinationDirectory = layout.buildDirectory
+    compression = Compression.NONE
+}
+
+tasks.register('releaseConfig', Copy) {
+    from(webProject.layout.projectDirectory.file('src/main/configuration/pdf-as-web.properties'))
+    into(releasesDirectory.dir("cfg"))
 }
 
 tasks.register('releases', Copy) {
-	from jar.outputs
-	from distZip.outputs
-	from distTar.outputs
-	into rootDir.toString() + "/releases/" + version
+    dependsOn(dbExtensionJar, 'sourcesJar', 'distZip', 'distTar', 'releaseConfig', 'putDbExtensionLibs', 'buildTomcatZip', 'buildTomcatTar')
+
+    from(dbExtensionJar.flatMap { it.archiveFile })
+    from(tasks.named('sourcesJar').flatMap { it.archiveFile })
+    from(tasks.named('distZip').flatMap { it.archiveFile })
+    from(tasks.named('distTar').flatMap { it.archiveFile })
+    from(tasks.named('putDbExtensionIntoWebApp', Zip).flatMap { it.archiveFile })
+    from(tasks.named('buildTomcatZip').flatMap { it.archiveFile })
+    from(tasks.named('buildTomcatTar').flatMap { it.archiveFile })
+    into(releasesDirectory)
 }
 
-releases.dependsOn jar
-releases.dependsOn sourcesJar
-releases.dependsOn distZip
-releases.dependsOn distTar
+tasks.named('clean', Delete) {
+    delete(releasesDirectory)
+}

@@ -1,74 +1,13 @@
-# Release notes
+# [PDF-AS](https://technology.a-sit.at/en/pdf-as/)
 
-### Overview of necessary steps
-1. Release on Joinup page
-2. Push code to public git repo
-3. Add release news to the website
+PDF-AS is a multi-component solution for creating PAdES PDF signatures. It consists of three components:
+- The PDF-AS Library implements the processing of PDF documents for and creation of PAdES signatures.
+- PDF-AS Web builds on the PDF-AS Library to offer both a simple user-facing web interface and highly flexible integration for other web services.
+- PDF-AS CLI allows the PDF-AS Library to be operated from the command line.
 
-#### 1. Release on Joinup page
-To add contribution on Joinup page, both release folder and maven repository are necessary.
+PDF-AS can be integrated into other software requiring PAdES-compliant signature creation.
+For example, it also powers [PDF-Over](https://github.com/a-sit/PDF-Over) in the context of the Austrian eGovernment.
 
-Create release folder by running:
+For the full documentation of PDF-AS, see [🇦🇹 the documentation](https://github.com/a-sit/pdf-as/tree/development/doc).
 
-`./gradlew jar sourcesJar war distZip distTar releases`
-
-With this command, a release folder is created. 
-
-**Note**: The release version should be without snapshot!
-
-Release folder needs to be uploaded to https://apps.egiz.gv.at/releases/pdf-as/release/ 
-
-Create mvn repo folder by running:
-
-`./gradlew publish`
-
-The generated mvn repo needs to be uploaded to https://apps.egiz.gv.at/maven/at/gv/egiz/pdfas/
-
-After this, the release on Joinup page is necessary. 
-For this purpose, make sure to have corresponding role in PDF-AS project. 
-Make a new "release" on PDF-AS page on Joinup. The release version should contain a new version number, distribution links, and notes about the major changes in that version.
-https://joinup.ec.europa.eu/collection/e-government-innovation-center-egiz/solution/pdf 
-
-
-#### 2. Push source code to public git
-
-Run git push with tag also to  https://git.egiz.gv.at/pdf-as/ (this is the public EGIZ GIT REPO) 
-
-#### 3. Add release notes to EGIZ or ASIT website! 
-
-# Setup
-
-
-#### 1. Deployment of configuration 
-
-arguments: 
-
--d
-
-#### 2. DebugRun 
-
-arguments: 
-
--p SIGNATURBLOCK_DE 
-
--c bku 
-  
--m sign C:\Users\username\Desktop\testing\test.pdf
-
--pos "x:220;y:220;w:300;p:1" 
-
-#### 3. PDF-AS-Web 
-
-`-Dpdf-as-web.conf=$CATALINA_BASE/conf/pdf-as/pdf-as-web.properties \` 
-
-#### 4. Intellij Config for testing:
-
-* Main class: at.gv.egiz.pdfas.cli.Main
-* Classpath: pdf-as-5-pdf-as-cli.pdfbox3
-* Parameters: -p SIGNATURBLOCK_DE_NOTE_DYNAMIC -c bku -m sign /Users/user/Documents/pdf-as-5/unsigned.pdf
-* Needs local BKU (e.g. Mocca)
-* Uses configuration from /Users/user/.pdfas/
-
-
-
-
+- Inquiries and bug reports are accepted via the [issue tracker](https://github.com/a-sit/pdf-as/issues), or directed to [software@egiz.gv.at](mailto:software@egiz.gv.at).

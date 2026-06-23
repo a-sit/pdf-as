@@ -12,14 +12,32 @@ Wir empfehlen, das Update zunächst in einer Testumgebung einzuspielen und die e
     - Ein Timeout oder Fehler bei der Verbindung zum MOA-Connector gibt nun einen eigens definierten PDF-AS-Fehlercode `11022` (`ERROR_SIG_CONNECT_ERROR`) zurück.
     - Java 17
     - Apache PDFBox 3.0.6
+    - Update sonstiger verwendeter Programmbibliotheken:
+        - logback-classic 1.5.25
+        - commons-cli 1.11.0
+        - commons-collections 4.5.0
+        - commons-codec 1.21.0
+        - jakarta.activation 2.1.4
+        - jakarta.xml.bind-api 4.0.4
+        - jakarta.jws 3.0.0
+        - gson 2.13.2
+        - org.apache.cxf 4.2.1
+        
 - An PDF-AS Web:
     - Umstellung von PDF-AS-Web auf Spring Boot 4.0.6. Die PDF-AS-Web-Konfigurationsdatei, angegeben über `-Dpdf-as-web.conf`, kann auch zur Angabe von Spring-Konfigurationsparametern genutzt werden.
+    - Integration von Spring Boot Admin Client 4.0.4 zum einfacheren Monitoring. Dieser ist standardmäßig deaktiviert und muss, falls gewünscht, über die Konfigurationsdatei aktiviert werden.
     - Eine vollwertige JSON-API, funktionell gleichwertig zur SOAP-API, wurde hinzugefügt. Für weitere Informationen verweisen wir auf die Dokumentation zur Anbindung externer Webanwendungen an PDF-AS 5.0, sowie auf die maschinenlesbare OpenAPI-Dokumentation.
     - Für jeden MOA-Connector kann nun ein konfigurierbares Timeout gewählt werden. Setzen Sie hierzu den Wert `moal.(id).timeout` auf das gewünschte Timeout in Millisekunden.
+    - Update sonstiger verwendeter Programmbibliotheken:
+        - commons-text 1.14.0
+        - zxing 3.5.0
+        - sitemesh 3.2.1
+        - hibernate 6.6.44.Final
 
 ### Durchführen eines Updates von PDF-AS Web
 
 Das Major-Release 5.0 bringt einige Änderungen mit sich.
+Aus diesem Grund soll auf jeden Fall ein vollständiges Backup der existierenden PDF-AS-Web-Umgebung durchgeführt werden, bevor das Upgrade versucht wird.
 
 PDF-AS-Web wurde auf Java 17 migriert. PDF-As-Web 5.0 sollte also mit einem geeigneten Servlet-Container (wie z.B. Tomcat 11) betrieben werden.
 

@@ -106,8 +106,7 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
         fun extract(document: PDDocument, targetPlaceholderID: String?, matchMode: Int): SignaturePlaceholderData? {
             placeholderNamesOfExistingSignatures =
                 document.signatureDictionaries.asSequence()
-                    .map { it.signaturePlaceholderId }
-                    .filterNotNull()
+                    .mapNotNull { it.signaturePlaceholderId }
                     .toSet()
 
             document.pages.forEachIndexed { i, page ->

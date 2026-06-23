@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.apache.pdfbox.Loader;
 import org.junit.jupiter.api.Assertions;
 import tools.jackson.databind.json.JsonMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -19,10 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @SpringBootTest(properties = {
     "management.endpoint.metrics.enabled=true",
@@ -78,6 +76,56 @@ public class JsonApiTest extends TestUtils.CanWatchOperationCount {
       Assertions.assertArrayEquals(
           new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5),
           "Signed data looks PDF-ish (%PDF- header)");
+    }
+  }
+
+  @Test
+  @SneakyThrows
+  public void sign_with_placeholder() {
+    try (val watcher = OperationCountWatcher("operation:sign", "status:ok")) {
+      final String pdf = Base64.getEncoder().encodeToString(
+          IOUtils.toByteArray(JsonApiTest.class.getResourceAsStream("/data/placeholder.pdf")));
+
+      final String signRequestID = UUID.randomUUID().toString();
+      final String signRequest = om.writeValueAsString(
+          Map.of(
+              "requestID", signRequestID,
+              "inputData", pdf,
+              "parameters", Map.of(
+                  "connector", "jks",
+                  "transactionId", UUID.randomUUID().toString(),
+                  "configurationOverrides", Map.of(
+                      "propertyEntries", List.of(
+                          Map.of("key", "enable_placeholder_search", "value", "true"),
+                          Map.of("key", "placeholder_mode", "value", "0"),
+                          Map.of("key", "placeholder_id", "value", "1")
+                      )
+                  )
+              )
+          )
+      );
+
+      final String signResponse = mvc.perform(
+              post("/api/v2/sign/single")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON)
+                  .content(signRequest)
+          )
+          .andExpect(status().isOk())
+          .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+          .andExpect(jsonPath("$.requestID").value(signRequestID))
+          .andExpect(jsonPath("$.signedPDF").isNotEmpty())
+          .andExpect(jsonPath("$.verificationResponse").exists())
+          .andReturn().getResponse().getContentAsString();
+
+      final byte[] signedPDF = Base64.getDecoder().decode(JsonPath.<String>read(signResponse, "$.signedPDF"));
+      Assertions.assertArrayEquals(
+          new byte[]{'%', 'P', 'D', 'F', '-'}, Arrays.copyOfRange(signedPDF, 0, 5),
+          "Signed data looks PDF-ish (%PDF- header)");
+
+      try (val doc = Loader.loadPDF(signedPDF)) {
+        Assertions.assertEquals(1, doc.getNumberOfPages(), "The placeholder on page 1 should be found & used");
+      }
     }
   }
 

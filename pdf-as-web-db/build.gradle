@@ -21,9 +21,11 @@ dependencies {
 	api "org.hibernate:hibernate-entitymanager:5.6.15.Final"
 	implementation 'ch.qos.logback:logback-classic:1.2.13'
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+
+	testRuntimeOnly 'com.h2database:h2:2.4.240'
 }
 
-task releases(type: Copy) {
+tasks.register('releases', Copy) {
 	from jar.outputs
 	from distZip.outputs
 	from distTar.outputs

@@ -49,8 +49,8 @@ public class RequestStore {
 					throw new PdfAsStoreException("Failed to instanciate Request Store from " + storeClass);
 				}
 			} catch (Throwable e) {
-				e.printStackTrace();
-				throw new PdfAsStoreException("Failed to instanciate Request Store", e);
+				logger.error("Failed to instantiate Request Store", e);
+				throw new PdfAsStoreException("Failed to instantiate Request Store", e);
 			}
 		}
 		return instance;

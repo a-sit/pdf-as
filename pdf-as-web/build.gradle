@@ -257,34 +257,3 @@ task releaseConfig(type: Copy) {
 }
 
 
-
-war{
-	doFirst{
-		sourceSets.main.compileClasspath += configurations.pdfbox2
-		sourceSets.test.compileClasspath += configurations.pdfbox2
-		classpath+=sourceSets.main.compileClasspath
-	}
-}
-
-task releases(dependsOn: buildTomcat, type: Copy) {
-	String archive = project.buildDir.toString() + "/apache-tomcat-##VERSION##-pdf-as-web-##PVERSION##.zip";
-	archive = archive.replaceAll("##VERSION##", project.tomcatVersion);
-	archive = archive.replaceAll("##PVERSION##", project.version);
-	
-	String tararchive = project.buildDir.toString() + "/apache-tomcat-##VERSION##-pdf-as-web-##PVERSION##.tar";
-	tararchive = tararchive.replaceAll("##VERSION##", project.tomcatVersion);
-	tararchive = tararchive.replaceAll("##PVERSION##", project.version);
-	
-
-	from war
-	from archive
-	from tararchive	
-	into rootDir.toString() + "/releases/" + version
-}
-
-releases.dependsOn jar
-releases.dependsOn sourcesJar
-releases.dependsOn war
-releases.dependsOn releaseConfig
-releases.dependsOn buildTomcatTar
-

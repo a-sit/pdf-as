@@ -27,50 +27,39 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.collections4.map.PassiveExpiringMap;
+import org.apache.commons.lang3.tuple.Pair;
 
 import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 import at.gv.egiz.pdfas.api.processing.PdfasSignResponse;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
+import lombok.val;
 
 public class InMemoryRequestStore implements IRequestStore {
 
   // expires after 10 minutes
   private static final long DEFAULT_EXPIRATION = 10 * 60 * 1000;
   
-  private Map<String, PdfasSignRequest> reqStore = new PassiveExpiringMap<>(DEFAULT_EXPIRATION);
+  private Map<String, Pair<PdfasSignRequest, StatisticEvent>> reqStore = new PassiveExpiringMap<>(DEFAULT_EXPIRATION);
   private Map<String, PdfasSignResponse> respStore = new PassiveExpiringMap<>(DEFAULT_EXPIRATION);
-  private Map<String, StatisticEvent> statEvents = new PassiveExpiringMap<>(DEFAULT_EXPIRATION);
   
 	public InMemoryRequestStore() {
 		  
 	}
-	
+
+	@Override
 	public String createNewStoreEntry(PdfasSignRequest request, StatisticEvent event) {
 		UUID id = UUID.randomUUID();
 		String sid = id.toString();
-		this.reqStore.put(sid, request);
-		this.statEvents.put(sid, event);
+		this.reqStore.put(sid, Pair.of(request, event));
 		return sid;
-		 	
 	}
 
-	public StatisticEvent fetchStatisticEntry(String id) {
-		if(statEvents.containsKey(id)) {
-			StatisticEvent event = statEvents.get(id);
-			statEvents.remove(id);
-			return event;
-			
-		}
-		
-		return null;
-	}
-	
-	public PdfasSignRequest fetchStoreEntry(String id) {
+	@Override
+	public Pair<PdfasSignRequest, StatisticEvent> fetchStoreEntry(String id) {
 		if(reqStore.containsKey(id)) {
-			PdfasSignRequest request = reqStore.get(id);
+			val storeEntry = reqStore.get(id);
 			reqStore.remove(id);
-			return request;
-			
+			return storeEntry;
 		}
 		
 		return null;

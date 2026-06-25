@@ -23,14 +23,15 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.store;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 import at.gv.egiz.pdfas.api.processing.PdfasSignResponse;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 
 public interface IRequestStore {
-	public StatisticEvent fetchStatisticEntry(String id);
 	public String createNewStoreEntry(PdfasSignRequest request, StatisticEvent event);
-	public PdfasSignRequest fetchStoreEntry(String id);
+	public Pair<PdfasSignRequest, StatisticEvent> fetchStoreEntry(String id);
 	
 	public String createNewResponseEntry(PdfasSignResponse response);
 	public PdfasSignResponse fetchStoreResponse(String id);

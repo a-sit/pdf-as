@@ -9,7 +9,7 @@ repositories {
     mavenCentral()
 }
 
-task releases(type: Copy) {
+tasks.register('releases', Copy) {
 	from distZip.outputs
 	from distTar.outputs
 	into rootDir.toString() + "/releases/" + version

@@ -25,12 +25,6 @@ package at.gv.egiz.pdfas.web.servlets;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
@@ -39,8 +33,12 @@ import at.gv.egiz.pdfas.web.exception.PdfAsStoreException;
 import at.gv.egiz.pdfas.web.exception.PdfAsWebException;
 import at.gv.egiz.pdfas.web.helper.DigestHelper;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
-import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.store.RequestStore;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -76,16 +74,16 @@ public class UIEntryPointServlet extends HttpServlet {
 				throw new PdfAsStoreException("Wrong Parameters");
 			}
 
-			PdfasSignRequest pdfAsRequest = RequestStore.getInstance()
+			val storeEntry = RequestStore.getInstance()
 					.fetchStoreEntry(storeId);
 
-			if (pdfAsRequest == null) {
+			if (storeEntry == null) {
 				throw new PdfAsStoreException("Invalid " + REQUEST_ID_PARAM
 						+ " value");
 			}
 
-			StatisticEvent statisticEvent = RequestStore.getInstance()
-					.fetchStatisticEntry(storeId);
+			val pdfAsRequest = storeEntry.getLeft();
+			val statisticEvent = storeEntry.getRight();
 
 			PdfAsHelper.setStatisticEvent(req, resp, statisticEvent);
 			

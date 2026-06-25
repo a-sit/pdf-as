@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -20,7 +21,6 @@ import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.store.db.Request;
 import at.gv.egiz.pdfas.web.store.db.Response;
-import at.gv.egiz.pdfas.web.store.db.StatisticRequest;
 
 public class DBRequestStore implements IRequestStore {
 
@@ -28,17 +28,15 @@ public class DBRequestStore implements IRequestStore {
       .getLogger(DBRequestStore.class);
 
   private final SessionFactory sessions;
-  private final ServiceRegistry serviceRegistry;
 
   public DBRequestStore() {
     final Configuration cfg = new Configuration();
     cfg.addAnnotatedClass(Request.class);
     cfg.addAnnotatedClass(Response.class);
-    cfg.addAnnotatedClass(StatisticRequest.class);
     cfg.setProperties(WebConfiguration.getHibernateProps());
 
-    serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
-        cfg.getProperties()).build();
+    ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
+                cfg.getProperties()).build();
 
     sessions = cfg.buildSessionFactory(serviceRegistry);
   }
@@ -50,24 +48,18 @@ public class DBRequestStore implements IRequestStore {
     final Date date = calendar.getTime();
     final SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     logger.info("Clearing Entries before: " + dt.format(date));
-    Session session = null;
-    Transaction tx = null;
-    try {
-      session = sessions.openSession();
-      tx = session.beginTransaction();
-      final Query query = session.createQuery("delete from Request as req"
-          + " where req.created < :date");
-      query.setCalendar("date", calendar);
-      query.executeUpdate();
-      tx.commit();
-    } catch (final Throwable e) {
-      logger.error("Failed to save Request", e);
-      tx.rollback();
-    } finally {
-      if (session != null) {
-        session.close();
+      Transaction tx = null;
+      try (Session session = sessions.openSession()) {
+          tx = session.beginTransaction();
+          final Query query = session.createQuery("delete from Request as req"
+                  + " where req.created < :date");
+          query.setParameter("date", calendar.getTime());
+          query.executeUpdate();
+          tx.commit();
+      } catch (final Throwable e) {
+          logger.error("Failed to save Request", e);
+          if (tx != null) tx.rollback();
       }
-    }
   }
 
   public void cleanOldRequestException() {
@@ -77,29 +69,18 @@ public class DBRequestStore implements IRequestStore {
     final Date date = calendar.getTime();
     final SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     logger.info("Clearing Entries before: " + dt.format(date));
-    Session session = null;
-    try {
-      session = sessions.openSession();
-      final Query query = session.createQuery("delete from Request as req"
-          + " where req.created < :date");
-      query.setCalendar("date", calendar);
-      query.executeUpdate();
+      try (Session session = sessions.openSession()) {
+          final Query query = session.createQuery("delete from Request as req"
+                  + " where req.created < :date");
+          query.setParameter("date", calendar.getTime());
+          query.executeUpdate();
 
-      final Query queryStat = session.createQuery("delete from StatisticRequest as req"
-          + " where req.created < :date");
-      queryStat.setCalendar("date", calendar);
-      queryStat.executeUpdate();
+          final Query queryResponse = session.createQuery("delete from Response as req"
+                  + " where req.created < :date");
+          queryResponse.setParameter("date", calendar.getTime());
+          queryResponse.executeUpdate();
 
-      final Query queryResponse = session.createQuery("delete from Response as req"
-          + " where req.created < :date");
-      queryResponse.setCalendar("date", calendar);
-      queryResponse.executeUpdate();
-      
-    } finally {
-      if (session != null) {
-        session.close();
       }
-    }
   }
 
   @Override
@@ -107,119 +88,68 @@ public class DBRequestStore implements IRequestStore {
       StatisticEvent event) {
     // Clean Old Requests
     this.cleanOldRequests();
-    Session session = null;
-    Transaction tx = null;
-    try {
-      session = sessions.openSession();
-      tx = session.beginTransaction();
-      final Request dbRequest = new Request();
-      dbRequest.setSignRequest(request);
-      dbRequest.setCreated(Calendar.getInstance().getTime());
-      session.save(dbRequest);
+      Transaction tx = null;
+      try (Session session = sessions.openSession()) {
+          tx = session.beginTransaction();
+          final Request dbRequest = new Request();
+          dbRequest.setSignRequest(request);
+          dbRequest.setStatisticEvent(event);
+          dbRequest.setCreated(Calendar.getInstance().getTime());
+          session.persist(dbRequest);
 
-      final StatisticRequest statisticRequest = new StatisticRequest();
-      statisticRequest.setStatisticEvent(event);
-      statisticRequest.setCreated(Calendar.getInstance().getTime());
-      session.save(statisticRequest);
-
-      tx.commit();
-      return dbRequest.getId();
-    } catch (final Throwable e) {
-      logger.error("Failed to save Request", e);
-      tx.rollback();
-      return null;
-    } finally {
-      if (session != null) {
-        session.close();
+          tx.commit();
+          return dbRequest.getId();
+      } catch (final Throwable e) {
+          logger.error("Failed to save Request", e);
+          if (tx != null) tx.rollback();
+          return null;
       }
-    }
   }
 
   @Override
-  public PdfasSignRequest fetchStoreEntry(String id) {
+  public Pair<PdfasSignRequest, StatisticEvent> fetchStoreEntry(String id) {
     // Clean Old Requests
     this.cleanOldRequests();
 
-    Session session = null;
-    Transaction tx = null;
-    try {
-      session = sessions.openSession();
-      tx = session.beginTransaction();
-      final Request dbRequest = session.get(Request.class, id);
+      Transaction tx = null;
+      try (Session session = sessions.openSession()) {
+          tx = session.beginTransaction();
+          final Request dbRequest = session.get(Request.class, id);
+          if (dbRequest == null) return null;
 
-      final PdfasSignRequest request = dbRequest.getSignRequest();
+          final PdfasSignRequest request = dbRequest.getSignRequest();
+          final StatisticEvent event = dbRequest.getStatisticEvent();
+          session.remove(dbRequest);
 
-      session.delete(dbRequest);
-
-      tx.commit();
-      return request;
-    } catch (final Throwable e) {
-      logger.error("Failed to fetch Request", e);
-      tx.rollback();
-      return null;
-    } finally {
-      if (session != null) {
-        session.close();
+          tx.commit();
+          return Pair.of(request, event);
+      } catch (final Throwable e) {
+          logger.error("Failed to fetch Request", e);
+          if (tx != null) tx.rollback();
+          return null;
       }
-    }
 
-  }
-
-  @Override
-  public StatisticEvent fetchStatisticEntry(String id) {
-    // Clean Old Requests
-    this.cleanOldRequests();
-
-    Session session = null;
-    Transaction tx = null;
-    try {
-      session = sessions.openSession();
-      tx = session.beginTransaction();
-      final StatisticRequest dbRequest = session.get(
-          StatisticRequest.class, id);
-
-      final StatisticEvent request = dbRequest.getStatisticEvent();
-
-      session.delete(dbRequest);
-
-      tx.commit();
-      return request;
-    } catch (final Throwable e) {
-      logger.error("Failed to fetch Request", e);
-      tx.rollback();
-      return null;
-    } finally {
-      if (session != null) {
-        session.close();
-      }
-    }
   }
 
   @Override
   public String createNewResponseEntry(PdfasSignResponse response) {
     // Clean Old Requests
     this.cleanOldRequests();
-    Session session = null;
-    Transaction tx = null;
-    try {
-      session = sessions.openSession();
-      tx = session.beginTransaction();
-      final Response dbRequest = new Response();
-      dbRequest.setSignedResponse(response);
-      dbRequest.setCreated(Calendar.getInstance().getTime());
-      session.save(dbRequest);
+      Transaction tx = null;
+      try (Session session = sessions.openSession()) {
+          tx = session.beginTransaction();
+          final Response dbRequest = new Response();
+          dbRequest.setSignedResponse(response);
+          dbRequest.setCreated(Calendar.getInstance().getTime());
+          session.persist(dbRequest);
 
-      tx.commit();
-      return dbRequest.getId();
-    } catch (final Throwable e) {
-      logger.error("Failed to save Request", e);
-      tx.rollback();
-      return null;
-    } finally {
-      if (session != null) {
-        session.close();
+          tx.commit();
+          return dbRequest.getId();
+      } catch (final Throwable e) {
+          logger.error("Failed to save Request", e);
+          if (tx != null) tx.rollback();
+          return null;
       }
-    }
   }
 
   @Override
@@ -227,27 +157,21 @@ public class DBRequestStore implements IRequestStore {
     // Clean Old Requests
     this.cleanOldRequests();
 
-    Session session = null;
-    Transaction tx = null;
-    try {
-      session = sessions.openSession();
-      tx = session.beginTransaction();
-      final Response dbResponse = session.get(Response.class, id);
+      Transaction tx = null;
+      try (Session session = sessions.openSession()) {
+          tx = session.beginTransaction();
+          final Response dbResponse = session.get(Response.class, id);
 
-      final PdfasSignResponse request = dbResponse.getSignedResponse();
+          final PdfasSignResponse request = dbResponse.getSignedResponse();
 
-      session.delete(dbResponse);
+          session.remove(dbResponse);
 
-      tx.commit();
-      return request;
-    } catch (final Throwable e) {
-      logger.error("Failed to fetch Response", e);
-      tx.rollback();
-      return null;
-    } finally {
-      if (session != null) {
-        session.close();
+          tx.commit();
+          return request;
+      } catch (final Throwable e) {
+          logger.error("Failed to fetch Response", e);
+          if (tx != null) tx.rollback();
+          return null;
       }
-    }
   }
 }

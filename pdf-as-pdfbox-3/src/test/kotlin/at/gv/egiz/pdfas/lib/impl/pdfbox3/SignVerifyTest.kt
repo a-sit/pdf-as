@@ -8,6 +8,8 @@ import at.gv.egiz.pdfas.lib.api.sign.SignParameter
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore
 import jakarta.activation.DataSource
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.ClassRule
@@ -93,10 +95,51 @@ class SignVerifyTest {
                     signatureVerificationLevel = VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
                 }
                 .let(pdfAs::verify)
-        Assert.assertEquals(verificationResult.size, 1)
+        Assert.assertEquals(1, verificationResult.size)
         verificationResult[0].let {
             Assert.assertTrue(it.isVerificationDone)
-            Assert.assertEquals(it.signerCertificate, getKeystoreSigner("test-key").getCertificate(null))
+            Assert.assertEquals(getKeystoreSigner("test-key").getCertificate(null), it.signerCertificate)
+        }
+    }
+
+    @Test
+    fun existingAcroForm() {
+        val input = getInputPdf("existing-acroform.pdf")
+
+        val originalFieldCount = input.inputStream.use { stream ->
+            Loader.loadPDF(stream.readAllBytes()).use { document ->
+                val acroForm = requireNotNull(document.documentCatalog.acroForm)
+                require(acroForm.fields.none { it is PDSignatureField })
+                acroForm.fields.size.also { require (it>0) }
+            }
+        }
+
+        val signedPdf = captureSign(input, getKeystoreSigner("test-key"))
+
+        Loader.loadPDF(signedPdf).use { document ->
+            val acroForm = requireNotNull(document.documentCatalog.acroForm)
+            val signatureFields = acroForm.fields.filterIsInstance<PDSignatureField>()
+
+            Assert.assertEquals("Wrong field count",
+                originalFieldCount + 1, acroForm.fields.size)
+            Assert.assertEquals("Signature field missing",
+                1, signatureFields.size
+            )
+
+            val signatureField = signatureFields.single()
+
+            Assert.assertNotNull("Signature value missing", signatureField.signature)
+
+            val annotations = document.pages.flatMap { it.annotations }
+
+            Assert.assertTrue(
+                "Signature widget missing",
+                signatureField.widgets.any { widget ->
+                    annotations.any { annotation ->
+                        annotation.cosObject === widget.cosObject
+                    }
+                }
+            )
         }
     }
 }

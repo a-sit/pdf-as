@@ -61,12 +61,7 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
 
     @JvmStatic
     fun findEmptySignatureFields(doc: PDDocument) =
-        doc.documentCatalog.acroForm?.fields?.asSequence()
-            ?.filterIsInstance<PDSignatureField>()
-            ?.filter { it.signature == null }
-            ?.mapNotNull { it.partialName }
-            ?.toList()
-            ?: emptyList()
+        doc.signatureFields.asSequence().filter { it.signature == null }.mapNotNull { it.partialName }.toList()
 
     /**
      * Returns the next unused signature placeholder

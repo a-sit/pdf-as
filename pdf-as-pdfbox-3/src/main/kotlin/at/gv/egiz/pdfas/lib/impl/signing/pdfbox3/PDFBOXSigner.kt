@@ -147,7 +147,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             ?.let { it.getField(sigFieldName) as? PDSignatureField }
             ?.let { field ->
                 check (field.signature == null) { "The signature field $sigFieldName is already signed." }
-                PDSignature().also { field.cosObject.setItem(COSName.V, it) }
+                PDSignature().also { field.value = it }
             }
 
     private fun getSignatureFieldNameConfig(pdfObject: PDFBOXObject): String? =
@@ -210,16 +210,10 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
         val baseName = getSignatureFieldNameConfig(pdfObject) ?: "PDF-AS Signatur"
 
         val existingSignatureNames =
-            doc.document.trailer
-                .getCOSDictionary(COSName.ROOT)
-                .getCOSDictionary(COSName.ACRO_FORM)
-                .getCOSArray(COSName.FIELDS)
-                .asDereferencedSequence()
-                .mapNotNull {
-                    if (it !is COSDictionary) return@mapNotNull null
-                    if (it.getNameAsString(COSName.FT) != "Sig") return@mapNotNull null
-                    it.getString(COSName.T)?.takeIf { n -> n.startsWith(baseName) }
-                }
+            doc.signatureFields
+                .asSequence()
+                .mapNotNull { it.partialName }
+                .filter { it.startsWith(baseName) }
                 .toSet()
 
         var i = 1
@@ -481,8 +475,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             doc.addSignature(signature, signer, options)
 
             val signatureField =
-                doc.documentCatalog.acroForm?.fields?.asSequence()
-                    ?.filterIsInstance<PDSignatureField>()
+                doc.signatureFields
                     ?.firstOrNull { it.signature?.cosObject == signature.cosObject }
                     ?: throw IllegalStateException("Cannot find signature field after addSignature?")
 

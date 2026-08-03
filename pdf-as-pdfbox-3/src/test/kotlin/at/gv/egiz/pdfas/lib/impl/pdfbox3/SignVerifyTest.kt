@@ -204,4 +204,17 @@ class SignVerifyTest {
             Assert.assertNotNull(field.signature)
         }
     }
+
+    @Test
+    fun unsupportedSignatureFilter() {
+        val parameter = PdfAsFactory.createVerifyParameter(
+            pdfAs.configuration,
+            getInputPdf("unsupported-filter.pdf")
+        ).apply {
+            signatureVerificationLevel =
+                VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
+        }
+
+        Assert.assertTrue(PDFBOXVerifier.verify(parameter).isEmpty())
+    }
 }

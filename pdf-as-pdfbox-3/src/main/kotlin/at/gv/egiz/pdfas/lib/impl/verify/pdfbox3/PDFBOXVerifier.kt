@@ -54,7 +54,7 @@ object PDFBOXVerifier : VerifyBackend {
         val subFilter = sigDict.getNameAsString(COSName.SUB_FILTER)
         val content = sigDict.getDictionaryObject(COSName.CONTENTS) as COSString
 
-        val filterVerifier = getVerifier(filter, subFilter)
+        val filterVerifier = getVerifier(filter, subFilter) ?: return emptyList()
         val levelVerifier = getVerifierByLevel(parameter.signatureVerificationLevel)
         synchronized(levelVerifier) {
             levelVerifier.setConfiguration(parameter.configuration)

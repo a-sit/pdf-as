@@ -142,4 +142,27 @@ class SignVerifyTest {
             )
         }
     }
+
+
+    /**
+     * Signature fields must have unique fully qualified names, otherwise Adobe Reader treats
+     * them as a single field and only ever reports the first signature.
+     */
+    @Test
+    fun signTwiceYieldsUniqueSignatureFieldNames() {
+        val signedOnce = captureSign(getInputPdf("align.pdf"), getKeystoreSigner("test-key"))
+        val signedTwice = captureSign(ByteArrayDataSource(signedOnce), getKeystoreSigner("test-key"))
+
+        val fieldNames = Loader.loadPDF(signedTwice).use { doc ->
+            doc.documentCatalog.acroForm.fieldTree
+                .filterIsInstance<PDSignatureField>()
+                .map { it.fullyQualifiedName }
+        }
+
+        Assert.assertEquals("expected two signature fields", 2, fieldNames.size)
+        Assert.assertEquals(
+            "signature field names must be unique, but were $fieldNames",
+            fieldNames.size, fieldNames.toSet().size
+        )
+    }
 }

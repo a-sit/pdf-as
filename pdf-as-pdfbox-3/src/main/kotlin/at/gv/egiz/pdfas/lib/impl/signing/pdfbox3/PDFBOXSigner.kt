@@ -36,6 +36,7 @@ import org.apache.pdfbox.cos.COSArray
 import org.apache.pdfbox.cos.COSDictionary
 import org.apache.pdfbox.cos.COSInteger
 import org.apache.pdfbox.cos.COSName
+import org.apache.pdfbox.cos.COSObject
 import org.apache.pdfbox.cos.COSString
 import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -214,8 +215,9 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             doc.document.trailer
                 .getCOSDictionary(COSName.ROOT)
                 .getCOSDictionary(COSName.ACRO_FORM)
-                .getCOSArray(COSName.FIELDS)
-                .asSequence()
+                .getCOSArray(COSName.FIELDS).let {
+                    (0..<it.size()).asSequence().map(it::getObject)
+                }
                 .mapNotNull {
                     if (it !is COSDictionary) return@mapNotNull null
                     if (it.getNameAsString(COSName.FT) != "Sig") return@mapNotNull null

@@ -1,6 +1,7 @@
 package at.gv.egiz.pdfas.lib.impl.pdfbox3
 
 import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource
+import at.gv.egiz.pdfas.lib.api.IConfigurationConstants
 import at.gv.egiz.pdfas.lib.api.PdfAs
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner
@@ -37,10 +38,11 @@ class SignVerifyTest {
                 it.toByteArray()
             }
 
-        fun captureSign(pdf: DataSource, signer: IPlainSigner) =
+        fun captureSign(pdf: DataSource, signer: IPlainSigner, config: SignParameter.()->Unit = {}) =
             captureSign(
                 PdfAsFactory.createSignParameter(pdfAs.configuration, pdf, null)
                     .apply { plainSigner = signer }
+                    .apply(config)
             )
 
         @JvmStatic
@@ -187,5 +189,19 @@ class SignVerifyTest {
         }
 
         Assert.assertEquals(1, PDFBOXVerifier.verify(parameter).size)
+    }
+
+    @Test
+    fun existingEmptySignatureField() {
+        val fieldName = "ownerSignature"
+        val output = captureSign(getInputPdf("acroform-placeholder.pdf"), getKeystoreSigner("test-key")) {
+            configuration.setValue(IConfigurationConstants.SIGNATURE_FIELD_NAME, fieldName)
+        }
+        Loader.loadPDF(output).use { doc ->
+            val field = doc.documentCatalog.acroForm
+                .getField(fieldName) as PDSignatureField
+
+            Assert.assertNotNull(field.signature)
+        }
     }
 }

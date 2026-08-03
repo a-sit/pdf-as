@@ -16,7 +16,6 @@ import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration
 import at.gv.egiz.pdfas.lib.impl.pdfbox3.PDFBOXObject
 import at.gv.egiz.pdfas.lib.impl.pdfbox3.PDFBoxPlaceholderExtractor.signaturePlaceholderId
 import at.gv.egiz.pdfas.lib.impl.pdfbox3.Positioning
-import at.gv.egiz.pdfas.lib.impl.pdfbox3.asDereferencedSequence
 import at.gv.egiz.pdfas.lib.impl.placeholder.PlaceholderFilter
 import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderData
 import at.gv.egiz.pdfas.lib.impl.signing.IPdfSigner

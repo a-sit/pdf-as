@@ -26,7 +26,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDPropBuild
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDPropBuildDataDict
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature
-import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField
 import org.apache.pdfbox.util.Matrix
 import org.slf4j.LoggerFactory
 import java.awt.geom.AffineTransform

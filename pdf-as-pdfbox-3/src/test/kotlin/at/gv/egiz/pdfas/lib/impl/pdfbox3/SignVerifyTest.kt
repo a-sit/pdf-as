@@ -164,7 +164,7 @@ class SignVerifyTest {
 
     /** the provided pdf has acroform fields, but none are signatures; trying to select the "last" of these should not throw */
     @Test
-    fun lastSignatureOnUnsignedAcroFormReturnsEmpty() {
+    fun lastSignatureOnUnsignedAcroForm() {
         val parameter = PdfAsFactory.createVerifyParameter(
             pdfAs.configuration,
             getInputPdf("existing-acroform.pdf")
@@ -172,7 +172,20 @@ class SignVerifyTest {
             whichSignature = -2
         }
 
-        // 4.4 returns empty; 5.0 currently throws.
         Assert.assertTrue(PDFBOXVerifier.verify(parameter).isEmpty())
+    }
+
+    /** the provided pdf has the signature field as a direct field, rather than the more common indirect fields */
+    @Test
+    fun directSignatureField() {
+        val parameter = PdfAsFactory.createVerifyParameter(
+            pdfAs.configuration,
+            getInputPdf("align-signed-direct.pdf")
+        ).apply {
+            signatureVerificationLevel =
+                VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
+        }
+
+        Assert.assertEquals(1, PDFBOXVerifier.verify(parameter).size)
     }
 }

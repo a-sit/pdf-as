@@ -16,6 +16,7 @@ import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration
 import at.gv.egiz.pdfas.lib.impl.pdfbox3.PDFBOXObject
 import at.gv.egiz.pdfas.lib.impl.pdfbox3.PDFBoxPlaceholderExtractor.signaturePlaceholderId
 import at.gv.egiz.pdfas.lib.impl.pdfbox3.Positioning
+import at.gv.egiz.pdfas.lib.impl.pdfbox3.asDereferencedSequence
 import at.gv.egiz.pdfas.lib.impl.placeholder.PlaceholderFilter
 import at.gv.egiz.pdfas.lib.impl.placeholder.SignaturePlaceholderData
 import at.gv.egiz.pdfas.lib.impl.signing.IPdfSigner
@@ -146,9 +147,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
         doc.documentCatalog.acroForm
             ?.let { it.getField(sigFieldName) as? PDSignatureField }
             ?.let { field ->
-                if (field.signature != null) {
-                    throw IllegalStateException("The signature field $sigFieldName is already signed.")
-                }
+                check (field.signature == null) { "The signature field $sigFieldName is already signed." }
                 PDSignature().also { field.cosObject.setItem(COSName.V, it) }
             }
 
@@ -215,9 +214,8 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             doc.document.trailer
                 .getCOSDictionary(COSName.ROOT)
                 .getCOSDictionary(COSName.ACRO_FORM)
-                .getCOSArray(COSName.FIELDS).let {
-                    (0..<it.size()).asSequence().map(it::getObject)
-                }
+                .getCOSArray(COSName.FIELDS)
+                .asDereferencedSequence()
                 .mapNotNull {
                     if (it !is COSDictionary) return@mapNotNull null
                     if (it.getNameAsString(COSName.FT) != "Sig") return@mapNotNull null

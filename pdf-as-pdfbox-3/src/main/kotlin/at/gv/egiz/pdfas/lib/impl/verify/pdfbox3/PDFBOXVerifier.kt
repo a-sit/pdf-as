@@ -3,6 +3,7 @@ package at.gv.egiz.pdfas.lib.impl.verify.pdfbox3
 import at.gv.egiz.pdfas.common.settings.ISettings
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult
+import at.gv.egiz.pdfas.lib.impl.pdfbox3.asDereferencedSequence
 import at.gv.egiz.pdfas.lib.impl.verify.SignatureInputData
 import at.gv.egiz.pdfas.lib.impl.verify.VerifierDispatcher
 import at.gv.egiz.pdfas.lib.impl.verify.VerifyBackend
@@ -30,9 +31,8 @@ object PDFBOXVerifier : VerifyBackend {
                 signatureIndex == -2 -> -2
                 else -> null
             }
-            return fields.asSequence()
-                .filterIsInstance<COSObject>()
-                .mapNotNull { it.`object` as? COSDictionary }
+            return fields.asDereferencedSequence()
+                .filterIsInstance<COSDictionary>()
                 .filter { it.getCOSName(COSName.FT) == COSName.SIG }
                 .let {
                     if (onlyVerifyThisSignature == -2) sequenceOf(it.lastOrNull()).filterNotNull()

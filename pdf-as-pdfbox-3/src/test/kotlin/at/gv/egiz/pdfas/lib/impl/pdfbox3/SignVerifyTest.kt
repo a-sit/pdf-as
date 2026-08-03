@@ -6,6 +6,7 @@ import at.gv.egiz.pdfas.lib.api.PdfAsFactory
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter
+import at.gv.egiz.pdfas.lib.impl.verify.pdfbox3.PDFBOXVerifier
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore
 import jakarta.activation.DataSource
 import org.apache.pdfbox.Loader
@@ -94,7 +95,7 @@ class SignVerifyTest {
                 .apply {
                     signatureVerificationLevel = VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
                 }
-                .let(pdfAs::verify)
+                .let(PDFBOXVerifier::verify)
         Assert.assertEquals(1, verificationResult.size)
         verificationResult[0].let {
             Assert.assertTrue(it.isVerificationDone)
@@ -143,11 +144,6 @@ class SignVerifyTest {
         }
     }
 
-
-    /**
-     * Signature fields must have unique fully qualified names, otherwise Adobe Reader treats
-     * them as a single field and only ever reports the first signature.
-     */
     @Test
     fun signTwiceYieldsUniqueSignatureFieldNames() {
         val signedOnce = captureSign(getInputPdf("align.pdf"), getKeystoreSigner("test-key"))
@@ -164,5 +160,19 @@ class SignVerifyTest {
             "signature field names must be unique, but were $fieldNames",
             fieldNames.size, fieldNames.toSet().size
         )
+    }
+
+    /** the provided pdf has acroform fields, but none are signatures; trying to select the "last" of these should not throw */
+    @Test
+    fun lastSignatureOnUnsignedAcroFormReturnsEmpty() {
+        val parameter = PdfAsFactory.createVerifyParameter(
+            pdfAs.configuration,
+            getInputPdf("existing-acroform.pdf")
+        ).apply {
+            whichSignature = -2
+        }
+
+        // 4.4 returns empty; 5.0 currently throws.
+        Assert.assertTrue(PDFBOXVerifier.verify(parameter).isEmpty())
     }
 }

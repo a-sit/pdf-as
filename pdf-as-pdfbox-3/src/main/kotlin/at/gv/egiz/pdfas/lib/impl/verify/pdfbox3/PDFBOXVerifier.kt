@@ -35,7 +35,7 @@ object PDFBOXVerifier : VerifyBackend {
                 .mapNotNull { it.`object` as? COSDictionary }
                 .filter { it.getCOSName(COSName.FT) == COSName.SIG }
                 .let {
-                    if (onlyVerifyThisSignature == -2) sequenceOf(it.last())
+                    if (onlyVerifyThisSignature == -2) sequenceOf(it.lastOrNull()).filterNotNull()
                     else it.filterIndexed { i, _ -> onlyVerifyThisSignature?.equals(i) ?: true }
                 }
                 .mapNotNull { it.getCOSDictionary(COSName.V) }

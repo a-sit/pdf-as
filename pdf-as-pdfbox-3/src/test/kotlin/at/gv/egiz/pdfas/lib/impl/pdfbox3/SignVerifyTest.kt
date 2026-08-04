@@ -7,10 +7,11 @@ import at.gv.egiz.pdfas.lib.api.PdfAsFactory
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter
-import at.gv.egiz.pdfas.lib.impl.verify.pdfbox3.PDFBOXVerifier
+import at.gv.egiz.pdfas.lib.api.verify.VerifyResult
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore
 import jakarta.activation.DataSource
 import org.apache.pdfbox.Loader
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField
 import org.junit.Assert
 import org.junit.BeforeClass
@@ -39,11 +40,15 @@ class SignVerifyTest {
             }
 
         fun captureSign(pdf: DataSource, signer: IPlainSigner, config: SignParameter.()->Unit = {}) =
-            captureSign(
-                PdfAsFactory.createSignParameter(pdfAs.configuration, pdf, null)
-                    .apply { plainSigner = signer }
-                    .apply(config)
-            )
+            PdfAsFactory.createSignParameter(pdfAs.configuration, pdf, null)
+                .apply { plainSigner = signer }
+                .apply(config)
+                .let(::captureSign)
+
+        fun doVerify(pdf: DataSource, config: VerifyParameter.()->Unit = {}) : List<VerifyResult> =
+            PdfAsFactory.createVerifyParameter(pdfAs.configuration, pdf).apply {
+                signatureVerificationLevel = VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
+            }.apply(config).let(pdfAs::verify)
 
         @JvmStatic
         @BeforeClass
@@ -56,48 +61,45 @@ class SignVerifyTest {
             )
             pdfAs = PdfAsFactory.createPdfAs(configDir)
         }
+    }
 
-        val getInputPdf = object : Function1<String, ByteArrayDataSource> {
-            private val _map = mutableMapOf<String, ByteArrayDataSource>()
-            private fun normalize(key: String) = when {
-                key.endsWith(".pdf") -> key
-                else -> "$key.pdf"
-            }
+    private object getInputPdf : Function1<String, ByteArrayDataSource>, Function2<String, PDDocument.()->Unit, ByteArrayDataSource> {
+        private val _map = mutableMapOf<String, ByteArrayDataSource>()
+        private fun normalize(key: String) = when {
+            key.endsWith(".pdf") -> key
+            else -> "$key.pdf"
+        }
 
-            override operator fun invoke(key: String) = normalize(key).let { pdfName ->
-                _map.getOrPut(pdfName) {
-                    SignVerifyTest::class.java.getResourceAsStream("/data/$pdfName").use {
-                        ByteArrayDataSource(it!!.readAllBytes())
-                    }
+        override operator fun invoke(key: String) = normalize(key).let { pdfName ->
+            _map.getOrPut(pdfName) {
+                SignVerifyTest::class.java.getResourceAsStream("/data/$pdfName").use {
+                    ByteArrayDataSource(it!!.readAllBytes())
                 }
             }
         }
 
-        val getKeystoreSigner = object : Function1<String, PAdESSignerKeystore> {
-            private val _keyStore = KeyStore.getInstance("PKCS12").apply {
-                SignVerifyTest::class.java.getResourceAsStream("/test.p12").use {
-                    load(it, "password".toCharArray())
-                }
+        override operator fun invoke(key: String, verifier: PDDocument.()->Unit) =
+            invoke(key).also {
+                it.inputStream.use { input -> Loader.loadPDF(input.readAllBytes()).use(verifier) }
             }
-            private val _map = mutableMapOf<String, PAdESSignerKeystore>()
-            override operator fun invoke(alias: String) = _map.getOrPut(alias) {
-                PAdESSignerKeystore(_keyStore, alias, "password")
+    }
+
+    private object getKeystoreSigner : Function1<String, PAdESSignerKeystore> {
+        private val _keyStore = KeyStore.getInstance("PKCS12").apply {
+            SignVerifyTest::class.java.getResourceAsStream("/test.p12").use {
+                load(it, "password".toCharArray())
             }
+        }
+        private val _map = mutableMapOf<String, PAdESSignerKeystore>()
+        override operator fun invoke(alias: String) = _map.getOrPut(alias) {
+            PAdESSignerKeystore(_keyStore, alias, "password")
         }
     }
 
     @Test
     fun signVerify() {
         val signedPdf = captureSign(getInputPdf("align.pdf"), getKeystoreSigner("test-key"))
-        val verificationResult =
-            PdfAsFactory.createVerifyParameter(
-                pdfAs.configuration,
-                ByteArrayDataSource(signedPdf)
-            )
-                .apply {
-                    signatureVerificationLevel = VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
-                }
-                .let(PDFBOXVerifier::verify)
+        val verificationResult = doVerify(ByteArrayDataSource(signedPdf))
         Assert.assertEquals(1, verificationResult.size)
         verificationResult[0].let {
             Assert.assertTrue(it.isVerificationDone)
@@ -167,28 +169,17 @@ class SignVerifyTest {
     /** the provided pdf has acroform fields, but none are signatures; trying to select the "last" of these should not throw */
     @Test
     fun lastSignatureOnUnsignedAcroForm() {
-        val parameter = PdfAsFactory.createVerifyParameter(
-            pdfAs.configuration,
-            getInputPdf("existing-acroform.pdf")
-        ).apply {
+        val result = doVerify(getInputPdf("existing-acroform.pdf")) {
             whichSignature = -2
         }
-
-        Assert.assertTrue(PDFBOXVerifier.verify(parameter).isEmpty())
+        Assert.assertTrue(result.isEmpty())
     }
 
     /** the provided pdf has the signature field as a direct field, rather than the more common indirect fields */
     @Test
     fun directSignatureField() {
-        val parameter = PdfAsFactory.createVerifyParameter(
-            pdfAs.configuration,
-            getInputPdf("align-signed-direct.pdf")
-        ).apply {
-            signatureVerificationLevel =
-                VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
-        }
-
-        Assert.assertEquals(1, PDFBOXVerifier.verify(parameter).size)
+        val result = doVerify((getInputPdf("align-signed-direct.pdf")))
+        Assert.assertEquals(1, result.size)
     }
 
     @Test
@@ -207,14 +198,7 @@ class SignVerifyTest {
 
     @Test
     fun unsupportedSignatureFilter() {
-        val parameter = PdfAsFactory.createVerifyParameter(
-            pdfAs.configuration,
-            getInputPdf("unsupported-filter.pdf")
-        ).apply {
-            signatureVerificationLevel =
-                VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
-        }
-
-        Assert.assertTrue(PDFBOXVerifier.verify(parameter).isEmpty())
+        val result = doVerify(getInputPdf("unsupported-filter.pdf"))
+        Assert.assertTrue(result.isEmpty())
     }
 }

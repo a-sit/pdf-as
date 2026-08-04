@@ -104,7 +104,7 @@ public class JsonSoapParameterNamingTest {
     assertJsonHasOnlySoapName(serializedParameters, "preprocessorArguments", "preprocessor");
     assertJsonHasOnlySoapName(serializedParameters, "configurationOverrides", "overrides");
     assertJsonHasOnlySoapName(serializedParameters, "qrCodeContent", "QRCodeContent", "qrcodecontent");
-    assertEquals("jks", serializedParameters.get("connector").asText());
+    assertEquals("jks", serializedParameters.get("connector").asString());
   }
 
   @Test
@@ -156,7 +156,7 @@ public class JsonSoapParameterNamingTest {
     assertJsonHasOnlySoapName(serialized, "configurationOverrides", "overrides");
     assertJsonHasOnlySoapName(serialized, "signatureBlockParameter", "signatureBlockParameters");
     assertJsonHasOnlySoapName(serialized, "documents", "input");
-    assertEquals("mobilebku", serialized.get("connector").asText());
+    assertEquals("mobilebku", serialized.get("connector").asString());
 
     final PdfasSignedDocument signedDocument = new PdfasSignedDocument();
     signedDocument.setFileName("one.pdf");
@@ -168,7 +168,7 @@ public class JsonSoapParameterNamingTest {
 
     final JsonNode serializedResponse = om.valueToTree(response);
     assertJsonHasOnlySoapName(serializedResponse, "documents", "output");
-    assertEquals("one.pdf", serializedResponse.get("documents").get(0).get("fileName").asText());
+    assertEquals("one.pdf", serializedResponse.get("documents").get(0).get("fileName").asString());
   }
 
   @Test

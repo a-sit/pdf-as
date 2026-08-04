@@ -1,0 +1,87 @@
+name: Publish Development Snapshot
+
+on:
+  workflow_run:
+    workflows:
+      - Build
+    types:
+      - completed
+    branches:
+      - development
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: github-packages-development-snapshot
+  queue: max
+
+jobs:
+  publish:
+    # Prevent publishing after a manual workflow run.
+    if: >-
+      ${{
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push'
+      }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Verify snapshot version
+        shell: bash
+        run: |
+          version="$(
+            ./gradlew properties --quiet |
+              sed -n 's/^version: //p' |
+              head -n 1
+          )"
+
+          case "$version" in
+            *-SNAPSHOT)
+              echo "Publishing snapshot version: $version"
+              ;;
+            *)
+              echo "::error::Development version is not a SNAPSHOT: $version"
+              exit 1
+              ;;
+          esac
+
+      - name: Verify current development HEAD
+        id: head
+        shell: bash
+        run: |
+          git fetch --no-tags origin development
+          remote_sha="$(git rev-parse origin/development)"
+
+          if [[ "${{ github.event.workflow_run.head_sha }}" == "$remote_sha" ]]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::A newer development commit exists; skipping publication."
+          fi
+
+      - name: Publish snapshot
+        if: steps.head.outputs.current == 'true'
+        run: >
+          ./gradlew
+          --stacktrace
+          publishAllPublicationsToGithubPackagesRepository
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

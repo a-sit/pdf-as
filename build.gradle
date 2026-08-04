@@ -219,6 +219,7 @@ subprojects {
 	java {
 		sourceCompatibility = JavaVersion.VERSION_17
 		targetCompatibility = JavaVersion.VERSION_17
+		withSourcesJar()
 	}
 	compileJava.options.encoding = "UTF-8"
 	compileTestJava.options.encoding = "UTF-8"
@@ -247,6 +248,22 @@ subprojects {
             	name = 'egiz_repo'
             	 url = version.endsWith('SNAPSHOT') ? project.snapshotRepoUrl : project.releaseRepoUrl
         	}
+
+			// for github CI
+			def githubRepository = System.getenv("GITHUB_REPOSITORY")
+			def githubActor = System.getenv("GITHUB_ACTOR")
+			def githubToken = System.getenv("GITHUB_TOKEN")
+			if ((githubRepository != null) && (githubActor != null) && (githubToken != null)) {
+				maven {
+					name = "GithubPackages"
+					url = uri("https://maven.pkg.github.com/" + githubRepository.toLowerCase())
+
+					credentials {
+						username = githubActor
+						password = githubToken
+					}
+				}
+			}
     	}
 	}	
 	

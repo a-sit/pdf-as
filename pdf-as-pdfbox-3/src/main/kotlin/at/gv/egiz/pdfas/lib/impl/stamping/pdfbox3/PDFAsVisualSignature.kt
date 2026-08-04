@@ -189,9 +189,8 @@ object PDFAsVisualSignature {
 
             pdfStructure.visualSignature = pdfStructure.template.document
 
-            pdfStructure.widgetDictionary = pdfStructure.signatureField.widgets[0].cosObject.apply {
-                isNeedToBeUpdated = true
-                setItem(COSName.DR, pdfStructure.holderFormResources.cosObject)
+            pdfStructure.widgetDictionary = pdfStructure.signatureField.widgets[0].cosObject.also {
+                it.setItem(COSName.DR, pdfStructure.holderFormResources)
             }
 
             if (signatureProfileSettings.isPDFA3) {

@@ -247,9 +247,11 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                         setName(COSName.O, "Layout")
                         setName("Placement", "Block")
                     })
-                    isNeedToBeUpdated = true
                 }
-            }.also(docElement::appendKid)
+            }.also {
+                docElement.appendKid(it)
+                docElement.cosObject.isNeedToBeUpdated = true
+            }
 
             val ntn = structureTreeRoot.parentTree ?: run {
                 logger.info("No number-tree-node found!")
@@ -277,12 +279,12 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                     })
                 }, PDNumberTreeNode::class.java).let {
                     ntnKids.add(it)
-                    ntnKids.isNeedToBeUpdated = true
+                    ntn.cosObject.isNeedToBeUpdated = true
                 }
             } else if ((ntnNumbers != null) && (ntnKids == null)) {
                 ntnNumbers.add(parentTreeNextKeyCOS)
-                ntnNumbers.add(sigBlock.cosObject)
-                ntnNumbers.isNeedToBeUpdated = true
+                ntnNumbers.add(sigBlock)
+                ntn.cosObject.isNeedToBeUpdated = true
                 structureTreeRoot.parentTree = ntn
             } else {
                 logger.error(
@@ -293,19 +295,10 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
 
             annotationObj.structParent = parentTreeNextKey
             structureTreeRoot.parentTreeNextKey = parentTreeNextKey + 1
-            annotationPage.cosObject.let {
-                it.setName("Tabs", "S")
-                it.isNeedToBeUpdated = true
-            }
+            annotationPage.cosObject.setName("Tabs", "S")
 
             if (signatureField.alternateFieldName.isEmpty())
                 signatureField.alternateFieldName = signatureField.partialName
-
-            ntn.cosObject.isNeedToBeUpdated = true
-            sigBlock.cosObject.isNeedToBeUpdated = true
-            structureTreeRoot.cosObject.isNeedToBeUpdated = true
-            objectDic.isNeedToBeUpdated = true
-            docElement.cosObject.isNeedToBeUpdated = true
 
         } catch (e: Throwable) {
             if (signatureProfileSettings.isPDFUA) {
@@ -427,8 +420,6 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                         val last = doc.numberOfPages - 1
                         val root = doc.documentCatalog
                         val lastPage = root.pages[last]
-                        root.pages.cosObject.isNeedToBeUpdated = true
-
                         doc.addPage(
                             PDPage(lastPage.mediaBox).apply {
                                 setResources(PDResources())
@@ -456,7 +447,6 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                             outputConditionIdentifier = "sRGB IEC61966-2.1"
                             registryName = "http://www.color.org"
                         })
-                        root.cosObject.isNeedToBeUpdated = true
                     }
 
                 }

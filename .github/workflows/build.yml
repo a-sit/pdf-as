@@ -15,12 +15,6 @@ on:
     
 permissions:
   contents: read
-  checks: write
-  pull-requests: write
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref == 'refs/heads/development' }}
 
 env:
   LC_ALL: "en_US.UTF-8"
@@ -69,6 +63,10 @@ jobs:
   build-and-analyse:
     name: Build & Quality Checks
     runs-on: ubuntu-latest
+    permissions:
+        contents: read
+        checks: write
+        pull-requests: write
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     needs: [security-checks]
     env:
@@ -151,113 +149,3 @@ jobs:
           checks-name: Quality Monitor
           config: ${{ steps.qm.outputs.config }}
           quality-gates: ${{ steps.qm.outputs.gates }}
-          
-  publishDevelopmentSnapshot:
-    name: Publish SNAPSHOT package
-    runs-on: ubuntu-latest
-
-    needs: build-and-analyse
-
-    if: >-
-      ${{
-        github.event_name == 'push' &&
-        github.ref == 'refs/heads/development'
-      }}
-
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout development HEAD
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
-
-      - name: Verify snapshot version
-        shell: bash
-        run: |
-          version="$(
-            ./gradlew properties --quiet |
-              sed -n 's/^version: //p' |
-              head -n 1
-          )"
-
-          case "$version" in
-            *-SNAPSHOT)
-              echo "Publishing snapshot version: $version"
-              ;;
-            *)
-              echo "::error::Development version is not a SNAPSHOT: $version"
-              exit 1
-              ;;
-          esac
-          
-      - name: Check development HEAD
-        id: development-head
-        shell: bash
-        run: |
-          git fetch --no-tags origin development
-
-          remote_sha="$(git rev-parse origin/development)"
-
-          if [[ "$GITHUB_SHA" == "$remote_sha" ]]; then
-            echo "current=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "current=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Skipping stale commit $GITHUB_SHA; development is now $remote_sha"
-          fi
-
-      - name: Publish snapshot to GitHub Packages
-        if: steps.development-head.outputs.current == 'true'
-        run: >
-          ./gradlew
-          --stacktrace
-          publishAllPublicationsToGithubPackagesRepository
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publishToEGIZMaven:
-    name: Assemble Release Package & Publish
-    runs-on: [self-hosted, linux]
-    needs: build-and-analyse
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-    env:
-      REPO_PATH: repo-${{ github.run_id }}-${{ github.job }}
-      
-    defaults:
-      run:
-        working-directory: ${{ env.REPO_PATH }}
-        
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          path: ${{ env.REPO_PATH }}
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
-
-      - name: Setup SSH known_hosts
-        env:
-          DEPLOY_EGIZ: ${{ secrets.DEPLOY_EGIZ }}
-        run: |
-          mkdir -p ~/.ssh
-          echo $DEPLOY_EGIZ | base64 --decode > ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
-
-      - name: Build and Publish
-        run: ./gradlew --stacktrace -x test publish

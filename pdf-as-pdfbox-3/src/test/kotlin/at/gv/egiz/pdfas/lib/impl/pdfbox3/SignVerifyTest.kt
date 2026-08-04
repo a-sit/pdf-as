@@ -1,11 +1,13 @@
 package at.gv.egiz.pdfas.lib.impl.pdfbox3
 
 import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource
+import at.gv.egiz.pdfas.lib.api.IConfigurationConstants
 import at.gv.egiz.pdfas.lib.api.PdfAs
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter
+import at.gv.egiz.pdfas.lib.impl.verify.pdfbox3.PDFBOXVerifier
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore
 import jakarta.activation.DataSource
 import org.apache.pdfbox.Loader
@@ -36,10 +38,11 @@ class SignVerifyTest {
                 it.toByteArray()
             }
 
-        fun captureSign(pdf: DataSource, signer: IPlainSigner) =
+        fun captureSign(pdf: DataSource, signer: IPlainSigner, config: SignParameter.()->Unit = {}) =
             captureSign(
                 PdfAsFactory.createSignParameter(pdfAs.configuration, pdf, null)
                     .apply { plainSigner = signer }
+                    .apply(config)
             )
 
         @JvmStatic
@@ -94,7 +97,7 @@ class SignVerifyTest {
                 .apply {
                     signatureVerificationLevel = VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
                 }
-                .let(pdfAs::verify)
+                .let(PDFBOXVerifier::verify)
         Assert.assertEquals(1, verificationResult.size)
         verificationResult[0].let {
             Assert.assertTrue(it.isVerificationDone)
@@ -141,5 +144,77 @@ class SignVerifyTest {
                 }
             )
         }
+    }
+
+    @Test
+    fun signTwiceYieldsUniqueSignatureFieldNames() {
+        val signedOnce = captureSign(getInputPdf("align.pdf"), getKeystoreSigner("test-key"))
+        val signedTwice = captureSign(ByteArrayDataSource(signedOnce), getKeystoreSigner("test-key"))
+
+        val fieldNames = Loader.loadPDF(signedTwice).use { doc ->
+            doc.documentCatalog.acroForm.fieldTree
+                .filterIsInstance<PDSignatureField>()
+                .map { it.fullyQualifiedName }
+        }
+
+        Assert.assertEquals("expected two signature fields", 2, fieldNames.size)
+        Assert.assertEquals(
+            "signature field names must be unique, but were $fieldNames",
+            fieldNames.size, fieldNames.toSet().size
+        )
+    }
+
+    /** the provided pdf has acroform fields, but none are signatures; trying to select the "last" of these should not throw */
+    @Test
+    fun lastSignatureOnUnsignedAcroForm() {
+        val parameter = PdfAsFactory.createVerifyParameter(
+            pdfAs.configuration,
+            getInputPdf("existing-acroform.pdf")
+        ).apply {
+            whichSignature = -2
+        }
+
+        Assert.assertTrue(PDFBOXVerifier.verify(parameter).isEmpty())
+    }
+
+    /** the provided pdf has the signature field as a direct field, rather than the more common indirect fields */
+    @Test
+    fun directSignatureField() {
+        val parameter = PdfAsFactory.createVerifyParameter(
+            pdfAs.configuration,
+            getInputPdf("align-signed-direct.pdf")
+        ).apply {
+            signatureVerificationLevel =
+                VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
+        }
+
+        Assert.assertEquals(1, PDFBOXVerifier.verify(parameter).size)
+    }
+
+    @Test
+    fun existingEmptySignatureField() {
+        val fieldName = "ownerSignature"
+        val output = captureSign(getInputPdf("acroform-placeholder.pdf"), getKeystoreSigner("test-key")) {
+            configuration.setValue(IConfigurationConstants.SIGNATURE_FIELD_NAME, fieldName)
+        }
+        Loader.loadPDF(output).use { doc ->
+            val field = doc.documentCatalog.acroForm
+                .getField(fieldName) as PDSignatureField
+
+            Assert.assertNotNull(field.signature)
+        }
+    }
+
+    @Test
+    fun unsupportedSignatureFilter() {
+        val parameter = PdfAsFactory.createVerifyParameter(
+            pdfAs.configuration,
+            getInputPdf("unsupported-filter.pdf")
+        ).apply {
+            signatureVerificationLevel =
+                VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
+        }
+
+        Assert.assertTrue(PDFBOXVerifier.verify(parameter).isEmpty())
     }
 }

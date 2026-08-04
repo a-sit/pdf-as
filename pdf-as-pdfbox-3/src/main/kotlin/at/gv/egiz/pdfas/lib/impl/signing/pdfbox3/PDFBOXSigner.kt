@@ -145,10 +145,8 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
         doc.documentCatalog.acroForm
             ?.let { it.getField(sigFieldName) as? PDSignatureField }
             ?.let { field ->
-                if (field.signature != null) {
-                    throw IllegalStateException("The signature field $sigFieldName is already signed.")
-                }
-                PDSignature().also { field.cosObject.setItem(COSName.V, it) }
+                check (field.signature == null) { "The signature field $sigFieldName is already signed." }
+                PDSignature().also { field.value = it }
             }
 
     private fun getSignatureFieldNameConfig(pdfObject: PDFBOXObject): String? =
@@ -211,16 +209,10 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
         val baseName = getSignatureFieldNameConfig(pdfObject) ?: "PDF-AS Signatur"
 
         val existingSignatureNames =
-            doc.document.trailer
-                .getCOSDictionary(COSName.ROOT)
-                .getCOSDictionary(COSName.ACRO_FORM)
-                .getCOSArray(COSName.FIELDS)
+            doc.signatureFields
                 .asSequence()
-                .mapNotNull {
-                    if (it !is COSDictionary) return@mapNotNull null
-                    if (it.getNameAsString(COSName.FT) != "Sig") return@mapNotNull null
-                    it.getString(COSName.T)?.takeIf { n -> n.startsWith(baseName) }
-                }
+                .mapNotNull { it.partialName }
+                .filter { it.startsWith(baseName) }
                 .toSet()
 
         var i = 1
@@ -229,7 +221,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     }
 
     private fun injectPdfUaContent(doc: PDDocument, signatureField: PDSignatureField,
-                                   sigFieldName: String, signatureProfileSettings: SignatureProfileSettings) {
+                                   signatureProfileSettings: SignatureProfileSettings) {
         try {
             logger.info("Adding PDF/UA content...")
             val structureTreeRoot = doc.documentCatalog.structureTreeRoot
@@ -307,7 +299,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             }
 
             if (signatureField.alternateFieldName.isEmpty())
-                signatureField.alternateFieldName = sigFieldName
+                signatureField.alternateFieldName = signatureField.partialName
 
             ntn.cosObject.isNeedToBeUpdated = true
             sigBlock.cosObject.isNeedToBeUpdated = true
@@ -481,23 +473,18 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
 
             doc.addSignature(signature, signer, options)
 
-            val sigFieldName = buildNextSignatureFieldName(doc, pdfObject)
+            val signatureField =
+                doc.signatureFields
+                    ?.firstOrNull { it.signature?.cosObject == signature.cosObject }
+                    ?: throw IllegalStateException("Cannot find signature field after addSignature?")
 
             if (!isAdobeSignatureForm) {
-                val signatureField =
-                    doc.documentCatalog.acroForm?.fields?.asSequence()
-                        ?.filterIsInstance<PDSignatureField>()
-                        ?.firstOrNull { it.signature?.cosObject == signature.cosObject }
-                if (signatureField != null) {
-                    signatureField.partialName = sigFieldName
-                    signatureField.alternateFieldName = alternateCaption ?: sigFieldName
-                } else {
-                    logger.warn("Failed to name Signature Field! [Cannot find AcroForm field list]")
-                }
+                val sigFieldName = buildNextSignatureFieldName(doc, pdfObject)
+                signatureField.partialName = sigFieldName
+                signatureField.alternateFieldName = alternateCaption ?: sigFieldName
             }
+            injectPdfUaContent(doc, signatureField, signatureProfileSettings)
 
-            val signatureField = doc.documentCatalog.acroForm?.getField(sigFieldName) as PDSignatureField
-            injectPdfUaContent(doc, signatureField, sigFieldName, signatureProfileSettings)
             try {
                 synchronized(doc) {
                     pdfObject.signedDocument = ByteArrayOutputStream().also(doc::saveIncremental).toByteArray()

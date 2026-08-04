@@ -26,7 +26,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDPropBuild
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDPropBuildDataDict
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature
-import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField
 import org.apache.pdfbox.util.Matrix
 import org.slf4j.LoggerFactory
 import java.awt.geom.AffineTransform
@@ -61,12 +60,7 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
 
     @JvmStatic
     fun findEmptySignatureFields(doc: PDDocument) =
-        doc.documentCatalog.acroForm?.fields?.asSequence()
-            ?.filterIsInstance<PDSignatureField>()
-            ?.filter { it.signature == null }
-            ?.mapNotNull { it.partialName }
-            ?.toList()
-            ?: emptyList()
+        doc.signatureFields.asSequence().filter { it.signature == null }.mapNotNull { it.partialName }.toList()
 
     /**
      * Returns the next unused signature placeholder

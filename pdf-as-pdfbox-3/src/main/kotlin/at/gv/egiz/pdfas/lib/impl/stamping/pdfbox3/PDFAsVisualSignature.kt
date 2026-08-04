@@ -165,7 +165,6 @@ object PDFAsVisualSignature {
                 pdfStructure.innerFormName = pdfStructure.holderFormResources.add(it, "FRM")
             }
 
-            pdfStructure.innerForm.resources.cosObject.setItem(COSName.PROC_SET, pdfStructure.procSet)
             pdfStructure.page.cosObject.setItem(COSName.PROC_SET, pdfStructure.procSet)
             pdfStructure.innerFormResources.cosObject.setItem(COSName.PROC_SET, pdfStructure.procSet)
             pdfStructure.holderFormResources.cosObject.setItem(COSName.PROC_SET, pdfStructure.procSet)

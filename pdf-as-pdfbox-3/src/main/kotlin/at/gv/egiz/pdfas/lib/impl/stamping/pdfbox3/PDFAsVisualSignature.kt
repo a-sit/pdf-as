@@ -101,10 +101,11 @@ object PDFAsVisualSignature {
             pdfStructure.acroFormFields = pdfStructure.acroForm.fields.apply {
                 add(pdfStructure.signatureField)
             }
-            pdfStructure.acroFormDictionary = pdfStructure.acroForm.cosObject.apply {
-                isDirect = true
-                setInt(COSName.SIG_FLAGS, 3)
-                setString(COSName.DA, "/sylfaen 0 Tf 0 g")
+            pdfStructure.acroFormDictionary = pdfStructure.acroForm.let { acroForm ->
+                acroForm.isSignaturesExist = true
+                acroForm.isAppendOnly = true
+                acroForm.defaultAppearance = "/sylfaen 0 Tf 0 g"
+                return@let acroForm.cosObject.also { it.isDirect = true }
             }
             pdfStructure.affineTransform = AffineTransform(floatArrayOf(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f))
             pdfStructure.signatureRectangle = createSignatureRectangle(
@@ -197,7 +198,7 @@ object PDFAsVisualSignature {
                     page.resources.fontNames.forEach { fontName ->
                         val pdFont = page.resources.getFont(fontName)
                         if (pdFont is PDType0Font) {
-                            pdFont.descendantFont?.fontDescriptor?.cosObject?.removeItem(COSName.CID_SET)
+                            pdFont.descendantFont?.fontDescriptor?.cidSet = null
                         }
                     }
                 }

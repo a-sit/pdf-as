@@ -69,7 +69,7 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.PDFAIdentificationSchema;
-import org.apache.xmpbox.xml.DomXmpParser;
+import org.apache.xmpbox.xml.DomXmpParser; 
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
@@ -878,18 +878,19 @@ public class PADESPDFBOXSigner implements IPdfSigner, IConfigurationConstants {
   // Find an existing signature.
   private PDSignature findExistingSignature(PDDocument doc, String sigFieldName) {
     PDSignature signature = null;
-    PDSignatureField signatureField;
-    final PDAcroForm acroForm = doc.getDocumentCatalog().getAcroForm();
-    if (acroForm != null) {
-      signatureField = (PDSignatureField) acroForm.getField(sigFieldName);
-      if (signatureField != null) {
-        // retrieve signature dictionary
-        signature = signatureField.getSignature();
-        if (signature == null) {
-          signature = new PDSignature();
-          signatureField.getCOSObject().setItem(COSName.V, signature);
-        } else {
-          throw new IllegalStateException("The signature field " + sigFieldName + " is already signed.");
+    if (sigFieldName != null) {    
+      final PDAcroForm acroForm = doc.getDocumentCatalog().getAcroForm();
+      if (acroForm != null) {
+        PDField signatureField = acroForm.getField(sigFieldName);
+        if (signatureField instanceof PDSignatureField) {
+          // retrieve signature dictionary
+          signature = ((PDSignatureField) signatureField).getSignature();
+          if (signature == null) {
+            signature = new PDSignature();
+            signatureField.getCOSObject().setItem(COSName.V, signature);
+          } else {
+            throw new IllegalStateException("The signature field " + sigFieldName + " is already signed.");
+          }
         }
       }
     }

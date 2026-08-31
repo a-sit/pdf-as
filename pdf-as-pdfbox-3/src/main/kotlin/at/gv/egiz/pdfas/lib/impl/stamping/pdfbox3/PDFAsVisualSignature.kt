@@ -101,10 +101,11 @@ object PDFAsVisualSignature {
             pdfStructure.acroFormFields = pdfStructure.acroForm.fields.apply {
                 add(pdfStructure.signatureField)
             }
-            pdfStructure.acroFormDictionary = pdfStructure.acroForm.cosObject.apply {
-                isDirect = true
-                setInt(COSName.SIG_FLAGS, 3)
-                setString(COSName.DA, "/sylfaen 0 Tf 0 g")
+            pdfStructure.acroFormDictionary = pdfStructure.acroForm.let { acroForm ->
+                acroForm.isSignaturesExist = true
+                acroForm.isAppendOnly = true
+                acroForm.defaultAppearance = "/sylfaen 0 Tf 0 g"
+                return@let acroForm.cosObject.also { it.isDirect = true }
             }
             pdfStructure.affineTransform = AffineTransform(floatArrayOf(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f))
             pdfStructure.signatureRectangle = createSignatureRectangle(
@@ -165,7 +166,6 @@ object PDFAsVisualSignature {
                 pdfStructure.innerFormName = pdfStructure.holderFormResources.add(it, "FRM")
             }
 
-            pdfStructure.innerForm.resources.cosObject.setItem(COSName.PROC_SET, pdfStructure.procSet)
             pdfStructure.page.cosObject.setItem(COSName.PROC_SET, pdfStructure.procSet)
             pdfStructure.innerFormResources.cosObject.setItem(COSName.PROC_SET, pdfStructure.procSet)
             pdfStructure.holderFormResources.cosObject.setItem(COSName.PROC_SET, pdfStructure.procSet)
@@ -189,9 +189,8 @@ object PDFAsVisualSignature {
 
             pdfStructure.visualSignature = pdfStructure.template.document
 
-            pdfStructure.widgetDictionary = pdfStructure.signatureField.widgets[0].cosObject.apply {
-                isNeedToBeUpdated = true
-                setItem(COSName.DR, pdfStructure.holderFormResources.cosObject)
+            pdfStructure.widgetDictionary = pdfStructure.signatureField.widgets[0].cosObject.also {
+                it.setItem(COSName.DR, pdfStructure.holderFormResources)
             }
 
             if (signatureProfileSettings.isPDFA3) {
@@ -199,7 +198,7 @@ object PDFAsVisualSignature {
                     page.resources.fontNames.forEach { fontName ->
                         val pdFont = page.resources.getFont(fontName)
                         if (pdFont is PDType0Font) {
-                            pdFont.descendantFont?.fontDescriptor?.cosObject?.removeItem(COSName.CID_SET)
+                            pdFont.descendantFont?.fontDescriptor?.cidSet = null
                         }
                     }
                 }

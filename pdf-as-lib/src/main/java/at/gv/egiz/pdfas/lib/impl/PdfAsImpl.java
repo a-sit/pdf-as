@@ -278,6 +278,9 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       final int[] byteRange = PDFUtils
               .extractSignatureByteRange(signatureDataExtractor
                       .getSignatureData());
+      if ((byteRange == null) || (byteRange.length != 4)) {
+        throw new PDFASError(ERROR_PDF_PROCESSING_FAILED, "Invalid or no byte range in PDF (expected exactly 4 elements)");
+      }
 
       if (logger.isDebugEnabled()) {
         for (final int element : byteRange) {

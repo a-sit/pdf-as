@@ -72,13 +72,13 @@ public class StatusRequestImpl implements StatusRequest {
   }
 
   class Stage1 extends StageBase implements StatusRequest.Stage1 {
-    public StatusRequestImpl.Stage2 setCertificate(X509Certificate certificate) throws PDFASError {
-      pdfAs.processCertificate(StatusRequestImpl.this, certificate);
+    public StatusRequestImpl.Stage2 setCertificate(X509Certificate certificate, String pdfFilter, String pdfSubFilter) throws PDFASError {
+      pdfAs.processCertificate(StatusRequestImpl.this, certificate, pdfFilter, pdfSubFilter);
       return new StatusRequestImpl.Stage2();
     }
     @Override
-    public StatusRequestImpl.Stage2 setCertificate(byte[] encodedCertificate) throws CertificateException, PDFASError {
-      return setCertificate(new X509Certificate(encodedCertificate));
+    public StatusRequestImpl.Stage2 setCertificate(byte[] encodedCertificate, String pdfFilter, String pdfSubFilter) throws CertificateException, PDFASError {
+      return setCertificate(new X509Certificate(encodedCertificate), pdfFilter, pdfSubFilter);
     }
   }
 

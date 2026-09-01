@@ -686,7 +686,9 @@ public class PdfAsHelper {
 			throw new PdfAsWebException("No Signature running in session:"
 					+ session.getId());
 		}
-		val statusRequest2 = statusRequest1.setCertificate(certificate);
+		val statusRequest2 = statusRequest1.setCertificate(certificate,
+				statusRequest1.getSignParameter().getPlainSigner().getPDFFilter(),
+				statusRequest1.getSignParameter().getPlainSigner().getPDFSubFilter());
 		session.setAttribute(PDF_STATUS, statusRequest2);
 
 		PdfAsHelper.process(request, response, context);
@@ -1050,7 +1052,9 @@ public class PdfAsHelper {
 			  log.debug("Find additional file, restarting signing process again ... ");			  
 			  StatusRequest.Stage1 nextStatusRequest1 = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
 			  StatusRequest.Stage2 nextStatusRequest2 = nextStatusRequest1.setCertificate(
-                  statusRequest.getRequestedSignature().getCertificate().getEncoded());
+                  statusRequest.getRequestedSignature().getCertificate().getEncoded(),
+					  statusRequest.getSignParameter().getPlainSigner().getPDFFilter(),
+					  statusRequest.getSignParameter().getPlainSigner().getPDFSubFilter());
 
 			  session.setAttribute(PDF_STATUS, nextStatusRequest2);
 

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.4.10"
+    kotlin("jvm")
 }
 
 tasks.jar {
@@ -24,6 +24,7 @@ dependencies {
     testImplementation(project(":signature-standards:sigs-pades"))
     testImplementation(project(":signature-standards:sigs-pkcs7detached"))
     testImplementation(group = "org.zeroturnaround", name = "zt-zip", version = project.ext["ztZipVersion"] as String)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 }
 
 tasks.register("releases", Copy::class) {

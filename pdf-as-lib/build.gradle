@@ -1,10 +1,17 @@
 apply plugin: 'java-library'
+apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'eclipse'
 apply plugin: 'java-library-distribution'
 
 jar {
 	manifest {
 		attributes 'Implementation-Title': 'PDF-AS-5 Library', 'JARMANIFEST': 'PDF-AS-LIB'
+	}
+}
+
+kotlin {
+	compilerOptions {
+		jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
 	}
 }
 

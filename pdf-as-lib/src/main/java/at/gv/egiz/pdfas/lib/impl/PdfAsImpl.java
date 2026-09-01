@@ -125,9 +125,12 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   public SignResult sign(SignParameter parameter) throws PDFASError {
     val signer = parameter.getPlainSigner();
     if (signer == null) {
+      if (parameter.getSuspendingSigner() != null) {
+        throw new IllegalArgumentException(".sign() needs a plainSigner. To use a suspending signer, use the .signSuspend() kotlin extension.");
+      }
       throw new IllegalArgumentException("SignParameter is missing plainSigner for use of sign()");
     }
-    val state1 = (StatusRequestImpl.Stage1)startSign(parameter);
+    val state1 = startSign(parameter);
     try {
       val state2 = state1.setCertificate(
           signer.getCertificate(state1.getSignParameter()),
@@ -191,7 +194,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
   private final TimedFunction signTimer = new TimedFunction("pdfas.sign");
   @Override
-  public StatusRequest.Stage1 startSign(SignParameter parameter) throws PDFASError {
+  public StatusRequestImpl.Stage1 startSign(SignParameter parameter) throws PDFASError {
 
     verifySignParameter(parameter);
     OperationStatus status = null;

@@ -68,7 +68,8 @@ public class SignatureTest {
         val inputPdf = getInputPdf("align.pdf");
 
         val param = PdfAsFactory.createSignParameter(pdfAs.getConfiguration(), inputPdf, null);
-        param.setPlainSigner(getKeystoreSigner("test-key"));
+        val plainSigner = getKeystoreSigner("test-key");
+        param.setPlainSigner(plainSigner);
         param.setSignatureProfileId("SIGNATURBLOCK_SMALL_EN_NOTE");
 
         val outputStream1 = new ByteArrayOutputStream();
@@ -76,11 +77,13 @@ public class SignatureTest {
         pdfAs.sign(param);
 
         val outputStream2 = new ByteArrayOutputStream();
+        param.setPlainSigner(null);
         param.setOutputStream(outputStream2);
-        pdfAs.sign(param);
         val state1 = pdfAs.startSign(param);
-        val state2 = state1.setCertificate(param.getPlainSigner().getCertificate(state1.getSignParameter()).getEncoded());
-        val state3 = state2.setSignature(param.getPlainSigner().sign(
+        val state2 = state1.setCertificate(
+            plainSigner.getCertificate(state1.getSignParameter()).getEncoded(),
+            plainSigner.getPDFFilter(), plainSigner.getPDFSubFilter());
+        val state3 = state2.setSignature(plainSigner.sign(
                         state2.getSignatureData(),
                         state2.getSignatureDataByteRange(),
                         state2.getSignParameter(),

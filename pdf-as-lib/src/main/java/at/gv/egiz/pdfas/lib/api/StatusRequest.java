@@ -41,7 +41,7 @@ public interface StatusRequest {
          * @param encodedCertificate
          * @throws CertificateException
          */
-        public Stage2 setCertificate(byte[] encodedCertificate) throws CertificateException, PDFASError;
+        public Stage2 setCertificate(byte[] encodedCertificate, String pdfFilter, String pdfSubFilter) throws CertificateException, PDFASError;
     }
 
     public interface Stage2 extends StatusRequest {

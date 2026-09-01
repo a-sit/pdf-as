@@ -71,18 +71,18 @@ public class StatusRequestImpl implements StatusRequest {
     @Override public RequestedSignature getRequestedSignature() { return status.getRequestedSignature(); }
   }
 
-  class Stage1 extends StageBase implements StatusRequest.Stage1 {
-    public StatusRequestImpl.Stage2 setCertificate(X509Certificate certificate) throws PDFASError {
-      pdfAs.processCertificate(StatusRequestImpl.this, certificate);
+  public class Stage1 extends StageBase implements StatusRequest.Stage1 {
+    public StatusRequestImpl.Stage2 setCertificate(X509Certificate certificate, String pdfFilter, String pdfSubFilter) throws PDFASError {
+      pdfAs.processCertificate(StatusRequestImpl.this, certificate, pdfFilter, pdfSubFilter);
       return new StatusRequestImpl.Stage2();
     }
     @Override
-    public StatusRequestImpl.Stage2 setCertificate(byte[] encodedCertificate) throws CertificateException, PDFASError {
-      return setCertificate(new X509Certificate(encodedCertificate));
+    public StatusRequestImpl.Stage2 setCertificate(byte[] encodedCertificate, String pdfFilter, String pdfSubFilter) throws CertificateException, PDFASError {
+      return setCertificate(new X509Certificate(encodedCertificate), pdfFilter, pdfSubFilter);
     }
   }
 
-  class Stage2 extends StageBase implements StatusRequest.Stage2 {
+  public class Stage2 extends StageBase implements StatusRequest.Stage2 {
     @Override
     public StatusRequestImpl.Stage3 setSignature(byte[] signatureValue) throws PDFASError {
       pdfAs.processSignature(StatusRequestImpl.this, signatureValue);
@@ -90,7 +90,7 @@ public class StatusRequestImpl implements StatusRequest {
     }
   }
 
-  class Stage3 extends StageBase implements StatusRequest.Stage3 {
+  public class Stage3 extends StageBase implements StatusRequest.Stage3 {
     @Override
     public SignResult finishSign() throws PDFASError {
       return pdfAs.finishSign(StatusRequestImpl.this);

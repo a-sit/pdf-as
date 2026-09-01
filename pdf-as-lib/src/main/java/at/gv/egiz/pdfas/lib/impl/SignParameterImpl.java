@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.gv.egiz.pdfas.lib.api.ISuspendingSigner;
 import jakarta.activation.DataSource;
 
 import at.gv.egiz.pdfas.lib.api.Configuration;
@@ -37,58 +38,38 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class SignParameterImpl extends PdfAsParameterImpl implements SignParameter, BKUHeaderHolder {
-	protected String signatureProfileId = null;
-	protected String signaturePosition = null;
-	
-	@Getter
-	@Setter
-	protected String placeHolderId;
-	
-	@Getter
-  @Setter
-	protected boolean placeHolderSearchEnabled;
-	
-	protected IPlainSigner signer = null;
-	protected OutputStream outputStream = null;
-	protected List<BKUHeader> processInfo = new ArrayList<BKUHeader>();
-	
-	public SignParameterImpl(Configuration configuration, 
-			DataSource dataSource, OutputStream outputStream) {
-		super(configuration, dataSource);
-		this.outputStream = outputStream;
-	}
+    @Getter @Setter
+    protected String signatureProfileId = null;
 
-	// ========================================================================
-	
-	public String getSignatureProfileId() {
-		return signatureProfileId;
-	}
+    @Getter @Setter
+    protected String signaturePosition = null;
+    
+    @Getter @Setter
+    protected String placeHolderId;
+    
+    @Getter @Setter
+    protected boolean placeHolderSearchEnabled;
 
-	public void setSignatureProfileId(String signatureProfileId) {
-		this.signatureProfileId = signatureProfileId;
-	}
+	@Getter @Setter
+    protected IPlainSigner plainSigner = null;
 
-	public String getSignaturePosition() {
-		return signaturePosition;
-	}
+	@Getter @Setter
+	protected ISuspendingSigner suspendingSigner = null;
 
-	public void setSignaturePosition(String signaturePosition) {
-		this.signaturePosition = signaturePosition;
-	}
+    protected OutputStream outputStream = null;
+    @Getter
+    protected List<BKUHeader> processInfo = new ArrayList<BKUHeader>();
+    
+    public SignParameterImpl(Configuration configuration, 
+            DataSource dataSource, OutputStream outputStream) {
+        super(configuration, dataSource);
+        this.outputStream = outputStream;
+    }
 
-	public void setPlainSigner(IPlainSigner signer) {
-		this.signer = signer;
-	}
-	
-	public IPlainSigner getPlainSigner() {
-		return this.signer;
-	}
+    // ========================================================================
 
     @Override public void setOutputStream(OutputStream stream) { this.outputStream = stream; }
 
-	@Override public OutputStream getSignatureResult() { return outputStream; }
+    @Override public OutputStream getSignatureResult() { return outputStream; }
 
-	public List<BKUHeader> getProcessInfo() {
-		return processInfo;
-	}
 }

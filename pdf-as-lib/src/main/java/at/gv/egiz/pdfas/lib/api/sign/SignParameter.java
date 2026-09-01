@@ -25,6 +25,7 @@ package at.gv.egiz.pdfas.lib.api.sign;
 
 import java.io.OutputStream;
 
+import at.gv.egiz.pdfas.lib.api.ISuspendingSigner;
 import at.gv.egiz.pdfas.lib.api.PdfAsParameter;
 
 public interface SignParameter extends PdfAsParameter {
@@ -86,20 +87,12 @@ public interface SignParameter extends PdfAsParameter {
 	 * @param flag <code>true</code> to enable, <code>false</code> to disable
 	 */
 	void setPlaceHolderSearchEnabled(boolean flag);
-	
-	/**
-	 * Sets the signer to use
-	 * 
-	 * 
-	 * @param signer
-	 */
+
 	public void setPlainSigner(IPlainSigner signer);
-	
-	/**
-	 * Gets the signer to use.
-	 * @return
-	 */
 	public IPlainSigner getPlainSigner();
+
+	public void setSuspendingSigner(ISuspendingSigner signer);
+	public ISuspendingSigner getSuspendingSigner();
 
     public void setOutputStream(OutputStream stream);
     public default OutputStream getOutputStream() { return getSignatureResult(); }

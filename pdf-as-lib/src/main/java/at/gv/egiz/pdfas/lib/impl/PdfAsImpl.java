@@ -125,12 +125,16 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   public SignResult sign(SignParameter parameter) throws PDFASError {
     val signer = parameter.getPlainSigner();
     if (signer == null) {
+      if (parameter.getSuspendingSigner() != null) {
+        throw new IllegalArgumentException(".sign() needs a plainSigner. To use a suspending signer, use the .signSuspend() kotlin extension.");
+      }
       throw new IllegalArgumentException("SignParameter is missing plainSigner for use of sign()");
     }
-    val state1 = (StatusRequestImpl.Stage1)startSign(parameter);
+    val state1 = startSign(parameter);
     try {
       val state2 = state1.setCertificate(
-          signer.getCertificate(state1.getSignParameter()));
+          signer.getCertificate(state1.getSignParameter()),
+          signer.getPDFFilter(), signer.getPDFSubFilter());
       val state3 = state2.setSignature(
           signer.sign(
               state2.getSignatureData(), state2.getSignatureDataByteRange(),
@@ -190,7 +194,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
   private final TimedFunction signTimer = new TimedFunction("pdfas.sign");
   @Override
-  public StatusRequest.Stage1 startSign(SignParameter parameter) throws PDFASError {
+  public StatusRequestImpl.Stage1 startSign(SignParameter parameter) throws PDFASError {
 
     verifySignParameter(parameter);
     OperationStatus status = null;
@@ -233,7 +237,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     }
   }
 
-  public void processCertificate(StatusRequestImpl request, X509Certificate certificate) throws PDFASError {
+  public void processCertificate(StatusRequestImpl request, X509Certificate certificate, String pdfFilter, String pdfSubFilter) throws PDFASError {
     final OperationStatus status = request.getStatus();
     try {
       status.getRequestedSignature().setCertificate(certificate);
@@ -258,12 +262,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       }
 
       status.setSigningDate(Calendar.getInstance());
-
-      // GET Signature DATA
-      final String pdfFilter = status.getSignParameter().getPlainSigner()
-              .getPDFFilter();
-      final String pdfSubFilter = status.getSignParameter().getPlainSigner()
-              .getPDFSubFilter();
 
       final IPdfSigner signer = status.getBackend().getPdfSigner();
 

@@ -278,6 +278,9 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       final int[] byteRange = PDFUtils
               .extractSignatureByteRange(signatureDataExtractor
                       .getSignatureData());
+      if ((byteRange == null) || (byteRange.length != 4)) {
+        throw new PDFASError(ERROR_PDF_PROCESSING_FAILED, "Invalid or no byte range in PDF (expected exactly 4 elements)");
+      }
 
       if (logger.isDebugEnabled()) {
         for (final int element : byteRange) {
@@ -319,6 +322,13 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
           ((X509Certificate) verifyResult.getSignerCertificate()).getFingerprintSHA()
       )) {
         throw new PDFASError(ERROR_SIG_CERTIFICATE_MISSMATCH);
+      }
+
+      final int signatureEnd = request.getSignatureDataByteRange()[2] - 1;
+      if (signatureEnd < (offset + pdfSignature.length)) {
+        logger.error("Signature returned from signer encodes to {} bytes (hex string), but we only allocated {} bytes.",
+            pdfSignature.length, signatureEnd - offset - 1);
+        throw new PDFASError(ERROR_PDF_PROCESSING_FAILED, "Signer returned a signature that is too large");
       }
 
       for (int i = 0; i < pdfSignature.length; i++) {

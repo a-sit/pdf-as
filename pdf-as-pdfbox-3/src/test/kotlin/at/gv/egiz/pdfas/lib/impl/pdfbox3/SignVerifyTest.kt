@@ -81,7 +81,7 @@ class SignVerifyTest {
         }
     }
 
-    private object getInputPdf : Function1<String, ByteArrayDataSource>, Function2<String, PDDocument.()->Unit, ByteArrayDataSource> {
+    private val getInputPdf = object : Function1<String, ByteArrayDataSource>, Function2<String, PDDocument.()->Unit, ByteArrayDataSource> {
         private val _map = mutableMapOf<String, ByteArrayDataSource>()
         private fun normalize(key: String) = when {
             key.endsWith(".pdf") -> key
@@ -102,7 +102,7 @@ class SignVerifyTest {
             }
     }
 
-    private object getKeystoreSigner : Function1<String, PAdESSignerKeystore> {
+    private val getKeystoreSigner = object : Function1<String, PAdESSignerKeystore> {
         private val _keyStore = KeyStore.getInstance("PKCS12").apply {
             SignVerifyTest::class.java.getResourceAsStream("/test.p12").use {
                 load(it, "password".toCharArray())

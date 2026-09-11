@@ -59,11 +59,8 @@ public class PDFToImage {
 
 				X509Certificate cert = new X509Certificate(new FileInputStream(
 						"/home/afitzek/qualified.cer"));
-
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				
-				SignParameter parameter = PdfAsFactory.createSignParameter(
-						config, null, baos);
+				SignParameter parameter = PdfAsFactory.createSignParameter(config);
 				parameter.setSignatureProfileId(profile);
 				Image img = pdfas.generateVisibleSignaturePreview(parameter,
 						cert, 128);
@@ -75,8 +72,6 @@ public class PDFToImage {
 
 		} catch (Throwable e) {
 			e.printStackTrace();
-		} finally {
-
 		}
 	}
 

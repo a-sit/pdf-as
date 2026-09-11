@@ -10,6 +10,8 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsMOAException;
 import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
 
+import java.security.cert.CertificateException;
+
 public class ErrorExtractor implements ErrorConstants {
 
 	private static final Logger logger = LoggerFactory
@@ -18,19 +20,17 @@ public class ErrorExtractor implements ErrorConstants {
 	private static final int MAX_CAUSE_DEPTH = 30;
 
 	private static PDFASError convertPdfAsError(Throwable e) {
-		if (e instanceof SLPdfAsException) {
-			SLPdfAsException ex = (SLPdfAsException) e;
-			if (ex.getInfo() != null) {
+		if (e instanceof SLPdfAsException ex) {
+            if (ex.getInfo() != null) {
 				return new PDFASError(ex.getCode(), ex.getInfo(), e);
 			} else {
 				return new PDFASError(ex.getCode(), e);
 			}
-		} else if(e instanceof PdfAsMOAException) {
-			PdfAsMOAException ex = (PdfAsMOAException) e;
-			int code = -1;
+		} else if (e instanceof PdfAsMOAException ex) {
+            int code = -1;
 			String errorInfo = ex.getErrorResponse();
 			
-			if(ex.getErrorCode() != null && !ex.getErrorCode().isEmpty()) {
+			if (ex.getErrorCode() != null && !ex.getErrorCode().isEmpty()) {
 				try {
 					code = Integer.parseInt(ex.getErrorCode());
 				} catch(NumberFormatException numfo) {
@@ -43,10 +43,10 @@ public class ErrorExtractor implements ErrorConstants {
 			} else {
 				return new PDFASError(code, e);
 			}
-			
-		} else if(e instanceof PdfAsException) {
+		} else if (e instanceof PdfAsException) {
 		  return new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, e.getMessage(), e);
-		  
+		} else if (e instanceof CertificateException) {
+          return new PDFASError(ErrorConstants.ERROR_INVALID_CERTIFICATE, e);
 		}
 		
 		// TODO: Handle more exceptions
@@ -66,52 +66,32 @@ public class ErrorExtractor implements ErrorConstants {
 			if (err != null) {
 				break;
 			}
-
 			cur = cur.getCause();
 			if (cur == null) {
 				break;
 			}
 		}
-		
-		if(err != null) {
-			
-			if(status != null) {
-				err.getProcessInformations().putAll(status.getMetaInformations());
+
+		if (err == null) {
+			cur = e;
+			// Search other reasons
+			for (int i = 0; i < MAX_CAUSE_DEPTH; i++) {
+				if (cur == null) {
+					break;
+				}
+				err = convertPdfAsError(cur);
+				if (err != null) {
+					break;
+				}
+				cur = cur.getCause();
 			}
-			
-			return err;
-		}
-		
-		cur = e;
-		// Search other reasons
-		for (int i = 0; i < MAX_CAUSE_DEPTH; i++) {
-
-			if (cur == null) {
-				break;
-			}
-
-			err = convertPdfAsError(cur);
-
-			if (err != null) {
-				break;
-			}
-
-			cur = cur.getCause();
 		}
 
-		if (err != null) {
-			
-			if(status != null) {
-				err.getProcessInformations().putAll(status.getMetaInformations());
-			}
-			
-			return err;
+		if (err == null) {
+			logger.info("Cannot extract correct failure code from: ", e);
+			err =  new PDFASError(ERROR_GENERIC, e);
 		}
 
-		logger.info("Cannot extract correct failure code from: ", e);
-		
-		err =  new PDFASError(ERROR_GENERIC, e);
-		
 		if(status != null) {
 			err.getProcessInformations().putAll(status.getMetaInformations());
 		}

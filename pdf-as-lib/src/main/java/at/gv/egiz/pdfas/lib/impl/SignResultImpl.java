@@ -29,35 +29,11 @@ import java.util.Map;
 
 import at.gv.egiz.pdfas.lib.api.SignaturePosition;
 import at.gv.egiz.pdfas.lib.api.sign.SignResult;
+import lombok.Value;
 
+@Value
 public class SignResultImpl implements SignResult {
-
-	protected X509Certificate certificate;
-	protected SignaturePosition position;
-	protected Map<String, String> processInfo = new HashMap<String, String>();
-	
-	public SignResultImpl() {
-	}
-
-	public X509Certificate getSignerCertificate() {
-		return this.certificate;
-	}
-
-	public SignaturePosition getSignaturePosition() {
-		return this.position;
-	}
-
-	public void setSignerCertificate(X509Certificate certificate) {
-		this.certificate = certificate;
-	}
-
-	public void setSignaturePosition(SignaturePosition position) {
-		this.position = position;
-	}
-
-	@Override
-	public Map<String, String> getProcessInformations() {
-		return processInfo;
-	}
-
+	X509Certificate signerCertificate;
+	SignaturePosition signaturePosition;
+	Map<String, String> processInformations;
 }

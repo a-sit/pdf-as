@@ -5,6 +5,7 @@ import at.gv.egiz.pdfas.lib.api.IConfigurationConstants
 import at.gv.egiz.pdfas.lib.api.ISuspendingSigner
 import at.gv.egiz.pdfas.lib.api.PdfAs
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory
+import at.gv.egiz.pdfas.lib.api.sign.IAsyncSigner
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter
 import at.gv.egiz.pdfas.lib.api.signSuspend
@@ -13,6 +14,10 @@ import at.gv.egiz.pdfas.lib.api.verify.VerifyResult
 import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore
 import jakarta.activation.DataSource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.runBlocking
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -27,7 +32,7 @@ import org.junit.runners.BlockJUnit4ClassRunner
 import org.zeroturnaround.zip.ZipUtil
 import java.io.ByteArrayOutputStream
 import java.security.KeyStore
-import kotlin.system.exitProcess
+import java.util.concurrent.CompletionException
 
 @RunWith(BlockJUnit4ClassRunner::class)
 class SignVerifyTest {
@@ -37,36 +42,36 @@ class SignVerifyTest {
         public val tempFolder = TemporaryFolder()
 
         lateinit var pdfAs: PdfAs
-        fun captureSign(param: SignParameter): ByteArray =
+        fun captureSign(param: SignParameter, document: DataSource, signer: IPlainSigner): ByteArray =
             ByteArrayOutputStream().use {
-                param.outputStream = it
-                pdfAs.sign(param)
+                pdfAs.sign(param, document, signer, it)
                 it.toByteArray()
             }
 
-        suspend fun captureSignSuspend(param: SignParameter): ByteArray =
+        suspend fun captureSignSuspend(param: SignParameter, document: DataSource, signer: IAsyncSigner): ByteArray =
             ByteArrayOutputStream().use {
-                param.outputStream = it
-                pdfAs.signSuspend(param)
+                try {
+                    pdfAs.signSuspend(param, document, signer, it)
+                } catch (e: CompletionException) {
+                    throw e.cause!!
+                }
                 it.toByteArray()
             }
 
         fun captureSign(pdf: DataSource, signer: IPlainSigner, config: SignParameter.()->Unit = {}) =
-            PdfAsFactory.createSignParameter(pdfAs.configuration, pdf, null)
-                .apply { plainSigner = signer }
+            PdfAsFactory.createSignParameter(pdfAs.configuration)
                 .apply(config)
-                .let(::captureSign)
+                .let { captureSign(it, pdf, signer) }
 
-        suspend fun captureSignSuspend(pdf: DataSource, signer: ISuspendingSigner, config: SignParameter.()->Unit = {}) =
-            PdfAsFactory.createSignParameter(pdfAs.configuration, pdf, null)
-                .apply { suspendingSigner = signer }
+        suspend fun captureSignSuspend(pdf: DataSource, signer: IAsyncSigner, config: SignParameter.()->Unit = {}) =
+            PdfAsFactory.createSignParameter(pdfAs.configuration)
                 .apply(config)
-                .let { captureSignSuspend(it) }
+                .let { captureSignSuspend(it, pdf, signer) }
 
         fun doVerify(pdf: DataSource, config: VerifyParameter.()->Unit = {}) : List<VerifyResult> =
-            PdfAsFactory.createVerifyParameter(pdfAs.configuration, pdf).apply {
+            PdfAsFactory.createVerifyParameter(pdfAs.configuration).apply {
                 signatureVerificationLevel = VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
-            }.apply(config).let(pdfAs::verify)
+            }.apply(config).let { pdfAs.verify(it, pdf) }
 
         @JvmStatic
         @BeforeClass
@@ -113,12 +118,15 @@ class SignVerifyTest {
             PAdESSignerKeystore(_keyStore, alias, "password")
         }
     }
-    private fun IPlainSigner.wrapSuspend() = object : ISuspendingSigner {
-        override fun getPDFFilter() = this@wrapSuspend.pdfFilter
-        override fun getPDFSubFilter() = this@wrapSuspend.pdfSubFilter
-        override suspend fun getCertificate(parameter: SignParameter) = this@wrapSuspend.getCertificate(parameter)
-        override suspend fun sign(input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature) =
-            this@wrapSuspend.sign(input, byteRange, parameter, requestedSignature)
+    private suspend fun IPlainSigner.wrapSuspend(): ISuspendingSigner {
+        val coroutineScope = CoroutineScope(currentCoroutineContext())
+        return object : ISuspendingSigner {
+            override val coroutineScope get() = coroutineScope
+            override suspend fun getCertificateDataSuspend(parameter: SignParameter) =
+                IAsyncSigner.CertificateData(this@wrapSuspend.getCertificate(parameter), this@wrapSuspend.pdfFilter, this@wrapSuspend.pdfSubFilter)
+            override suspend fun signSuspend(input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature) =
+                this@wrapSuspend.sign(input, byteRange, parameter, requestedSignature)
+        }
     }
 
     @Test

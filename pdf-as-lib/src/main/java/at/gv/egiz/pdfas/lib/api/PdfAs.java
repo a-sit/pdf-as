@@ -23,53 +23,87 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.api;
 
+import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 
 import java.awt.Image;
 import java.util.List;
+import java.util.concurrent.CompletionStage;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.lib.api.sign.IAsyncSigner;
+import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.api.sign.SignResult;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
+import jakarta.activation.DataSource;
+import lombok.NonNull;
+import lombok.val;
 
 public interface PdfAs {	
-	/**
-	 * Signs a PDF document using PDF-AS.
-	 * 
-	 * @param parameter
-	 * @return
-	 */
-	public SignResult sign(SignParameter parameter) throws PDFASError;
+	/** Signs a PDF document synchronously, using a {@link IPlainSigner}. */
+	public @NonNull SignResult sign(@NonNull SignParameter parameter, @NonNull DataSource document, @NonNull IPlainSigner plainSigner, @NonNull OutputStream output) throws PDFASError;
+
+	/** Signs a PDF document asynchronously, using a {@link IAsyncSigner}. */
+	public @NonNull CompletionStage<@NonNull SignResult> signAsync(@NonNull SignParameter parameter, @NonNull DataSource document, @NonNull IAsyncSigner asyncSigner, @NonNull OutputStream output);
+
+	/** Legacy interface that expects the {@link DataSource}, {@link IPlainSigner}, and {@link OutputStream} to be set on the {@link SignParameter}.
+	 * Deprecated in favor of {@link PdfAs#sign(SignParameter, DataSource, IPlainSigner, OutputStream)}. */
+	@Deprecated
+	public default @NonNull SignResult sign(@NonNull SignParameter parameter) throws PDFASError {
+		val input = parameter.getDataSource();
+		if (input == null) {
+			throw new IllegalArgumentException("SignParameter is missing dataSource for use of legacy sign().");
+		}
+		val signer = parameter.getPlainSigner();
+		if (signer == null) {
+			throw new IllegalArgumentException("SignParameter is missing plainSigner for use of legacy sign().");
+		}
+		val outputStream = parameter.getOutputStream();
+		if (outputStream == null) {
+			throw new IllegalArgumentException("SignParameter is missing outputStream for use of legacy sign().");
+		}
+		return sign(parameter, input, signer, outputStream);
+	}
+
 	
 	/**
-	 * Verifies a document with (potentially multiple) PDF-AS signatures.
+	 * Verifies a document with (potentially multiple) PDF signatures.
 	 *  
 	 * @param parameter The verification parameter
 	 * @return A list of verification Results
 	 */
-	public List<VerifyResult> verify(VerifyParameter parameter) throws PDFASError;
+	public @NonNull List<@NonNull VerifyResult> verify(@NonNull VerifyParameter parameter, @NonNull DataSource document) throws PDFASError;
+	/** Legacy interface that expects the {@link DataSource} to be set on the {@link VerifyParameter}.
+	 * Deprecated in favor of {@link PdfAs#verify(VerifyParameter, DataSource). */
+	@Deprecated
+	public default @NonNull List<@NonNull VerifyResult> verify(@NonNull VerifyParameter parameter) throws PDFASError {
+		val input = parameter.getDataSource();
+		if (input == null) {
+			throw new IllegalArgumentException("VerifyParameter is missing dataSource for use of legacy verify().");
+		}
+		return verify(parameter, input);
+	}
 	
 	/**
 	 * Gets a copy of the PDF-AS configuration, to allow the application to 
 	 * override configuration parameters at runtime.
 	 * 
-	 * @return A private copy of the pdf as configuration
+	 * @return A private copy of the PDF-AS configuration
 	 */
-	public Configuration getConfiguration();
-	
+	public @NonNull Configuration getConfiguration();
+
 	/**
-	 * Starts a signature process
-	 * 
-	 * After the process has to be started the status request has to be services by the user application
-	 * 
-	 * @param parameter The sign parameter
-	 * @return A status request
-	 * @throws PdfAsException
+	 * Multi-stage signing interface.
+	 * <p>
+	 * PDF-AS can use three ways to sign a document.
+	 * <li> Use the multi-stage API yourself. <b>You are here.</b>
+	 * <li> Use a synchronous IPlainSigner. See {@link PdfAs#sign(SignParameter, DataSource, IPlainSigner, OutputStream)}.
+	 * <li> Use an asynchronous IAsyncSigner. See {@link PdfAs#signAsync(SignParameter, DataSource, IAsyncSigner, OutputStream)}.
 	 */
-	public StatusRequest.Stage1 startSign(SignParameter parameter) throws PDFASError;
+	public @NonNull StatusRequest.Stage1 startSign(@NonNull SignParameter parameter, @NonNull DataSource document) throws PDFASError;
 	
 	/**
 	 * Generates a Image of the visual signatur block as Preview
@@ -77,8 +111,7 @@ public interface PdfAs {
 	 * @param parameter The signing Parameter
 	 * @param cert The certificate to use to build the signature block
 	 * @param resolution the resolution in dpi (dots per inch) (default is 72)
-	 * @return
-	 * @throws PdfAsException
+	 * @return The {@link Image} preview of the parameter specifies a visible signature, `null` otherwise.
 	 */
-	public Image generateVisibleSignaturePreview(SignParameter parameter, X509Certificate cert, int resolution) throws PDFASError;
+	public Image generateVisibleSignaturePreview(@NonNull SignParameter parameter, @NonNull X509Certificate cert, int resolution) throws PDFASError;
 }

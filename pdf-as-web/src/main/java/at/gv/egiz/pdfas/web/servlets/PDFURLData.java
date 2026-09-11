@@ -3,6 +3,7 @@ package at.gv.egiz.pdfas.web.servlets;
 import at.gv.egiz.pdfas.common.exceptions.PDFIOException;
 import at.gv.egiz.pdfas.common.utils.PDFUtils;
 import at.gv.egiz.pdfas.lib.api.StatusRequest;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,7 @@ public class PDFURLData extends HttpServlet {
                            HttpServletResponse response) throws ServletException, IOException, PDFIOException {
 
         HttpSession session = request.getSession();
-        StatusRequest statusRequest = (StatusRequest) session
+        val statusRequest = (StatusRequest.HasRequestedSignature) session
                 .getAttribute(PDF_STATUS);
 
         if(statusRequest!=null)

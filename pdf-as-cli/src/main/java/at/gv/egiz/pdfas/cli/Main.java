@@ -261,14 +261,10 @@ public class Main {
 		} catch (PDFASError e) {
 			System.err.println("PDF-AS Error: [" + e.getCode() + "]"
 					+ e.getMessage());
-			Iterator<Entry<String, String>> infoIt = e.getProcessInformations()
-					.entrySet().iterator();
 
-			while (infoIt.hasNext()) {
-				Entry<String, String> infoEntry = infoIt.next();
-				logger.debug("Process Information: {} = {}",
-						infoEntry.getKey(), infoEntry.getValue());
-			}
+            for (Entry<String, String> infoEntry : e.getProcessInformations().entrySet()) {
+                logger.debug("Process Information: {} = {}", infoEntry.getKey(), infoEntry.getValue());
+            }
 			e.printStackTrace(System.err);
 			System.exit(-1);
 		} catch (Throwable e) {
@@ -285,9 +281,9 @@ public class Main {
 				PdfAsFactory.deployDefaultConfiguration(configurationLocation);
 			}
 		} catch (Exception e) {
+			logger.error("Failed to deploy default configuration to {}", configurationLocation.getAbsolutePath(), e);
 			System.out.println("Failed to deploy default confiuration to "
 					+ configurationLocation.getAbsolutePath());
-			e.printStackTrace();
 		}
 	}
 
@@ -303,27 +299,21 @@ public class Main {
 		}
 
 		String positionString = null;
-
 		if (cli.hasOption(CLI_ARG_POSITION_SHORT)) {
 			positionString = cli.getOptionValue(CLI_ARG_POSITION_SHORT);
-		} else {
-			positionString = null;
 		}
 
 		String profilID = null;
-
 		if (cli.hasOption(CLI_ARG_PROFILE_SHORT)) {
 			profilID = cli.getOptionValue(CLI_ARG_PROFILE_SHORT);
 		}
 
 		String outputFile = null;
-
 		if (cli.hasOption(CLI_ARG_OUTPUT_SHORT)) {
 			outputFile = cli.getOptionValue(CLI_ARG_OUTPUT_SHORT);
 		}
 
 		String connector = null;
-
 		if (cli.hasOption(CLI_ARG_CONNECTOR_SHORT)) {
 			connector = cli.getOptionValue(CLI_ARG_CONNECTOR_SHORT);
 		}
@@ -360,8 +350,7 @@ public class Main {
 
 		Configuration configuration = pdfAs.getConfiguration();
 		FileOutputStream fos = new FileOutputStream(outputPdfFile, false);
-		SignParameter signParameter = PdfAsFactory.createSignParameter(
-				configuration, dataSource, fos);
+		SignParameter signParameter = PdfAsFactory.createSignParameter(configuration);
 
 		String id = UUID.randomUUID().toString();
 		signParameter.setTransactionId(id);
@@ -434,8 +423,6 @@ public class Main {
 			slConnector = new PAdESSigner(new BKUSLConnector(configuration));
 		}
 
-		signParameter.setPlainSigner(slConnector);
-		signParameter.setDataSource(dataSource);
 		signParameter.setSignaturePosition(positionString);
 		signParameter.setSignatureProfileId(profilID);
 		System.out.println("Starting signature for " + pdfFile);
@@ -447,7 +434,7 @@ public class Main {
 			signatureBlockParameters = cli.getOptionValues(CLI_ARG_SIGNATURE_BLOCK_PARAM_SHORT);
 		}
 		Map<String, String> signatureBlockParametersMap = new HashMap<>();
-		if(signatureBlockParameters != null && signatureBlockParameters.length > 0) {
+		if (signatureBlockParameters != null) {
 			for(String s : signatureBlockParameters) {
 				if(!s.contains("=")) {
 					throw new Exception("Invalid parameter: "+s);
@@ -460,17 +447,13 @@ public class Main {
 
 		SignResult result = null;
 		try {
- 			result = pdfAs.sign(signParameter);
+ 			result = pdfAs.sign(signParameter, dataSource, slConnector, fos);
 		} finally {
 			if (result != null) {
-				Iterator<Entry<String, String>> infoIt = result
-						.getProcessInformations().entrySet().iterator();
-
-				while (infoIt.hasNext()) {
-					Entry<String, String> infoEntry = infoIt.next();
-					logger.debug("Process Information: {} = {}",
-							infoEntry.getKey(), infoEntry.getValue());
-				}
+				for (Entry<String, String> infoEntry : result
+                    .getProcessInformations().entrySet()) {
+                    logger.debug("Process Information: {} = {}", infoEntry.getKey(), infoEntry.getValue());
+                }
 			}
 		}
 
@@ -542,14 +525,11 @@ public class Main {
 
 		Configuration configuration = pdfAs.getConfiguration();
 
-		VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(
-				configuration, dataSource);
+		VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(configuration);
 		verifyParameter.setSignatureVerificationLevel(lvl);
-		verifyParameter.setDataSource(dataSource);
-		verifyParameter.setConfiguration(configuration);
 		verifyParameter.setWhichSignature(which);
 
-		List<VerifyResult> results = pdfAs.verify(verifyParameter);
+		List<VerifyResult> results = pdfAs.verify(verifyParameter, dataSource);
 
 		Iterator<VerifyResult> resultIterator = results.iterator();
 
@@ -605,9 +585,9 @@ public class Main {
 				System.out.println("\tSigned PDF: " + outputFile);
 			}
 		} catch (Exception e) {
+			logger.error("Failed to save signed PDF", e);
 			System.out.println("\tFailed to save signed PDF! ["
 					+ e.getMessage() + "]");
-			e.printStackTrace();
 		}
 	}
 }

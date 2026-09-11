@@ -28,19 +28,33 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
 import at.gv.egiz.pdfas.lib.api.SignaturePosition;
 import at.knowcenter.wag.egov.egiz.pdf.TablePos;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 
 public class RequestedSignature implements ICertificateProvider {
+	@NonNull
     private String signatureProfile;
-    private TablePos tablePosition;
-    private OperationStatus status;
-    private X509Certificate certificate;
-    private SignaturePosition signaturePosition = null;
+	@Getter @Setter
+    private @NonNull SignaturePosition signaturePosition = null;
+
+    private final @NonNull TablePos tablePosition;
+	@Getter
+    private final @NonNull OperationStatus status;
+	@Getter
+    private final @NonNull X509Certificate certificate;
+	@Getter
+    private final @NonNull String pdfFilter;
+	@Getter
+	private final @NonNull String pdfSubFilter;
     //private IPlainSigner signer = null;
 
-    public RequestedSignature(OperationStatus status) throws PdfAsException {
-    	
+    public RequestedSignature(@NonNull OperationStatus status, @NonNull X509Certificate certificate, @NonNull String pdfFilter, @NonNull String pdfSubFilter) throws PdfAsException {
     	this.status = status;
+		this.certificate = certificate;
+		this.pdfFilter = pdfFilter;
+		this.pdfSubFilter = pdfSubFilter;
     	
     	String profileID = status.getSignParameter().getSignatureProfileId();
     	
@@ -68,32 +82,12 @@ public class RequestedSignature implements ICertificateProvider {
     public TablePos getTablePos() {
     	return this.tablePosition;
     }
-    
+
     public String getSignatureProfileID() {
     	return this.signatureProfile;
     }
-    
+
     public void setSignatureProfileID(String signatureProfile) {
     	this.signatureProfile = signatureProfile;
     }
-    
-    public X509Certificate getCertificate() {
-    	return this.certificate;
-    }
-
-    public void setCertificate(X509Certificate certificate) {
-    	this.certificate = certificate;
-    }
-
-	public SignaturePosition getSignaturePosition() {
-		return signaturePosition;
-	}
-
-	public void setSignaturePosition(SignaturePosition signaturePosition) {
-		this.signaturePosition = signaturePosition;
-	}
-
-	public OperationStatus getStatus() {
-		return status;
-	}
 }

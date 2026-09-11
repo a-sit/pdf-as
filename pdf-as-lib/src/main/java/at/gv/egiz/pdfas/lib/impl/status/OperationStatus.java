@@ -46,7 +46,7 @@ public class OperationStatus implements Serializable {
 	 */
 	private static final long serialVersionUID = -2985007198666388528L;
 
-	private SignParameter signParamter;
+	private final SignParameter signParamter;
 	@Setter
     @Getter
     private PDFObject pdfObject;
@@ -55,7 +55,7 @@ public class OperationStatus implements Serializable {
 	private PlaceholderConfiguration placeholderConfiguration = null;
 	private GlobalConfiguration globalConfiguration = null;
 	private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<String, SignatureProfileConfiguration>();
-	private TempFileHelper helper;
+	private final TempFileHelper helper;
 	@Setter
     @Getter
     private RequestedSignature requestedSignature;
@@ -76,7 +76,7 @@ public class OperationStatus implements Serializable {
 		this.signParamter = signParameter;
 		this.backend = backend;
         this.signTimer = timer;
-		helper = new TempFileHelper(configuration);
+		this.helper = new TempFileHelper(configuration);
 	}
 
 	@Override

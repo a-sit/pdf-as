@@ -83,7 +83,6 @@ import at.gv.egiz.pdfas.lib.api.sign.SignResult;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
-import at.gv.egiz.pdfas.lib.impl.StatusRequestImpl;
 import at.gv.egiz.pdfas.moa.MOAConnector;
 import at.gv.egiz.pdfas.sigs.pades.PAdESSigner;
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore;
@@ -118,7 +117,6 @@ public class PdfAsHelper {
 	
 	private static final String PDF_PROCESSING_REQUEST = "PDF_PROCESSING_REQUEST";
 	private static final String PDF_STATUS = "PDF_STATUS";
-	private static final String PDF_OUTPUT = "PDF_OUTPUT";
 	private static final String PDF_SL_CONNECTOR = "PDF_SL_CONNECTOR";
 	private static final String PDF_STATISTICS = "PDF_STATISTICS";
 	private static final String PDF_SIGNER = "PDF_SIGNER";
@@ -153,7 +151,7 @@ public class PdfAsHelper {
 	public enum PDF_RESPONSE_MODES {htmlform, direct};
 
 	private static PdfAs pdfAs;
-	private static ObjectFactory of = new ObjectFactory();
+	private static final ObjectFactory of = new ObjectFactory();
 	@Getter
     private static Configuration pdfAsConfig;
 
@@ -207,7 +205,7 @@ public class PdfAsHelper {
 					sb.append("x:auto;");
 				}
 			}
-			sb.append("x:" + posX.trim() + ";");
+			sb.append("x:").append(posX.trim()).append(";");
 		} else {
 			sb.append("x:auto;");
 		}
@@ -224,7 +222,7 @@ public class PdfAsHelper {
 					sb.append("y:auto;");
 				}
 			}
-			sb.append("y:" + posY.trim() + ";");
+			sb.append("y:").append(posY.trim()).append(";");
 		} else {
 			sb.append("y:auto;");
 		}
@@ -313,16 +311,12 @@ public class PdfAsHelper {
 
 		Configuration config = pdfAs.getConfiguration();
 
-		ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfData);
-
-		VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(
-				config, dataSource);
-
-		verifyParameter.setDataSource(dataSource);
+		VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(config);
 		verifyParameter.setConfiguration(config);
 		verifyParameter.setWhichSignature(signIdx);
 
-        return pdfAs.verify(verifyParameter);
+		ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfData);
+        return pdfAs.verify(verifyParameter, dataSource);
 	}
 
 	public static List<VerifyResult> synchronousVerify(byte[] pdfData,
@@ -331,19 +325,13 @@ public class PdfAsHelper {
 		log.debug("Verifing Signature index: " + signIdx);
 
 		Configuration config = pdfAs.getConfiguration();
-
-		ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfData);
-
-		VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(
-				config, dataSource);
-
+		VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(config);
 		verifyParameter.setPreprocessorArguments(preProcessor);
 		verifyParameter.setSignatureVerificationLevel(lvl);
-		verifyParameter.setDataSource(dataSource);
-		verifyParameter.setConfiguration(config);
 		verifyParameter.setWhichSignature(signIdx);
 
-        return pdfAs.verify(verifyParameter);
+		ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfData);
+        return pdfAs.verify(verifyParameter, dataSource);
 	}
 	
   public static PdfasSignResponse synchronousServerSignature(PdfasSignRequest internalReq) throws Exception {
@@ -383,8 +371,7 @@ public class PdfAsHelper {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		// Generate Sign Parameter
-		SignParameter signParameter = PdfAsFactory.createSignParameter(config,
-				new ByteArrayDataSource(documentToSign.getInputData()), baos);
+		SignParameter signParameter = PdfAsFactory.createSignParameter(config);
 
 		// Get Connector
 		val connector = coreParams.getConnector();
@@ -440,8 +427,6 @@ public class PdfAsHelper {
 			
 		}
 
-		signParameter.setPlainSigner(signer);
-
 		String profile = documentToSign.getProfile();
 
 		// PdfAsHelper.getQRCodeContent(request);
@@ -486,7 +471,7 @@ public class PdfAsHelper {
 
 		signParameter.setDynamicSignatureBlockArguments(coreParams.getSignatureBlockParameters());
 
-		SignResult signResult = pdfAs.sign(signParameter);
+		SignResult signResult = pdfAs.sign(signParameter, new ByteArrayDataSource(documentToSign.getInputData()), signer, baos);
 
 		
 		PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
@@ -510,7 +495,7 @@ public class PdfAsHelper {
     log.info("Starting signature in session: " + session.getId());    
     session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);
     
-    StatusRequest statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);    
+    StatusRequest.Stage1 statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
     session.setAttribute(PDF_STATUS, statusRequest);
     
 	}
@@ -521,7 +506,7 @@ public class PdfAsHelper {
     log.info("Starting signature in session: " + session.getId());    
     session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);    
     
-    StatusRequest statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);    
+    StatusRequest.Stage1 statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
     session.setAttribute(PDF_STATUS, statusRequest);
     
     // start processing of first document
@@ -556,11 +541,9 @@ public class PdfAsHelper {
 
   private static StatusRequest.Stage1 buildPdfasStatusRequestToSignSingleDocument(DocumentToSign pdfToSign, HttpSession session, IPlainSigner signer,
       CoreSignParams coreSignParams, String qrCodeContent, Configuration config) throws WriterException, IOException, PdfAsException, PDFASError {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    session.setAttribute(PDF_OUTPUT, baos);
         
     // Generate Sign Parameter
-    SignParameter signParameter = PdfAsFactory.createSignParameter(config, new ByteArrayDataSource(pdfToSign.getInputData()), baos);
+    SignParameter signParameter = PdfAsFactory.createSignParameter(config);
     log.info("Setting TransactionID: " + coreSignParams.getTransactionId());
     signParameter.setTransactionId(coreSignParams.getTransactionId());
 
@@ -602,7 +585,7 @@ public class PdfAsHelper {
     signParameter.setPlaceHolderSearchEnabled(pdfToSign.isPlaceholderSearchEnabled());   
     signParameter.setDynamicSignatureBlockArguments(coreSignParams.getSignatureBlockParameters());
         
-    return pdfAs.startSign(signParameter);
+    return pdfAs.startSign(signParameter, new ByteArrayDataSource(pdfToSign.getInputData()));
     
   }
 
@@ -618,21 +601,16 @@ public class PdfAsHelper {
 	
 	public static byte[] getCertificate(
 			InfoboxReadResponseType infoboxReadResponseType) {
-		byte[] data = null;
 		if (infoboxReadResponseType.getAssocArrayData() != null) {
 			List<InfoboxAssocArrayPairType> pairs = infoboxReadResponseType
 					.getAssocArrayData().getPair();
-			Iterator<InfoboxAssocArrayPairType> pairIterator = pairs.iterator();
-			while (pairIterator.hasNext()) {
-				InfoboxAssocArrayPairType pair = pairIterator.next();
-				if (pair.getKey().equals("SecureSignatureKeypair")) {
-					return pair.getBase64Content();
-				}
-			}
+            for (InfoboxAssocArrayPairType pair : pairs) {
+              if (pair.getKey().equals("SecureSignatureKeypair")) {
+                return pair.getBase64Content();
+			  }
+            }
 		}
-		// SecureSignatureKeypair
-
-		return data;
+		return null;
 	}
 
 	public static byte[] generateVisualBlock(String profile, int resolution)
@@ -640,8 +618,7 @@ public class PdfAsHelper {
 		X509Certificate cert = new X509Certificate(
 				PdfAsHelper.class.getResourceAsStream("/qualified.cer"));
 		Configuration config = pdfAs.getConfiguration();
-		SignParameter parameter = PdfAsFactory.createSignParameter(config,
-				null, null);
+		SignParameter parameter = PdfAsFactory.createSignParameter(config);
 		parameter.setSignatureProfileId(profile);
 		Image img = pdfAs.generateVisibleSignaturePreview(parameter, cert,
 				resolution);
@@ -662,11 +639,8 @@ public class PdfAsHelper {
 		if(session != null) {
 			Object statusObject = session
 					.getAttribute(PDF_STATUS);
-			if(statusObject != null && statusObject instanceof StatusRequest) {
-				StatusRequest statusRequest = (StatusRequest)statusObject;
-				if (statusRequest instanceof StatusRequest.Stage1 || statusRequest instanceof StatusRequest.Stage2) {
-					return true;
-				}
+			if (statusObject instanceof StatusRequest.Stage1 || statusObject instanceof StatusRequest.Stage2) {
+				return true;
 			}
 		}
 
@@ -702,8 +676,7 @@ public class PdfAsHelper {
 		log.debug("Got CMS Signature Response");
 
 		HttpSession session = request.getSession();
-		StatusRequest statusRequest = (StatusRequest) session
-				.getAttribute(PDF_STATUS);
+		Object statusRequest = session.getAttribute(PDF_STATUS);
 
 		if (!(statusRequest instanceof StatusRequest.Stage2 statusRequest2)) {
 			throw new PdfAsWebException("No Signature running in session:"
@@ -720,24 +693,19 @@ public class PdfAsHelper {
 										HttpServletResponse response, ServletContext context)
 			throws Exception {
 		HttpSession session = request.getSession();
-		StatusRequest statusRequest = (StatusRequest) session
-				.getAttribute(PDF_STATUS);
-		// IPlainSigner plainSigner = (IPlainSigner) session
-		// .getAttribute(PDF_SIGNER);
+		Object statusRequest = session.getAttribute(PDF_STATUS);
 
 		Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
 		PdfAsHelper.checkConnectorSupported(connector, null);
 
 		if (connector == Connector.BKU || connector == Connector.ONLINEBKU || connector == Connector.MOBILEBKU) {
-			BKUSLConnector bkuSLConnector = (BKUSLConnector) session
-					.getAttribute(PDF_SL_CONNECTOR);
+			BKUSLConnector bkuSLConnector = (BKUSLConnector) session.getAttribute(PDF_SL_CONNECTOR);
 
-			if (statusRequest instanceof StatusRequest.Stage1) {
+			if (statusRequest instanceof StatusRequest.Stage1 statusRequest1) {
 				log.debug("Needing Certificate from BKU");
 				// build SL Request to read certificate
 				InfoboxReadRequestType readCertificateRequest = bkuSLConnector
-						.createInfoboxReadRequest(statusRequest
-								.getSignParameter());
+						.createInfoboxReadRequest(statusRequest1.getSignParameter());
 
 				JAXBElement<InfoboxReadRequestType> readRequest = of
 						.createInfoboxReadRequest(readCertificateRequest);
@@ -758,7 +726,7 @@ public class PdfAsHelper {
 			throws Exception {
 
 		HttpSession session = request.getSession();
-		StatusRequest statusRequestGeneric = (StatusRequest) session.getAttribute(PDF_STATUS);
+		Object statusRequestGeneric = session.getAttribute(PDF_STATUS);
 		PdfasSignRequest pdfAsRequest = (PdfasSignRequest) session.getAttribute(PDF_PROCESSING_REQUEST);
 		
 		
@@ -1015,14 +983,16 @@ public class PdfAsHelper {
 								
 		} else if (statusRequestGeneric instanceof StatusRequest.Stage3 statusRequest) {
 			log.debug("Single document is ready. Perform post-processing ... ");
-			SignResult result = statusRequest.finishSign();
-
-			ByteArrayOutputStream baos = (ByteArrayOutputStream) session.getAttribute(PDF_OUTPUT);
-			baos.close();
+			SignResult result;
+			byte[] signedDocument;
+			try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+				result  = statusRequest.finishSign(baos);
+				signedDocument = baos.toByteArray();
+			}
 
 			PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
 			List<VerifyResult> verResults = PdfAsHelper.synchronousVerify(
-					baos.toByteArray(), -2,
+					signedDocument, -2,
 					PdfAsHelper.getVerificationLevel(request), null);
 
 			if (verResults.size() != 1) {
@@ -1038,7 +1008,7 @@ public class PdfAsHelper {
 					
 			SignedDocument signPdfDoc = SignedDocument.builder()
 			    .signingTimestamp(System.currentTimeMillis())
-			    .outputData(baos.toByteArray())
+			    .outputData(signedDocument)
 			    .fileName(PdfAsHelper.getPDFFileName(request))
 			    .verificationResponse(verResponse)
 			    .signerCertificate(Base64.encodeBase64String(result.getSignerCertificate().getEncoded()))
@@ -1084,52 +1054,45 @@ public class PdfAsHelper {
   }
 
   private static String getTemplateSL() throws IOException {
-		String xml = FileUtils.readFileToString(
+		return FileUtils.readFileToString(
 		    FileUtils.toFile(PdfAsHelper.class.getResource("/template_sl.html")),
                 StandardCharsets.UTF_8);
-		return xml;
 	}
 
 	public static String getErrorRedirectTemplateSL() throws IOException {
-		String xml = FileUtils.readFileToString(
+		return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_error_redirect.html")),
                 StandardCharsets.UTF_8);
-		return xml;
 	}
 
 	public static String getProvideTemplate() throws IOException {
-		String xml = FileUtils.readFileToString(
+		return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_provide.html")),
                 StandardCharsets.UTF_8);
-		return xml;
 	}
 
 	public static String getErrorTemplate() throws IOException {
-		String xml = FileUtils.readFileToString(
+		return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_error.html")),
                 StandardCharsets.UTF_8);
-		return xml;
 	}
 
 	public static String getGenericTemplate() throws IOException {
-		String xml = FileUtils.readFileToString(
+		return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_generic_param.html")),
                 StandardCharsets.UTF_8);
-		return xml;
 	}
 
 	public static String getInvokeRedirectTemplateSL() throws IOException {
-		String xml = FileUtils.readFileToString(
+		return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_invoke_redirect.html")),
                 StandardCharsets.UTF_8);
-		return xml;
 	}
 
   public static String getInvokeRedirectTemplateMoreFiles() throws IOException {
-    String xml = FileUtils.readFileToString(
+    return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_invoke_redirect_more_files.html")),
                 StandardCharsets.UTF_8);
-    return xml;
   }
 	
 	public static void setStatisticEvent(HttpServletRequest request,

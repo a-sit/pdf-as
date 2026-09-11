@@ -26,12 +26,6 @@ class PDFBox2To3Test {
         public val tempFolder = TemporaryFolder()
 
         lateinit var pdfAs: PdfAs
-        fun captureSign(param: SignParameter): ByteArray =
-            ByteArrayOutputStream().use {
-                param.outputStream = it
-                pdfAs.sign(param)
-                it.toByteArray()
-            }
 
         @JvmStatic
         @BeforeClass
@@ -78,13 +72,12 @@ class PDFBox2To3Test {
     fun pdfBox2To3Test() {
         val verificationResult =
             PdfAsFactory.createVerifyParameter(
-                pdfAs.configuration,
-                getInputPdf("align_signed.pdf"))
+                pdfAs.configuration)
             .apply {
                 signatureVerificationLevel = VerifyParameter.SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION
             }
-            .let(PDFBOXVerifier::verify)
-        Assert.assertEquals(verificationResult.size, 1)
+            .let { PDFBOXVerifier.verify(it, getInputPdf("align_signed.pdf")) }
+        Assert.assertEquals(1, verificationResult.size)
         verificationResult[0].let {
             Assert.assertTrue(it.isVerificationDone)
             Assert.assertEquals(it.signerCertificate, getKeystoreSigner("test-key").getCertificate(null))

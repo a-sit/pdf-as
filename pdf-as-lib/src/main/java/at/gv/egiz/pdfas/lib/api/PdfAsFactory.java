@@ -34,6 +34,7 @@ import at.gv.egiz.pdfas.lib.impl.VerifyParameterImpl;
 import at.gv.egiz.pdfas.lib.impl.configuration.ConfigValidatorLoader;
 import iaik.security.ec.provider.ECCelerate;
 import iaik.security.provider.IAIK;
+import lombok.NonNull;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +102,7 @@ public class PdfAsFactory implements IConfigurationConstants {
 	}
 
 	private static boolean initialized = false;
-	private static Object init_mutex = new Object();
+	private static final Object init_mutex = new Object();
 
 	private static void registerSecurityProvider(ISettings configuration) {
 		boolean doRegister = true;
@@ -117,8 +118,7 @@ public class PdfAsFactory implements IConfigurationConstants {
 			logger.info("Registering Security Providers!");
 
 			registerProvider(new IAIK(), 1);
-			// TODO: register ECCelerate in second position when TLS issue is
-			// fixed
+			// TODO: register ECCelerate in second position when TLS issue is fixed
 			registerProvider(ECCelerate.getInstance(), -1);
 
 			registerProvider( new  BouncyCastleProvider(), -2);
@@ -243,37 +243,32 @@ public class PdfAsFactory implements IConfigurationConstants {
 		return new PdfAsImpl(settings);
 	}
 
-	/**
-	 * Creates a sign parameter
-	 * 
-	 * @param configuration
-	 *            The configuration to be used
-	 * @param dataSource
-	 *            The data source to be used
-	 * @return
-	 */
+	public static SignParameter createSignParameter(@NonNull Configuration configuration) {
+		return new SignParameterImpl(configuration, null, null);
+	}
+
+	/** Creates a sign parameter.
+	 * Deprecated in favor of {@link createSignParameter(Configuration)},
+	 * with `dataSource` and `output` being passed directly to {@link PdfAs#sign}. */
+	@Deprecated
 	public static SignParameter createSignParameter(
 			Configuration configuration, DataSource dataSource,
 			OutputStream output) {
-		SignParameter param = new SignParameterImpl(configuration, dataSource,
-				output);
-		return param;
+		return new SignParameterImpl(configuration, dataSource, output);
 	}
 
-	/**
-	 * Creates a verification parameter
-	 * 
-	 * @param configuration
-	 *            The configuration to be used
-	 * @param dataSource
-	 *            The data source to be used
-	 * @return
-	 */
+	/** Creates a verify parameter. */
+	public static VerifyParameter createVerifyParameter(Configuration configuration) {
+		return new VerifyParameterImpl(configuration, null);
+	}
+
+	/** Creates a verify parameter.
+	 * Deprecated in favor of {@link createVerifyParameter(Configuration)},
+	 * with `dataSource` being passed directly to {@link PdfAs#verify}. */
+	@Deprecated
 	public static VerifyParameter createVerifyParameter(
 			Configuration configuration, DataSource dataSource) {
-		VerifyParameter param = new VerifyParameterImpl(configuration,
-				dataSource);
-		return param;
+		return new VerifyParameterImpl(configuration, dataSource);
 	}
 
 	/**

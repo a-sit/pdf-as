@@ -102,8 +102,7 @@ public class SignatureTest {
                 .getConfigurationFile()));
         Configuration configuration = pdfAs.getConfiguration();
         FileOutputStream fos = new FileOutputStream(outputPdfFile, false);
-        signParameter = PdfAsFactory.createSignParameter(configuration,
-                dataSource, fos);
+        signParameter = PdfAsFactory.createSignParameter(configuration);
 
         String id = UUID.randomUUID().toString();
         signParameter.setTransactionId(id);
@@ -149,8 +148,6 @@ public class SignatureTest {
             slConnector = new PAdESSigner(new BKUSLConnector(configuration));
         }
 
-        signParameter.setPlainSigner(slConnector);
-        signParameter.setDataSource(dataSource);
         // this is not needed for PDF-A test
         if (positionString != null)
             signParameter.setSignaturePosition(positionString);
@@ -158,7 +155,7 @@ public class SignatureTest {
         logger.debug("Starting signature for " + baseTestData.getPdfFile());
         logger.debug("Selected signature Profile " + baseTestData.getProfilID());
         @SuppressWarnings("unused")
-		SignResult result = pdfAs.sign(signParameter);
+		SignResult result = pdfAs.sign(signParameter, dataSource, slConnector, fos);
         try {
             fos.close();
         } catch (IOException e) {

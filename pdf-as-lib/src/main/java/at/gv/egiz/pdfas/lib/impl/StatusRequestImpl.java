@@ -26,74 +26,81 @@ package at.gv.egiz.pdfas.lib.impl;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.lib.api.sign.SignResult;
 import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
-import iaik.x509.X509Certificate;
 
+import java.io.OutputStream;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 import at.gv.egiz.pdfas.lib.api.StatusRequest;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-public class StatusRequestImpl implements StatusRequest {
+public class StatusRequestImpl {
 
-  private final PdfAsImpl pdfAs;
-  @Getter
-  private final OperationStatus status;
+  private final @NonNull PdfAsImpl pdfAs;
+  private final @NonNull OperationStatus status;
 
-  private StatusRequestImpl(PdfAsImpl pdfAs, OperationStatus status ) { this.pdfAs = pdfAs; this.status = status; }
-  static StatusRequestImpl.Stage1 create(PdfAsImpl pdfAs, OperationStatus status) {
+  private StatusRequestImpl(@NonNull PdfAsImpl pdfAs, @NonNull OperationStatus status ) { this.pdfAs = pdfAs; this.status = status; }
+  private byte[] signatureData;
+  private int[] byteRange;
+
+  static @NonNull StatusRequestImpl.Stage1 create(PdfAsImpl pdfAs, OperationStatus status) {
     return new StatusRequestImpl(pdfAs, status).new Stage1();
   }
 
-  @Setter @Getter
-  private byte[] signatureData;
-  @Setter
-  private int[] byteRange;
-
-  @Override public int[] getSignatureDataByteRange() {
-      return byteRange;
-  }
-
-  @Override public SignParameter getSignParameter() {
-      return this.status.getSignParameter();
-  }
-
-  @Override public RequestedSignature getRequestedSignature() { return this.status.getRequestedSignature(); }
-
   class StageBase implements StatusRequest {
     public OperationStatus getStatus() { return status; }
-    @Override public byte[] getSignatureData() { return signatureData; }
-    @Override public int[] getSignatureDataByteRange() { return byteRange; }
-    @Override public SignParameter getSignParameter() { return status.getSignParameter(); }
-    @Override public RequestedSignature getRequestedSignature() { return status.getRequestedSignature(); }
+    @Override public @NonNull SignParameter getSignParameter() { return status.getSignParameter(); }
+  }
+
+  class StageBaseWithData extends StageBase implements StatusRequest.HasRequestedSignature {
+
+    @Override public byte @NonNull[] getSignatureData() { return signatureData; }
+
+    @Override public int @NonNull[] getSignatureDataByteRange() { return byteRange; }
+
+    @Override public @NonNull RequestedSignature getRequestedSignature() { return status.getRequestedSignature(); }
   }
 
   public class Stage1 extends StageBase implements StatusRequest.Stage1 {
-    public StatusRequestImpl.Stage2 setCertificate(X509Certificate certificate, String pdfFilter, String pdfSubFilter) throws PDFASError {
-      pdfAs.processCertificate(StatusRequestImpl.this, certificate, pdfFilter, pdfSubFilter);
+    public void setSignatureData(byte @NonNull[] data) { signatureData = data; }
+    public void setByteRange(int @NonNull[] range) { byteRange = range; }
+    public StatusRequestImpl.Stage2 setCertificate(iaik.x509.X509Certificate certificate, String pdfFilter, String pdfSubFilter) throws PDFASError {
+      pdfAs.processCertificate(this, certificate, pdfFilter, pdfSubFilter);
       return new StatusRequestImpl.Stage2();
     }
     @Override
-    public StatusRequestImpl.Stage2 setCertificate(byte[] encodedCertificate, String pdfFilter, String pdfSubFilter) throws CertificateException, PDFASError {
-      return setCertificate(new X509Certificate(encodedCertificate), pdfFilter, pdfSubFilter);
+    public @NonNull StatusRequestImpl.Stage2 setCertificate(
+        @NonNull X509Certificate certificate, @NonNull String pdfFilter, @NonNull String pdfSubFilter)
+        throws CertificateException, PDFASError
+    {
+      @NonNull iaik.x509.X509Certificate c;
+      if (certificate instanceof iaik.x509.X509Certificate xc) { c = xc; }
+      else { c = new iaik.x509.X509Certificate(certificate.getEncoded()); }
+      return setCertificate(c, pdfFilter, pdfSubFilter);
+    }
+    @Override
+    public @NonNull StatusRequestImpl.Stage2 setCertificate(
+        byte @NonNull[] encodedCertificate, @NonNull String pdfFilter, @NonNull String pdfSubFilter)
+        throws CertificateException, PDFASError
+    {
+      return setCertificate(new iaik.x509.X509Certificate(encodedCertificate), pdfFilter, pdfSubFilter);
     }
   }
 
-  public class Stage2 extends StageBase implements StatusRequest.Stage2 {
+  public class Stage2 extends StageBaseWithData implements StatusRequest.Stage2 {
     @Override
-    public StatusRequestImpl.Stage3 setSignature(byte[] signatureValue) throws PDFASError {
-      pdfAs.processSignature(StatusRequestImpl.this, signatureValue);
+    public @NonNull StatusRequestImpl.Stage3 setSignature(byte @NonNull[] signatureValue) throws PDFASError {
+      pdfAs.processSignature(this, signatureValue);
       return new StatusRequestImpl.Stage3();
     }
   }
 
-  public class Stage3 extends StageBase implements StatusRequest.Stage3 {
+  public class Stage3 extends StageBaseWithData implements StatusRequest.Stage3 {
     @Override
-    public SignResult finishSign() throws PDFASError {
-      return pdfAs.finishSign(StatusRequestImpl.this);
+    public @NonNull SignResult finishSign(@NonNull OutputStream output) throws PDFASError {
+      return pdfAs.finishSign(this, output);
     }
   }
 }

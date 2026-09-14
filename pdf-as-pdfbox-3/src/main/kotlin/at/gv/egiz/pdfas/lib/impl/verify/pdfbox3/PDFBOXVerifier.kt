@@ -6,13 +6,14 @@ import at.gv.egiz.pdfas.lib.api.verify.VerifyResult
 import at.gv.egiz.pdfas.lib.impl.verify.SignatureInputData
 import at.gv.egiz.pdfas.lib.impl.verify.VerifierDispatcher
 import at.gv.egiz.pdfas.lib.impl.verify.VerifyBackend
+import jakarta.activation.DataSource
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature
 
 object PDFBOXVerifier : VerifyBackend {
-    override fun verify(parameter: VerifyParameter): List<VerifyResult> {
+    override fun verify(parameter: VerifyParameter, document: DataSource): List<VerifyResult> {
         val dispatcher = VerifierDispatcher(parameter.configuration as ISettings)
-        val pdfData = parameter.dataSource.inputStream.readAllBytes()
+        val pdfData = document.inputStream.readAllBytes()
         Loader.loadPDF(pdfData).use { document ->
             val allSignatures = document.signatureDictionaries
             val selectedSignatures = when(val i = parameter.whichSignature) {

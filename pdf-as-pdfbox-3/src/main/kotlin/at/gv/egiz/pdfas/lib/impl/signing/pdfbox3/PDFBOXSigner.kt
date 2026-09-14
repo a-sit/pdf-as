@@ -566,7 +566,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                     true
                 )
                     .let { (bytes, _) ->
-                        synchronized(PDDocument::javaClass) { Loader.loadPDF(bytes) }
+                        synchronized(PDDocument::class.java) { Loader.loadPDF(bytes) }
                     }
                     .use { visualDoc ->
                         PDFRenderer(visualDoc)
@@ -585,7 +585,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                     (0 * factor).toInt(),
                     (pageImage.height - (requestedSignature.signaturePosition.height + 1) * factor).toInt(),
                     ((requestedSignature.signaturePosition.width + 2) * factor).toInt(),
-                    (pageImage.height).toInt(),
+                    (pageImage.height),
                     null
                 )
             }

@@ -25,21 +25,19 @@ package at.gv.egiz.pdfas.web.servlets;
 
 import java.io.IOException;
 
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
-import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.exception.PdfAsStoreException;
 import at.gv.egiz.pdfas.web.exception.PdfAsWebException;
 import at.gv.egiz.pdfas.web.helper.DigestHelper;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
-import at.gv.egiz.pdfas.web.stats.StatisticEvent;
 import at.gv.egiz.pdfas.web.store.RequestStore;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -129,9 +127,13 @@ public class UIEntryPointServlet extends HttpServlet {
 			// IPlainSigner signer;
 			if (Connector.isAsynchronous(connector)) {
 				// start asynchronous signature creation
-				
-				PdfAsHelper.startSignature(req, resp, getServletContext(), connector, pdfAsRequest);
-				
+
+				ServletContext context = getServletContext();
+				PdfAsHelper.startSignature(req, connector, pdfAsRequest);
+
+				// start processing of first document
+				PdfAsHelper.writeHTTPResponse(req, resp, context);
+
 			} else {
 				throw new PdfAsWebException("Invalid connector ("
 						+ Connector.BKU + " | " + Connector.ONLINEBKU + " | "

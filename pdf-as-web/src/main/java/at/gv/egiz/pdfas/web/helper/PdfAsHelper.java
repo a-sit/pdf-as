@@ -29,7 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -488,33 +487,18 @@ public class PdfAsHelper {
 		
 	}
 
-	public static void startSignatureJson(HttpServletRequest request, HttpServletResponse response, 
-	    ServletContext context, Connector connector, PdfasSignRequest pdfAsRequest) throws Exception {
-	  HttpSession session = request.getSession();
-        
-    log.info("Starting signature in session: " + session.getId());    
-    session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);
+	public static void startSignature(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest) throws Exception {
+
+		HttpSession session = request.getSession();
+		log.info("Starting signature in session: " + session.getId());
+    	session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);
     
-    StatusRequest.Stage1 statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
-    session.setAttribute(PDF_STATUS, statusRequest);
+    	StatusRequest.Stage1 statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
+    	session.setAttribute(PDF_STATUS, statusRequest);
     
 	}
 
-  public static void startSignature(HttpServletRequest request, HttpServletResponse response,
-      ServletContext context, Connector connector, PdfasSignRequest pdfAsRequest) throws Exception {
-    HttpSession session = request.getSession();
-    log.info("Starting signature in session: " + session.getId());    
-    session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);    
-    
-    StatusRequest.Stage1 statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
-    session.setAttribute(PDF_STATUS, statusRequest);
-    
-    // start processing of first document
-    PdfAsHelper.process(request, response, context);
-            
-  }
-	
-  private static StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest)
+	private static StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest)
       throws PdfAsWebException, WriterException, IOException, PdfAsException, PDFASError {   
     HttpSession session = request.getSession();
     
@@ -665,7 +649,7 @@ public class PdfAsHelper {
 				statusRequest1.getSignParameter().getPlainSigner().getPDFSubFilter());
 		session.setAttribute(PDF_STATUS, statusRequest2);
 
-		PdfAsHelper.process(request, response, context);
+		PdfAsHelper.writeHTTPResponse(request, response, context);
 	}
 
 	public static void injectSignature(HttpServletRequest request,
@@ -686,7 +670,7 @@ public class PdfAsHelper {
 		val statusRequest3 = statusRequest2.setSignature(cmsSignature);
 		session.setAttribute(PDF_STATUS, statusRequest3);
 
-		PdfAsHelper.process(request, response, context);
+		PdfAsHelper.writeHTTPResponse(request, response, context);
 	}
 
 	public static JSONStartResponse startJsonProcess(HttpServletRequest request,
@@ -721,9 +705,9 @@ public class PdfAsHelper {
 		return null;
 	}
 
-	protected static void process(HttpServletRequest request,
-			HttpServletResponse response, ServletContext context)
-			throws Exception {
+	public static void writeHTTPResponse(
+		HttpServletRequest request, HttpServletResponse response, ServletContext context
+	) throws Exception {
 
 		HttpSession session = request.getSession();
 		Object statusRequestGeneric = session.getAttribute(PDF_STATUS);
@@ -1029,7 +1013,7 @@ public class PdfAsHelper {
 			  session.setAttribute(PDF_STATUS, nextStatusRequest2);
 
               // recurse
-			  PdfAsHelper.process(request, response, context);
+			  PdfAsHelper.writeHTTPResponse(request, response, context);
 			  		    			  			  
 			} else {
               if (slConnector instanceof BKUSLConnector) {

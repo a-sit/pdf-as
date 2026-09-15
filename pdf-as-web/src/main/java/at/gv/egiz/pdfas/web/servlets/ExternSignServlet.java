@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import at.gv.egiz.pdfas.web.config.PdfAsWebSpringConfiguration;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -389,7 +390,11 @@ public class ExternSignServlet extends HttpServlet {
 			PdfAsHelper.setStatisticEvent(request, response, statisticEvent);
 			
 	    	// sign document
-			PdfAsHelper.startSignature(request, response, getServletContext(), connector, data);
+			ServletContext context = getServletContext();
+			PdfAsHelper.startSignature(request, connector, data);
+
+			// start processing of first document
+			PdfAsHelper.writeHTTPResponse(request, response, context);
 
 			return;
 			

@@ -1266,12 +1266,6 @@ public class PdfAsHelper {
 	    log.debug("Generated URL: " + dataURL);
 	    return dataURL;
 	  }
-	
-	
-	public static void regenerateSession(HttpServletRequest request) {
-		request.getSession(false).invalidate();
-		request.getSession(true);
-	}
 
 	public static String generateDataURLSL20(HttpServletRequest request,
 			HttpServletResponse response) {

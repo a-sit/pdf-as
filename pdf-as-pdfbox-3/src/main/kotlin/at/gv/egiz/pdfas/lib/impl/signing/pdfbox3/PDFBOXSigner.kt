@@ -142,7 +142,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     ) = SignatureDataExtractor(certificate, filter, subfilter, date)
 
     private fun findExistingSignature(doc: PDDocument, sigFieldName: String?): PDSignature? =
-        doc.documentCatalog.acroForm
+        doc.documentCatalog.getAcroForm(null)
             ?.let { it.getField(sigFieldName) as? PDSignatureField }
             ?.let { field ->
                 check (field.signature == null) { "The signature field $sigFieldName is already signed." }

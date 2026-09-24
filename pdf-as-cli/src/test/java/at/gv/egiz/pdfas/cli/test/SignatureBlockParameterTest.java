@@ -272,7 +272,7 @@ public class SignatureBlockParameterTest {
     try (PDDocument pdDoc = Loader.loadPDF(new File(fileName))) {
       PDSignature signature = null;
       PDSignatureField signatureField;
-      PDAcroForm acroForm = pdDoc.getDocumentCatalog().getAcroForm();
+      PDAcroForm acroForm = pdDoc.getDocumentCatalog().getAcroForm(null);
       if (acroForm != null) {
         List<PDField> aa = acroForm.getFields();
         signatureField = (PDSignatureField) acroForm.getField(sigFieldName);

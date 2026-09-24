@@ -20,6 +20,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.runBlocking
 import org.apache.pdfbox.Loader
+import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField
 import org.junit.Assert
@@ -31,6 +32,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.zeroturnaround.zip.ZipUtil
 import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
 import java.security.KeyStore
 import java.util.concurrent.CompletionException
 
@@ -159,7 +161,7 @@ class SignVerifyTest {
 
         val originalFieldCount = input.inputStream.use { stream ->
             Loader.loadPDF(stream.readAllBytes()).use { document ->
-                val acroForm = requireNotNull(document.documentCatalog.acroForm)
+                val acroForm = requireNotNull(document.documentCatalog.getAcroForm(null))
                 require(acroForm.fields.none { it is PDSignatureField })
                 acroForm.fields.size.also { require (it>0) }
             }
@@ -168,7 +170,7 @@ class SignVerifyTest {
         val signedPdf = captureSign(input, getKeystoreSigner("test-key"))
 
         Loader.loadPDF(signedPdf).use { document ->
-            val acroForm = requireNotNull(document.documentCatalog.acroForm)
+            val acroForm = requireNotNull(document.documentCatalog.getAcroForm(null))
             val signatureFields = acroForm.fields.filterIsInstance<PDSignatureField>()
 
             Assert.assertEquals("Wrong field count",
@@ -200,7 +202,7 @@ class SignVerifyTest {
         val signedTwice = captureSign(ByteArrayDataSource(signedOnce), getKeystoreSigner("test-key"))
 
         val fieldNames = Loader.loadPDF(signedTwice).use { doc ->
-            doc.documentCatalog.acroForm.fieldTree
+            doc.documentCatalog.getAcroForm(null).fieldTree
                 .filterIsInstance<PDSignatureField>()
                 .map { it.fullyQualifiedName }
         }
@@ -235,10 +237,20 @@ class SignVerifyTest {
             configuration.setValue(IConfigurationConstants.SIGNATURE_FIELD_NAME, fieldName)
         }
         Loader.loadPDF(output).use { doc ->
-            val field = doc.documentCatalog.acroForm
+            val field = doc.documentCatalog.getAcroForm(null)
                 .getField(fieldName) as PDSignatureField
 
             Assert.assertNotNull(field.signature)
+        }
+    }
+
+    @Test
+    fun existingSignatureWithoutAcroFormFixup() {
+        val output = captureSign(getInputPdf("signed-without-fixup.pdf"), getKeystoreSigner("test-key"))
+        Loader.loadPDF(output).use { doc ->
+            val acroForm = requireNotNull(doc.documentCatalog.getAcroForm(null))
+            Assert.assertFalse(acroForm.cosObject.containsKey(COSName.DA))
+            Assert.assertNotEquals(true, acroForm.defaultResources?.fontNames?.any())
         }
     }
 

@@ -15,8 +15,6 @@ import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature
 import at.gv.egiz.pdfas.sigs.pades.PAdESSignerKeystore
 import jakarta.activation.DataSource
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.runBlocking
 import org.apache.pdfbox.Loader
@@ -32,7 +30,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.zeroturnaround.zip.ZipUtil
 import java.io.ByteArrayOutputStream
-import java.io.FileOutputStream
 import java.security.KeyStore
 import java.util.concurrent.CompletionException
 

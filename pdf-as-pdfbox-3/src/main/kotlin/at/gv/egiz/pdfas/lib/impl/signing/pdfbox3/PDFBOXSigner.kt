@@ -410,9 +410,11 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
 
                 val visualObject = PDFBOXStamper.createVisualPDFObject(pdfObject, main)
 
-                val positioningInstruction: PositioningInstruction = Positioning.determineTablePositioning(
-                    tablePos, doc, visualObject, pdfObject.status.settings, signatureProfileSettings
-                )
+                val positioningInstruction: PositioningInstruction =
+                    Loader.loadPDF(pdfObject.getOriginalDocument().getInputStream().readAllBytes()).use { analysisDoc ->
+                        Positioning.determineTablePositioning(
+                            tablePos, analysisDoc, visualObject, pdfObject.status.settings, signatureProfileSettings)
+                    }
                 logger.debug("Positioning: {}", positioningInstruction)
 
                 if (!isAdobeSignatureForm) {

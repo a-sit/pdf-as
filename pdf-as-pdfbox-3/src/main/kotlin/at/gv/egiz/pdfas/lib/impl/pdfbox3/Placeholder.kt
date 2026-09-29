@@ -16,6 +16,7 @@ import com.google.zxing.NotFoundException
 import com.google.zxing.ReaderException
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource
 import com.google.zxing.common.HybridBinarizer
+import org.apache.pdfbox.Loader
 import org.apache.pdfbox.contentstream.PDFStreamEngine
 import org.apache.pdfbox.contentstream.operator.Operator
 import org.apache.pdfbox.contentstream.operator.OperatorProcessor
@@ -46,14 +47,20 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
     ): SignaturePlaceholderData? {
         if (pdfObject !is PDFBOXObject) throw PdfAsException("Invalid state")
         try {
-            return Extractor().extract(pdfObject.document!!, placeholderID, matchMode)
+            val bytes: ByteArray = pdfObject.getOriginalDocument().getInputStream().readAllBytes()
+            val copy: PDDocument = Loader.loadPDF(bytes)
+            try {
+                return Extractor().extract(copy, placeholderID, matchMode)
+            } finally {
+                copy.close()
+            }
         } catch (e: Throwable) {
             when (e) {
                 is IOException, is ClassNotFoundException, is InstantiationException,
                 is IllegalAccessException, is NoSuchMethodException, is InvocationTargetException
-                    -> throw PDFIOException("error.pdf.io.04", e)
+                -> throw PDFIOException("error.pdf.io.04", e)
                 else
-                    -> throw e
+                -> throw e
             }
         }
     }

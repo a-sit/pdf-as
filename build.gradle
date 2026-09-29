@@ -88,7 +88,7 @@ allprojects {
 		jakartaServletVersion = '6.1.0'
 		jaxbApiVersion = '4.0.4'
 		jaxbRuntimeVersion = '4.0.7'
-		pdfboxVersion = '3.0.6'
+		pdfboxVersion = '3.0.8'
 		ztZipVersion = '1.17'
 		lombokVersion = '1.18.38'
 	}

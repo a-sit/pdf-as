@@ -132,7 +132,7 @@ public class UIEntryPointServlet extends HttpServlet {
 				PdfAsHelper.startSignature(req, connector, pdfAsRequest);
 
 				// start processing of first document
-				PdfAsHelper.writeHTTPResponse(req, resp, context);
+				PdfAsHelper.processRequestAndWriteHTTPResponse(req, resp, context);
 
 			} else {
 				throw new PdfAsWebException("Invalid connector ("

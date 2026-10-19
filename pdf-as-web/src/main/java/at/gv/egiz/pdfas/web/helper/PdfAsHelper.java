@@ -649,7 +649,7 @@ public class PdfAsHelper {
 				statusRequest1.getSignParameter().getPlainSigner().getPDFSubFilter());
 		session.setAttribute(PDF_STATUS, statusRequest2);
 
-		PdfAsHelper.writeHTTPResponse(request, response, context);
+		PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
 	}
 
 	public static void injectSignature(HttpServletRequest request,
@@ -670,7 +670,7 @@ public class PdfAsHelper {
 		val statusRequest3 = statusRequest2.setSignature(cmsSignature);
 		session.setAttribute(PDF_STATUS, statusRequest3);
 
-		PdfAsHelper.writeHTTPResponse(request, response, context);
+		PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
 	}
 
 	public static JSONStartResponse startJsonProcess(HttpServletRequest request,
@@ -705,7 +705,7 @@ public class PdfAsHelper {
 		return null;
 	}
 
-	public static void writeHTTPResponse(
+	public static void processRequestAndWriteHTTPResponse(
 		HttpServletRequest request, HttpServletResponse response, ServletContext context
 	) throws Exception {
 
@@ -1013,7 +1013,7 @@ public class PdfAsHelper {
 			  session.setAttribute(PDF_STATUS, nextStatusRequest2);
 
               // recurse
-			  PdfAsHelper.writeHTTPResponse(request, response, context);
+			  PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
 			  		    			  			  
 			} else {
               if (slConnector instanceof BKUSLConnector) {

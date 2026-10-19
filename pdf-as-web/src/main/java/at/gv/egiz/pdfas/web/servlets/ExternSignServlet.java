@@ -394,7 +394,7 @@ public class ExternSignServlet extends HttpServlet {
 			PdfAsHelper.startSignature(request, connector, data);
 
 			// start processing of first document
-			PdfAsHelper.writeHTTPResponse(request, response, context);
+			PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
 
 			return;
 			

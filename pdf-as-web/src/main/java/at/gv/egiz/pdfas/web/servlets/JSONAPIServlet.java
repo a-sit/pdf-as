@@ -209,8 +209,7 @@ public class JSONAPIServlet extends HttpServlet {
 
                 // start asynchronous signature creation
 
-                PdfAsHelper.startSignatureJson(request, response, getServletContext(),
-                    connector, data);
+                PdfAsHelper.startSignature(request, connector, data);
 
                 JSONStartResponse jsonStartResponse = PdfAsHelper.startJsonProcess(request, response, getServletContext());
 

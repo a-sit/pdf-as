@@ -135,7 +135,6 @@ public class PdfAsHelper {
 	private static final String PDF_RESPONSE_MODE = "PDF_RESPONSE_MODE";
 	private static final String REQUEST_FROM_DU = "REQ_DATA_URL";
 	private static final String SIGNATURE_DATA_HASH = "SIGNATURE_DATA_HASH";
-	private static final String SIGNATURE_ACTIVE = "SIGNATURE_ACTIVE";
 	private static final String VERIFICATION_RESULT = "VERIFICATION_RESULT";
   private static final String PDF_SIGNING_RESPONSE = "PDF_SIGNING_RESULT";
 	private static final String QRCODE_CONTENT = "QR_CONT";
@@ -1449,23 +1448,6 @@ public class PdfAsHelper {
 			}
 		}
 		return null;
-	}
-
-	public static void setSignatureActive(HttpServletRequest request,
-			boolean value) {
-		HttpSession session = request.getSession();
-		session.setAttribute(SIGNATURE_ACTIVE, Boolean.valueOf(value));
-	}
-
-	public static boolean isSignatureActive(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(SIGNATURE_ACTIVE);
-		if (obj != null) {
-			if (obj instanceof Boolean) {
-				return ((Boolean) obj).booleanValue();
-			}
-		}
-		return false;
 	}
 
 	public static String getVersion() {

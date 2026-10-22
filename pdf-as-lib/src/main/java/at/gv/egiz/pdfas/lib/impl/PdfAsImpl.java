@@ -294,14 +294,11 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
           }
       }
 
-      status.setSigningDate(Calendar.getInstance());
-
       final IPdfSigner signer = status.getBackend().getPdfSigner();
 
       final PDFASSignatureExtractor signatureDataExtractor = signer
               .buildBlindSignaturInterface(certificate,
-                      pdfFilter, pdfSubFilter,
-                      status.getSigningDate());
+                      pdfFilter, pdfSubFilter);
 
       signer.signPDF(status.getPdfObject(),
               status.getRequestedSignature(), signatureDataExtractor);

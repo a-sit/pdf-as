@@ -107,13 +107,11 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     class SignatureDataExtractor(
         val certificate: X509Certificate,
         private val pdfFilter: String,
-        private val pdfSubFilter: String,
-        private val signingDate: Calendar)
+        private val pdfSubFilter: String)
         : PDFASSignatureExtractor, PDFASSignatureInterface, SignatureInterface {
 
         override fun getPDFFilter() = pdfFilter
         override fun getPDFSubFilter() = pdfSubFilter
-        override fun getSigningDate() = signingDate
 
         private lateinit var signatureData: ByteArray
         override fun getSignatureData() = signatureData
@@ -137,9 +135,8 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     override fun buildBlindSignaturInterface(
         certificate: X509Certificate,
         filter: String,
-        subfilter: String,
-        date: Calendar
-    ) = SignatureDataExtractor(certificate, filter, subfilter, date)
+        subfilter: String
+    ) = SignatureDataExtractor(certificate, filter, subfilter)
 
     private fun findExistingSignature(doc: PDDocument, sigFieldName: String?): PDSignature? =
         doc.documentCatalog.getAcroForm(null)

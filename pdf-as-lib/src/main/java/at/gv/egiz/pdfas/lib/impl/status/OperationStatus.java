@@ -59,9 +59,6 @@ public class OperationStatus implements Serializable {
 	@Setter
     @Getter
     private RequestedSignature requestedSignature;
-	@Setter
-    @Getter
-    private Calendar signingDate;
 	@Getter
     private final PDFASBackend backend;
 	@Getter

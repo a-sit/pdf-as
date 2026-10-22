@@ -35,6 +35,7 @@ import at.gv.egiz.pdfas.lib.impl.configuration.ConfigValidatorLoader;
 import iaik.security.ec.provider.ECCelerate;
 import iaik.security.provider.IAIK;
 import lombok.NonNull;
+import lombok.val;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -407,15 +408,18 @@ public class PdfAsFactory implements IConfigurationConstants {
 	 * @throws PdfAsSettingsValidationException 
 	 */
 	public static void validateConfiguration(ISettings configuration) throws PdfAsSettingsValidationException{
-		Map<String, ConfigurationValidator> availableValidators = ConfigValidatorLoader.getAvailableValidators();
-		if(availableValidators.isEmpty()){
+		Iterable<@NonNull ConfigurationValidator> availableValidators = ConfigValidatorLoader.getAvailableValidators();
+		var it = availableValidators.iterator();
+		if (!it.hasNext()) {
 			logger.info("No configuration validators available");
+			return;
 		}
-		for(Entry<String, ConfigurationValidator> validatorEntry : availableValidators.entrySet()){
-			logger.info("Running configuration validator: "+validatorEntry.getKey());
-			validatorEntry.getValue().validate(configuration);
+		while (it.hasNext()) {
+			val validator = it.next();
+            logger.info("Running configuration validator: {}", validator.getName());
+			validator.validate(configuration);
 		}
-		logger.info("All configuration validators succeded.");
+		logger.info("All configuration validators succeeded.");
 
 	}
 }

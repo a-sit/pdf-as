@@ -27,9 +27,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.settings.ISettings;
+import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.backend.PDFASBackend;
+import at.gv.egiz.pdfas.lib.impl.backend.BackendLoader;
+import at.gv.egiz.pdfas.lib.impl.configuration.ConfigurationImpl;
 import at.gv.egiz.pdfas.lib.impl.configuration.GlobalConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
@@ -41,9 +45,6 @@ import lombok.Setter;
 
 public class OperationStatus implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2985007198666388528L;
 
 	private final SignParameter signParamter;
@@ -66,8 +67,9 @@ public class OperationStatus implements Serializable {
 	@Setter
     @Getter
     private RequestedSignature requestedSignature;
-	@Getter
-    private final PDFASBackend backend;
+	@Getter(lazy = true)
+	@Transient
+    private final PDFASBackend backend = BackendLoader.getPDFASBackend((ConfigurationImpl)this.configuration);
 	@Getter
     private final Map<String, String> metaInformations = new HashMap<String, String>();
     @Getter
@@ -75,11 +77,15 @@ public class OperationStatus implements Serializable {
 
 //	private HashMap<String, String> requestParameters = new HashMap<String, String>();
 
-	public OperationStatus(ISettings configuration, SignParameter signParameter, PDFASBackend backend, TimedFunction.Context timer) {
+	public OperationStatus(ISettings configuration, SignParameter signParameter, TimedFunction.Context timer) throws PDFASError {
 		this.configuration = configuration;
 		this.signParamter = signParameter;
-		this.backend = backend;
         this.signTimer = timer;
+		if (configuration instanceof Configuration config) {
+			backend = BackendLoader.getPDFASBackend(config);
+		} else {
+			backend = BackendLoader.getPDFASBackend();
+		}
 	}
 
 	// ========================================================================

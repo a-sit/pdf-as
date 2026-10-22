@@ -268,7 +268,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     }
   }
 
-  public void processCertificate(
+  void processCertificate(
       @NonNull StatusRequestImpl.Stage1 request, @NonNull X509Certificate certificate,
       @NonNull String pdfFilter, @NonNull String pdfSubFilter) throws PDFASError
   {
@@ -333,7 +333,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     }
   }
 
-  public void processSignature(
+  void processSignature(
       @NonNull StatusRequestImpl.Stage2 request, byte @NonNull[] signatureValue) throws PDFASError
   {
     final OperationStatus status = request.getStatus();
@@ -374,7 +374,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     }
   }
 
-  public @NonNull SignResult finishSign(@NonNull StatusRequestImpl.Stage3 request, @NonNull OutputStream output) throws PDFASError {
+  @NonNull SignResult finishSign(@NonNull StatusRequestImpl.Stage3 request, @NonNull OutputStream output) throws PDFASError {
     final OperationStatus status = request.getStatus();
 
     try {

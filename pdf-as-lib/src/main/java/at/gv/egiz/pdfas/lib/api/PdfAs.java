@@ -46,7 +46,8 @@ public interface PdfAs {
 	/** Signs a PDF document synchronously, using a {@link IPlainSigner}. */
 	public @NonNull SignResult sign(@NonNull SignParameter parameter, @NonNull DataSource document, @NonNull IPlainSigner plainSigner, @NonNull OutputStream output) throws PDFASError;
 
-	/** Signs a PDF document asynchronously, using a {@link IAsyncSigner}. */
+	/** Signs a PDF document asynchronously, using a {@link IAsyncSigner}.
+	 * @see PdfAsExtensionsKt#signSuspend */
 	public @NonNull CompletionStage<@NonNull SignResult> signAsync(@NonNull SignParameter parameter, @NonNull DataSource document, @NonNull IAsyncSigner asyncSigner, @NonNull OutputStream output);
 
 	/** Legacy interface that expects the {@link DataSource}, {@link IPlainSigner}, and {@link OutputStream} to be set on the {@link SignParameter}.

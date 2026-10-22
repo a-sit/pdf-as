@@ -38,12 +38,14 @@ suspend fun PdfAs.signSuspend(param: SignParameter, document: DataSource, signer
 /** Helper interface for Kotlin consumers. Bridges Kotlin suspend function implementations to Java's [IAsyncSigner]. */
 interface ISuspendingSigner : IAsyncSigner {
     val coroutineScope: CoroutineScope
+
+    @Throws(PdfAsException::class) suspend fun getCertificateDataSuspend(
+        parameter: SignParameter): IAsyncSigner.CertificateData
+    @Throws(PdfAsException::class) suspend fun signSuspend(
+        input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature): ByteArray
+
     override fun getCertificateData(parameter: SignParameter) =
         coroutineScope.future { getCertificateDataSuspend(parameter) }.minimalCompletionStage()
-    @Throws(PdfAsException::class)
-    suspend fun getCertificateDataSuspend(parameter: SignParameter): IAsyncSigner.CertificateData
     override fun sign(input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature) =
         coroutineScope.future { signSuspend(input, byteRange, parameter, requestedSignature) }.minimalCompletionStage()
-    @Throws(PdfAsException::class)
-    suspend fun signSuspend(input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature): ByteArray
 }

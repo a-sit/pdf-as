@@ -136,7 +136,7 @@ public class PdfAsHelper {
 	private static final String REQUEST_FROM_DU = "REQ_DATA_URL";
 	private static final String SIGNATURE_DATA_HASH = "SIGNATURE_DATA_HASH";
 	private static final String VERIFICATION_RESULT = "VERIFICATION_RESULT";
-  private static final String PDF_SIGNING_RESPONSE = "PDF_SIGNING_RESULT";
+	private static final String PDF_SIGNING_RESPONSE = "PDF_SIGNING_RESULT";
 	private static final String QRCODE_CONTENT = "QR_CONT";
 	public static final String PDF_SESSION_PREFIX = "PDF_SESSION_";
   

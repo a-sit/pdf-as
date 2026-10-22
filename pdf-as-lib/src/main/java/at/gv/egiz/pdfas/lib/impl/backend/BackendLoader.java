@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,20 +15,12 @@ import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.backend.PDFASBackend;
 
-/**
- * The Class BackendLoader.
- */
+/** The Class BackendLoader. */
+@Slf4j
 public class BackendLoader implements ErrorConstants {
 	
-	/** The Constant logger. */
-	private static final Logger logger = LoggerFactory
-			.getLogger(BackendLoader.class);
-	
-	/** The pdf as backend loader. */
-	private static ServiceLoader<PDFASBackend> pdfAsBackendLoader = ServiceLoader.load(PDFASBackend.class);
-	
 	/** The available backends. */
-	private static Map<String, PDFASBackend> availableBackends = new HashMap<String, PDFASBackend>();
+	private static final Map<String, PDFASBackend> availableBackends = new HashMap<String, PDFASBackend>();
 	
 	/** The Constant BACKEND_CONFIG. */
 	public static final String BACKEND_CONFIG = "runtime.backend";
@@ -35,49 +29,28 @@ public class BackendLoader implements ErrorConstants {
 	private static PDFASBackend defaultBackend = null;
 	
 	static {
-		logger.debug("building PDF-AS Backends");
-		
-		Iterator<PDFASBackend> backendIterator = pdfAsBackendLoader.iterator();
-		
-		while(backendIterator.hasNext()) {
-			PDFASBackend backend = backendIterator.next();
-			logger.debug("Loading " + backend.getName() + " [" + backend.getClass().getName() + "]");
-			availableBackends.put(backend.getName(), backend);
-			logger.debug("PDF-Backend added " + backend.getName());
-			if(backend.usedAsDefault()) {
-				defaultBackend = backend;
-				logger.debug("PDF-Backend added as default " + backend.getName());
+		log.debug("building PDF-AS Backends");
+
+        for (PDFASBackend backend : ServiceLoader.load(PDFASBackend.class)) {
+            log.debug("Loading {} [{}]", backend.getName(), backend.getClass().getName());
+            availableBackends.put(backend.getName(), backend);
+            if (backend.usedAsDefault()) {
+                defaultBackend = backend;
+                log.debug("PDF-Backend added as default {}", backend.getName());
+            } else {
+                log.debug("PDF-Backend added {}", backend.getName());
 			}
-		}
+        }
 		
-		logger.debug("PDF-AS Backends constructed");
+		log.debug("PDF-AS Backends constructed");
 		
 		if(defaultBackend != null) {
-			logger.debug("Default backend is " + defaultBackend.getName());
+            log.debug("Default backend is {}", defaultBackend.getName());
 		}
 	}
-	
-	/**
-	 * Gets the PDFAS backend.
-	 *
-	 * @param configuration the configuration
-	 * @return the PDFAS backend
-	 * @throws PDFASError the PDFAS error
-	 */
-	public static PDFASBackend getPDFASBackend(Configuration configuration) throws PDFASError {
-		String backendName = configuration.getValue(BACKEND_CONFIG);
-		return getPDFASBackend(backendName);
-	}
-	
-	/**
-	 * Gets the PDFAS backend.
-	 *
-	 * @param name the name
-	 * @return the PDFAS backend
-	 * @throws PDFASError the PDFAS error
-	 */
-	public static PDFASBackend getPDFASBackend(String name) throws PDFASError {
-		if(name != null) {
+
+	public static @NonNull PDFASBackend getPDFASBackend(String name) throws PDFASError {
+		if (name != null) {
 			if(availableBackends.containsKey(name)) {
 				return availableBackends.get(name);
 			}
@@ -90,18 +63,9 @@ public class BackendLoader implements ErrorConstants {
 		
 		throw new PDFASError(ERROR_NO_BACKEND);
 	}
-	
-	/**
-	 * Gets the PDFAS backend.
-	 *
-	 * @return the PDFAS backend
-	 * @throws PDFASError the PDFAS error
-	 */
-	public static PDFASBackend getPDFASBackend() throws PDFASError {
-		if(defaultBackend != null) {
-			return defaultBackend;
-		}
-		
-		throw new PDFASError(ERROR_NO_BACKEND);
+
+	public static @NonNull PDFASBackend getPDFASBackend(Configuration configuration) throws PDFASError {
+      return getPDFASBackend(configuration.getValue(BACKEND_CONFIG));
 	}
+	public static @NonNull PDFASBackend getPDFASBackend() throws PDFASError { return getPDFASBackend((String)null); }
 }

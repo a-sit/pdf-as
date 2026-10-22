@@ -243,17 +243,9 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       // execute pre Processors
       signPreProcessing(parameter);
 
-      // allocated Backend
-      final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
+      status = new OperationStatus(config, parameter, signTimer.start());
 
-      if (backend == null) {
-        throw new PDFASError(ERROR_NO_BACKEND);
-      }
-
-      status = new OperationStatus(config, parameter,
-          backend, signTimer.start());
-
-      final IPdfSigner signer = backend.getPdfSigner();
+      final IPdfSigner signer = status.getBackend().getPdfSigner();
 
       val pdfObject = signer.buildPDFObject(status);
       pdfObject.setOriginalDocument(document);
@@ -478,12 +470,10 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       } else {
         iaikCert = (X509Certificate) cert;
       }
-      // allocated Backend
-      final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
 
-      status = new OperationStatus(config, parameter, backend, null);
+      status = new OperationStatus(config, parameter, null);
 
-      final IPdfSigner<?, ?> signer = backend.getPdfSigner();
+      final IPdfSigner<?, ?> signer = status.getBackend().getPdfSigner();
 
       status.setPdfObject(signer.buildPDFObject(status));
 

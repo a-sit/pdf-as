@@ -7,8 +7,6 @@ public interface ConfigurationValidator {
 
 	void validate(ISettings settings) throws PdfAsSettingsValidationException;
 
-	boolean usedAsDefault();
-
 	String getName();
 
 

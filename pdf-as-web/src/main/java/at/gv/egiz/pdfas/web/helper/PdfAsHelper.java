@@ -111,14 +111,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PdfAsHelper {
-
-	private static final String PDF_CONFIG = "PDF_CONFIG";
 	
 	private static final String PDF_PROCESSING_REQUEST = "PDF_PROCESSING_REQUEST";
 	private static final String PDF_STATUS = "PDF_STATUS";
 	private static final String PDF_SL_CONNECTOR = "PDF_SL_CONNECTOR";
 	private static final String PDF_STATISTICS = "PDF_STATISTICS";
-	private static final String PDF_SIGNER = "PDF_SIGNER";
 	private static final String PDF_SL_INTERACTIVE = "PDF_SL_INTERACTIVE";
 	private static final String PDF_LOCALE = "PDF_LOCALE";
 	private static final String PDF_ERR_MESSAGE = "PDF_ERR_MESSAGE";
@@ -138,7 +135,6 @@ public class PdfAsHelper {
 	private static final String PDF_RESPONSE_MODE = "PDF_RESPONSE_MODE";
 	private static final String REQUEST_FROM_DU = "REQ_DATA_URL";
 	private static final String SIGNATURE_DATA_HASH = "SIGNATURE_DATA_HASH";
-	private static final String SIGNATURE_ACTIVE = "SIGNATURE_ACTIVE";
 	private static final String VERIFICATION_RESULT = "VERIFICATION_RESULT";
   private static final String PDF_SIGNING_RESPONSE = "PDF_SIGNING_RESULT";
 	private static final String QRCODE_CONTENT = "QR_CONT";
@@ -503,7 +499,6 @@ public class PdfAsHelper {
     HttpSession session = request.getSession();
     
     Configuration config = pdfAs.getConfiguration();
-    session.setAttribute(PDF_CONFIG, config);
 
     ConfigurationOverwrite.overwriteConfiguration(pdfAsRequest.getCoreParams().getOverrides(), config);
         
@@ -511,7 +506,6 @@ public class PdfAsHelper {
         
     // prepare first document
     IPlainSigner signer = getSignerFromConnector(connector, session);
-    session.setAttribute(PDF_SIGNER, signer);
         
     String qrCodeContent = PdfAsHelper.getQRCodeContent(request);
     
@@ -712,10 +706,6 @@ public class PdfAsHelper {
 		HttpSession session = request.getSession();
 		Object statusRequestGeneric = session.getAttribute(PDF_STATUS);
 		PdfasSignRequest pdfAsRequest = (PdfasSignRequest) session.getAttribute(PDF_PROCESSING_REQUEST);
-		
-		
-		// IPlainSigner plainSigner = (IPlainSigner) session
-		// .getAttribute(PDF_SIGNER);
 
 		Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
 		PdfAsHelper.checkConnectorSupported(connector, null);
@@ -1458,23 +1448,6 @@ public class PdfAsHelper {
 			}
 		}
 		return null;
-	}
-
-	public static void setSignatureActive(HttpServletRequest request,
-			boolean value) {
-		HttpSession session = request.getSession();
-		session.setAttribute(SIGNATURE_ACTIVE, Boolean.valueOf(value));
-	}
-
-	public static boolean isSignatureActive(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(SIGNATURE_ACTIVE);
-		if (obj != null) {
-			if (obj instanceof Boolean) {
-				return ((Boolean) obj).booleanValue();
-			}
-		}
-		return false;
 	}
 
 	public static String getVersion() {

@@ -34,7 +34,9 @@ import at.gv.egiz.pdfas.lib.impl.configuration.GlobalConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
 import at.gv.egiz.pdfas.lib.util.TimedFunction;
+import jakarta.persistence.Transient;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 public class OperationStatus implements Serializable {
@@ -50,9 +52,17 @@ public class OperationStatus implements Serializable {
     private PDFObject pdfObject;
 
 	private final ISettings configuration;
-	private PlaceholderConfiguration placeholderConfiguration = null;
-	private GlobalConfiguration globalConfiguration = null;
-	private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<String, SignatureProfileConfiguration>();
+
+	@Getter(lazy = true)
+	@Transient
+	private final @NonNull PlaceholderConfiguration placeholderConfiguration = new PlaceholderConfiguration(this.configuration);
+
+	@Getter(lazy = true)
+	@Transient
+	private final @NonNull GlobalConfiguration globalConfiguration = new GlobalConfiguration(this.configuration);
+
+	@Transient
+	private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<>();
 	@Setter
     @Getter
     private RequestedSignature requestedSignature;
@@ -80,34 +90,10 @@ public class OperationStatus implements Serializable {
 		}
 	}
 
-    public PlaceholderConfiguration getPlaceholderConfiguration() {
-      if (this.placeholderConfiguration == null) {
-          this.placeholderConfiguration = new PlaceholderConfiguration(
-                  this.configuration);
-      }
-      return this.placeholderConfiguration;
-	}
-
-	public GlobalConfiguration getGlobalConfiguration() {
-		if (this.globalConfiguration == null) {
-			this.globalConfiguration = new GlobalConfiguration(
-					this.configuration);
-		}
-		return this.globalConfiguration;
-	}
-
-	public SignatureProfileConfiguration getSignatureProfileConfiguration(
-			String profileID) {
-
-		SignatureProfileConfiguration signatureProfileConfiguration = signatureProfiles
-				.get(profileID);
-		if (signatureProfileConfiguration == null) {
-			signatureProfileConfiguration = new SignatureProfileConfiguration(
-					this.configuration, profileID);
-			signatureProfiles.put(profileID, signatureProfileConfiguration);
-		}
-
-		return signatureProfileConfiguration;
+	public @NonNull SignatureProfileConfiguration getSignatureProfileConfiguration(@NonNull String profileID) {
+		return signatureProfiles.computeIfAbsent(profileID,
+			key -> new SignatureProfileConfiguration(this.configuration, key)
+		);
 	}
 
 	// ========================================================================

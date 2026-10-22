@@ -77,6 +77,7 @@ dependencies {
     api group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: bouncyCastleVersion
 	api group: 'jakarta.activation', name: 'jakarta.activation-api', version: jakartaActivationVersion
 	api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: jaxbApiVersion
+	compileOnly group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: jakartaPersistenceVersion
 	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: jaxbRuntimeVersion
 	api group: 'com.google.code.gson', name: 'gson', version: gsonVersion
 	api group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.9.6'

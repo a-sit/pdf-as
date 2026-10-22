@@ -38,9 +38,7 @@ import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
 
 public interface IPdfSigner<PDFObjectT extends PDFObject, SignerT extends PDFASSignatureExtractor>  {
 
-	SignerT buildBlindSignaturInterface(
-			X509Certificate certificate, String filter, String subfilter,
-			Calendar date);
+	SignerT buildBlindSignaturInterface(X509Certificate certificate, String filter, String subfilter);
 
 	PDFObjectT buildPDFObject(OperationStatus operationStatus);
 

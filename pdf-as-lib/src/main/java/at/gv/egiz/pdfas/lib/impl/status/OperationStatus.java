@@ -24,12 +24,10 @@
 package at.gv.egiz.pdfas.lib.impl.status;
 
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.common.utils.TempFileHelper;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.backend.PDFASBackend;
 import at.gv.egiz.pdfas.lib.impl.configuration.GlobalConfiguration;
@@ -55,7 +53,6 @@ public class OperationStatus implements Serializable {
 	private PlaceholderConfiguration placeholderConfiguration = null;
 	private GlobalConfiguration globalConfiguration = null;
 	private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<String, SignatureProfileConfiguration>();
-	private final TempFileHelper helper;
 	@Setter
     @Getter
     private RequestedSignature requestedSignature;
@@ -73,29 +70,11 @@ public class OperationStatus implements Serializable {
 		this.signParamter = signParameter;
 		this.backend = backend;
         this.signTimer = timer;
-		this.helper = new TempFileHelper(configuration);
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		if (this.helper != null) {
-			try {
-				this.helper.clear();
-			} catch (Throwable ignored) {
-			}
-		}
-		super.finalize();
 	}
 
 	// ========================================================================
 	
 	public void clear() {
-		if (this.helper != null) {
-			try {
-				this.helper.clear();
-			} catch (Throwable ignored) {
-			}
-		}
 		if(pdfObject != null) {
 			pdfObject.close();
 		}
@@ -135,10 +114,6 @@ public class OperationStatus implements Serializable {
 
     public SignParameter getSignParameter() {
 		return signParamter;
-	}
-
-	public TempFileHelper getTempFileHelper() {
-		return this.helper;
 	}
 
 	public ISettings getSettings() {

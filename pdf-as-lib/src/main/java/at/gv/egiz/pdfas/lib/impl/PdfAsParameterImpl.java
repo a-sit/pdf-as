@@ -34,72 +34,40 @@ import at.gv.egiz.pdfas.common.utils.CheckSignatureBlockParameters;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.api.PdfAsParameter;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 public class PdfAsParameterImpl implements PdfAsParameter {
-protected Configuration configuration;
-	
-	protected DataSource dataSource;
-	protected String transactionId;
-	protected Map<String, String> preProcessorProps;
-	protected Map<String, String> dynamicSignatureBlockArgumentsMap;
-	public PdfAsParameterImpl(Configuration configuration, 
-			DataSource dataSource) {
-		this.configuration = configuration;
-		this.dataSource = dataSource;
-		this.transactionId = null;
-	}
+    @Setter @Getter
+    protected Configuration configuration;
+    @Setter @Getter
+    protected DataSource dataSource;
+	@Setter @Getter
+    protected String transactionId;
+	@Setter @Getter
+    protected Map<String, String> preprocessorArguments;
+	@Getter
+    protected Map<String, String> dynamicSignatureBlockArguments;
+    public PdfAsParameterImpl(@NonNull Configuration configuration,
+            DataSource dataSource) {
+        this.configuration = configuration;
+        this.dataSource = dataSource;
+        this.transactionId = null;
+    }
 
-	public Configuration getConfiguration() {
-		return configuration;
-	}
+    @Override
+    public void setDynamicSignatureBlockArguments(Map<String, String> map) throws PdfAsException {
+        if (map == null)
+            map = new HashMap<>();
+        Map<String, String> tmpMap = Collections.unmodifiableMap(map);
+        String keyRegex = configuration.getValue(IConfigurationConstants.SIG_BLOCK_PARAMETER_KEY_REGEX);
+        String valueRegex = configuration.getValue(IConfigurationConstants.SIG_BLOCK_PARAMETER_VALUE_REGEX);
+        if (CheckSignatureBlockParameters.checkSignatureBlockParameterMapIsValid(tmpMap, keyRegex, valueRegex)) {
+            this.dynamicSignatureBlockArguments = tmpMap;
+        }else{
+            throw new PdfAsException("error.invalid.signature.parameter.01");
+        }
 
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
-
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
-
-	public String getTransactionId() {
-		return transactionId;
-	}
-
-	public void setTransactionId(String id) {
-		this.transactionId = id;
-	}
-
-	@Override
-	public Map<String, String> getPreprocessorArguments() {
-		return preProcessorProps;
-	}
-
-	@Override
-	public void setPreprocessorArguments(Map<String, String> map) {
-		this.preProcessorProps = map;
-	}
-
-	@Override
-	public void setDynamicSignatureBlockArguments(Map<String, String> map) throws PdfAsException {
-		if(map == null)
-			map = new HashMap<String, String>();
-		Map<String, String> tmpMap = Collections.unmodifiableMap(map);
-		String keyRegex = configuration.getValue(IConfigurationConstants.SIG_BLOCK_PARAMETER_KEY_REGEX);
-		String valueRegex = configuration.getValue(IConfigurationConstants.SIG_BLOCK_PARAMETER_VALUE_REGEX);
-		if( CheckSignatureBlockParameters.checkSignatureBlockParameterMapIsValid(tmpMap, keyRegex, valueRegex) == true) {
-			this.dynamicSignatureBlockArgumentsMap = tmpMap;
-		}else{
-			throw new PdfAsException("error.invalid.signature.parameter.01");
-		}
-
-	}
-
-	@Override
-	public Map<String, String> getDynamicSignatureBlockArguments() {
-		return this.dynamicSignatureBlockArgumentsMap;
-	}
+    }
 }

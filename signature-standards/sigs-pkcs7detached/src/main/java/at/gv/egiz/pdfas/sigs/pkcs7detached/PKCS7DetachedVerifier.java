@@ -32,37 +32,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.utils.PDFUtils;
-import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 
 public class PKCS7DetachedVerifier implements IVerifyFilter, PKCS7DetachedConstants {
-
-	private static final Logger logger = LoggerFactory.getLogger(PKCS7DetachedVerifier.class);
-	
-	public PKCS7DetachedVerifier() {
-	}
+    
+    public PKCS7DetachedVerifier() {}
 
     @Override
-	public List<VerifyResult> verify(SignatureInputData signedData, byte[] signature,
+    public List<VerifyResult> verify(SignatureInputData signedData, byte[] signature,
                                      Date verificationTime, IVerifier verifier)
-			throws PdfAsException {
-		
-		List<VerifyResult> verifieResults = verifier.verify(signature, signedData, verificationTime);
-		for(int i =0; i < verifieResults.size();i++) {
-			VerifyResultImpl result = (VerifyResultImpl)verifieResults.get(i);
-			result.setSignatureData(signedData);
-		}
-		
-		return verifieResults;
-		
-		
-	}
+            throws PdfAsException {
+        
+        List<VerifyResult> verifieResults = verifier.verify(signature, signedData, verificationTime);
+        for (VerifyResult verifieResult : verifieResults) {
+            VerifyResultImpl result = (VerifyResultImpl) verifieResult;
+            result.setSignatureData(signedData);
+        }
+        
+        return verifieResults;
+        
+        
+    }
 
-	public List<FilterEntry> getFiters() {
-		List<FilterEntry> result = new ArrayList<FilterEntry>();
-		result.add(new FilterEntry(FILTER_ADOBE_PPKLITE, SUBFILTER_ADBE_PKCS7_DETACHED));
-		return result;
-	}
+    public List<FilterEntry> getFiters() {
+        List<FilterEntry> result = new ArrayList<FilterEntry>();
+        result.add(new FilterEntry(FILTER_ADOBE_PPKLITE, SUBFILTER_ADBE_PKCS7_DETACHED));
+        return result;
+    }
 
 }

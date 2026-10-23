@@ -23,7 +23,6 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.configuration;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
@@ -34,6 +33,8 @@ import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.settings.Settings;
 
+/** ConfigurationImpl wraps the underlying {@link ISettings} object (which is the on-disk configuration).
+ * It allows runtime overriding of individual properties. */
 public class ConfigurationImpl implements ISettings, Configuration {
 
   protected Properties overwrittenProperties = new Properties();
@@ -68,7 +69,7 @@ public class ConfigurationImpl implements ISettings, Configuration {
     if (overwrittenProperties.containsKey(key)) {
       String value = overwrittenProperties.getProperty(key);
       if (StringUtils.isNotEmpty(value)) {
-        return Boolean.valueOf(value);
+        return Boolean.parseBoolean(value);
         
       } else {
         return defaultValue;
@@ -92,10 +93,9 @@ public class ConfigurationImpl implements ISettings, Configuration {
   @Override
   public Map<String, String> getValuesPrefix(String prefix) {
     final Map<String, String> valueMap = this.settings.getValuesPrefix(prefix);
-    final Iterator<Object> keyIterator = overwrittenProperties.keySet().iterator();
 
-    while (keyIterator.hasNext()) {
-      final String key = keyIterator.next().toString();
+    for (Object o : overwrittenProperties.keySet()) {
+      final String key = o.toString();
 
       if (key.startsWith(prefix)) {
         valueMap.put(key, overwrittenProperties.getProperty(key));
@@ -114,10 +114,9 @@ public class ConfigurationImpl implements ISettings, Configuration {
     }
 
     final String mPrefix = prefix.endsWith(".") ? prefix : prefix + ".";
-    final Iterator<Object> keyIterator = overwrittenProperties.keySet().iterator();
 
-    while (keyIterator.hasNext()) {
-      final String key = keyIterator.next().toString();
+    for (Object o : overwrittenProperties.keySet()) {
+      final String key = o.toString();
 
       if (key.startsWith(prefix)) {
         final int keyIdx = key.indexOf('.', mPrefix.length()) > 0 ? key.indexOf('.', mPrefix.length())
@@ -143,11 +142,8 @@ public class ConfigurationImpl implements ISettings, Configuration {
       return true;
     }
 
-    final Iterator<Object> keyIterator = overwrittenProperties.keySet().iterator();
-    while (keyIterator.hasNext()) {
-      final String key = keyIterator.next().toString();
-
-      if (key.startsWith(prefix)) {
+    for (Object key : overwrittenProperties.keySet()) {
+      if (key.toString().startsWith(prefix)) {
         return true;
       }
     }
@@ -171,11 +167,8 @@ public class ConfigurationImpl implements ISettings, Configuration {
 
   @Override
   public void removeProfile(String configurationPrefix) {
-    final Iterator<Object> keyIterator = overwrittenProperties.keySet().iterator();
-    while (keyIterator.hasNext()) {
-      final String key = keyIterator.next().toString();
-
-      if (key.startsWith(configurationPrefix)) {
+    for (Object key : overwrittenProperties.keySet()) {
+      if (key.toString().startsWith(configurationPrefix)) {
         overwrittenProperties.remove(key);
       }
     }

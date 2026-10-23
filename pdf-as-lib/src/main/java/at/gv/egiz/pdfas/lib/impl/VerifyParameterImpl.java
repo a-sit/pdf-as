@@ -29,43 +29,23 @@ import jakarta.activation.DataSource;
 
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 public class VerifyParameterImpl extends PdfAsParameterImpl implements VerifyParameter {
-	
-	protected int which = - 1;
-	
-	protected Date verificationTime = null;
-	
-	protected SignatureVerificationLevel signatureVerificationLevel = 
-			SignatureVerificationLevel.FULL_VERIFICATION;
-	
-	public VerifyParameterImpl(Configuration configuration,
-			DataSource dataSource) {
-		super(configuration, dataSource);
-	}
+    @Getter @Setter
+    protected int whichSignature = - 1;
 
-	public int getWhichSignature() {
-		return which;
-	}
+	@Getter @Setter
+    protected Date verificationTime = null;
+    
+    @Getter @Setter
+    protected SignatureVerificationLevel signatureVerificationLevel =
+            SignatureVerificationLevel.FULL_VERIFICATION;
+    
+    public VerifyParameterImpl(@NonNull Configuration configuration, DataSource dataSource) {
+        super(configuration, dataSource);
+    }
 
-	public void setWhichSignature(int which) {
-		this.which = which;
-	}
-
-	public Date getVerificationTime() {
-		return verificationTime;
-	}
-
-	public void setVerificationTime(Date verificationTime) {
-		this.verificationTime = verificationTime;
-	}
-
-	public void setSignatureVerificationLevel(
-			SignatureVerificationLevel signatureVerificationLevel) {
-		this.signatureVerificationLevel = signatureVerificationLevel;
-	}
-
-	public SignatureVerificationLevel getSignatureVerificationLevel() {
-		return this.signatureVerificationLevel;
-	}
 }

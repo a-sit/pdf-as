@@ -35,6 +35,7 @@ import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.sl.util.BKUHeader;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 public class SignParameterImpl extends PdfAsParameterImpl implements SignParameter, BKUHeaderHolder {
@@ -56,19 +57,15 @@ public class SignParameterImpl extends PdfAsParameterImpl implements SignParamet
 	@Getter @Setter
 	protected ISuspendingSigner suspendingSigner = null;
 
+    @Setter
     protected OutputStream outputStream = null;
     @Getter
     protected List<BKUHeader> processInfo = new ArrayList<BKUHeader>();
     
-    public SignParameterImpl(Configuration configuration, 
-            DataSource dataSource, OutputStream outputStream) {
+    public SignParameterImpl(@NonNull Configuration configuration, DataSource dataSource, OutputStream outputStream) {
         super(configuration, dataSource);
         this.outputStream = outputStream;
     }
-
-    // ========================================================================
-
-    @Override public void setOutputStream(OutputStream stream) { this.outputStream = stream; }
 
     @Override public OutputStream getSignatureResult() { return outputStream; }
 

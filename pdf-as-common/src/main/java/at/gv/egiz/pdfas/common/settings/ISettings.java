@@ -27,7 +27,19 @@ import java.util.Map;
 import java.util.Vector;
 
 public interface ISettings {
+
+	/**
+	 * Gets a specific Value
+	 * @param key The configuration key
+	 * @return The configured value
+	 */
 	public String getValue(String key);
+
+	/**
+	 * Is the configuration key set
+	 * @param key The configuration key
+	 * @return true | false
+	 */
 	public boolean hasValue(String key);
 	
 	/**

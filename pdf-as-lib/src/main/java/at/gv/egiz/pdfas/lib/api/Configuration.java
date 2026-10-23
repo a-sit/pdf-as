@@ -23,29 +23,15 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.api;
 
-import java.util.Map;
+import at.gv.egiz.pdfas.common.settings.ISettings;
 
 /**
  * Configuration interface
  *
- * This interface is used to configure one PDF-AS run. It contains the configuration values
+ * This interface is used to configure one PDF-AS run. It extends the configuration values
  * from the configuration file. Use this interface to override properties during runtime.
  */
-public interface Configuration {
-	
-	/**
-	 * Gets a specific Value
-	 * @param key The configuration key
-	 * @return The configured value
-	 */
-	public String getValue(String key);
-	
-	/**
-	 * Is the configuration key set
-	 * @param key The configuration key
-	 * @return true | false
-	 */
-	public boolean hasValue(String key);
+public interface Configuration extends ISettings {
 	
 	/**
 	 * Sets or overrides a configuration value
@@ -79,12 +65,4 @@ public interface Configuration {
 	 * @param configurationPrefix The configuration key prefix
 	 */
 	public void removeProfile(String configurationPrefix);
-	
-	/**
-	 * Gets the values prefix.
-	 *
-	 * @param prefix the prefix
-	 * @return the values prefix
-	 */
-	public Map<String, String> getValuesPrefix(String prefix);
 }

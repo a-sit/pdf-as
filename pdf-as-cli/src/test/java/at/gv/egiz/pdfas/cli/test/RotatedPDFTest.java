@@ -71,14 +71,12 @@ public class RotatedPDFTest {
 		DataSource source = new ByteArrayDataSource(
 				IOUtils.toByteArray(inputDokument));
 
-		SignParameter signParameter = PdfAsFactory.createSignParameter(
-				configuration, source, stream);
+		SignParameter signParameter = PdfAsFactory.createSignParameter(configuration);
 
-		signParameter.setPlainSigner(signer);
 		signParameter.setSignaturePosition(posString);
 		signParameter.setSignatureProfileId("SIGNATURBLOCK_SMALL_DE");
-		
-		pdfAs.sign(signParameter);
+
+		pdfAs.sign(signParameter, source, signer, stream);
 	}
 
 	public static void main(String[] args) {

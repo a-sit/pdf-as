@@ -60,6 +60,7 @@ import java.security.Security;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
@@ -67,359 +68,350 @@ import java.util.zip.ZipInputStream;
 
 public class PdfAsFactory implements IConfigurationConstants {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(PdfAsFactory.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(PdfAsFactory.class);
 
-	private static final String DEFAULT_CONFIG_RES = "config/config.zip";
+    private static final String DEFAULT_CONFIG_RES = "config/config.zip";
 
-	protected static void registerProvider(Provider provider, int position) {
-		String name = provider.getName();
-		if (Security.getProvider(name) == null) {
-			// register IAIK provider at first position
-			try {
-				if (position < 0) {
-					// add provider add default position.
-					Security.addProvider(provider);
-				} else {
-					Security.insertProviderAt(provider, position);
-				}
-			} catch (SecurityException e) {
-				logger.info("Failed to register required security Provider.", e);
-			}
-		} else {
-			logger.info("Required security Provider {} already registered.",
-					name);
-		}
+    protected static void registerProvider(Provider provider, int position) {
+        String name = provider.getName();
+        if (Security.getProvider(name) == null) {
+            // register IAIK provider at first position
+            try {
+                if (position < 0) {
+                    // add provider add default position.
+                    Security.addProvider(provider);
+                } else {
+                    Security.insertProviderAt(provider, position);
+                }
+            } catch (SecurityException e) {
+                logger.info("Failed to register required security Provider.", e);
+            }
+        } else {
+            logger.info("Required security Provider {} already registered.",
+                    name);
+        }
 
-	}
+    }
 
-	protected static void listRegisteredSecurityProviders() {
-		Provider[] providers = Security.getProviders();
-		logger.debug("Registered Security Providers:");
-		for (int i = 0; i < providers.length; i++) {
-			logger.debug("    {}: {} => {}", i, providers[i].getName(),
-					providers[i].getInfo());
-		}
-	}
+    protected static void listRegisteredSecurityProviders() {
+        Provider[] providers = Security.getProviders();
+        logger.debug("Registered Security Providers:");
+        for (int i = 0; i < providers.length; i++) {
+            logger.debug("    {}: {} => {}", i, providers[i].getName(),
+                    providers[i].getInfo());
+        }
+    }
 
-	private static boolean initialized = false;
-	private static final Object init_mutex = new Object();
+    private static boolean initialized = false;
+    private static final Object init_mutex = new Object();
 
-	private static void registerSecurityProvider(ISettings configuration) {
-		boolean doRegister = true;
+    private static void registerSecurityProvider(ISettings configuration) {
+        boolean doRegister = true;
 
-		String register = configuration.getValue(REGISTER_PROVIDER);
-		if (register != null) {
-			if (register.equals("false")) {
-				doRegister = false;
-			}
-		}
+        String register = configuration.getValue(REGISTER_PROVIDER);
+        if (register != null) {
+            if (register.equals("false")) {
+                doRegister = false;
+            }
+        }
 
-		if (doRegister) {
-			logger.info("Registering Security Providers!");
+        if (doRegister) {
+            logger.info("Registering Security Providers!");
 
-			registerProvider(new IAIK(), 1);
-			// TODO: register ECCelerate in second position when TLS issue is fixed
-			registerProvider(ECCelerate.getInstance(), -1);
+            registerProvider(new IAIK(), 1);
+            // TODO: register ECCelerate in second position when TLS issue is fixed
+            registerProvider(ECCelerate.getInstance(), -1);
 
-			registerProvider( new  BouncyCastleProvider(), -2);
+            registerProvider( new  BouncyCastleProvider(), -2);
 
-		} else {
-			logger.info("Skipping Security Provider registration!");
-		}
-	}
+        } else {
+            logger.info("Skipping Security Provider registration!");
+        }
+    }
 
-	private static void teeInformation(String str) {
-		// System.out.println(str);
-		logger.info(str);
-	}
+    private static void teeInformation(String str) {
+        // System.out.println(str);
+        logger.info(str);
+    }
 
-	private static void showRuntimeInformation() {
-		try {
-			RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
-			OperatingSystemMXBean osBean = ManagementFactory
-					.getOperatingSystemMXBean();
-			teeInformation("+ OS Name: " + osBean.getName());
-			teeInformation("+ OS Version: " + osBean.getVersion());
-			teeInformation("+ OS Arch: " + osBean.getArch());
-			teeInformation("+ JAVA Version: "
-					+ runtimeBean.getSystemProperties().get(
-							"java.runtime.version"));
-			teeInformation("+ JAVA Spec ----------------------------------------------------------");
-			teeInformation("+ JAVA Spec Name: " + runtimeBean.getSpecName());
-			teeInformation("+ JAVA Spec Version: "
-					+ runtimeBean.getSpecVersion());
-			teeInformation("+ JAVA Spec Vendor: " + runtimeBean.getSpecVendor());
-			teeInformation("+ JAVA VM ----------------------------------------------------------");
-			teeInformation("+ JAVA VM Name: " + runtimeBean.getVmName());
-			teeInformation("+ JAVA VM Version: " + runtimeBean.getVmVersion());
-			teeInformation("+ JAVA VM Vendor: " + runtimeBean.getVmVendor());
-			teeInformation("+ AES Max allowed Key Length: "
-					+ Cipher.getMaxAllowedKeyLength("AES"));
-			teeInformation("+ RSA Max allowed Key Length: "
-					+ Cipher.getMaxAllowedKeyLength("RSA"));
-			teeInformation("+ EC Max allowed Key Length: "
-					+ Cipher.getMaxAllowedKeyLength("EC"));
-			teeInformation("+ DSA Max allowed Key Length: "
-					+ Cipher.getMaxAllowedKeyLength("DSA"));
-		} catch (Throwable e) {
-			teeInformation("+ Failed to show runtime informations");
-		}
-	}
+    private static void showRuntimeInformation() {
+        try {
+            RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
+            OperatingSystemMXBean osBean = ManagementFactory
+                    .getOperatingSystemMXBean();
+            teeInformation("+ OS Name: " + osBean.getName());
+            teeInformation("+ OS Version: " + osBean.getVersion());
+            teeInformation("+ OS Arch: " + osBean.getArch());
+            teeInformation("+ JAVA Version: "
+                    + runtimeBean.getSystemProperties().get(
+                            "java.runtime.version"));
+            teeInformation("+ JAVA Spec ----------------------------------------------------------");
+            teeInformation("+ JAVA Spec Name: " + runtimeBean.getSpecName());
+            teeInformation("+ JAVA Spec Version: "
+                    + runtimeBean.getSpecVersion());
+            teeInformation("+ JAVA Spec Vendor: " + runtimeBean.getSpecVendor());
+            teeInformation("+ JAVA VM ----------------------------------------------------------");
+            teeInformation("+ JAVA VM Name: " + runtimeBean.getVmName());
+            teeInformation("+ JAVA VM Version: " + runtimeBean.getVmVersion());
+            teeInformation("+ JAVA VM Vendor: " + runtimeBean.getVmVendor());
+            teeInformation("+ AES Max allowed Key Length: "
+                    + Cipher.getMaxAllowedKeyLength("AES"));
+            teeInformation("+ RSA Max allowed Key Length: "
+                    + Cipher.getMaxAllowedKeyLength("RSA"));
+            teeInformation("+ EC Max allowed Key Length: "
+                    + Cipher.getMaxAllowedKeyLength("EC"));
+            teeInformation("+ DSA Max allowed Key Length: "
+                    + Cipher.getMaxAllowedKeyLength("DSA"));
+        } catch (Throwable e) {
+            teeInformation("+ Failed to show runtime informations");
+        }
+    }
 
-	private static void showSecProviderInfo() {
-		try {
-			teeInformation("+ IAIK-JCE Version: " + IAIK.getVersionInfo());
-			teeInformation("+ ECCelerate Version: "
-					+ ECCelerate.getInstance().getVersionStr());
-		} catch (Throwable e) {
-			teeInformation("+ Failed to show security provider informations");
-		}
-	}
+    private static void showSecProviderInfo() {
+        try {
+            teeInformation("+ IAIK-JCE Version: " + IAIK.getVersionInfo());
+            teeInformation("+ ECCelerate Version: "
+                    + ECCelerate.getInstance().getVersionStr());
+        } catch (Throwable e) {
+            teeInformation("+ Failed to show security provider informations");
+        }
+    }
 
-	/**
-	 * Configure log.
-	 *
-	 * @param configuration
-	 *            the configuration
-	 */
-	private static void initialize(ISettings configuration) {
-		if (!initialized) {
-			synchronized (init_mutex) {
-				if (!initialized) {
-					initialized = true;
-					registerGraphicsEnvironment();
-					registerSecurityProvider(configuration);
-					teeInformation("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-					teeInformation("+ PDF-AS: " + getVersion());
-					teeInformation("+ PDF-AS SCM Revision: " + getSCMRevision());
-					showRuntimeInformation();
-					showSecProviderInfo();
-					teeInformation("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    /**
+     * Configure log.
+     *
+     * @param configuration
+     *            the configuration
+     */
+    private static void initialize(ISettings configuration) {
+        if (!initialized) {
+            synchronized (init_mutex) {
+                if (!initialized) {
+                    initialized = true;
+                    registerGraphicsEnvironment();
+                    registerSecurityProvider(configuration);
+                    teeInformation("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                    teeInformation("+ PDF-AS: " + getVersion());
+                    teeInformation("+ PDF-AS SCM Revision: " + getSCMRevision());
+                    showRuntimeInformation();
+                    showSecProviderInfo();
+                    teeInformation("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-					listRegisteredSecurityProviders();
-				}
-			}
-		}
-	}
-	
-	private static void registerGraphicsEnvironment(){
-		BufferedImage bim = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D graphics = bim.createGraphics();
-	}
+                    listRegisteredSecurityProviders();
+                }
+            }
+        }
+    }
+    
+    private static void registerGraphicsEnvironment(){
+        BufferedImage bim = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = bim.createGraphics();
+    }
 
-	/**
-	 * Create a new instance of PDF-AS
-	 * 
-	 * @param configuration
-	 *            The PDF-AS configuration
-	 * @return
-	 */
-	public static PdfAs createPdfAs(File configuration) {
-		PdfAs pdfas = new PdfAsImpl(configuration);
+    /**
+     * Create a new instance of PDF-AS
+     * 
+     * @param configuration
+     *            The PDF-AS configuration
+     * @return
+     */
+    public static PdfAs createPdfAs(File configuration) {
+        PdfAs pdfas = new PdfAsImpl(configuration);
 
-		if (!initialized) {
-			synchronized (init_mutex) {
-				initialize((ISettings) pdfas.getConfiguration());
-			}
-		}
+        if (!initialized) {
+            synchronized (init_mutex) {
+                initialize((ISettings) pdfas.getConfiguration());
+            }
+        }
 
-		return pdfas;
-	}
+        return pdfas;
+    }
 
-	/**
-	 * Creates a new PdfAs object.
-	 *
-	 * @param settings
-	 *            the settings
-	 * @return the pdf as
-	 */
-	public static PdfAs createPdfAs(ISettings settings) {
-		if (!initialized) {
-			synchronized (init_mutex) {
-				initialize(settings);
-			}
-		}
+    /**
+     * Creates a new PdfAs object.
+     *
+     * @param settings
+     *            the settings
+     * @return the pdf as
+     */
+    public static PdfAs createPdfAs(ISettings settings) {
+        if (!initialized) {
+            synchronized (init_mutex) {
+                initialize(settings);
+            }
+        }
 
-		return new PdfAsImpl(settings);
-	}
+        return new PdfAsImpl(settings);
+    }
 
-	public static SignParameter createSignParameter(@NonNull Configuration configuration) {
-		return new SignParameterImpl(configuration, null, null);
-	}
+    public static SignParameter createSignParameter(@NonNull Configuration configuration) {
+        return new SignParameterImpl(configuration, null, null);
+    }
 
-	/** Creates a sign parameter.
-	 * Deprecated in favor of {@link createSignParameter(Configuration)},
-	 * with `dataSource` and `output` being passed directly to {@link PdfAs#sign}. */
-	@Deprecated
-	public static SignParameter createSignParameter(
-			Configuration configuration, DataSource dataSource,
-			OutputStream output) {
-		return new SignParameterImpl(configuration, dataSource, output);
-	}
+    /** Creates a sign parameter.
+     * Deprecated in favor of {@link createSignParameter(Configuration)},
+     * with `dataSource` and `output` being passed directly to {@link PdfAs#sign}. */
+    @Deprecated
+    public static SignParameter createSignParameter(
+            @NonNull Configuration configuration, DataSource dataSource,
+            OutputStream output) {
+        return new SignParameterImpl(configuration, dataSource, output);
+    }
 
-	/** Creates a verify parameter. */
-	public static VerifyParameter createVerifyParameter(Configuration configuration) {
-		return new VerifyParameterImpl(configuration, null);
-	}
+    /** Creates a verify parameter. */
+    public static VerifyParameter createVerifyParameter(@NonNull Configuration configuration) {
+        return new VerifyParameterImpl(configuration, null);
+    }
 
-	/** Creates a verify parameter.
-	 * Deprecated in favor of {@link createVerifyParameter(Configuration)},
-	 * with `dataSource` being passed directly to {@link PdfAs#verify}. */
-	@Deprecated
-	public static VerifyParameter createVerifyParameter(
-			Configuration configuration, DataSource dataSource) {
-		return new VerifyParameterImpl(configuration, dataSource);
-	}
+    /** Creates a verify parameter.
+     * Deprecated in favor of {@link createVerifyParameter(Configuration)},
+     * with `dataSource` being passed directly to {@link PdfAs#verify}. */
+    @Deprecated
+    public static VerifyParameter createVerifyParameter(
+            @NonNull Configuration configuration, DataSource dataSource) {
+        return new VerifyParameterImpl(configuration, dataSource);
+    }
 
-	/**
-	 * Deploy default configuration to targetDirectory
-	 * 
-	 * The targetDirectory will be deleted and
-	 * 
-	 * @param targetDirectory
-	 * @throws Exception
-	 */
-	public static void deployDefaultConfiguration(File targetDirectory)
-			throws Exception {
-		if (targetDirectory.exists()) {
-			targetDirectory.delete();
-		}
+    /**
+     * Deploy default configuration to targetDirectory
+     * 
+     * The targetDirectory will be deleted and
+     * 
+     * @param targetDirectory
+     * @throws Exception
+     */
+    public static void deployDefaultConfiguration(File targetDirectory)
+            throws Exception {
+        if (targetDirectory.exists()) {
+            targetDirectory.delete();
+        }
 
-		if (!targetDirectory.exists()) {
-			targetDirectory.mkdir();
-		}
-		InputStream is = ClassLoader
-				.getSystemResourceAsStream(DEFAULT_CONFIG_RES);
-		ZipInputStream zip = null;
-		try {
-			zip = new ZipInputStream(is);
+        if (!targetDirectory.exists()) {
+            targetDirectory.mkdir();
+        }
 
-			ZipEntry entry = zip.getNextEntry();
-			while (entry != null) {
+        InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(DEFAULT_CONFIG_RES));
 
-				File destinationPath = new File(
-						targetDirectory.getAbsolutePath(), entry.getName());
+        try (ZipInputStream zip = new ZipInputStream(is)) {
 
-				// create parent directories
-				destinationPath.getParentFile().mkdirs();
+            ZipEntry entry = zip.getNextEntry();
+            while (entry != null) {
 
-				// if the entry is a file extract it
-				if (entry.isDirectory()) {
-					destinationPath.mkdir();
-					zip.closeEntry();
-					entry = zip.getNextEntry();
-					continue;
-				} else {
+                File destinationPath = new File(
+                        targetDirectory.getAbsolutePath(), entry.getName());
 
-					logger.debug("Extracting file: " + destinationPath);
+                // create parent directories
+                destinationPath.getParentFile().mkdirs();
 
-					int b;
-					byte buffer[] = new byte[1024];
+                // if the entry is a file extract it
+                if (entry.isDirectory()) {
+                    destinationPath.mkdir();
+                    zip.closeEntry();
+                    entry = zip.getNextEntry();
+                    continue;
+                } else {
 
-					FileOutputStream fos = new FileOutputStream(destinationPath);
+                    logger.debug("Extracting file: " + destinationPath);
 
-					BufferedOutputStream bos = new BufferedOutputStream(fos,
-							1024);
+                    int b;
+                    byte[] buffer = new byte[1024];
 
-					while ((b = zip.read(buffer, 0, 1024)) != -1) {
-						bos.write(buffer, 0, b);
-					}
+                    FileOutputStream fos = new FileOutputStream(destinationPath);
 
-					bos.close();
-					zip.closeEntry();
+                    BufferedOutputStream bos = new BufferedOutputStream(fos,
+                            1024);
 
-				}
-				entry = zip.getNextEntry();
-			}
+                    while ((b = zip.read(buffer, 0, 1024)) != -1) {
+                        bos.write(buffer, 0, b);
+                    }
 
-		} catch (IOException ioe) {
-			System.out.println("Error opening zip file" + ioe);
-		} finally {
-			try {
-				if (zip != null) {
-					zip.close();
-				}
-			} catch (IOException ioe) {
-				System.out.println("Error while closing zip file" + ioe);
-			}
-		}
-	}
+                    bos.close();
+                    zip.closeEntry();
 
-	/**
-	 * Gets the PDF-AS SCM Revision
-	 * 
-	 * @return
-	 */
-	public static String getSCMRevision() {
-		Package pack = PdfAsFactory.class.getPackage();
-		String specificationVersion =  pack.getSpecificationVersion();
+                }
+                entry = zip.getNextEntry();
+            }
 
-		if(specificationVersion != null)
-			return specificationVersion;
-		//fallback
-		return getJarAttributes().getValue("Specification-Version");
-	}
+        } catch (IOException ioe) {
+            System.out.println("Error opening zip file" + ioe);
+        }
+    }
 
-	/**
-	 * Gets the PDF-AS Version
-	 * 
-	 * @return PDF-AS Verison string
-	 */
-	public static String getVersion() {
+    /**
+     * Gets the PDF-AS SCM Revision
+     * 
+     * @return
+     */
+    public static String getSCMRevision() {
+        Package pack = PdfAsFactory.class.getPackage();
+        String specificationVersion =  pack.getSpecificationVersion();
 
-		Package pack = PdfAsFactory.class.getPackage();
-		String version =  pack.getImplementationVersion();
-		if(version != null)
-			return version;
-		//fallback
-		return getJarAttributes().getValue("Implementation-Version");
-	}
+        if(specificationVersion != null)
+            return specificationVersion;
+        //fallback
+        return getJarAttributes().getValue("Specification-Version");
+    }
 
-	private static Attributes jarAttributes = null;
-	private static Attributes getJarAttributes() {
-		if(jarAttributes != null)
-			return jarAttributes;
-		try {
-			URLClassLoader cl = (URLClassLoader) PdfAsFactory.class.getClassLoader();
-			Enumeration<URL> urls = cl.findResources("META-INF/MANIFEST.MF");
-			URL url = null;
-			while (urls.hasMoreElements()) {
-				URL tmp = urls.nextElement();
-				if (tmp.getFile().contains("pdf-as-lib")) {
-					//System.out.println("Found:" + tmp);
-					url = tmp;
-				}
+    /**
+     * Gets the PDF-AS Version
+     * 
+     * @return PDF-AS Verison string
+     */
+    public static String getVersion() {
 
-			}
-			Manifest manifest = new Manifest(url.openStream());
-			Attributes mainAttributes = manifest.getMainAttributes();
-			jarAttributes = mainAttributes;
-			return mainAttributes;
-		} catch (Exception e) {
+        Package pack = PdfAsFactory.class.getPackage();
+        String version =  pack.getImplementationVersion();
+        if(version != null)
+            return version;
+        //fallback
+        return getJarAttributes().getValue("Implementation-Version");
+    }
 
-		}
-		return new Attributes();
-	}
-	
-	/**
-	 * Execute all loaded Configuration Validators
-	 * 
-	 * @throws PdfAsSettingsValidationException 
-	 */
-	public static void validateConfiguration(ISettings configuration) throws PdfAsSettingsValidationException{
-		Iterable<@NonNull ConfigurationValidator> availableValidators = ConfigValidatorLoader.getAvailableValidators();
-		var it = availableValidators.iterator();
-		if (!it.hasNext()) {
-			logger.info("No configuration validators available");
-			return;
-		}
-		while (it.hasNext()) {
-			val validator = it.next();
+    private static Attributes jarAttributes = null;
+    private static Attributes getJarAttributes() {
+        if(jarAttributes != null)
+            return jarAttributes;
+        try {
+            URLClassLoader cl = (URLClassLoader) PdfAsFactory.class.getClassLoader();
+            Enumeration<URL> urls = cl.findResources("META-INF/MANIFEST.MF");
+            URL url = null;
+            while (urls.hasMoreElements()) {
+                URL tmp = urls.nextElement();
+                if (tmp.getFile().contains("pdf-as-lib")) {
+                    //System.out.println("Found:" + tmp);
+                    url = tmp;
+                }
+
+            }
+            Manifest manifest = new Manifest(url.openStream());
+            Attributes mainAttributes = manifest.getMainAttributes();
+            jarAttributes = mainAttributes;
+            return mainAttributes;
+        } catch (Exception e) {
+
+        }
+        return new Attributes();
+    }
+    
+    /**
+     * Execute all loaded Configuration Validators
+     * 
+     * @throws PdfAsSettingsValidationException 
+     */
+    public static void validateConfiguration(ISettings configuration) throws PdfAsSettingsValidationException{
+        Iterable<@NonNull ConfigurationValidator> availableValidators = ConfigValidatorLoader.getAvailableValidators();
+        var it = availableValidators.iterator();
+        if (!it.hasNext()) {
+            logger.info("No configuration validators available");
+            return;
+        }
+        while (it.hasNext()) {
+            val validator = it.next();
             logger.info("Running configuration validator: {}", validator.getName());
-			validator.validate(configuration);
-		}
-		logger.info("All configuration validators succeeded.");
+            validator.validate(configuration);
+        }
+        logger.info("All configuration validators succeeded.");
 
-	}
+    }
 }

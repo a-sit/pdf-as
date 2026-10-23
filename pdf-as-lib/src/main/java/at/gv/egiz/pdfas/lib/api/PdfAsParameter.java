@@ -27,8 +27,8 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 
 import java.util.Map;
 
-import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
 import jakarta.activation.DataSource;
+import lombok.NonNull;
 
 public interface PdfAsParameter {
 
@@ -36,13 +36,13 @@ public interface PdfAsParameter {
 	 * Gets the configuration associated with the parameter
 	 * @return
 	 */
-	public Configuration getConfiguration() ;
+	public @NonNull Configuration getConfiguration() ;
 
 	/**
 	 * Sets the configuration associated with the parameter
 	 * @param configuration
 	 */
-	public void setConfiguration(Configuration configuration);
+	public void setConfiguration(@NonNull Configuration configuration);
 
 	/** Deprecated compatibility getter.
 	 *  Instead, pass the data source directly to {@link PdfAs#sign} or {@link PdfAs#verify}. */

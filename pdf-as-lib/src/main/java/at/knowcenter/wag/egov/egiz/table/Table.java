@@ -64,13 +64,8 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
  * @see Style
  * @see at.knowcenter.wag.egov.egiz.table.Entry
  */
-public class Table implements Serializable
+public class Table
 {
-
-  /**
-   * SVUID.
-   */
-  private static final long serialVersionUID = 8488947943674086618L;
 
   /**
    * The table column settings.

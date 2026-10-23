@@ -23,18 +23,11 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.api.ws;
 
-import java.io.Serializable;
-
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name="SignResponse")
-public class PDFASSignResponse implements Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6369697640117556071L;
+public class PDFASSignResponse {
 	
 	String requestID;
 	Long errorCode;

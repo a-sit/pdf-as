@@ -1,19 +1,10 @@
 package at.gv.egiz.pdfas.api.ws;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name="VerifyRequest")
-public class PDFASVerifyRequest implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8159503247524085992L;
+public class PDFASVerifyRequest {
 
 	String requestID;
 	byte[] inputData;

@@ -23,7 +23,6 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.api.ws;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -33,12 +32,7 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.NonNull;
 
 @XmlType(name="SignParameters")
-public class PDFASSignParameters implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2375108993871456465L;
+public class PDFASSignParameters {
 
 	@XmlType(name="Connector")
 	public enum Connector {

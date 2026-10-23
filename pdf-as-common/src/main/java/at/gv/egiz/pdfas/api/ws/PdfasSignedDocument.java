@@ -1,7 +1,5 @@
 package at.gv.egiz.pdfas.api.ws;
 
-import java.io.Serializable;
-
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -14,9 +12,7 @@ import lombok.Setter;
 @Setter
 @XmlType(name="signedMultipleFile")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PdfasSignedDocument implements Serializable {
-
-	private static final long serialVersionUID = -2621030544869357960L;
+public class PdfasSignedDocument {
 
 	@XmlElement(required = true, nillable = false, name="outputData")
 	byte[] outputData;

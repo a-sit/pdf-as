@@ -19,11 +19,6 @@ public class DebugPreProcessor implements PreProcessor {
 			.getLogger(DebugPreProcessor.class);
 	
 	private static final String NAME = "Debug PreProcessor";
-	
-	@Override
-	public void initialize(Configuration configuration) {
-		logger.debug("Initializing {}", getName());
-	}
 
 	private void listPPArguments(Map<String, String> map) {
 		if(map != null) {

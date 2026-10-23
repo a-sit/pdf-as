@@ -59,12 +59,7 @@ import java.io.Serializable;
  * @author wlackner
  * @see at.knowcenter.wag.egov.egiz.sig.SignatureObject
  */
-public class SignatureEntry implements Serializable {
-
-  /**
-   * SVUID.
-   */
-  private static final long serialVersionUID = 4640380069301731879L;
+public class SignatureEntry {
   
   /**
    * The signature key.

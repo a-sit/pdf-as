@@ -58,13 +58,8 @@ import java.io.Serializable;
  * 
  * @author wlackner
  */
-public class Entry implements Serializable
+public class Entry
 {
-
-  /**
-   * SVUID.
-   */
-  private static final long serialVersionUID = -7952755200668528348L;
 
   /**
    * Type for a text entry.

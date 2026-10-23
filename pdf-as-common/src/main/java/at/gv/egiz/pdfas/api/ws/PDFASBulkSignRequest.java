@@ -23,20 +23,13 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.api.ws;
 
-import java.io.Serializable;
 import java.util.List;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name="BulkSignRequest")
-public class PDFASBulkSignRequest implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2335377335418211956L;
-
+public class PDFASBulkSignRequest {
 	List<PDFASSignRequest> signRequests;
 
 	@XmlElement(required = true, nillable = false, name="signRequests")

@@ -42,9 +42,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-public class OperationStatus implements Serializable {
-
-    private static final long serialVersionUID = -2985007198666388528L;
+public class OperationStatus {
 
     @Getter
     private final SignParameter signParameter;

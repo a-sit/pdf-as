@@ -64,17 +64,11 @@ import lombok.Setter;
  * @author mruhmer
  */
 @NoArgsConstructor
-public class TablePos implements Serializable
+public class TablePos
 {
 
   public enum PAGE_MODE {AUTO, LAST, EXACT, NEW}; 
   public enum POS_MODE {AUTO, EXACT};
-  
-  
-  /**
-   * SVUID.
-   */
-  private static final long serialVersionUID = -5299027706623518059L;
 
   /**
    * The page on which the block should be displayed.

@@ -23,9 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.utils;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.naming.InvalidNameException;
@@ -33,31 +31,22 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
 public class DNUtils {
-  private static final Map<String, String> RFC2255_NAME_MAPPER = Collections.unmodifiableMap(
-      new HashMap<String, String>() {
-        private static final long serialVersionUID = 3434415954591076154L;
-        {
-          put("title", "T");
-        }
-      });
+  private static final Map<String, String> RFC2255_NAME_MAPPER = Map.of("title", "T");
 
   public static Map<String, String> dnToMap(String dn) throws InvalidNameException {
     final Map<String, String> map = new HashMap<>();
 
     final LdapName ldapName = new LdapName(dn);
 
-    final Iterator<Rdn> rdnIterator = ldapName.getRdns().iterator();
-
-    while (rdnIterator.hasNext()) {
-      final Rdn rdn = rdnIterator.next();
+    for (Rdn rdn : ldapName.getRdns()) {
       map.put(rdn.getType(), rdn.getValue().toString());
 
       // map specific RFC2255 names to support old PDF-AS signature-profile definitions
       if (RFC2255_NAME_MAPPER.containsKey(rdn.getType())) {
         map.put(RFC2255_NAME_MAPPER.get(rdn.getType()), rdn.getValue().toString());
-        
+
       }
-            
+
     }
 
     map.put("DN", dn);

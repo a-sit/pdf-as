@@ -111,224 +111,224 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PdfAsHelper {
-	
-	private static final String PDF_PROCESSING_REQUEST = "PDF_PROCESSING_REQUEST";
-	private static final String PDF_STATUS = "PDF_STATUS";
-	private static final String PDF_SL_CONNECTOR = "PDF_SL_CONNECTOR";
-	private static final String PDF_STATISTICS = "PDF_STATISTICS";
-	private static final String PDF_SL_INTERACTIVE = "PDF_SL_INTERACTIVE";
-	private static final String PDF_LOCALE = "PDF_LOCALE";
-	private static final String PDF_ERR_MESSAGE = "PDF_ERR_MESSAGE";
-	private static final String PDF_ERR_THROWABLE = "PDF_ERR_THROWABLE";
-	private static final String PDF_ERROR_PAGE = "/ErrorPage";
-	private static final String PDF_PROVIDE_PAGE = "/ProvidePDF";
-	private static final String PDF_PDFDATA_PAGE = "/PDFData";
-	private static final String PDF_PDFDATAURL_PAGE = "/PDFURLData";
-	private static final String PDF_DATAURL_PAGE = "/DataURL";
-	private static final String PDF_SL20_DATAURL_PAGE = "/DataURLSL20";
-	private static final String PDF_USERENTRY_PAGE = "/userentry";
-	private static final String PDF_ERR_URL = "PDF_ERR_URL";
-	private static final String PDF_FILE_NAME = "PDF_FILE_NAME";
-	private static final String PDF_VER_LEVEL = "PDF_VER_LEVEL";
-	private static final String PDF_INVOKE_URL = "PDF_INVOKE_URL";
-	private static final String PDF_INVOKE_TARGET = "PDF_INVOKE_TARGET";
-	private static final String PDF_RESPONSE_MODE = "PDF_RESPONSE_MODE";
-	private static final String REQUEST_FROM_DU = "REQ_DATA_URL";
-	private static final String SIGNATURE_DATA_HASH = "SIGNATURE_DATA_HASH";
-	private static final String VERIFICATION_RESULT = "VERIFICATION_RESULT";
-	private static final String PDF_SIGNING_RESPONSE = "PDF_SIGNING_RESULT";
-	private static final String QRCODE_CONTENT = "QR_CONT";
-	public static final String PDF_SESSION_PREFIX = "PDF_SESSION_";
+    
+    private static final String PDF_PROCESSING_REQUEST = "PDF_PROCESSING_REQUEST";
+    private static final String PDF_STATUS = "PDF_STATUS";
+    private static final String PDF_SL_CONNECTOR = "PDF_SL_CONNECTOR";
+    private static final String PDF_STATISTICS = "PDF_STATISTICS";
+    private static final String PDF_SL_INTERACTIVE = "PDF_SL_INTERACTIVE";
+    private static final String PDF_LOCALE = "PDF_LOCALE";
+    private static final String PDF_ERR_MESSAGE = "PDF_ERR_MESSAGE";
+    private static final String PDF_ERR_THROWABLE = "PDF_ERR_THROWABLE";
+    private static final String PDF_ERROR_PAGE = "/ErrorPage";
+    private static final String PDF_PROVIDE_PAGE = "/ProvidePDF";
+    private static final String PDF_PDFDATA_PAGE = "/PDFData";
+    private static final String PDF_PDFDATAURL_PAGE = "/PDFURLData";
+    private static final String PDF_DATAURL_PAGE = "/DataURL";
+    private static final String PDF_SL20_DATAURL_PAGE = "/DataURLSL20";
+    private static final String PDF_USERENTRY_PAGE = "/userentry";
+    private static final String PDF_ERR_URL = "PDF_ERR_URL";
+    private static final String PDF_FILE_NAME = "PDF_FILE_NAME";
+    private static final String PDF_VER_LEVEL = "PDF_VER_LEVEL";
+    private static final String PDF_INVOKE_URL = "PDF_INVOKE_URL";
+    private static final String PDF_INVOKE_TARGET = "PDF_INVOKE_TARGET";
+    private static final String PDF_RESPONSE_MODE = "PDF_RESPONSE_MODE";
+    private static final String REQUEST_FROM_DU = "REQ_DATA_URL";
+    private static final String SIGNATURE_DATA_HASH = "SIGNATURE_DATA_HASH";
+    private static final String VERIFICATION_RESULT = "VERIFICATION_RESULT";
+    private static final String PDF_SIGNING_RESPONSE = "PDF_SIGNING_RESULT";
+    private static final String QRCODE_CONTENT = "QR_CONT";
+    public static final String PDF_SESSION_PREFIX = "PDF_SESSION_";
   
-	public static final String DEFAULT_RESULT_FILENAME = "document.pdf";
-	
-	
-	public enum PDF_RESPONSE_MODES {htmlform, direct};
+    public static final String DEFAULT_RESULT_FILENAME = "document.pdf";
+    
+    
+    public enum PDF_RESPONSE_MODES {htmlform, direct};
 
-	private static PdfAs pdfAs;
-	private static final ObjectFactory of = new ObjectFactory();
-	@Getter
+    private static PdfAs pdfAs;
+    private static final ObjectFactory of = new ObjectFactory();
+    @Getter
     private static Configuration pdfAsConfig;
 
-	static {
-		reloadConfig();
-	}
+    static {
+        reloadConfig();
+    }
 
-	public static void init() {	 
+    public static void init() {     
     JsonSecurityUtils.getInstance();
-	  
-		log.info("PDF-AS Helper initialized");
-	}
+      
+        log.info("PDF-AS Helper initialized");
+    }
 
-	public static synchronized void reloadConfig() {
-		log.info("Creating PDF-AS");
-		val workdir = WebConfiguration.getPdfASDir();
-		if (workdir == null) {
-			throw new IllegalStateException(
-					"WebConfiguration is not yet initialized. This is an application start-up order bug.");
-		}
-		pdfAs = PdfAsFactory.createPdfAs(new File(workdir));
-		pdfAsConfig = pdfAs.getConfiguration();
-		log.info("Creating PDF-AS done");
-	}
+    public static synchronized void reloadConfig() {
+        log.info("Creating PDF-AS");
+        val workdir = WebConfiguration.getPdfASDir();
+        if (workdir == null) {
+            throw new IllegalStateException(
+                    "WebConfiguration is not yet initialized. This is an application start-up order bug.");
+        }
+        pdfAs = PdfAsFactory.createPdfAs(new File(workdir));
+        pdfAsConfig = pdfAs.getConfiguration();
+        log.info("Creating PDF-AS done");
+    }
 
   public static String buildPosString(HttpServletRequest request,
-			HttpServletResponse response) throws PdfAsWebException {
-		String posP = PdfAsParameterExtractor.getSigPosP(request);
-		String posX = PdfAsParameterExtractor.getSigPosX(request);
-		String posY = PdfAsParameterExtractor.getSigPosY(request);
-		String posW = PdfAsParameterExtractor.getSigPosW(request);
-		String posR = PdfAsParameterExtractor.getSigPosR(request);
-		String posF = PdfAsParameterExtractor.getSigPosF(request);
+            HttpServletResponse response) throws PdfAsWebException {
+        String posP = PdfAsParameterExtractor.getSigPosP(request);
+        String posX = PdfAsParameterExtractor.getSigPosX(request);
+        String posY = PdfAsParameterExtractor.getSigPosY(request);
+        String posW = PdfAsParameterExtractor.getSigPosW(request);
+        String posR = PdfAsParameterExtractor.getSigPosR(request);
+        String posF = PdfAsParameterExtractor.getSigPosF(request);
 
-		if (posP == null && posW == null && posX == null && posY == null
-				&& posR == null && posF == null) {
-			return null;
-		}
+        if (posP == null && posW == null && posX == null && posY == null
+                && posR == null && posF == null) {
+            return null;
+        }
 
-		StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-		if (posX != null) {
-			try {
-				Float.parseFloat(posX);
-			} catch (NumberFormatException e) {
-				if (!posX.equalsIgnoreCase("auto")) {
-					throw new PdfAsWebException(
-							PdfAsParameterExtractor.PARAM_SIG_POS_X
-									+ " has invalid value!", e);
-				} else {
-					sb.append("x:auto;");
-				}
-			}
-			sb.append("x:").append(posX.trim()).append(";");
-		} else {
-			sb.append("x:auto;");
-		}
+        if (posX != null) {
+            try {
+                Float.parseFloat(posX);
+            } catch (NumberFormatException e) {
+                if (!posX.equalsIgnoreCase("auto")) {
+                    throw new PdfAsWebException(
+                            PdfAsParameterExtractor.PARAM_SIG_POS_X
+                                    + " has invalid value!", e);
+                } else {
+                    sb.append("x:auto;");
+                }
+            }
+            sb.append("x:").append(posX.trim()).append(";");
+        } else {
+            sb.append("x:auto;");
+        }
 
-		if (posY != null) {
-			try {
-				Float.parseFloat(posY);
-			} catch (NumberFormatException e) {
-				if (!posY.equalsIgnoreCase("auto")) {
-					throw new PdfAsWebException(
-							PdfAsParameterExtractor.PARAM_SIG_POS_Y
-									+ " has invalid value!", e);
-				} else {
-					sb.append("y:auto;");
-				}
-			}
-			sb.append("y:").append(posY.trim()).append(";");
-		} else {
-			sb.append("y:auto;");
-		}
+        if (posY != null) {
+            try {
+                Float.parseFloat(posY);
+            } catch (NumberFormatException e) {
+                if (!posY.equalsIgnoreCase("auto")) {
+                    throw new PdfAsWebException(
+                            PdfAsParameterExtractor.PARAM_SIG_POS_Y
+                                    + " has invalid value!", e);
+                } else {
+                    sb.append("y:auto;");
+                }
+            }
+            sb.append("y:").append(posY.trim()).append(";");
+        } else {
+            sb.append("y:auto;");
+        }
 
-		if (posW != null) {
-			try {
-				Float.parseFloat(posW);
-			} catch (NumberFormatException e) {
-				if (!posW.equalsIgnoreCase("auto")) {
-					throw new PdfAsWebException(
-							PdfAsParameterExtractor.PARAM_SIG_POS_W
-									+ " has invalid value!", e);
-				} else {
-					sb.append("w:auto;");
-				}
-			}
-			sb.append("w:").append(posW.trim()).append(";");
-		} else {
-			sb.append("w:auto;");
-		}
+        if (posW != null) {
+            try {
+                Float.parseFloat(posW);
+            } catch (NumberFormatException e) {
+                if (!posW.equalsIgnoreCase("auto")) {
+                    throw new PdfAsWebException(
+                            PdfAsParameterExtractor.PARAM_SIG_POS_W
+                                    + " has invalid value!", e);
+                } else {
+                    sb.append("w:auto;");
+                }
+            }
+            sb.append("w:").append(posW.trim()).append(";");
+        } else {
+            sb.append("w:auto;");
+        }
 
-		if (posP != null) {
-			if (!(posP.equals("auto") || posP.equals("new") || posP.equals("last"))) {
-				try {
-					Integer.parseInt(posP);
-				} catch (NumberFormatException e) {
-					throw new PdfAsWebException(
-							PdfAsParameterExtractor.PARAM_SIG_POS_P
-									+ " has invalid value! (auto | new | last)");
-				}
-			}
-			sb.append("p:").append(posP.trim()).append(";");
-		} else {
-			sb.append("p:auto;");
-		}
+        if (posP != null) {
+            if (!(posP.equals("auto") || posP.equals("new") || posP.equals("last"))) {
+                try {
+                    Integer.parseInt(posP);
+                } catch (NumberFormatException e) {
+                    throw new PdfAsWebException(
+                            PdfAsParameterExtractor.PARAM_SIG_POS_P
+                                    + " has invalid value! (auto | new | last)");
+                }
+            }
+            sb.append("p:").append(posP.trim()).append(";");
+        } else {
+            sb.append("p:auto;");
+        }
 
-		if (posR != null) {
-			try {
-				Float.parseFloat(posR);
-			} catch (NumberFormatException e) {
-				if (!posR.equalsIgnoreCase("auto")) {
-					throw new PdfAsWebException(
-							PdfAsParameterExtractor.PARAM_SIG_POS_R
-									+ " has invalid value!", e);
-				}
-			}
-			sb.append("r:").append(posR.trim()).append(";");
-		} else {
-			sb.append("r:0;");
-		}
+        if (posR != null) {
+            try {
+                Float.parseFloat(posR);
+            } catch (NumberFormatException e) {
+                if (!posR.equalsIgnoreCase("auto")) {
+                    throw new PdfAsWebException(
+                            PdfAsParameterExtractor.PARAM_SIG_POS_R
+                                    + " has invalid value!", e);
+                }
+            }
+            sb.append("r:").append(posR.trim()).append(";");
+        } else {
+            sb.append("r:0;");
+        }
 
-		if (posF != null) {
-			try {
-				Float.parseFloat(posF);
-			} catch (NumberFormatException e) {
-				if (!posF.equalsIgnoreCase("auto")) {
-					throw new PdfAsWebException(
-							PdfAsParameterExtractor.PARAM_SIG_POS_F
-									+ " has invalid value!", e);
-				} else {
-					sb.append("f:0;");
-				}
-			}
-			sb.append("f:").append(posF.trim()).append(";");
-		} else {
-			sb.append("f:0;");
-		}
+        if (posF != null) {
+            try {
+                Float.parseFloat(posF);
+            } catch (NumberFormatException e) {
+                if (!posF.equalsIgnoreCase("auto")) {
+                    throw new PdfAsWebException(
+                            PdfAsParameterExtractor.PARAM_SIG_POS_F
+                                    + " has invalid value!", e);
+                } else {
+                    sb.append("f:0;");
+                }
+            }
+            sb.append("f:").append(posF.trim()).append(";");
+        } else {
+            sb.append("f:0;");
+        }
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
-	public static List<VerifyResult> synchronousVerify(
-			HttpServletRequest request, HttpServletResponse response,
-			byte[] pdfData) throws Exception {
-		String signidxString = PdfAsParameterExtractor.getSigIdx(request);
-		int signIdx = -1;
-		if (signidxString != null) {
-			try {
-				signIdx = Integer.parseInt(signidxString);
-			} catch (Throwable e) {
-				log.warn("Failed to parse Signature Index: " + signidxString);
-			}
-		}
+    public static List<VerifyResult> synchronousVerify(
+            HttpServletRequest request, HttpServletResponse response,
+            byte[] pdfData) throws Exception {
+        String signidxString = PdfAsParameterExtractor.getSigIdx(request);
+        int signIdx = -1;
+        if (signidxString != null) {
+            try {
+                signIdx = Integer.parseInt(signidxString);
+            } catch (Throwable e) {
+                log.warn("Failed to parse Signature Index: " + signidxString);
+            }
+        }
 
-		log.debug("Verifing Signature index: " + signIdx);
+        log.debug("Verifing Signature index: " + signIdx);
 
-		Configuration config = pdfAs.getConfiguration();
+        Configuration config = pdfAs.getConfiguration();
 
-		VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(config);
-		verifyParameter.setConfiguration(config);
-		verifyParameter.setWhichSignature(signIdx);
+        VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(config);
+        verifyParameter.setConfiguration(config);
+        verifyParameter.setWhichSignature(signIdx);
 
-		ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfData);
+        ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfData);
         return pdfAs.verify(verifyParameter, dataSource);
-	}
+    }
 
-	public static List<VerifyResult> synchronousVerify(byte[] pdfData,
-																										 int signIdx, SignatureVerificationLevel lvl,
-																										 Map<String, String> preProcessor) throws Exception {
-		log.debug("Verifing Signature index: " + signIdx);
+    public static List<VerifyResult> synchronousVerify(byte[] pdfData,
+                                                                                                         int signIdx, SignatureVerificationLevel lvl,
+                                                                                                         Map<String, String> preProcessor) throws Exception {
+        log.debug("Verifing Signature index: " + signIdx);
 
-		Configuration config = pdfAs.getConfiguration();
-		VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(config);
-		verifyParameter.setPreprocessorArguments(preProcessor);
-		verifyParameter.setSignatureVerificationLevel(lvl);
-		verifyParameter.setWhichSignature(signIdx);
+        Configuration config = pdfAs.getConfiguration();
+        VerifyParameter verifyParameter = PdfAsFactory.createVerifyParameter(config);
+        verifyParameter.setPreprocessorArguments(preProcessor);
+        verifyParameter.setSignatureVerificationLevel(lvl);
+        verifyParameter.setWhichSignature(signIdx);
 
-		ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfData);
+        ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfData);
         return pdfAs.verify(verifyParameter, dataSource);
-	}
-	
+    }
+    
   public static PdfasSignResponse synchronousServerSignature(PdfasSignRequest internalReq) throws Exception {
     log.debug("Find #{} files to sign synchronized. Starting signing process ... ", internalReq.getInput().size());    
     PdfasSignResponseBuilder respBuilder = PdfasSignResponse.builder();            
@@ -354,147 +354,147 @@ public class PdfAsHelper {
    * @return Signing result
    * @throws Exception In case of an error
    */
-	private static SignedDocument synchronousServerSignature(DocumentToSign documentToSign, CoreSignParams coreParams) throws Exception {
-	  log.debug("Signing file with transactionId:{}", coreParams.getTransactionId());
-	  
-		Configuration config = pdfAs.getConfiguration();
+    private static SignedDocument synchronousServerSignature(DocumentToSign documentToSign, CoreSignParams coreParams) throws Exception {
+      log.debug("Signing file with transactionId:{}", coreParams.getTransactionId());
+      
+        Configuration config = pdfAs.getConfiguration();
 
-		if (WebConfiguration.isAllowExtOverwrite() && coreParams.getOverrides() != null) {
-			ConfigurationOverwrite.overwriteConfiguration(coreParams.getOverrides(), config);
-		}
+        if (WebConfiguration.isAllowExtOverwrite() && coreParams.getOverrides() != null) {
+            ConfigurationOverwrite.overwriteConfiguration(coreParams.getOverrides(), config);
+        }
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		// Generate Sign Parameter
-		SignParameter signParameter = PdfAsFactory.createSignParameter(config);
+        // Generate Sign Parameter
+        SignParameter signParameter = PdfAsFactory.createSignParameter(config);
 
-		// Get Connector
-		val connector = coreParams.getConnector();
-		val keyIdentifier = coreParams.getKeyIdentifier();
-		PdfAsHelper.checkConnectorSupported(connector, keyIdentifier);
+        // Get Connector
+        val connector = coreParams.getConnector();
+        val keyIdentifier = coreParams.getKeyIdentifier();
+        PdfAsHelper.checkConnectorSupported(connector, keyIdentifier);
 
-		IPlainSigner signer;
-		if (connector == Connector.MOA) {
+        IPlainSigner signer;
+        if (connector == Connector.MOA) {
 
-			if (keyIdentifier != null) {
-				String url = WebConfiguration.getMoaURL(keyIdentifier);
-				String timeout = WebConfiguration.getMoaTimeout(keyIdentifier);
-				String keyId = WebConfiguration.getMoaKeyID(keyIdentifier);
-				String certificate = WebConfiguration
-						.getMoaCertificate(keyIdentifier);
+            if (keyIdentifier != null) {
+                String url = WebConfiguration.getMoaURL(keyIdentifier);
+                String timeout = WebConfiguration.getMoaTimeout(keyIdentifier);
+                String keyId = WebConfiguration.getMoaKeyID(keyIdentifier);
+                String certificate = WebConfiguration
+                        .getMoaCertificate(keyIdentifier);
 
-				config.setValue(IConfigurationConstants.MOA_SIGN_URL, url);
-				config.setValue(IConfigurationConstants.MOA_SIGN_TIMEOUT, timeout);
-				config.setValue(IConfigurationConstants.MOA_SIGN_KEY_ID, keyId);
-				config.setValue(IConfigurationConstants.MOA_SIGN_CERTIFICATE,
-						certificate);
-			}
+                config.setValue(IConfigurationConstants.MOA_SIGN_URL, url);
+                config.setValue(IConfigurationConstants.MOA_SIGN_TIMEOUT, timeout);
+                config.setValue(IConfigurationConstants.MOA_SIGN_KEY_ID, keyId);
+                config.setValue(IConfigurationConstants.MOA_SIGN_CERTIFICATE,
+                        certificate);
+            }
 
-			signer = new PAdESSigner(new MOAConnector(config));
-		
-		
-		} else if (connector == Connector.JKS) {
-			String ksFile = null;
-			String ksAlias = null;
-			String ksPass = null;
-			String ksKeyPass = null;
-			String ksType = null;
+            signer = new PAdESSigner(new MOAConnector(config));
+        
+        
+        } else if (connector == Connector.JKS) {
+            String ksFile = null;
+            String ksAlias = null;
+            String ksPass = null;
+            String ksKeyPass = null;
+            String ksType = null;
 
-			if (keyIdentifier != null) {
-				ksFile = WebConfiguration.getKeystoreFile(keyIdentifier);
-				ksAlias = WebConfiguration.getKeystoreAlias(keyIdentifier);
-				ksPass = WebConfiguration.getKeystorePass(keyIdentifier);
-				ksKeyPass = WebConfiguration.getKeystoreKeyPass(keyIdentifier);
-				ksType = WebConfiguration.getKeystoreType(keyIdentifier);
-			} else {
-				ksFile = WebConfiguration.getKeystoreDefaultFile();
-				ksAlias = WebConfiguration.getKeystoreDefaultAlias();
-				ksPass = WebConfiguration.getKeystoreDefaultPass();
-				ksKeyPass = WebConfiguration.getKeystoreDefaultKeyPass();
-				ksType = WebConfiguration.getKeystoreDefaultType();
-			}
+            if (keyIdentifier != null) {
+                ksFile = WebConfiguration.getKeystoreFile(keyIdentifier);
+                ksAlias = WebConfiguration.getKeystoreAlias(keyIdentifier);
+                ksPass = WebConfiguration.getKeystorePass(keyIdentifier);
+                ksKeyPass = WebConfiguration.getKeystoreKeyPass(keyIdentifier);
+                ksType = WebConfiguration.getKeystoreType(keyIdentifier);
+            } else {
+                ksFile = WebConfiguration.getKeystoreDefaultFile();
+                ksAlias = WebConfiguration.getKeystoreDefaultAlias();
+                ksPass = WebConfiguration.getKeystoreDefaultPass();
+                ksKeyPass = WebConfiguration.getKeystoreDefaultKeyPass();
+                ksType = WebConfiguration.getKeystoreDefaultType();
+            }
 
-			signer = new PAdESSignerKeystore(ksFile, ksAlias, ksPass,
-					ksKeyPass, ksType);
-			
-		} else {
-			throw new PdfAsWebException("Invalid connector (moa | jks)");
-			
-		}
+            signer = new PAdESSignerKeystore(ksFile, ksAlias, ksPass,
+                    ksKeyPass, ksType);
+            
+        } else {
+            throw new PdfAsWebException("Invalid connector (moa | jks)");
+            
+        }
 
-		String profile = documentToSign.getProfile();
+        String profile = documentToSign.getProfile();
 
-		// PdfAsHelper.getQRCodeContent(request);
-		// Get QR Code Content form param
-		String qrCodeContent = documentToSign.getQrCodeContent();
+        // PdfAsHelper.getQRCodeContent(request);
+        // Get QR Code Content form param
+        String qrCodeContent = documentToSign.getQrCodeContent();
 
-		if (qrCodeContent != null) {
-			if (profile == null) {
-				// get default Profile
-				profile = config.getValue("sig_obj.type.default");
-			}
+        if (qrCodeContent != null) {
+            if (profile == null) {
+                // get default Profile
+                profile = config.getValue("sig_obj.type.default");
+            }
 
-			if (profile == null) {
-				log.warn("Failed to determine default profile! Using hard coded!");
-				profile = "SIGNATURBLOCK_SMALL_DE";
-			}
+            if (profile == null) {
+                log.warn("Failed to determine default profile! Using hard coded!");
+                profile = "SIGNATURBLOCK_SMALL_DE";
+            }
 
-			ByteArrayOutputStream qrbaos = new ByteArrayOutputStream();
-			try {
-				String key = "sig_obj." + profile + ".value.SIG_LABEL";
-				QRCodeGenerator.generateQRCode(qrCodeContent, qrbaos, 200);
-				String value = Base64.encodeBase64String(qrbaos.toByteArray());
-				config.setValue(key, value);
-			} finally {
-				IOUtils.closeQuietly(qrbaos);
-			}
-		}
+            ByteArrayOutputStream qrbaos = new ByteArrayOutputStream();
+            try {
+                String key = "sig_obj." + profile + ".value.SIG_LABEL";
+                QRCodeGenerator.generateQRCode(qrCodeContent, qrbaos, 200);
+                String value = Base64.encodeBase64String(qrbaos.toByteArray());
+                config.setValue(key, value);
+            } finally {
+                IOUtils.closeQuietly(qrbaos);
+            }
+        }
 
-		// set Signature Profile (null use default ...)
-		signParameter.setSignatureProfileId(profile);
+        // set Signature Profile (null use default ...)
+        signParameter.setSignatureProfileId(profile);
 
-		// set Signature Position
-		signParameter.setSignaturePosition(documentToSign.getPosition());
-		signParameter.setPlaceHolderId(documentToSign.getPlaceHolderId());
-		signParameter.setPlaceHolderSearchEnabled(documentToSign.isPlaceholderSearchEnabled());
-		
-		// Set Preprocessor
-		if (coreParams.getPreprocessor() != null) {
-			signParameter.setPreprocessorArguments(coreParams.getPreprocessor());
-			
-		}
+        // set Signature Position
+        signParameter.setSignaturePosition(documentToSign.getPosition());
+        signParameter.setPlaceHolderId(documentToSign.getPlaceHolderId());
+        signParameter.setPlaceHolderSearchEnabled(documentToSign.isPlaceholderSearchEnabled());
+        
+        // Set Preprocessor
+        if (coreParams.getPreprocessor() != null) {
+            signParameter.setPreprocessorArguments(coreParams.getPreprocessor());
+            
+        }
 
-		signParameter.setDynamicSignatureBlockArguments(coreParams.getSignatureBlockParameters());
+        signParameter.setDynamicSignatureBlockArguments(coreParams.getSignatureBlockParameters());
 
-		SignResult signResult = pdfAs.sign(signParameter, new ByteArrayDataSource(documentToSign.getInputData()), signer, baos);
+        SignResult signResult = pdfAs.sign(signParameter, new ByteArrayDataSource(documentToSign.getInputData()), signer, baos);
 
-		
-		PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
-		verResponse.setSignerCertificate(signResult.getSignerCertificate().getEncoded());
+        
+        PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
+        verResponse.setSignerCertificate(signResult.getSignerCertificate().getEncoded());
 
 
-		return SignedDocument.builder()
-			.signingTimestamp(System.currentTimeMillis())
-			.outputData(baos.toByteArray())
-			.fileName(documentToSign.getFileName())
-			.verificationResponse(verResponse)
-			.signerCertificate(Base64.encodeBase64String(signResult.getSignerCertificate().getEncoded()))
-			.build();
-		
-	}
+        return SignedDocument.builder()
+            .signingTimestamp(System.currentTimeMillis())
+            .outputData(baos.toByteArray())
+            .fileName(documentToSign.getFileName())
+            .verificationResponse(verResponse)
+            .signerCertificate(Base64.encodeBase64String(signResult.getSignerCertificate().getEncoded()))
+            .build();
+        
+    }
 
-	public static void startSignature(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest) throws Exception {
+    public static void startSignature(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest) throws Exception {
 
-		HttpSession session = request.getSession();
-		log.info("Starting signature in session: " + session.getId());
-    	session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);
+        HttpSession session = request.getSession();
+        log.info("Starting signature in session: " + session.getId());
+        session.setAttribute(PDF_PROCESSING_REQUEST, pdfAsRequest);
     
-    	StatusRequest.Stage1 statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
-    	session.setAttribute(PDF_STATUS, statusRequest);
+        StatusRequest.Stage1 statusRequest = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
+        session.setAttribute(PDF_STATUS, statusRequest);
     
-	}
+    }
 
-	private static StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest)
+    private static StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest)
       throws PdfAsWebException, WriterException, IOException, PdfAsException, PDFASError {   
     HttpSession session = request.getSession();
     
@@ -568,444 +568,444 @@ public class PdfAsHelper {
   }
 
   private static IPlainSigner getSignerFromConnector(Connector connector, HttpSession session) throws PdfAsWebException {
-	val slConnector = switch(connector) {
-		case BKU, ONLINEBKU, MOBILEBKU -> new BKUSLConnector(generateBKUURL(connector));
-		case SECLAYER20 -> new SL20Connector(WebConfiguration.getSecurityLayer20URL());
-		default -> throw new PdfAsWebException("Invalid connector (bku | onlinebku | mobilebku | sl20)");
-	};
-	session.setAttribute(PDF_SL_CONNECTOR, slConnector);
-	return new PAdESSigner(slConnector);
+    val slConnector = switch(connector) {
+        case BKU, ONLINEBKU, MOBILEBKU -> new BKUSLConnector(generateBKUURL(connector));
+        case SECLAYER20 -> new SL20Connector(WebConfiguration.getSecurityLayer20URL());
+        default -> throw new PdfAsWebException("Invalid connector (bku | onlinebku | mobilebku | sl20)");
+    };
+    session.setAttribute(PDF_SL_CONNECTOR, slConnector);
+    return new PAdESSigner(slConnector);
   }
-	
-	public static byte[] getCertificate(
-			InfoboxReadResponseType infoboxReadResponseType) {
-		if (infoboxReadResponseType.getAssocArrayData() != null) {
-			List<InfoboxAssocArrayPairType> pairs = infoboxReadResponseType
-					.getAssocArrayData().getPair();
+    
+    public static byte[] getCertificate(
+            InfoboxReadResponseType infoboxReadResponseType) {
+        if (infoboxReadResponseType.getAssocArrayData() != null) {
+            List<InfoboxAssocArrayPairType> pairs = infoboxReadResponseType
+                    .getAssocArrayData().getPair();
             for (InfoboxAssocArrayPairType pair : pairs) {
               if (pair.getKey().equals("SecureSignatureKeypair")) {
                 return pair.getBase64Content();
-			  }
+              }
             }
-		}
-		return null;
-	}
+        }
+        return null;
+    }
 
-	public static byte[] generateVisualBlock(String profile, int resolution)
-			throws IOException, CertificateException, PDFASError {
-		X509Certificate cert = new X509Certificate(
-				PdfAsHelper.class.getResourceAsStream("/qualified.cer"));
-		Configuration config = pdfAs.getConfiguration();
-		SignParameter parameter = PdfAsFactory.createSignParameter(config);
-		parameter.setSignatureProfileId(profile);
-		Image img = pdfAs.generateVisibleSignaturePreview(parameter, cert,
-				resolution);
+    public static byte[] generateVisualBlock(String profile, int resolution)
+            throws IOException, CertificateException, PDFASError {
+        X509Certificate cert = new X509Certificate(
+                PdfAsHelper.class.getResourceAsStream("/qualified.cer"));
+        Configuration config = pdfAs.getConfiguration();
+        SignParameter parameter = PdfAsFactory.createSignParameter(config);
+        parameter.setSignatureProfileId(profile);
+        Image img = pdfAs.generateVisibleSignaturePreview(parameter, cert,
+                resolution);
 
-		if (img == null) {
-			return null;
-		}
+        if (img == null) {
+            return null;
+        }
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write((RenderedImage) img, "png", baos);
-		baos.close();
-		return baos.toByteArray();
-	}
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write((RenderedImage) img, "png", baos);
+        baos.close();
+        return baos.toByteArray();
+    }
 
-	public static boolean checkDataUrlAccess(HttpServletRequest request) throws Exception {
-		HttpSession session = request.getSession(false);
-		
-		if(session != null) {
-			Object statusObject = session
-					.getAttribute(PDF_STATUS);
-			if (statusObject instanceof StatusRequest.Stage1 || statusObject instanceof StatusRequest.Stage2) {
-				return true;
-			}
-		}
+    public static boolean checkDataUrlAccess(HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession(false);
+        
+        if(session != null) {
+            Object statusObject = session
+                    .getAttribute(PDF_STATUS);
+            if (statusObject instanceof StatusRequest.Stage1 || statusObject instanceof StatusRequest.Stage2) {
+                return true;
+            }
+        }
 
-		return false;
-	}
-	
-	public static void injectCertificate(HttpServletRequest request,
-			HttpServletResponse response,
-			byte[] certificate,
-			ServletContext context) throws Exception {
+        return false;
+    }
+    
+    public static void injectCertificate(HttpServletRequest request,
+            HttpServletResponse response,
+            byte[] certificate,
+            ServletContext context) throws Exception {
 
-		HttpSession session = request.getSession();
-		StatusRequest statusRequest = (StatusRequest) session
-				.getAttribute(PDF_STATUS);
+        HttpSession session = request.getSession();
+        StatusRequest statusRequest = (StatusRequest) session
+                .getAttribute(PDF_STATUS);
 
-		if (!(statusRequest instanceof StatusRequest.Stage1 statusRequest1)) {
-			throw new PdfAsWebException("No Signature running in session:"
-					+ session.getId());
-		}
-		val statusRequest2 = statusRequest1.setCertificate(certificate,
-				statusRequest1.getSignParameter().getPlainSigner().getPDFFilter(),
-				statusRequest1.getSignParameter().getPlainSigner().getPDFSubFilter());
-		session.setAttribute(PDF_STATUS, statusRequest2);
+        if (!(statusRequest instanceof StatusRequest.Stage1 statusRequest1)) {
+            throw new PdfAsWebException("No Signature running in session:"
+                    + session.getId());
+        }
+        val statusRequest2 = statusRequest1.setCertificate(certificate,
+                statusRequest1.getSignParameter().getPlainSigner().getPDFFilter(),
+                statusRequest1.getSignParameter().getPlainSigner().getPDFSubFilter());
+        session.setAttribute(PDF_STATUS, statusRequest2);
 
-		PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
-	}
+        PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
+    }
 
-	public static void injectSignature(HttpServletRequest request,
-			HttpServletResponse response,
-			byte[] cmsSignature,
-			ServletContext context) throws Exception {
+    public static void injectSignature(HttpServletRequest request,
+            HttpServletResponse response,
+            byte[] cmsSignature,
+            ServletContext context) throws Exception {
 
-		log.debug("Got CMS Signature Response");
+        log.debug("Got CMS Signature Response");
 
-		HttpSession session = request.getSession();
-		Object statusRequest = session.getAttribute(PDF_STATUS);
+        HttpSession session = request.getSession();
+        Object statusRequest = session.getAttribute(PDF_STATUS);
 
-		if (!(statusRequest instanceof StatusRequest.Stage2 statusRequest2)) {
-			throw new PdfAsWebException("No Signature running in session:"
-					+ session.getId());
-		}
+        if (!(statusRequest instanceof StatusRequest.Stage2 statusRequest2)) {
+            throw new PdfAsWebException("No Signature running in session:"
+                    + session.getId());
+        }
 
-		val statusRequest3 = statusRequest2.setSignature(cmsSignature);
-		session.setAttribute(PDF_STATUS, statusRequest3);
+        val statusRequest3 = statusRequest2.setSignature(cmsSignature);
+        session.setAttribute(PDF_STATUS, statusRequest3);
 
-		PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
-	}
+        PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
+    }
 
-	public static JSONStartResponse startJsonProcess(HttpServletRequest request,
-										HttpServletResponse response, ServletContext context)
-			throws Exception {
-		HttpSession session = request.getSession();
-		Object statusRequest = session.getAttribute(PDF_STATUS);
+    public static JSONStartResponse startJsonProcess(HttpServletRequest request,
+                                        HttpServletResponse response, ServletContext context)
+            throws Exception {
+        HttpSession session = request.getSession();
+        Object statusRequest = session.getAttribute(PDF_STATUS);
 
-		Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
-		PdfAsHelper.checkConnectorSupported(connector, null);
+        Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
+        PdfAsHelper.checkConnectorSupported(connector, null);
 
-		if (connector == Connector.BKU || connector == Connector.ONLINEBKU || connector == Connector.MOBILEBKU) {
-			BKUSLConnector bkuSLConnector = (BKUSLConnector) session.getAttribute(PDF_SL_CONNECTOR);
+        if (connector == Connector.BKU || connector == Connector.ONLINEBKU || connector == Connector.MOBILEBKU) {
+            BKUSLConnector bkuSLConnector = (BKUSLConnector) session.getAttribute(PDF_SL_CONNECTOR);
 
-			if (statusRequest instanceof StatusRequest.Stage1 statusRequest1) {
-				log.debug("Needing Certificate from BKU");
-				// build SL Request to read certificate
-				InfoboxReadRequestType readCertificateRequest = bkuSLConnector
-						.createInfoboxReadRequest(statusRequest1.getSignParameter());
+            if (statusRequest instanceof StatusRequest.Stage1 statusRequest1) {
+                log.debug("Needing Certificate from BKU");
+                // build SL Request to read certificate
+                InfoboxReadRequestType readCertificateRequest = bkuSLConnector
+                        .createInfoboxReadRequest(statusRequest1.getSignParameter());
 
-				JAXBElement<InfoboxReadRequestType> readRequest = of
-						.createInfoboxReadRequest(readCertificateRequest);
+                JAXBElement<InfoboxReadRequestType> readRequest = of
+                        .createInfoboxReadRequest(readCertificateRequest);
 
-				String url = generateDataURL(request, response);
-				String slRequest = SLMarschaller.marshalToString(readRequest);
-				String template = getTemplateSL();
-				String locale = getLocale(request, response);
-				String bkuURL = generateBKUURL(connector);
-				return new JSONStartResponse(url, slRequest, template, locale, bkuURL);
-			}
-		}
-		return null;
-	}
+                String url = generateDataURL(request, response);
+                String slRequest = SLMarschaller.marshalToString(readRequest);
+                String template = getTemplateSL();
+                String locale = getLocale(request, response);
+                String bkuURL = generateBKUURL(connector);
+                return new JSONStartResponse(url, slRequest, template, locale, bkuURL);
+            }
+        }
+        return null;
+    }
 
-	public static void processRequestAndWriteHTTPResponse(
-		HttpServletRequest request, HttpServletResponse response, ServletContext context
-	) throws Exception {
+    public static void processRequestAndWriteHTTPResponse(
+        HttpServletRequest request, HttpServletResponse response, ServletContext context
+    ) throws Exception {
 
-		HttpSession session = request.getSession();
-		Object statusRequestGeneric = session.getAttribute(PDF_STATUS);
-		PdfasSignRequest pdfAsRequest = (PdfasSignRequest) session.getAttribute(PDF_PROCESSING_REQUEST);
+        HttpSession session = request.getSession();
+        Object statusRequestGeneric = session.getAttribute(PDF_STATUS);
+        PdfasSignRequest pdfAsRequest = (PdfasSignRequest) session.getAttribute(PDF_PROCESSING_REQUEST);
 
-		Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
-		PdfAsHelper.checkConnectorSupported(connector, null);
+        Connector connector = (Connector) session.getAttribute(PDF_SL_INTERACTIVE);
+        PdfAsHelper.checkConnectorSupported(connector, null);
 
-		//load connector
-		ISLConnector slConnector = (ISLConnector) session.getAttribute(PDF_SL_CONNECTOR);
-		
-		JsonSecurityUtils joseTools = JsonSecurityUtils.getInstance();
-		if (!joseTools.isInitialized())
-			joseTools = null;
-		
-		if (statusRequestGeneric instanceof StatusRequest.Stage1 statusRequest) {
-			log.debug("Needing Certificate from BKU");
-			// build SL Request to read certificate
-			InfoboxReadRequestType readCertificateRequest = slConnector
-					.createInfoboxReadRequest(statusRequest.getSignParameter());
+        //load connector
+        ISLConnector slConnector = (ISLConnector) session.getAttribute(PDF_SL_CONNECTOR);
+        
+        JsonSecurityUtils joseTools = JsonSecurityUtils.getInstance();
+        if (!joseTools.isInitialized())
+            joseTools = null;
+        
+        if (statusRequestGeneric instanceof StatusRequest.Stage1 statusRequest) {
+            log.debug("Needing Certificate from BKU");
+            // build SL Request to read certificate
+            InfoboxReadRequestType readCertificateRequest = slConnector
+                    .createInfoboxReadRequest(statusRequest.getSignParameter());
 
-			if (slConnector instanceof BKUSLConnector) {
-				JAXBElement<InfoboxReadRequestType> readRequest = of
-						.createInfoboxReadRequest(readCertificateRequest);
-	
-				String url = generateDataURL(request, response);
-				String slRequest = SLMarschaller.marshalToString(readRequest);
-				String template = getTemplateSL();
-				String locale = getLocale(request, response);
-				template = template.replace("##BKU##",
-						generateBKUURL(connector));
-				template = template.replace("##XMLRequest##",
-						StringEscapeUtils.escapeHtml4(slRequest));
-				template = template.replace("##DataURL##", url);
-				template = template.replace("##LOCALE##", locale);
-	
-				if (statusRequest.getSignParameter().getTransactionId() != null) {
-					template = template.replace(
-							"##ADDITIONAL##",
-							"<input type=\"hidden\" name=\"TransactionId_\" value=\""
-									+ StringEscapeUtils
-											.escapeHtml4(statusRequest
-													.getSignParameter()
-													.getTransactionId())
-									+ "\">");
-				} else {
-					template = template.replace("##ADDITIONAL##", "");
-				}
-	
-				response.getWriter().write(template);
-				// TODO: set content type of response!!
-				response.setContentType("text/html");
-				response.getWriter().close();
-				
-			} else if (slConnector instanceof SL20Connector sl20Connector) {
-				//generate request for getCertificate command
+            if (slConnector instanceof BKUSLConnector) {
+                JAXBElement<InfoboxReadRequestType> readRequest = of
+                        .createInfoboxReadRequest(readCertificateRequest);
+    
+                String url = generateDataURL(request, response);
+                String slRequest = SLMarschaller.marshalToString(readRequest);
+                String template = getTemplateSL();
+                String locale = getLocale(request, response);
+                template = template.replace("##BKU##",
+                        generateBKUURL(connector));
+                template = template.replace("##XMLRequest##",
+                        StringEscapeUtils.escapeHtml4(slRequest));
+                template = template.replace("##DataURL##", url);
+                template = template.replace("##LOCALE##", locale);
+    
+                if (statusRequest.getSignParameter().getTransactionId() != null) {
+                    template = template.replace(
+                            "##ADDITIONAL##",
+                            "<input type=\"hidden\" name=\"TransactionId_\" value=\""
+                                    + StringEscapeUtils
+                                            .escapeHtml4(statusRequest
+                                                    .getSignParameter()
+                                                    .getTransactionId())
+                                    + "\">");
+                } else {
+                    template = template.replace("##ADDITIONAL##", "");
+                }
+    
+                response.getWriter().write(template);
+                // TODO: set content type of response!!
+                response.setContentType("text/html");
+                response.getWriter().close();
+                
+            } else if (slConnector instanceof SL20Connector sl20Connector) {
+                //generate request for getCertificate command
 
                 //use 'SecureSigningKeypair' per default
-				String keyId = SL20Connector.SecureSignatureKeypair;
-				
-				java.security.cert.X509Certificate x5cEnc = null;
-				if (WebConfiguration.isSL20EncryptionEnabled() && joseTools != null)
-					x5cEnc = joseTools.getEncryptionCertificate();
-				JsonObject getCertParams = 
-						SL20JSONBuilderUtils.createGetCertificateCommandParameters(
-								keyId, generateDataURLSL20(request, response), x5cEnc);
-				
-				JsonObject sl20Req = null;
-				String reqId = UUID.randomUUID().toString();
-				if (WebConfiguration.isSL20SigningEnabled()) {
-				  if (joseTools == null) {
-				    throw new PdfAsException("error.config.sl20.01");
-				  }
-				  
-					String signedCertCommand = SL20JSONBuilderUtils.createSignedCommand(
-							SL20Constants.SL20_COMMAND_IDENTIFIER_GETCERTIFICATE, getCertParams, joseTools);
-					sl20Req = SL20JSONBuilderUtils.createGenericRequest(reqId, null, null, signedCertCommand);
-					
-				} else {
-					JsonObject getCertCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_GETCERTIFICATE, getCertParams);
-					sl20Req = SL20JSONBuilderUtils.createGenericRequest(reqId, null, getCertCommand, null);
-					
-				}	
-								
-				//send SL20 request via Backend connection
-				JsonObject sl20Resp = sl20Connector.sendSL20Request(sl20Req, null, generateBKUURL(connector));
-				if (sl20Resp == null) {
-					log.info("Receive NO responce from SL2.0 connection. Process stops ... ");
-					throw new SLCommandoParserException();
-					
-				}
-				
-				//SL2.0 redirect and call commands do not require signed payload
-				VerificationResult respPayloadContainer = SL20JSONExtractorUtils.extractSL20PayLoad(
-						sl20Resp, joseTools, false);
-				
-				if (respPayloadContainer.isValidSigned() == null)
-					log.debug("Receive unsigned payLoad from VDA");
-					
-				JsonObject respPayload = respPayloadContainer.getPayload();
-				if (respPayload.get(SL20Constants.SL20_COMMAND_CONTAINER_NAME).getAsString()
-						.equals(SL20Constants.SL20_COMMAND_IDENTIFIER_REDIRECT)) {
-					log.debug("Find 'redirect' command in VDA response ... ");									
-					JsonObject params = SL20JSONExtractorUtils.getJSONObjectValue(respPayload, SL20Constants.SL20_COMMAND_CONTAINER_PARAMS, true);					
-					String redirectURL = SL20JSONExtractorUtils.getStringValue(params, SL20Constants.SL20_COMMAND_PARAM_GENERAL_REDIRECT_URL, true);									
-					JsonObject command = SL20JSONExtractorUtils.getJSONObjectValue(params, SL20Constants.SL20_COMMAND_PARAM_GENERAL_REDIRECT_COMMAND, false);
-					String signedCommand = SL20JSONExtractorUtils.getStringValue(params, SL20Constants.SL20_COMMAND_PARAM_GENERAL_REDIRECT_SIGNEDCOMMAND, false);					
+                String keyId = SL20Connector.SecureSignatureKeypair;
+                
+                java.security.cert.X509Certificate x5cEnc = null;
+                if (WebConfiguration.isSL20EncryptionEnabled() && joseTools != null)
+                    x5cEnc = joseTools.getEncryptionCertificate();
+                JsonObject getCertParams = 
+                        SL20JSONBuilderUtils.createGetCertificateCommandParameters(
+                                keyId, generateDataURLSL20(request, response), x5cEnc);
+                
+                JsonObject sl20Req = null;
+                String reqId = UUID.randomUUID().toString();
+                if (WebConfiguration.isSL20SigningEnabled()) {
+                  if (joseTools == null) {
+                    throw new PdfAsException("error.config.sl20.01");
+                  }
+                  
+                    String signedCertCommand = SL20JSONBuilderUtils.createSignedCommand(
+                            SL20Constants.SL20_COMMAND_IDENTIFIER_GETCERTIFICATE, getCertParams, joseTools);
+                    sl20Req = SL20JSONBuilderUtils.createGenericRequest(reqId, null, null, signedCertCommand);
+                    
+                } else {
+                    JsonObject getCertCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_GETCERTIFICATE, getCertParams);
+                    sl20Req = SL20JSONBuilderUtils.createGenericRequest(reqId, null, getCertCommand, null);
+                    
+                }    
+                                
+                //send SL20 request via Backend connection
+                JsonObject sl20Resp = sl20Connector.sendSL20Request(sl20Req, null, generateBKUURL(connector));
+                if (sl20Resp == null) {
+                    log.info("Receive NO responce from SL2.0 connection. Process stops ... ");
+                    throw new SLCommandoParserException();
+                    
+                }
+                
+                //SL2.0 redirect and call commands do not require signed payload
+                VerificationResult respPayloadContainer = SL20JSONExtractorUtils.extractSL20PayLoad(
+                        sl20Resp, joseTools, false);
+                
+                if (respPayloadContainer.isValidSigned() == null)
+                    log.debug("Receive unsigned payLoad from VDA");
+                    
+                JsonObject respPayload = respPayloadContainer.getPayload();
+                if (respPayload.get(SL20Constants.SL20_COMMAND_CONTAINER_NAME).getAsString()
+                        .equals(SL20Constants.SL20_COMMAND_IDENTIFIER_REDIRECT)) {
+                    log.debug("Find 'redirect' command in VDA response ... ");                                    
+                    JsonObject params = SL20JSONExtractorUtils.getJSONObjectValue(respPayload, SL20Constants.SL20_COMMAND_CONTAINER_PARAMS, true);                    
+                    String redirectURL = SL20JSONExtractorUtils.getStringValue(params, SL20Constants.SL20_COMMAND_PARAM_GENERAL_REDIRECT_URL, true);                                    
+                    JsonObject command = SL20JSONExtractorUtils.getJSONObjectValue(params, SL20Constants.SL20_COMMAND_PARAM_GENERAL_REDIRECT_COMMAND, false);
+                    String signedCommand = SL20JSONExtractorUtils.getStringValue(params, SL20Constants.SL20_COMMAND_PARAM_GENERAL_REDIRECT_SIGNEDCOMMAND, false);                    
 
-					//create forward SL2.0 command
-					JsonObject sl20Forward = sl20Resp.deepCopy().getAsJsonObject();
-					SL20JSONBuilderUtils.addOnlyOnceOfTwo(sl20Forward, 
-							SL20Constants.SL20_PAYLOAD, SL20Constants.SL20_SIGNEDPAYLOAD, 
-							command, signedCommand);
-										
-					//store requestId
-					request.getSession(false).setAttribute(PDF_SESSION_PREFIX + SL20Constants.SL20_REQID, reqId);
+                    //create forward SL2.0 command
+                    JsonObject sl20Forward = sl20Resp.deepCopy().getAsJsonObject();
+                    SL20JSONBuilderUtils.addOnlyOnceOfTwo(sl20Forward, 
+                            SL20Constants.SL20_PAYLOAD, SL20Constants.SL20_SIGNEDPAYLOAD, 
+                            command, signedCommand);
+                                        
+                    //store requestId
+                    request.getSession(false).setAttribute(PDF_SESSION_PREFIX + SL20Constants.SL20_REQID, reqId);
 
-					//forward SL2.0 command
-					SL20HttpBindingUtils.writeIntoResponse(request, response, sl20Forward, redirectURL);
-													
-				} else if (respPayload.get(SL20Constants.SL20_COMMAND_CONTAINER_NAME).getAsString()
-						.equals(SL20Constants.SL20_COMMAND_IDENTIFIER_ERROR)) { 
-					JsonObject result = SL20JSONExtractorUtils.getJSONObjectValue(respPayload, SL20Constants.SL20_COMMAND_CONTAINER_RESULT, false);
-					if (result  == null)
-						result = SL20JSONExtractorUtils.getJSONObjectValue(respPayload, SL20Constants.SL20_COMMAND_CONTAINER_PARAMS, false);
-					
-					String errorCode = SL20JSONExtractorUtils.getStringValue(result, SL20Constants.SL20_COMMAND_PARAM_GENERAL_RESPONSE_ERRORCODE, true);
-					String errorMsg = SL20JSONExtractorUtils.getStringValue(result, SL20Constants.SL20_COMMAND_PARAM_GENERAL_RESPONSE_ERRORMESSAGE, true);
-					
-					log.info("Receive SL2.0 error. Code:" + errorCode + " Msg:" + errorMsg);
-					throw new SL20Exception("sl20.08");
-					
-				} else {
-					log.warn("Received an unrecognized command: " + respPayload.get(SL20Constants.SL20_COMMAND_CONTAINER_NAME).getAsString());
-					throw new SLCommandoParserException();
-					
-				}
-				
-			} else
-				throw new PdfAsWebException("Invalid connector: " + slConnector.getClass().getName());
-			
-		} else if (statusRequestGeneric instanceof StatusRequest.Stage2 statusRequest) {
-			log.debug("Needing Signature from BKU");
-			// build SL Request for cms signature
-			RequestPackage pack = slConnector.createCMSRequest(
-					statusRequest.getSignatureData(),
-					statusRequest.getSignatureDataByteRange(),
-					statusRequest.getSignParameter());
+                    //forward SL2.0 command
+                    SL20HttpBindingUtils.writeIntoResponse(request, response, sl20Forward, redirectURL);
+                                                    
+                } else if (respPayload.get(SL20Constants.SL20_COMMAND_CONTAINER_NAME).getAsString()
+                        .equals(SL20Constants.SL20_COMMAND_IDENTIFIER_ERROR)) { 
+                    JsonObject result = SL20JSONExtractorUtils.getJSONObjectValue(respPayload, SL20Constants.SL20_COMMAND_CONTAINER_RESULT, false);
+                    if (result  == null)
+                        result = SL20JSONExtractorUtils.getJSONObjectValue(respPayload, SL20Constants.SL20_COMMAND_CONTAINER_PARAMS, false);
+                    
+                    String errorCode = SL20JSONExtractorUtils.getStringValue(result, SL20Constants.SL20_COMMAND_PARAM_GENERAL_RESPONSE_ERRORCODE, true);
+                    String errorMsg = SL20JSONExtractorUtils.getStringValue(result, SL20Constants.SL20_COMMAND_PARAM_GENERAL_RESPONSE_ERRORMESSAGE, true);
+                    
+                    log.info("Receive SL2.0 error. Code:" + errorCode + " Msg:" + errorMsg);
+                    throw new SL20Exception("sl20.08");
+                    
+                } else {
+                    log.warn("Received an unrecognized command: " + respPayload.get(SL20Constants.SL20_COMMAND_CONTAINER_NAME).getAsString());
+                    throw new SLCommandoParserException();
+                    
+                }
+                
+            } else
+                throw new PdfAsWebException("Invalid connector: " + slConnector.getClass().getName());
+            
+        } else if (statusRequestGeneric instanceof StatusRequest.Stage2 statusRequest) {
+            log.debug("Needing Signature from BKU");
+            // build SL Request for cms signature
+            RequestPackage pack = slConnector.createCMSRequest(
+                    statusRequest.getSignatureData(),
+                    statusRequest.getSignatureDataByteRange(),
+                    statusRequest.getSignParameter());
 
-			if (slConnector instanceof BKUSLConnector) {						
-				String slRequest = SLMarschaller
-						.marshalToString(of
-								.createCreateCMSSignatureRequest(pack
-										.getRequestType()));
+            if (slConnector instanceof BKUSLConnector) {                        
+                String slRequest = SLMarschaller
+                        .marshalToString(of
+                                .createCreateCMSSignatureRequest(pack
+                                        .getRequestType()));
 
-				log.trace("SL Request: " + slRequest);
-				
-				response.setContentType("text/xml");
-				response.getWriter().write(slRequest);
-				response.getWriter().close();
-				
-			} else if (slConnector instanceof SL20Connector) {				
-				//convert byte range
-				
-				int[] exclude_range = PDFUtils.buildExcludeRange(statusRequest.getSignatureDataByteRange());
-				log.info("Exclude Byte Range: " + exclude_range[0] + " " + exclude_range[1]);
-				
-				List<JsonElement> byteRanges = new ArrayList<JsonElement>();
-				if (statusRequest.getSignatureDataByteRange().length % 2 != 0) {
-					log.warn("ByteRange is not a set of pairs. Something is maybe suspect");
-					
-				}
-				
-				for (int i=0; i<exclude_range.length/2; i++) {
-					JsonArray el = new JsonArray();
-					el.add(exclude_range[2*i]);
-					el.add(exclude_range[2*i + 1]);
-					byteRanges.add(el);
-										
-				}
-					
-				
-				java.security.cert.X509Certificate x5cEnc = null;
-				if (WebConfiguration.isSL20EncryptionEnabled() && joseTools != null)
-					x5cEnc = joseTools.getEncryptionCertificate();
+                log.trace("SL Request: " + slRequest);
+                
+                response.setContentType("text/xml");
+                response.getWriter().write(slRequest);
+                response.getWriter().close();
+                
+            } else if (slConnector instanceof SL20Connector) {                
+                //convert byte range
+                
+                int[] exclude_range = PDFUtils.buildExcludeRange(statusRequest.getSignatureDataByteRange());
+                log.info("Exclude Byte Range: " + exclude_range[0] + " " + exclude_range[1]);
+                
+                List<JsonElement> byteRanges = new ArrayList<JsonElement>();
+                if (statusRequest.getSignatureDataByteRange().length % 2 != 0) {
+                    log.warn("ByteRange is not a set of pairs. Something is maybe suspect");
+                    
+                }
+                
+                for (int i=0; i<exclude_range.length/2; i++) {
+                    JsonArray el = new JsonArray();
+                    el.add(exclude_range[2*i]);
+                    el.add(exclude_range[2*i + 1]);
+                    byteRanges.add(el);
+                                        
+                }
+                    
+                
+                java.security.cert.X509Certificate x5cEnc = null;
+                if (WebConfiguration.isSL20EncryptionEnabled() && joseTools != null)
+                    x5cEnc = joseTools.getEncryptionCertificate();
 
-				//set 'true' as default
-				boolean padesCompatibel = true;
-				if (pack.getRequestType().getPAdESFlag() != null)
-					padesCompatibel = pack.getRequestType().getPAdESFlag();
-				
-				byte[] data = PDFUtils.blackOutSignature(statusRequest.getSignatureData(), 
-						statusRequest.getSignatureDataByteRange());
-				JsonObject createCAdESSigParams;
-				if(data.length>20000000) {
-					 createCAdESSigParams =
-							SL20JSONBuilderUtils.createCreateCAdESCommandParameters(
-									pack.getRequestType().getKeyboxIdentifier(),
-									null,
-									generateNSPdfURL(request, response),
-									SL20Constants.SL20_COMMAND_PARAM_CREATE_SIG_CADES_CONTENTMODE_DETACHED,
-									pack.getRequestType().getDataObject().getMetaInfo().getMimeType(),
-									padesCompatibel,
-									byteRanges,
-									SL20Constants.SL20_COMMAND_PARAM_CREATE_SIG_CADES_CADESLEVEL_BASIC,
-									generateDataURLSL20(request, response),
-									x5cEnc);
-				} else
-				{
-					 createCAdESSigParams =
-							SL20JSONBuilderUtils.createCreateCAdESCommandParameters(
-									pack.getRequestType().getKeyboxIdentifier(),
-									data,
-									null,
-									SL20Constants.SL20_COMMAND_PARAM_CREATE_SIG_CADES_CONTENTMODE_DETACHED,
-									pack.getRequestType().getDataObject().getMetaInfo().getMimeType(),
-									padesCompatibel,
-									byteRanges,
-									SL20Constants.SL20_COMMAND_PARAM_CREATE_SIG_CADES_CADESLEVEL_BASIC,
-									generateDataURLSL20(request, response),
-									x5cEnc);
-				}
-				
-				JsonObject sl20CreateCAdES = null;
-				String reqId = UUID.randomUUID().toString();
-				if (WebConfiguration.isSL20SigningEnabled()) {
-					String signedCertCommand = SL20JSONBuilderUtils.createSignedCommand(
-							SL20Constants.SL20_COMMAND_IDENTIFIER_CREATE_SIG_CADES, createCAdESSigParams, joseTools);
-					sl20CreateCAdES = SL20JSONBuilderUtils.createGenericRequest(reqId, null, null, signedCertCommand);
-					
-				} else {
-					JsonObject getCertCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_CREATE_SIG_CADES, createCAdESSigParams);
-					sl20CreateCAdES = SL20JSONBuilderUtils.createGenericRequest(reqId, null, getCertCommand, null);
-					
-				}	
-				
-				request.getSession(false).setAttribute(PDF_SESSION_PREFIX + SL20Constants.SL20_REQID, reqId);
+                //set 'true' as default
+                boolean padesCompatibel = true;
+                if (pack.getRequestType().getPAdESFlag() != null)
+                    padesCompatibel = pack.getRequestType().getPAdESFlag();
+                
+                byte[] data = PDFUtils.blackOutSignature(statusRequest.getSignatureData(), 
+                        statusRequest.getSignatureDataByteRange());
+                JsonObject createCAdESSigParams;
+                if(data.length>20000000) {
+                     createCAdESSigParams =
+                            SL20JSONBuilderUtils.createCreateCAdESCommandParameters(
+                                    pack.getRequestType().getKeyboxIdentifier(),
+                                    null,
+                                    generateNSPdfURL(request, response),
+                                    SL20Constants.SL20_COMMAND_PARAM_CREATE_SIG_CADES_CONTENTMODE_DETACHED,
+                                    pack.getRequestType().getDataObject().getMetaInfo().getMimeType(),
+                                    padesCompatibel,
+                                    byteRanges,
+                                    SL20Constants.SL20_COMMAND_PARAM_CREATE_SIG_CADES_CADESLEVEL_BASIC,
+                                    generateDataURLSL20(request, response),
+                                    x5cEnc);
+                } else
+                {
+                     createCAdESSigParams =
+                            SL20JSONBuilderUtils.createCreateCAdESCommandParameters(
+                                    pack.getRequestType().getKeyboxIdentifier(),
+                                    data,
+                                    null,
+                                    SL20Constants.SL20_COMMAND_PARAM_CREATE_SIG_CADES_CONTENTMODE_DETACHED,
+                                    pack.getRequestType().getDataObject().getMetaInfo().getMimeType(),
+                                    padesCompatibel,
+                                    byteRanges,
+                                    SL20Constants.SL20_COMMAND_PARAM_CREATE_SIG_CADES_CADESLEVEL_BASIC,
+                                    generateDataURLSL20(request, response),
+                                    x5cEnc);
+                }
+                
+                JsonObject sl20CreateCAdES = null;
+                String reqId = UUID.randomUUID().toString();
+                if (WebConfiguration.isSL20SigningEnabled()) {
+                    String signedCertCommand = SL20JSONBuilderUtils.createSignedCommand(
+                            SL20Constants.SL20_COMMAND_IDENTIFIER_CREATE_SIG_CADES, createCAdESSigParams, joseTools);
+                    sl20CreateCAdES = SL20JSONBuilderUtils.createGenericRequest(reqId, null, null, signedCertCommand);
+                    
+                } else {
+                    JsonObject getCertCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_CREATE_SIG_CADES, createCAdESSigParams);
+                    sl20CreateCAdES = SL20JSONBuilderUtils.createGenericRequest(reqId, null, getCertCommand, null);
+                    
+                }    
+                
+                request.getSession(false).setAttribute(PDF_SESSION_PREFIX + SL20Constants.SL20_REQID, reqId);
 
-				//forward SL2.0 command
-				log.trace("Write 'createCAdES' command to VDA: " + sl20CreateCAdES.toString());
-				StringWriter writer = new StringWriter();
-				writer.write(sl20CreateCAdES.toString());						
-				final byte[] content = writer.toString().getBytes(StandardCharsets.UTF_8);
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentLength(content.length);
-				response.setContentType(ContentType.APPLICATION_JSON.toString());						
-				response.getOutputStream().write(content);
-				
-			} else {
-				throw new PdfAsWebException("Invalid connector: " + slConnector.getClass().getName());
-				
-			}
-								
-		} else if (statusRequestGeneric instanceof StatusRequest.Stage3 statusRequest) {
-			log.debug("Single document is ready. Perform post-processing ... ");
-			SignResult result;
-			byte[] signedDocument;
-			try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-				result  = statusRequest.finishSign(baos);
-				signedDocument = baos.toByteArray();
-			}
+                //forward SL2.0 command
+                log.trace("Write 'createCAdES' command to VDA: " + sl20CreateCAdES.toString());
+                StringWriter writer = new StringWriter();
+                writer.write(sl20CreateCAdES.toString());                        
+                final byte[] content = writer.toString().getBytes(StandardCharsets.UTF_8);
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.setContentLength(content.length);
+                response.setContentType(ContentType.APPLICATION_JSON.toString());                        
+                response.getOutputStream().write(content);
+                
+            } else {
+                throw new PdfAsWebException("Invalid connector: " + slConnector.getClass().getName());
+                
+            }
+                                
+        } else if (statusRequestGeneric instanceof StatusRequest.Stage3 statusRequest) {
+            log.debug("Single document is ready. Perform post-processing ... ");
+            SignResult result;
+            byte[] signedDocument;
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                result  = statusRequest.finishSign(baos);
+                signedDocument = baos.toByteArray();
+            }
 
-			PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
-			List<VerifyResult> verResults = PdfAsHelper.synchronousVerify(
-					signedDocument, -2,
-					PdfAsHelper.getVerificationLevel(request), null);
+            PDFASVerificationResponse verResponse = new PDFASVerificationResponse();
+            List<VerifyResult> verResults = PdfAsHelper.synchronousVerify(
+                    signedDocument, -2,
+                    PdfAsHelper.getVerificationLevel(request), null);
 
-			if (verResults.size() != 1) {
-				throw new WebServiceException(
-						"Document verification failed!");
-			}
-			VerifyResult verifyResult = verResults.get(0);
+            if (verResults.size() != 1) {
+                throw new WebServiceException(
+                        "Document verification failed!");
+            }
+            VerifyResult verifyResult = verResults.get(0);
 
-			verResponse.setCertificateCode(verifyResult
-					.getCertificateCheck().getCode());
-			verResponse.setValueCode(verifyResult.getValueCheckCode()
-					.getCode());
-					
-			SignedDocument signPdfDoc = SignedDocument.builder()
-			    .signingTimestamp(System.currentTimeMillis())
-			    .outputData(signedDocument)
-			    .fileName(PdfAsHelper.getPDFFileName(request))
-			    .verificationResponse(verResponse)
-			    .signerCertificate(Base64.encodeBase64String(result.getSignerCertificate().getEncoded()))
-			    .build();			
-						
-			addSignedDocumentToResult(request, signPdfDoc, pdfAsRequest.getRequestID(), 
-			    pdfAsRequest.getCoreParams().getTransactionId());
-			
-			// check if more files are available
-			if (pdfAsRequest.hasNext()) {
-			  log.debug("Find additional file, restarting signing process again ... ");			  
-			  StatusRequest.Stage1 nextStatusRequest1 = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
-			  StatusRequest.Stage2 nextStatusRequest2 = nextStatusRequest1.setCertificate(
+            verResponse.setCertificateCode(verifyResult
+                    .getCertificateCheck().getCode());
+            verResponse.setValueCode(verifyResult.getValueCheckCode()
+                    .getCode());
+                    
+            SignedDocument signPdfDoc = SignedDocument.builder()
+                .signingTimestamp(System.currentTimeMillis())
+                .outputData(signedDocument)
+                .fileName(PdfAsHelper.getPDFFileName(request))
+                .verificationResponse(verResponse)
+                .signerCertificate(Base64.encodeBase64String(result.getSignerCertificate().getEncoded()))
+                .build();            
+                        
+            addSignedDocumentToResult(request, signPdfDoc, pdfAsRequest.getRequestID(), 
+                pdfAsRequest.getCoreParams().getTransactionId());
+            
+            // check if more files are available
+            if (pdfAsRequest.hasNext()) {
+              log.debug("Find additional file, restarting signing process again ... ");              
+              StatusRequest.Stage1 nextStatusRequest1 = initializeSigningContextForNewDocument(request, connector, pdfAsRequest);
+              StatusRequest.Stage2 nextStatusRequest2 = nextStatusRequest1.setCertificate(
                   statusRequest.getRequestedSignature().getCertificate().getEncoded(),
-					  statusRequest.getSignParameter().getPlainSigner().getPDFFilter(),
-					  statusRequest.getSignParameter().getPlainSigner().getPDFSubFilter());
+                      statusRequest.getSignParameter().getPlainSigner().getPDFFilter(),
+                      statusRequest.getSignParameter().getPlainSigner().getPDFSubFilter());
 
-			  session.setAttribute(PDF_STATUS, nextStatusRequest2);
+              session.setAttribute(PDF_STATUS, nextStatusRequest2);
 
               // recurse
-			  PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
-			  		    			  			  
-			} else {
+              PdfAsHelper.processRequestAndWriteHTTPResponse(request, response, context);
+                                                      
+            } else {
               if (slConnector instanceof BKUSLConnector) {
                 PdfAsHelper.gotoProvidePdf(context, request, response);
 
@@ -1018,9 +1018,9 @@ public class PdfAsHelper {
               } else {
                 throw new PdfAsWebException("Invalid connector: " + slConnector.getClass().getName());
               }
-	     			  
-			}
-			
+                       
+            }
+            
     } else {
       throw new PdfAsWebException("Invalid state!");
       
@@ -1028,574 +1028,574 @@ public class PdfAsHelper {
   }
 
   private static String getTemplateSL() throws IOException {
-		return FileUtils.readFileToString(
-		    FileUtils.toFile(PdfAsHelper.class.getResource("/template_sl.html")),
+        return FileUtils.readFileToString(
+            FileUtils.toFile(PdfAsHelper.class.getResource("/template_sl.html")),
                 StandardCharsets.UTF_8);
-	}
+    }
 
-	public static String getErrorRedirectTemplateSL() throws IOException {
-		return FileUtils.readFileToString(
+    public static String getErrorRedirectTemplateSL() throws IOException {
+        return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_error_redirect.html")),
                 StandardCharsets.UTF_8);
-	}
+    }
 
-	public static String getProvideTemplate() throws IOException {
-		return FileUtils.readFileToString(
+    public static String getProvideTemplate() throws IOException {
+        return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_provide.html")),
                 StandardCharsets.UTF_8);
-	}
+    }
 
-	public static String getErrorTemplate() throws IOException {
-		return FileUtils.readFileToString(
+    public static String getErrorTemplate() throws IOException {
+        return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_error.html")),
                 StandardCharsets.UTF_8);
-	}
+    }
 
-	public static String getGenericTemplate() throws IOException {
-		return FileUtils.readFileToString(
+    public static String getGenericTemplate() throws IOException {
+        return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_generic_param.html")),
                 StandardCharsets.UTF_8);
-	}
+    }
 
-	public static String getInvokeRedirectTemplateSL() throws IOException {
-		return FileUtils.readFileToString(
+    public static String getInvokeRedirectTemplateSL() throws IOException {
+        return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_invoke_redirect.html")),
                 StandardCharsets.UTF_8);
-	}
+    }
 
   public static String getInvokeRedirectTemplateMoreFiles() throws IOException {
     return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_invoke_redirect_more_files.html")),
                 StandardCharsets.UTF_8);
   }
-	
-	public static void setStatisticEvent(HttpServletRequest request,
-			HttpServletResponse response, StatisticEvent event) {
-		HttpSession session = request.getSession();
-		session.setAttribute(PDF_STATISTICS, event);
-	}
+    
+    public static void setStatisticEvent(HttpServletRequest request,
+            HttpServletResponse response, StatisticEvent event) {
+        HttpSession session = request.getSession();
+        session.setAttribute(PDF_STATISTICS, event);
+    }
 
-	public static StatisticEvent getStatisticEvent(HttpServletRequest request,
-			HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		return (StatisticEvent) session.getAttribute(PDF_STATISTICS);
-	}
+    public static StatisticEvent getStatisticEvent(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        return (StatisticEvent) session.getAttribute(PDF_STATISTICS);
+    }
 
-	public static void setLocale(HttpServletRequest request,
-			HttpServletResponse response, String locale) {
-		HttpSession session = request.getSession();
-		session.setAttribute(PDF_LOCALE, locale);
-	}
+    public static void setLocale(HttpServletRequest request,
+            HttpServletResponse response, String locale) {
+        HttpSession session = request.getSession();
+        session.setAttribute(PDF_LOCALE, locale);
+    }
 
-	public static String getLocale(HttpServletRequest request,
-			HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_LOCALE);
-		return obj == null ? "DE" : obj.toString();
-	}
+    public static String getLocale(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_LOCALE);
+        return obj == null ? "DE" : obj.toString();
+    }
 
-	public static void setSessionException(HttpServletRequest request,
-			HttpServletResponse response, String message, Throwable e) {
-		HttpSession session = request.getSession();
-		session.setAttribute(PDF_ERR_MESSAGE, message);
-		session.setAttribute(PDF_ERR_THROWABLE, e);
-	}
+    public static void setSessionException(HttpServletRequest request,
+            HttpServletResponse response, String message, Throwable e) {
+        HttpSession session = request.getSession();
+        session.setAttribute(PDF_ERR_MESSAGE, message);
+        session.setAttribute(PDF_ERR_THROWABLE, e);
+    }
 
-	public static String getSessionErrMessage(HttpServletRequest request,
-			HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_ERR_MESSAGE);
-		return obj == null ? null : obj.toString();
-	}
+    public static String getSessionErrMessage(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_ERR_MESSAGE);
+        return obj == null ? null : obj.toString();
+    }
 
-	public static Throwable getSessionException(HttpServletRequest request,
-			HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_ERR_THROWABLE);
-		if (obj == null) {
-			return null;
-		}
+    public static Throwable getSessionException(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_ERR_THROWABLE);
+        if (obj == null) {
+            return null;
+        }
 
-		if (obj instanceof Throwable) {
-			return (Throwable) obj;
-		}
-		log.warn("PDF_ERR_THROWABLE in session is not a throwable type!");
-		return null;
-	}
+        if (obj instanceof Throwable) {
+            return (Throwable) obj;
+        }
+        log.warn("PDF_ERR_THROWABLE in session is not a throwable type!");
+        return null;
+    }
 
-	public static void gotoError(ServletContext context,
-			HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		if (PdfAsHelper.getFromDataUrl(request)) {
-			response.sendRedirect(generateErrorURL(request, response));
-		} else {
-			RequestDispatcher dispatcher = context
-					.getRequestDispatcher(PDF_ERROR_PAGE);
-			dispatcher.forward(request, response);
-		}
-	}
+    public static void gotoError(ServletContext context,
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if (PdfAsHelper.getFromDataUrl(request)) {
+            response.sendRedirect(generateErrorURL(request, response));
+        } else {
+            RequestDispatcher dispatcher = context
+                    .getRequestDispatcher(PDF_ERROR_PAGE);
+            dispatcher.forward(request, response);
+        }
+    }
 
-	public static void gotoProvidePdf(ServletContext context,
-			HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		if (PdfAsHelper.getFromDataUrl(request)) {
-			response.sendRedirect(generateProvideURL(request, response));
-		} else {
-			RequestDispatcher dispatcher = context
-					.getRequestDispatcher(PDF_PROVIDE_PAGE);
-			dispatcher.forward(request, response);
-		}
-	}
+    public static void gotoProvidePdf(ServletContext context,
+            HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if (PdfAsHelper.getFromDataUrl(request)) {
+            response.sendRedirect(generateProvideURL(request, response));
+        } else {
+            RequestDispatcher dispatcher = context
+                    .getRequestDispatcher(PDF_PROVIDE_PAGE);
+            dispatcher.forward(request, response);
+        }
+    }
 
-	public static void setErrorURL(HttpServletRequest request,
-			HttpServletResponse response, String url) {
-		HttpSession session = request.getSession();
-		log.debug("[" + session.getId() + "]: Setting Error URL to: " + url);
-		session.setAttribute(PDF_ERR_URL, url);
-	}
+    public static void setErrorURL(HttpServletRequest request,
+            HttpServletResponse response, String url) {
+        HttpSession session = request.getSession();
+        log.debug("[" + session.getId() + "]: Setting Error URL to: " + url);
+        session.setAttribute(PDF_ERR_URL, url);
+    }
 
-	public static String getErrorURL(HttpServletRequest request,
-			HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_ERR_URL);
-		return obj == null ? null : obj.toString();
-	}
+    public static String getErrorURL(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_ERR_URL);
+        return obj == null ? null : obj.toString();
+    }
 
-	public static void setInvokeURL(HttpServletRequest request,
-			HttpServletResponse response, String url) {
-		HttpSession session = request.getSession();
-		log.debug("[" + session.getId() + "]: Setting Invoke URL to: " + url);
-		session.setAttribute(PDF_INVOKE_URL, url);
-	}
+    public static void setInvokeURL(HttpServletRequest request,
+            HttpServletResponse response, String url) {
+        HttpSession session = request.getSession();
+        log.debug("[" + session.getId() + "]: Setting Invoke URL to: " + url);
+        session.setAttribute(PDF_INVOKE_URL, url);
+    }
 
-	public static String getInvokeURL(HttpServletRequest request,
-			HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_INVOKE_URL);
-		return obj == null ? null : obj.toString();
-	}
+    public static String getInvokeURL(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_INVOKE_URL);
+        return obj == null ? null : obj.toString();
+    }
 
-	public static void setInvokeTarget(HttpServletRequest request,
-			HttpServletResponse response, String url) {
+    public static void setInvokeTarget(HttpServletRequest request,
+            HttpServletResponse response, String url) {
 
-		HttpSession session = request.getSession();
-		session.setAttribute(PDF_INVOKE_TARGET, url);
-		log.debug("External Invoke TARGET: " + url);
-	}
+        HttpSession session = request.getSession();
+        session.setAttribute(PDF_INVOKE_TARGET, url);
+        log.debug("External Invoke TARGET: " + url);
+    }
 
-	public static String getInvokeTarget(HttpServletRequest request,
-			HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_INVOKE_TARGET);
-		return obj == null ? null : obj.toString();
-	}
+    public static String getInvokeTarget(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_INVOKE_TARGET);
+        return obj == null ? null : obj.toString();
+    }
 
-	public static void setResponseMode(HttpServletRequest request, 
-			HttpServletResponse response, String responseMode) {
-		
-		PDF_RESPONSE_MODES mode = PDF_RESPONSE_MODES.htmlform;
-		if (StringUtils.isNotEmpty(responseMode)) {
-			try {
-				mode = PDF_RESPONSE_MODES.valueOf(responseMode);
-				
-			} catch (Exception e) {
-				log.warn("HTTP parameter 'responsemode' has an unsupported value: " + responseMode 
-						+ ". Use default value: " + mode.toString());
-				
-			}
-		}
-				
-		HttpSession session = request.getSession();				
-		session.setAttribute(PDF_RESPONSE_MODE , mode);
-		log.debug("External ResponseMode: " + mode.toString());
-		
-	}
-	
-	public static PDF_RESPONSE_MODES getResponseMode(HttpServletRequest request,
-			HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_RESPONSE_MODE);
-		
-		if (obj == null) {
-			log.debug("'responseMode' parameter is 'null'. Use defaultvalue: " + PDF_RESPONSE_MODES.htmlform.toString());
-			return PDF_RESPONSE_MODES.htmlform;
-			
-		} else {
-			log.debug("'responseMode' parameter is " + ((PDF_RESPONSE_MODES) obj).toString());
-			return (PDF_RESPONSE_MODES) obj;
-		}
-				
-	}
-	
-	private static String generateURL(HttpServletRequest request,
-			HttpServletResponse response, String Servlet) {
-		return generateURL(request, response, Servlet, WebConfiguration.getPublicURL());
-		
-	}
+    public static void setResponseMode(HttpServletRequest request, 
+            HttpServletResponse response, String responseMode) {
+        
+        PDF_RESPONSE_MODES mode = PDF_RESPONSE_MODES.htmlform;
+        if (StringUtils.isNotEmpty(responseMode)) {
+            try {
+                mode = PDF_RESPONSE_MODES.valueOf(responseMode);
+                
+            } catch (Exception e) {
+                log.warn("HTTP parameter 'responsemode' has an unsupported value: " + responseMode 
+                        + ". Use default value: " + mode.toString());
+                
+            }
+        }
+                
+        HttpSession session = request.getSession();                
+        session.setAttribute(PDF_RESPONSE_MODE , mode);
+        log.debug("External ResponseMode: " + mode.toString());
+        
+    }
+    
+    public static PDF_RESPONSE_MODES getResponseMode(HttpServletRequest request,
+            HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_RESPONSE_MODE);
+        
+        if (obj == null) {
+            log.debug("'responseMode' parameter is 'null'. Use defaultvalue: " + PDF_RESPONSE_MODES.htmlform.toString());
+            return PDF_RESPONSE_MODES.htmlform;
+            
+        } else {
+            log.debug("'responseMode' parameter is " + ((PDF_RESPONSE_MODES) obj).toString());
+            return (PDF_RESPONSE_MODES) obj;
+        }
+                
+    }
+    
+    private static String generateURL(HttpServletRequest request,
+            HttpServletResponse response, String Servlet) {
+        return generateURL(request, response, Servlet, WebConfiguration.getPublicURL());
+        
+    }
 
-	 private static String generateURL(HttpServletRequest request,
-	      HttpServletResponse response, String Servlet, String publicURL) {
-	    HttpSession session = request.getSession();
-	    String dataURL = null;
-	    if (publicURL != null) {
-	      dataURL = publicURL + Servlet + ";jsessionid=" + session.getId();
-	    } else {
-	      if ((request.getScheme().equals("http") && request.getServerPort() == 80)
-	          || (request.getScheme().equals("https") && request
-	              .getServerPort() == 443)) {
-	        dataURL = request.getScheme() + "://" + request.getServerName()
-	            + request.getContextPath() + Servlet + ";jsessionid="
-	            + session.getId();
-	      } else {
-	        dataURL = request.getScheme() + "://" + request.getServerName()
-	            + ":" + request.getServerPort()
-	            + request.getContextPath() + Servlet + ";jsessionid="
-	            + session.getId();
-	      }
-	    }
-	    log.debug("Generated URL: " + dataURL);
-	    return dataURL;
-	  }
+     private static String generateURL(HttpServletRequest request,
+          HttpServletResponse response, String Servlet, String publicURL) {
+        HttpSession session = request.getSession();
+        String dataURL = null;
+        if (publicURL != null) {
+          dataURL = publicURL + Servlet + ";jsessionid=" + session.getId();
+        } else {
+          if ((request.getScheme().equals("http") && request.getServerPort() == 80)
+              || (request.getScheme().equals("https") && request
+                  .getServerPort() == 443)) {
+            dataURL = request.getScheme() + "://" + request.getServerName()
+                + request.getContextPath() + Servlet + ";jsessionid="
+                + session.getId();
+          } else {
+            dataURL = request.getScheme() + "://" + request.getServerName()
+                + ":" + request.getServerPort()
+                + request.getContextPath() + Servlet + ";jsessionid="
+                + session.getId();
+          }
+        }
+        log.debug("Generated URL: " + dataURL);
+        return dataURL;
+      }
 
-	public static String generateDataURLSL20(HttpServletRequest request,
-			HttpServletResponse response) {
-		return generateURL(request, response, PDF_SL20_DATAURL_PAGE,
+    public static String generateDataURLSL20(HttpServletRequest request,
+            HttpServletResponse response) {
+        return generateURL(request, response, PDF_SL20_DATAURL_PAGE,
         WebConfiguration.getPublicDataURL() != null 
             ? WebConfiguration.getPublicDataURL() : WebConfiguration.getPublicURL());
-	}
-	
-	public static String generateDataURL(HttpServletRequest request,
-			HttpServletResponse response) {
-		return generateURL(request, response, PDF_DATAURL_PAGE,
-		    WebConfiguration.getPublicDataURL() != null 
-		        ? WebConfiguration.getPublicDataURL() : WebConfiguration.getPublicURL());
-	}
+    }
+    
+    public static String generateDataURL(HttpServletRequest request,
+            HttpServletResponse response) {
+        return generateURL(request, response, PDF_DATAURL_PAGE,
+            WebConfiguration.getPublicDataURL() != null 
+                ? WebConfiguration.getPublicDataURL() : WebConfiguration.getPublicURL());
+    }
 
-	public static String generateProvideURL(HttpServletRequest request,
-			HttpServletResponse response) {
-		return generateURL(request, response, PDF_PROVIDE_PAGE);
-	}
+    public static String generateProvideURL(HttpServletRequest request,
+            HttpServletResponse response) {
+        return generateURL(request, response, PDF_PROVIDE_PAGE);
+    }
 
-	public static String generateErrorURL(HttpServletRequest request,
-			HttpServletResponse response) {
-		return generateURL(request, response, PDF_ERROR_PAGE);
-	}
+    public static String generateErrorURL(HttpServletRequest request,
+            HttpServletResponse response) {
+        return generateURL(request, response, PDF_ERROR_PAGE);
+    }
 
-	public static String generatePdfURL(HttpServletRequest request,
-			HttpServletResponse response) {
-		return generateURL(request, response, PDF_PDFDATA_PAGE);
-	}
+    public static String generatePdfURL(HttpServletRequest request,
+            HttpServletResponse response) {
+        return generateURL(request, response, PDF_PDFDATA_PAGE);
+    }
 
-	public static String generateNSPdfURL(HttpServletRequest request,
-										HttpServletResponse response) {
-		return generateURL(request, response, PDF_PDFDATAURL_PAGE);
-	}
+    public static String generateNSPdfURL(HttpServletRequest request,
+                                        HttpServletResponse response) {
+        return generateURL(request, response, PDF_PDFDATAURL_PAGE);
+    }
 
 
-	public static String generateUserEntryURL(String storeId) {
-		String publicURL = WebConfiguration.getPublicURL();
-		if (publicURL == null) {
-			log.error("To use this functionality "
-					+ WebConfiguration.PUBLIC_URL
-					+ " has to be configured in the web configuration");
-			return null;
-		}
+    public static String generateUserEntryURL(String storeId) {
+        String publicURL = WebConfiguration.getPublicURL();
+        if (publicURL == null) {
+            log.error("To use this functionality "
+                    + WebConfiguration.PUBLIC_URL
+                    + " has to be configured in the web configuration");
+            return null;
+        }
 
-		String baseURL = publicURL + PDF_USERENTRY_PAGE;
+        String baseURL = publicURL + PDF_USERENTRY_PAGE;
       return baseURL + "?" + UIEntryPointServlet.REQUEST_ID_PARAM + "="
               + URLEncoder.encode(storeId, StandardCharsets.UTF_8);
     }
 
-	public static String generateBKUURL(Connector connector) {
+    public static String generateBKUURL(Connector connector) {
       return switch (connector) {
-		case BKU -> WebConfiguration.getLocalBKUURL();
-		case ONLINEBKU -> WebConfiguration.getOnlineBKUURL();
+        case BKU -> WebConfiguration.getLocalBKUURL();
+        case ONLINEBKU -> WebConfiguration.getOnlineBKUURL();
         case MOBILEBKU -> WebConfiguration.getHandyBKUURL();
-		case SECLAYER20 -> WebConfiguration.getSecurityLayer20URL();
+        case SECLAYER20 -> WebConfiguration.getSecurityLayer20URL();
         default -> throw new IllegalStateException("Attempt to get BKU URL for connector: "+connector.name());
       };
     }
 
-	public static void setFromDataUrl(HttpServletRequest request) {
-		request.setAttribute(REQUEST_FROM_DU, (Boolean) true);
-	}
+    public static void setFromDataUrl(HttpServletRequest request) {
+        request.setAttribute(REQUEST_FROM_DU, (Boolean) true);
+    }
 
-	public static boolean getFromDataUrl(HttpServletRequest request) {
-		Object obj = request.getAttribute(REQUEST_FROM_DU);
-		if (obj != null) {
-			if (obj instanceof Boolean) {
-				return (Boolean) obj;
-			}
-		}
-		return false;
-	}
+    public static boolean getFromDataUrl(HttpServletRequest request) {
+        Object obj = request.getAttribute(REQUEST_FROM_DU);
+        if (obj != null) {
+            if (obj instanceof Boolean) {
+                return (Boolean) obj;
+            }
+        }
+        return false;
+    }
 
-	public static void setSignatureDataHash(HttpServletRequest request,
-			String value) {
-		HttpSession session = request.getSession();
-		session.setAttribute(SIGNATURE_DATA_HASH, value);
-	}
+    public static void setSignatureDataHash(HttpServletRequest request,
+            String value) {
+        HttpSession session = request.getSession();
+        session.setAttribute(SIGNATURE_DATA_HASH, value);
+    }
 
-	public static String getSignatureDataHash(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(SIGNATURE_DATA_HASH);
-		if (obj != null) {
-			return obj.toString();
-		}
-		return "";
-	}
+    public static String getSignatureDataHash(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(SIGNATURE_DATA_HASH);
+        if (obj != null) {
+            return obj.toString();
+        }
+        return "";
+    }
 
-	public static void setQRCodeContent(HttpServletRequest request, String value) {
-		HttpSession session = request.getSession();
-		session.setAttribute(QRCODE_CONTENT, value);
-	}
+    public static void setQRCodeContent(HttpServletRequest request, String value) {
+        HttpSession session = request.getSession();
+        session.setAttribute(QRCODE_CONTENT, value);
+    }
 
-	public static String getQRCodeContent(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(QRCODE_CONTENT);
-		if (obj != null) {
-			return obj.toString();
-		}
-		return null;
-	}
+    public static String getQRCodeContent(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(QRCODE_CONTENT);
+        if (obj != null) {
+            return obj.toString();
+        }
+        return null;
+    }
 
-	public static void setPDFFileName(HttpServletRequest request, String value) {
-		HttpSession session = request.getSession();
-		session.setAttribute(PDF_FILE_NAME, value);
-	}
+    public static void setPDFFileName(HttpServletRequest request, String value) {
+        HttpSession session = request.getSession();
+        session.setAttribute(PDF_FILE_NAME, value);
+    }
 
-	public static String getPDFFileName(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_FILE_NAME);
-		if (obj != null) {
-			return obj.toString();
-		}
-		return DEFAULT_RESULT_FILENAME;
-	}
+    public static String getPDFFileName(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_FILE_NAME);
+        if (obj != null) {
+            return obj.toString();
+        }
+        return DEFAULT_RESULT_FILENAME;
+    }
 
-	public static void addSignedDocumentToResult(HttpServletRequest request, SignedDocument signPdfDoc, 
-	    String requestId, String transactionId) {
-	  PdfasSignResponse fullResponse = getPdfSigningResponse(request);
-	  
-	  if (fullResponse == null) {	    
-	    setPdfSigningResponse(request,
-	        PdfasSignResponse.builder()
-	        .requestId(requestId)
-	        .transactionId(transactionId)
-	        .signedPdf(signPdfDoc).build());
-	    
-	  } else {
-	    setPdfSigningResponse(request,
-	        fullResponse.toBuilder().signedPdf(signPdfDoc).build());
-	    
-	  }	   	
-	}
-	
-	public static void setPdfSigningResponse(HttpServletRequest request, PdfasSignResponse response) {
-	  HttpSession session = request.getSession();
-	  session.setAttribute(PDF_SIGNING_RESPONSE, response);
-	      
-	}
-	
-	public static PdfasSignResponse getPdfSigningResponse(HttpServletRequest request) {
-	  HttpSession session = request.getSession();
-	  Object obj = session.getAttribute(PDF_SIGNING_RESPONSE);
+    public static void addSignedDocumentToResult(HttpServletRequest request, SignedDocument signPdfDoc, 
+        String requestId, String transactionId) {
+      PdfasSignResponse fullResponse = getPdfSigningResponse(request);
+      
+      if (fullResponse == null) {        
+        setPdfSigningResponse(request,
+            PdfasSignResponse.builder()
+            .requestId(requestId)
+            .transactionId(transactionId)
+            .signedPdf(signPdfDoc).build());
+        
+      } else {
+        setPdfSigningResponse(request,
+            fullResponse.toBuilder().signedPdf(signPdfDoc).build());
+        
+      }           
+    }
+    
+    public static void setPdfSigningResponse(HttpServletRequest request, PdfasSignResponse response) {
+      HttpSession session = request.getSession();
+      session.setAttribute(PDF_SIGNING_RESPONSE, response);
+          
+    }
+    
+    public static PdfasSignResponse getPdfSigningResponse(HttpServletRequest request) {
+      HttpSession session = request.getSession();
+      Object obj = session.getAttribute(PDF_SIGNING_RESPONSE);
     if (obj != null && obj instanceof PdfasSignResponse) {
       return (PdfasSignResponse) obj;
       
     }
-	  
-	  return null;
-	  	 
-	}
-	
-	public static void setVerificationLevel(HttpServletRequest request,
-			SignatureVerificationLevel lvl) {
-		HttpSession session = request.getSession();
-		session.setAttribute(PDF_VER_LEVEL, lvl);
-	}
+      
+      return null;
+           
+    }
+    
+    public static void setVerificationLevel(HttpServletRequest request,
+            SignatureVerificationLevel lvl) {
+        HttpSession session = request.getSession();
+        session.setAttribute(PDF_VER_LEVEL, lvl);
+    }
 
-	public static SignatureVerificationLevel getVerificationLevel(
-			HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(PDF_VER_LEVEL);
-		if (obj != null && obj instanceof SignatureVerificationLevel) {
-			return (SignatureVerificationLevel) obj;
-		}
-		return SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION;
-	}
+    public static SignatureVerificationLevel getVerificationLevel(
+            HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(PDF_VER_LEVEL);
+        if (obj != null && obj instanceof SignatureVerificationLevel) {
+            return (SignatureVerificationLevel) obj;
+        }
+        return SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION;
+    }
 
-	public static void setVerificationResult(HttpServletRequest request,
-			List<VerifyResult> value) {
-		HttpSession session = request.getSession();
-		session.setAttribute(VERIFICATION_RESULT, value);
-	}
+    public static void setVerificationResult(HttpServletRequest request,
+            List<VerifyResult> value) {
+        HttpSession session = request.getSession();
+        session.setAttribute(VERIFICATION_RESULT, value);
+    }
 
-	@SuppressWarnings("unchecked")
-	public static List<VerifyResult> getVerificationResult(
-			HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Object obj = session.getAttribute(VERIFICATION_RESULT);
-		if (obj != null) {
-			try {
-				if (!(obj instanceof List<?>)) {
-					log.warn("Invalid object type");
-					return null;
-				}
-				return (List<VerifyResult>) obj;
-			} catch (Throwable e) {
-				log.warn("Invalid object type");
-			}
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    public static List<VerifyResult> getVerificationResult(
+            HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute(VERIFICATION_RESULT);
+        if (obj != null) {
+            try {
+                if (!(obj instanceof List<?>)) {
+                    log.warn("Invalid object type");
+                    return null;
+                }
+                return (List<VerifyResult>) obj;
+            } catch (Throwable e) {
+                log.warn("Invalid object type");
+            }
+        }
+        return null;
+    }
 
-	public static String getVersion() {
-		return PdfAsFactory.getVersion();
-	}
+    public static String getVersion() {
+        return PdfAsFactory.getVersion();
+    }
 
-	public static String getSCMRevision() {
-		return PdfAsFactory.getSCMRevision();
-	}
-	
-	public static void buildSL20RedirectResponse(HttpServletRequest request, HttpServletResponse response, String transactionId, String callURL) throws IOException, SL20Exception {		
-		//create response 
-		Map<String, String> reqParameters = UrlParameterExtractor.splitQuery(new URL(callURL));
-		
-		//extract URL without parameters
-		String url;
-		int paramIndex = callURL.indexOf("?");
-		if (paramIndex == -1)
-			url = callURL;
-		else
-			url = callURL.substring(0, paramIndex);
-		
-		JsonObject callReqParams = SL20JSONBuilderUtils.createCallCommandParameters(
-				url, 
-				SL20Constants.SL20_COMMAND_PARAM_GENERAL_CALL_METHOD_GET, 
-				false, 
-				reqParameters);
-		JsonObject callCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_CALL, callReqParams);
-		
-		//build first redirect command for app
-		JsonObject redirectOneParams = SL20JSONBuilderUtils.createRedirectCommandParameters(
-				null, 
-				callCommand, null, true);
-		JsonObject redirectOneCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_REDIRECT, redirectOneParams);
-						
-		//build second redirect command for IDP
-		JsonObject redirectTwoParams = SL20JSONBuilderUtils.createRedirectCommandParameters(
-				callURL, 
-				redirectOneCommand, null, false);
-		JsonObject redirectTwoCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_REDIRECT, redirectTwoParams);
-		
-		//build generic SL2.0 response container								
-		JsonObject respContainer = SL20JSONBuilderUtils.createGenericRequest(
-				UUID.randomUUID().toString(), 
-				transactionId, 
-				redirectTwoCommand, 
-				null); 
-		
-		log.trace("SL2.0 command: " + respContainer.toString());
-		
-		//workaround for A-Trust
-		if (request.getHeader(SL20Constants.HTTP_HEADER_SL20_CLIENT_TYPE) != null && 
-				request.getHeader(SL20Constants.HTTP_HEADER_SL20_CLIENT_TYPE).equals(SL20Constants.HTTP_HEADER_VALUE_NATIVE)
-					|| true) {					
-			log.debug("Client request containts 'native client' header ... ");
-			log.trace("SL20 response to VDA: " + respContainer);
-			StringWriter writer = new StringWriter();
-			writer.write(respContainer.toString());						
-			final byte[] content = writer.toString().getBytes(StandardCharsets.UTF_8);
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentLength(content.length);
-			response.setContentType(ContentType.APPLICATION_JSON.toString());						
-			response.getOutputStream().write(content);
-			
-			
-		} else {
-			log.info("SL2.0 DataURL communication needs http header: '" + SL20Constants.HTTP_HEADER_SL20_CLIENT_TYPE + "'");
-			throw new SL20Exception("sl20.06");
-			
-		}
-	}
+    public static String getSCMRevision() {
+        return PdfAsFactory.getSCMRevision();
+    }
+    
+    public static void buildSL20RedirectResponse(HttpServletRequest request, HttpServletResponse response, String transactionId, String callURL) throws IOException, SL20Exception {        
+        //create response 
+        Map<String, String> reqParameters = UrlParameterExtractor.splitQuery(new URL(callURL));
+        
+        //extract URL without parameters
+        String url;
+        int paramIndex = callURL.indexOf("?");
+        if (paramIndex == -1)
+            url = callURL;
+        else
+            url = callURL.substring(0, paramIndex);
+        
+        JsonObject callReqParams = SL20JSONBuilderUtils.createCallCommandParameters(
+                url, 
+                SL20Constants.SL20_COMMAND_PARAM_GENERAL_CALL_METHOD_GET, 
+                false, 
+                reqParameters);
+        JsonObject callCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_CALL, callReqParams);
+        
+        //build first redirect command for app
+        JsonObject redirectOneParams = SL20JSONBuilderUtils.createRedirectCommandParameters(
+                null, 
+                callCommand, null, true);
+        JsonObject redirectOneCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_REDIRECT, redirectOneParams);
+                        
+        //build second redirect command for IDP
+        JsonObject redirectTwoParams = SL20JSONBuilderUtils.createRedirectCommandParameters(
+                callURL, 
+                redirectOneCommand, null, false);
+        JsonObject redirectTwoCommand = SL20JSONBuilderUtils.createCommand(SL20Constants.SL20_COMMAND_IDENTIFIER_REDIRECT, redirectTwoParams);
+        
+        //build generic SL2.0 response container                                
+        JsonObject respContainer = SL20JSONBuilderUtils.createGenericRequest(
+                UUID.randomUUID().toString(), 
+                transactionId, 
+                redirectTwoCommand, 
+                null); 
+        
+        log.trace("SL2.0 command: " + respContainer.toString());
+        
+        //workaround for A-Trust
+        if (request.getHeader(SL20Constants.HTTP_HEADER_SL20_CLIENT_TYPE) != null && 
+                request.getHeader(SL20Constants.HTTP_HEADER_SL20_CLIENT_TYPE).equals(SL20Constants.HTTP_HEADER_VALUE_NATIVE)
+                    || true) {                    
+            log.debug("Client request containts 'native client' header ... ");
+            log.trace("SL20 response to VDA: " + respContainer);
+            StringWriter writer = new StringWriter();
+            writer.write(respContainer.toString());                        
+            final byte[] content = writer.toString().getBytes(StandardCharsets.UTF_8);
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentLength(content.length);
+            response.setContentType(ContentType.APPLICATION_JSON.toString());                        
+            response.getOutputStream().write(content);
+            
+            
+        } else {
+            log.info("SL2.0 DataURL communication needs http header: '" + SL20Constants.HTTP_HEADER_SL20_CLIENT_TYPE + "'");
+            throw new SL20Exception("sl20.06");
+            
+        }
+    }
 
-	private static boolean anyNull(Object... any) {
-		return (Arrays.stream(any).anyMatch(Objects::isNull));
-	}
+    private static boolean anyNull(Object... any) {
+        return (Arrays.stream(any).anyMatch(Objects::isNull));
+    }
 
-	public static void checkConnectorSupported(Connector connector, String keyIdentifier) throws PdfAsWebException {
-		if (connector == null) {
-			throw new PdfAsWebException("Invalid or unknown connector value");
-		} else if (connector == Connector.BKU) {
-			if (!WebConfiguration.getLocalBKUEnabled()) {
-				throw new PdfAsWebException("Connector bku is not enabled in configuration");
-			}
-			if (WebConfiguration.getLocalBKUURL() == null) {
-				throw new PdfAsWebException("Connector bku is not properly configured");
-			}
-		} else if (connector == Connector.ONLINEBKU) {
-			if (!WebConfiguration.getOnlineBKUEnabled()) {
-				throw new PdfAsWebException("Connector onlinebku is not enabled in configuration");
-			}
-			if (WebConfiguration.getOnlineBKUURL() == null) {
-				throw new PdfAsWebException("Connector onlinebku is not properly configured");
-			}
-		} else if (connector == Connector.MOBILEBKU) {
-			if (!WebConfiguration.getMobileBKUEnabled()) {
-				throw new PdfAsWebException("Connector mobilebku is not enabled in configuration");
-			}
-			if (WebConfiguration.getHandyBKUURL() == null) {
-				throw new PdfAsWebException("Connector mobilebku is not properly configured");
-			}
-		} else if (connector == Connector.SECLAYER20) {
-			if (!WebConfiguration.getSL20Enabled()) {
-				throw new PdfAsWebException("Connector sl20 is not enabled in configuration");
-			}
-			if (WebConfiguration.getSecurityLayer20URL() == null) {
-				throw new PdfAsWebException("Connector sl20 is not properly configured");
-			}
-		} else if (connector == Connector.MOA) {
-			if (keyIdentifier != null) {
-				if (!WebConfiguration.isMoaEnabled(keyIdentifier)) {
-					throw new PdfAsWebException("Connector moa[keyId="+keyIdentifier+"] is not enabled in configuration");
-				}
-			} else {
-				if (!WebConfiguration.getMOASSEnabled()) {
-					throw new PdfAsWebException("Connector moa[default] is not enabled in configuration");
-				}
-			}
-		} else if (connector == Connector.JKS) {
-			if (keyIdentifier != null) {
-				if (!WebConfiguration.getKeystoreEnabled(keyIdentifier)) {
-					throw new PdfAsWebException("Connector jks[keyId="+keyIdentifier+"] is not enabled in configuration");
-				}
-				if (
-					anyNull(
-						WebConfiguration.getKeystoreFile(keyIdentifier),
-						WebConfiguration.getKeystoreAlias(keyIdentifier),
-						WebConfiguration.getKeystorePass(keyIdentifier),
-						WebConfiguration.getKeystoreKeyPass(keyIdentifier),
-						WebConfiguration.getKeystoreType(keyIdentifier)))
-				{
-					throw new PdfAsWebException("Connector jks[keyId="+keyIdentifier+"] is not properly configured");
-				}
-			} else {
-				if (!WebConfiguration.getKeystoreDefaultEnabled()) {
-					throw new PdfAsWebException("Connector jks[default] is not enabled in configuration");
-				}
-				if (
-					anyNull(
-						WebConfiguration.getKeystoreDefaultFile(),
-						WebConfiguration.getKeystoreDefaultAlias(),
-						WebConfiguration.getKeystoreDefaultPass(),
-						WebConfiguration.getKeystoreDefaultKeyPass(),
-						WebConfiguration.getKeystoreDefaultType()))
-				{
-					throw new PdfAsWebException("Connector jks[default] is not properly configured");
-				}
-			}
-		}
-	}
+    public static void checkConnectorSupported(Connector connector, String keyIdentifier) throws PdfAsWebException {
+        if (connector == null) {
+            throw new PdfAsWebException("Invalid or unknown connector value");
+        } else if (connector == Connector.BKU) {
+            if (!WebConfiguration.getLocalBKUEnabled()) {
+                throw new PdfAsWebException("Connector bku is not enabled in configuration");
+            }
+            if (WebConfiguration.getLocalBKUURL() == null) {
+                throw new PdfAsWebException("Connector bku is not properly configured");
+            }
+        } else if (connector == Connector.ONLINEBKU) {
+            if (!WebConfiguration.getOnlineBKUEnabled()) {
+                throw new PdfAsWebException("Connector onlinebku is not enabled in configuration");
+            }
+            if (WebConfiguration.getOnlineBKUURL() == null) {
+                throw new PdfAsWebException("Connector onlinebku is not properly configured");
+            }
+        } else if (connector == Connector.MOBILEBKU) {
+            if (!WebConfiguration.getMobileBKUEnabled()) {
+                throw new PdfAsWebException("Connector mobilebku is not enabled in configuration");
+            }
+            if (WebConfiguration.getHandyBKUURL() == null) {
+                throw new PdfAsWebException("Connector mobilebku is not properly configured");
+            }
+        } else if (connector == Connector.SECLAYER20) {
+            if (!WebConfiguration.getSL20Enabled()) {
+                throw new PdfAsWebException("Connector sl20 is not enabled in configuration");
+            }
+            if (WebConfiguration.getSecurityLayer20URL() == null) {
+                throw new PdfAsWebException("Connector sl20 is not properly configured");
+            }
+        } else if (connector == Connector.MOA) {
+            if (keyIdentifier != null) {
+                if (!WebConfiguration.isMoaEnabled(keyIdentifier)) {
+                    throw new PdfAsWebException("Connector moa[keyId="+keyIdentifier+"] is not enabled in configuration");
+                }
+            } else {
+                if (!WebConfiguration.getMOASSEnabled()) {
+                    throw new PdfAsWebException("Connector moa[default] is not enabled in configuration");
+                }
+            }
+        } else if (connector == Connector.JKS) {
+            if (keyIdentifier != null) {
+                if (!WebConfiguration.getKeystoreEnabled(keyIdentifier)) {
+                    throw new PdfAsWebException("Connector jks[keyId="+keyIdentifier+"] is not enabled in configuration");
+                }
+                if (
+                    anyNull(
+                        WebConfiguration.getKeystoreFile(keyIdentifier),
+                        WebConfiguration.getKeystoreAlias(keyIdentifier),
+                        WebConfiguration.getKeystorePass(keyIdentifier),
+                        WebConfiguration.getKeystoreKeyPass(keyIdentifier),
+                        WebConfiguration.getKeystoreType(keyIdentifier)))
+                {
+                    throw new PdfAsWebException("Connector jks[keyId="+keyIdentifier+"] is not properly configured");
+                }
+            } else {
+                if (!WebConfiguration.getKeystoreDefaultEnabled()) {
+                    throw new PdfAsWebException("Connector jks[default] is not enabled in configuration");
+                }
+                if (
+                    anyNull(
+                        WebConfiguration.getKeystoreDefaultFile(),
+                        WebConfiguration.getKeystoreDefaultAlias(),
+                        WebConfiguration.getKeystoreDefaultPass(),
+                        WebConfiguration.getKeystoreDefaultKeyPass(),
+                        WebConfiguration.getKeystoreDefaultType()))
+                {
+                    throw new PdfAsWebException("Connector jks[default] is not properly configured");
+                }
+            }
+        }
+    }
 
 }

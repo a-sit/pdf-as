@@ -51,86 +51,86 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ProvidePDFServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	
-	private static final String PDF_DATA_URL = "##PDFDATAURL##";
-	
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public ProvidePDFServlet() {
-		super();
-	}
+    private static final long serialVersionUID = 1L;
+    
+    private static final String PDF_DATA_URL = "##PDFDATAURL##";
+    
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public ProvidePDFServlet() {
+        super();
+    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		this.process(request, response);
-	}
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
+     */
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        this.process(request, response);
+    }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		this.process(request, response);
-	}
+    /**
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+     *      response)
+     */
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        this.process(request, response);
+    }
 
-	protected void process(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		try {
-			String invokeURL = PdfAsHelper.getInvokeURL(request, response);
+    protected void process(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        try {
+            String invokeURL = PdfAsHelper.getInvokeURL(request, response);
 
-			if (invokeURL == null || !WebConfiguration.isProvidePdfURLinWhitelist(invokeURL)) {
-				
-				if(invokeURL != null) {
-					log.warn(invokeURL + " is not allowed by whitelist");
-				}
-				
-				if (PdfAsHelper.getResponseMode(request, response).equals(PdfAsHelper.PDF_RESPONSE_MODES.htmlform)) {								
-					String template = PdfAsHelper.getProvideTemplate();
-					template = template.replace(PDF_DATA_URL, PdfAsHelper.generatePdfURL(request, response));
-					// Deliver to Browser directly!
-					response.setContentType("text/html");
-					response.getWriter().write(template);
-					response.getWriter().close();
-					
-				} else {
-					log.debug("PDFResult directMode: Forward to PDFData Servlet directly");
-					RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/PDFData");
-					dispatcher.forward(request, response);
-								
-				}
-					
-			} else {			  
-			  List<SignedDocument> signedPdfs = PdfAsHelper.getPdfSigningResponse(request).getSignedPdfs();
-			  
-			  if (signedPdfs.isEmpty()) {
-			    log.info("No signed pdf document available.");
-		      PdfAsHelper.setSessionException(request, response,
-		          "No signed pdf document available.", null);
-		      PdfAsHelper.gotoError(getServletContext(), request, response);  
-			    
-			  } else if (signedPdfs.size() == 1) {
-			    provideSingleFile(request, response, signedPdfs.get(0), invokeURL);
-			    
-			    
-			  } else {
-			    provideTokenToGetMultipleFiles(request, response, invokeURL);
-			    
-			  }			 
-			}
-			
-		} catch (Exception e) {
-			PdfAsHelper.setSessionException(request, response, e.getMessage(), e);
-			PdfAsHelper.gotoError(getServletContext(), request, response);
-			
-		}
-	}
+            if (invokeURL == null || !WebConfiguration.isProvidePdfURLinWhitelist(invokeURL)) {
+                
+                if(invokeURL != null) {
+                    log.warn(invokeURL + " is not allowed by whitelist");
+                }
+                
+                if (PdfAsHelper.getResponseMode(request, response).equals(PdfAsHelper.PDF_RESPONSE_MODES.htmlform)) {                                
+                    String template = PdfAsHelper.getProvideTemplate();
+                    template = template.replace(PDF_DATA_URL, PdfAsHelper.generatePdfURL(request, response));
+                    // Deliver to Browser directly!
+                    response.setContentType("text/html");
+                    response.getWriter().write(template);
+                    response.getWriter().close();
+                    
+                } else {
+                    log.debug("PDFResult directMode: Forward to PDFData Servlet directly");
+                    RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/PDFData");
+                    dispatcher.forward(request, response);
+                                
+                }
+                    
+            } else {              
+              List<SignedDocument> signedPdfs = PdfAsHelper.getPdfSigningResponse(request).getSignedPdfs();
+              
+              if (signedPdfs.isEmpty()) {
+                log.info("No signed pdf document available.");
+              PdfAsHelper.setSessionException(request, response,
+                  "No signed pdf document available.", null);
+              PdfAsHelper.gotoError(getServletContext(), request, response);  
+                
+              } else if (signedPdfs.size() == 1) {
+                provideSingleFile(request, response, signedPdfs.get(0), invokeURL);
+                
+                
+              } else {
+                provideTokenToGetMultipleFiles(request, response, invokeURL);
+                
+              }             
+            }
+            
+        } catch (Exception e) {
+            PdfAsHelper.setSessionException(request, response, e.getMessage(), e);
+            PdfAsHelper.gotoError(getServletContext(), request, response);
+            
+        }
+    }
 
   private void provideTokenToGetMultipleFiles(HttpServletRequest request, HttpServletResponse response,
       String invokeURL) throws IOException, PdfAsStoreException {

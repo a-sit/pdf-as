@@ -37,7 +37,6 @@ import at.gv.egiz.pdfas.lib.impl.configuration.ConfigurationImpl;
 import at.gv.egiz.pdfas.lib.impl.configuration.GlobalConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
-import at.gv.egiz.pdfas.lib.util.TimedFunction;
 import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NonNull;
@@ -72,15 +71,10 @@ public class OperationStatus implements Serializable {
     private final PDFASBackend backend = BackendLoader.getPDFASBackend((ConfigurationImpl)this.configuration);
 	@Getter
     private final Map<String, String> metaInformations = new HashMap<String, String>();
-    @Getter
-    private final TimedFunction.Context signTimer;
 
-//	private HashMap<String, String> requestParameters = new HashMap<String, String>();
-
-	public OperationStatus(ISettings configuration, SignParameter signParameter, TimedFunction.Context timer) throws PDFASError {
+	public OperationStatus(ISettings configuration, SignParameter signParameter) throws PDFASError {
 		this.configuration = configuration;
 		this.signParamter = signParameter;
-        this.signTimer = timer;
 		if (configuration instanceof Configuration config) {
 			backend = BackendLoader.getPDFASBackend(config);
 		} else {

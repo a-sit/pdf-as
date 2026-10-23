@@ -92,9 +92,6 @@ dependencies {
 	api group: 'org.slf4j', name: 'jcl-over-slf4j', version: slf4jVersion	
 	api group: 'com.google.zxing', name: 'core', version: zxingVersion
 	api group: 'com.google.zxing', name: 'javase', version: zxingVersion
-
-    api platform(group: 'io.micrometer', name: 'micrometer-bom', version: micrometerVersion)
-    api 'io.micrometer:micrometer-core'
 	
 	ws group: 'org.apache.cxf', name: 'cxf-tools', version: cxfVersion
 	ws group: 'org.apache.cxf', name: 'cxf-tools-wsdlto-databinding-jaxb', version: cxfVersion

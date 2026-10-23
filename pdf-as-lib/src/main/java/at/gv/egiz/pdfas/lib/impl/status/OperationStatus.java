@@ -28,11 +28,9 @@ import java.util.Map;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.backend.PDFASBackend;
 import at.gv.egiz.pdfas.lib.impl.backend.BackendLoader;
-import at.gv.egiz.pdfas.lib.impl.configuration.ConfigurationImpl;
 import at.gv.egiz.pdfas.lib.impl.configuration.GlobalConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
@@ -62,14 +60,15 @@ public class OperationStatus {
     @Setter
     @Getter
     private RequestedSignature requestedSignature;
-    @Getter(lazy = true)
+    @Getter
     @Transient
-    private final PDFASBackend backend = BackendLoader.getPDFASBackend(this.signParameter.getConfiguration());
+    private final PDFASBackend backend;
     @Getter
     private final Map<String, String> metaInformations = new HashMap<String, String>();
 
     public OperationStatus(SignParameter signParameter) throws PDFASError {
         this.signParameter = signParameter;
+        this.backend = BackendLoader.getPDFASBackend(signParameter.getConfiguration());
     }
 
     // ========================================================================

@@ -226,7 +226,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       // execute pre Processors
       signPreProcessing(parameter);
 
-      status = new OperationStatus(parameter.getConfiguration(), parameter);
+      status = new OperationStatus(parameter);
 
       final IPdfSigner signer = status.getBackend().getPdfSigner();
 
@@ -377,6 +377,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   }
 
   private void listPreProcessors(List<PreProcessor> preProcessors) {
+    if (!logger.isDebugEnabled()) return;
     logger.debug("--------------");
     logger.debug("Listing PreProcessors:");
 
@@ -393,8 +394,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
   private void verifyPreProcessing(VerifyParameter parameter)
       throws PDFASError {
-    final List<PreProcessor> preProcessors = PreProcessorLoader
-        .getPreProcessors(parameter.getConfiguration());
+    final List<PreProcessor> preProcessors = PreProcessorLoader.getPreProcessors();
 
     listPreProcessors(preProcessors);
 
@@ -412,8 +412,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   }
 
   private void signPreProcessing(SignParameter parameter) throws PDFASError {
-    final List<PreProcessor> preProcessors = PreProcessorLoader
-        .getPreProcessors(parameter.getConfiguration());
+    final List<PreProcessor> preProcessors = PreProcessorLoader.getPreProcessors();
 
     listPreProcessors(preProcessors);
 
@@ -445,7 +444,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
         iaikCert = (X509Certificate) cert;
       }
 
-      status = new OperationStatus(parameter, null);
+      status = new OperationStatus(parameter);
 
       final IPdfSigner<?, ?> signer = status.getBackend().getPdfSigner();
 

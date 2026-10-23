@@ -36,8 +36,7 @@ public class SignatureProfileConfiguration extends SpecificBaseConfiguration
 	
 	protected String profileID;
 
-	public SignatureProfileConfiguration(ISettings configuration, 
-			String profileID) {
+	public SignatureProfileConfiguration(ISettings configuration, String profileID) {
 		super(configuration);
 		this.profileID = profileID;
 	}

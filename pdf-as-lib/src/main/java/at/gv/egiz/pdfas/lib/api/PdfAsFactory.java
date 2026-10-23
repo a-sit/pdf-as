@@ -27,7 +27,6 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsValidationException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
-import at.gv.egiz.pdfas.lib.configuration.ConfigurationValidator;
 import at.gv.egiz.pdfas.lib.impl.PdfAsImpl;
 import at.gv.egiz.pdfas.lib.impl.SignParameterImpl;
 import at.gv.egiz.pdfas.lib.impl.VerifyParameterImpl;
@@ -58,8 +57,6 @@ import java.net.URLClassLoader;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Enumeration;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -400,7 +397,7 @@ public class PdfAsFactory implements IConfigurationConstants {
      * @throws PdfAsSettingsValidationException 
      */
     public static void validateConfiguration(ISettings configuration) throws PdfAsSettingsValidationException{
-        Iterable<@NonNull ConfigurationValidator> availableValidators = ConfigValidatorLoader.getAvailableValidators();
+        val availableValidators = ConfigValidatorLoader.getAvailableValidators();
         var it = availableValidators.iterator();
         if (!it.hasNext()) {
             logger.info("No configuration validators available");

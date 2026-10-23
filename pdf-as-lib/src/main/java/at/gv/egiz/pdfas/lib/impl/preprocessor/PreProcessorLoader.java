@@ -30,5 +30,5 @@ public class PreProcessorLoader {
     }
 
     @Getter(lazy = true)
-    private final List<PreProcessor> preProcessors = loadPreProcessors();
+    private static final List<PreProcessor> preProcessors = loadPreProcessors();
 }

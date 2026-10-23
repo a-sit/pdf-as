@@ -3,7 +3,6 @@ package at.gv.egiz.pdfas.web.store;
 import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
-import io.micrometer.core.instrument.Statistic;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;

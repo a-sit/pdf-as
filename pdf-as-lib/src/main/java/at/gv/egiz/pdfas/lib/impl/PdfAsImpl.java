@@ -35,7 +35,6 @@ import java.util.concurrent.CompletionStage;
 
 import at.gv.egiz.pdfas.lib.api.sign.IAsyncSigner;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
-import at.gv.egiz.pdfas.lib.util.TimedFunction;
 import jakarta.activation.DataSource;
 import lombok.NonNull;
 import lombok.val;
@@ -195,30 +194,23 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     }
   }
 
-  private final TimedFunction verifyTimer = new TimedFunction("pdfas.verify");
   @Override
   public @NonNull List<@NonNull VerifyResult> verify(@NonNull VerifyParameter parameter, @NonNull DataSource document)
       throws PDFASError {
 
-    return verifyTimer.timed(() -> {
-        verifyVerifyParameter(parameter);
+    verifyVerifyParameter(parameter);
 
-        // execute pre Processors
-        verifyPreProcessing(parameter);
+    // execute pre Processors
+    verifyPreProcessing(parameter);
 
-        // allocated Backend
-        final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
+    // allocated Backend
+    final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
 
-        if (backend == null) {
-            throw new PDFASError(ERROR_NO_BACKEND);
-        }
-
-        try {
-            return backend.getVerifier().verify(parameter, document);
-        } catch (final Throwable e) {
-            throw ErrorExtractor.searchPdfAsError(e, null);
-        }
-    });
+    try {
+        return backend.getVerifier().verify(parameter, document);
+    } catch (final Throwable e) {
+        throw ErrorExtractor.searchPdfAsError(e, null);
+    }
   }
 
   @Override
@@ -226,7 +218,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     return new ConfigurationImpl(this.settings);
   }
 
-  private final TimedFunction signTimer = new TimedFunction("pdfas.sign");
   @Override
   public @NonNull StatusRequestImpl.Stage1 startSign(
       @NonNull SignParameter parameter, @NonNull DataSource document) throws PDFASError
@@ -243,7 +234,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       // execute pre Processors
       signPreProcessing(parameter);
 
-      status = new OperationStatus(config, parameter, signTimer.start());
+      status = new OperationStatus(config, parameter);
 
       final IPdfSigner signer = status.getBackend().getPdfSigner();
 
@@ -254,7 +245,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
       return StatusRequestImpl.create(this, status);
     } catch (final Throwable e) {
-      if (status != null) status.getSignTimer().finishFailure(e);
       logger.warn("startSign", e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     }
@@ -315,7 +305,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       request.setByteRange(byteRange);
 
     } catch (final Throwable e) {
-        status.getSignTimer().finishFailure(e);
         logger.warn("process", e);
         throw ErrorExtractor.searchPdfAsError(e, status);
 
@@ -358,7 +347,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
         status.getPdfObject().getSignedDocument()[offset + i] = pdfSignature[i];
       }
     } catch (final Throwable e) {
-      status.getSignTimer().finishFailure(e);
       throw e;
     }
   }
@@ -385,11 +373,9 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
           status.getRequestedSignature().getSignaturePosition(),
           status.getMetaInformations()
       );
-      status.getSignTimer().finishSuccess();
       return signResult;
     } catch (final IOException e) {
       // new PdfAsException("error.pdf.sig.06", e);
-      status.getSignTimer().finishFailure(e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     } finally {
       if (status != null) {

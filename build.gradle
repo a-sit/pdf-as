@@ -77,7 +77,6 @@ allprojects {
 		zxingVersion = '3.5.0'
 		ognlVersion = '3.4.6'
 		jsonVersion = '20260814'
-		micrometerVersion = '1.17.2'
 		springBootVersion = '4.1.2'
 		springBootAdminVersion = '4.1.5'
 		junit4Version = '4.13.2'

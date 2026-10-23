@@ -28,12 +28,7 @@ import java.util.List;
 
 public class SLPdfAsException extends PdfAsException {
 
-  private static final List<Integer> ERRORCODES_ON_INFO_LEVEL = Arrays.asList(6000, 6001, 6002); 
-  
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1261346424827136327L;
+  private static final List<Integer> ERRORCODES_ON_INFO_LEVEL = Arrays.asList(6000, 6001, 6002);
 
 	private int code;
 	private String info;

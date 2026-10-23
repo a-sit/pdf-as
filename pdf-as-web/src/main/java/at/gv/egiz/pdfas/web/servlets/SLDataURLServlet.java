@@ -40,8 +40,6 @@ public class SLDataURLServlet extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(SLDataURLServlet.class);
-	
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()

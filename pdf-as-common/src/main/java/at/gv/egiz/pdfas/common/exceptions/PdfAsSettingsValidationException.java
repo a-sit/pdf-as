@@ -32,11 +32,6 @@ package at.gv.egiz.pdfas.common.exceptions;
  */
 public class PdfAsSettingsValidationException extends PdfAsException {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3277787631624822104L;
-
 
 	public PdfAsSettingsValidationException(String msgId) {
         super(msgId);

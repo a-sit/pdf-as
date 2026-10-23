@@ -25,11 +25,6 @@ import org.springframework.stereotype.Component;
 @ServletRegistration(urlMappings = "/Reload")
 public class ReloadServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6108555300743896727L;
-
 	public static final String PARAM_PASSWD = "PASSWD";
 	
 	private final PdfAsWebSpringConfiguration config;

@@ -10,9 +10,6 @@ import at.gv.egiz.pdfas.common.messages.ErrorCodeResolver;
  */
 public class PDFASError extends Exception implements ErrorConstants {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 1233586898708485346L;
-
 	/** The code. */
 	private long code;
 

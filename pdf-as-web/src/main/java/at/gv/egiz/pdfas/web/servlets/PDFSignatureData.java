@@ -41,8 +41,6 @@ import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 
 public class PDFSignatureData extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
-
 	private static final Logger logger = LoggerFactory
 			.getLogger(PDFSignatureData.class);
 

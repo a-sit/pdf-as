@@ -28,8 +28,6 @@ import at.gv.egiz.pdfas.web.helper.QRCodeGenerator;
 
 public class PlaceholderGeneratorServlet extends HttpServlet implements PlaceholderExtractorConstants {
 
-	private static final long serialVersionUID = -5854130802422496977L;
-
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_PROFILE = "profile";
 	public static final String PARAM_LANG = "lang";

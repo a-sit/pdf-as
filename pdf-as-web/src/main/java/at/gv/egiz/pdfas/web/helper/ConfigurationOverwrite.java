@@ -1,35 +1,27 @@
 package at.gv.egiz.pdfas.web.helper;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 
+@Slf4j
 public class ConfigurationOverwrite {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ConfigurationOverwrite.class);
-
-	public static void overwriteConfiguration(Map<String, String> overwrite,
-			Configuration config) {
-		if (WebConfiguration.isAllowExtOverwrite() && overwrite != null && config != null) {
-			Iterator<Entry<String, String>> entryIt = overwrite.entrySet()
-					.iterator();
-			while (entryIt.hasNext()) {
-				Entry<String, String> entry = entryIt.next();
-				if (WebConfiguration.isOverwriteAllowed(entry.getKey())) {
-					config.setValue(entry.getKey(), entry.getValue());
-				} else {
-					logger.warn(
-							"External component tried to overwrite cfg {}. This is not in the whitelist!",
-							entry.getKey());
-				}
-			}
-		}
-	}
+    public static void overwriteConfiguration(Map<String, String> overwrite, Configuration config) {
+        if (WebConfiguration.isAllowExtOverwrite() && overwrite != null && config != null) {
+          for (Entry<String, String> entry : overwrite.entrySet()) {
+            if (WebConfiguration.isOverwriteAllowed(entry.getKey())) {
+              config.setValue(entry.getKey(), entry.getValue());
+            } else {
+              log.warn(
+                  "External component tried to overwrite cfg {}. This is not in the whitelist!",
+                  entry.getKey());
+            }
+          }
+        }
+    }
 }

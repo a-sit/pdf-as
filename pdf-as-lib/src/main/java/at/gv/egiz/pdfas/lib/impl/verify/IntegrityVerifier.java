@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import at.gv.egiz.pdfas.common.settings.ISettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
-import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import iaik.asn1.ObjectID;
@@ -158,9 +158,7 @@ public class IntegrityVerifier implements IVerifier {
 		}
 	}
 
-	public void setConfiguration(Configuration config) {
-
-	}
+	public void setConfiguration(ISettings config) {}
 
 	@Override
 	public SignatureVerificationLevel getLevel() {

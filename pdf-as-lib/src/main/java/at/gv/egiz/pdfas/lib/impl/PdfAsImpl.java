@@ -90,13 +90,10 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
   private static void verifySignParameter(@NonNull SignParameter parameter) throws PDFASError {
     // Status initialization
-    if (!(parameter.getConfiguration() instanceof ISettings settings)) {
-      throw new PDFASError(ERROR_SET_INVALID_SETTINGS_OBJ);
-    }
 
     final String signatureProfile = parameter.getSignatureProfileId();
     if (signatureProfile != null) {
-      if (!settings.hasPrefix("sig_obj." + signatureProfile)) {
+      if (!parameter.getConfiguration().hasPrefix("sig_obj." + signatureProfile)) {
         throw new PDFASError(ERROR_SIG_INVALID_PROFILE,
             PDFASError.buildInfoString(ERROR_SIG_INVALID_PROFILE,
                 signatureProfile));
@@ -108,7 +105,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   private static void verifyVerifyParameter(@NonNull VerifyParameter parameter)
       throws PDFASError {
     // Status initialization
-    if (!(parameter.getConfiguration() instanceof ISettings)) {
+    if (parameter.getConfiguration() == null) {
       throw new PDFASError(ERROR_SET_INVALID_SETTINGS_OBJ);
     }
   }
@@ -226,15 +223,10 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     verifySignParameter(parameter);
     OperationStatus status = null;
     try {
-      // Status initialization
-      if (!(parameter.getConfiguration() instanceof ISettings config)) {
-        throw new PdfAsSettingsException("Invalid settings object!");
-      }
-
       // execute pre Processors
       signPreProcessing(parameter);
 
-      status = new OperationStatus(config, parameter);
+      status = new OperationStatus(parameter.getConfiguration(), parameter);
 
       final IPdfSigner signer = status.getBackend().getPdfSigner();
 
@@ -446,10 +438,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
     OperationStatus status = null;
     try {
-      // Status initialization
-      if (!(parameter.getConfiguration() instanceof ISettings config)) {
-        throw new PDFASError(ERROR_SET_INVALID_SETTINGS_OBJ);
-      }
       X509Certificate iaikCert;
       if (!(cert instanceof X509Certificate)) {
         iaikCert = new X509Certificate(cert.getEncoded());
@@ -457,7 +445,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
         iaikCert = (X509Certificate) cert;
       }
 
-      status = new OperationStatus(config, parameter, null);
+      status = new OperationStatus(parameter, null);
 
       final IPdfSigner<?, ?> signer = status.getBackend().getPdfSigner();
 

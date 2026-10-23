@@ -23,7 +23,6 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.status;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,15 +49,13 @@ public class OperationStatus {
     @Getter
     private PDFObject pdfObject;
 
-    private final ISettings configuration;
+    @Getter(lazy = true)
+    @Transient
+    private final @NonNull PlaceholderConfiguration placeholderConfiguration = new PlaceholderConfiguration(this.signParameter.getConfiguration());
 
     @Getter(lazy = true)
     @Transient
-    private final @NonNull PlaceholderConfiguration placeholderConfiguration = new PlaceholderConfiguration(this.configuration);
-
-    @Getter(lazy = true)
-    @Transient
-    private final @NonNull GlobalConfiguration globalConfiguration = new GlobalConfiguration(this.configuration);
+    private final @NonNull GlobalConfiguration globalConfiguration = new GlobalConfiguration(this.signParameter.getConfiguration());
 
     @Transient
     private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<>();
@@ -67,18 +64,12 @@ public class OperationStatus {
     private RequestedSignature requestedSignature;
     @Getter(lazy = true)
     @Transient
-    private final PDFASBackend backend = BackendLoader.getPDFASBackend((ConfigurationImpl)this.configuration);
+    private final PDFASBackend backend = BackendLoader.getPDFASBackend(this.signParameter.getConfiguration());
     @Getter
     private final Map<String, String> metaInformations = new HashMap<String, String>();
 
-    public OperationStatus(ISettings configuration, SignParameter signParameter) throws PDFASError {
-        this.configuration = configuration;
+    public OperationStatus(SignParameter signParameter) throws PDFASError {
         this.signParameter = signParameter;
-        if (configuration instanceof Configuration config) {
-            backend = BackendLoader.getPDFASBackend(config);
-        } else {
-            backend = BackendLoader.getPDFASBackend();
-        }
     }
 
     // ========================================================================
@@ -91,14 +82,14 @@ public class OperationStatus {
 
     public @NonNull SignatureProfileConfiguration getSignatureProfileConfiguration(@NonNull String profileID) {
         return signatureProfiles.computeIfAbsent(profileID,
-            key -> new SignatureProfileConfiguration(this.configuration, key)
+            key -> new SignatureProfileConfiguration(this.signParameter.getConfiguration(), key)
         );
     }
 
     // ========================================================================
 
     public ISettings getSettings() {
-        return this.configuration;
+        return this.signParameter.getConfiguration();
     }
 
     public String getTransactionId() {

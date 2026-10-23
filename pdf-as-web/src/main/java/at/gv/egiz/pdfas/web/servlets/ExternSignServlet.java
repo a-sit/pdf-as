@@ -89,7 +89,7 @@ public class ExternSignServlet extends HttpServlet {
         PdfAsHelper.init();
         
         try {
-            PdfAsFactory.validateConfiguration((ISettings)PdfAsHelper.getPdfAsConfig());
+            PdfAsFactory.validateConfiguration(PdfAsHelper.getPdfAsConfig());
         } catch (PdfAsSettingsValidationException e) {
             // TODO Auto-generated catch block
             log.error(e.getLocalizedMessage(),e.getCause());

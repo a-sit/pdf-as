@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import at.gv.egiz.pdfas.common.settings.ISettings;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class BackendLoader implements ErrorConstants {
 		throw new PDFASError(ERROR_NO_BACKEND);
 	}
 
-	public static @NonNull PDFASBackend getPDFASBackend(Configuration configuration) throws PDFASError {
+	public static @NonNull PDFASBackend getPDFASBackend(ISettings configuration) throws PDFASError {
       return getPDFASBackend(configuration.getValue(BACKEND_CONFIG));
 	}
 	public static @NonNull PDFASBackend getPDFASBackend() throws PDFASError { return getPDFASBackend((String)null); }

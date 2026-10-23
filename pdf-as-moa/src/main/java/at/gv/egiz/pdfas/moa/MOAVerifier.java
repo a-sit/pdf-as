@@ -5,15 +5,15 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.impl.verify.SignatureInputData;
 import jakarta.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import jakarta.xml.ws.BindingProvider;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
 
@@ -26,7 +26,6 @@ import at.gv.e_government.reference.namespace.moa._20020822_.SignatureVerificati
 import at.gv.e_government.reference.namespace.moa._20020822_.VerifyCMSSignatureRequest;
 import at.gv.e_government.reference.namespace.moa._20020822_.VerifyCMSSignatureResponseType;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import at.gv.egiz.pdfas.lib.impl.verify.IVerifier;
@@ -34,10 +33,8 @@ import at.gv.egiz.pdfas.lib.impl.verify.SignatureCheckImpl;
 import at.gv.egiz.pdfas.lib.impl.verify.VerifyResultImpl;
 import iaik.x509.X509Certificate;
 
+@Slf4j
 public class MOAVerifier implements IVerifier {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(MOAVerifier.class);
 
 	private static final String MOA_VERIFY_URL = "moa.verify.url";
 	private static final String MOA_VERIFY_TIMEOUT = "moa.verify.timeout";
@@ -52,7 +49,7 @@ public class MOAVerifier implements IVerifier {
 			Date verificationTime) throws PdfAsException {
 		List<VerifyResult> resultList = new ArrayList<VerifyResult>();
 		try {
-			logger.info("verification with MOA @ " + this.moaEndpoint);
+			log.info("verification with MOA @ " + this.moaEndpoint);
 
 			//URL moaUrl = new URL(this.moaEndpoint + "?wsdl");
 			
@@ -92,7 +89,7 @@ public class MOAVerifier implements IVerifier {
 			VerifyCMSSignatureResponseType response = verificationPort
 					.verifyCMSSignature(verifyCMSSignatureRequest);
 			
-			logger.debug("Got Verify Response from MOA");
+			log.debug("Got Verify Response from MOA");
 			
 			List<JAXBElement<?>> verifySequence = response.getSignerInfoAndSignatureAlgorithmAndSignatureCheck();
 			
@@ -102,37 +99,37 @@ public class MOAVerifier implements IVerifier {
 			result.setValueCheckCode(new SignatureCheckImpl(1,""));
 			result.setVerificationDone(true);
 			result.setSignatureData(signatureContent);
-			
+
 			for (int i = 0; i < verifySequence.size(); i++) {
 				//
-				
+
 				JAXBElement<?> element = verifySequence.get(i);
 
-				logger.debug(" ---------------------- ");
-				logger.debug("Name: " + element.getName().getLocalPart());
-				logger.debug("Class: " + element.getValue().getClass().getName());
-				
-				if(element.getName().getLocalPart().equals("SignerInfo")) {
-					if(!(element.getValue() instanceof KeyInfoType)) {
+				log.debug(" ---------------------- ");
+				log.debug("Name: " + element.getName().getLocalPart());
+				log.debug("Class: " + element.getValue().getClass().getName());
+
+				if (element.getName().getLocalPart().equals("SignerInfo")) {
+					if (!(element.getValue() instanceof KeyInfoType)) {
 						// TODO throw Exception
 					}
 					KeyInfoType keyInfo = (KeyInfoType)element.getValue();
 
 					for(Object obj : keyInfo.getContent()) {
-						logger.debug("KeyInfo: " + obj.getClass().toString());
+						log.debug("KeyInfo: " + obj.getClass().toString());
 						if(obj instanceof JAXBElement<?>) {
 							JAXBElement<?> ele = (JAXBElement<?>)obj;
-							logger.debug("KeyInfo: " + ele.getName().getLocalPart());
-							logger.debug("KeyInfo: " + ele.getValue().getClass().getName());
-							if(ele.getName().getLocalPart().equals("X509Data") && 
+							log.debug("KeyInfo: " + ele.getName().getLocalPart());
+							log.debug("KeyInfo: " + ele.getValue().getClass().getName());
+							if(ele.getName().getLocalPart().equals("X509Data") &&
 									ele.getValue() instanceof X509DataType) {
 								X509DataType x509Data = (X509DataType)ele.getValue();
 								for(Object o : x509Data.getX509IssuerSerialOrX509SKIOrX509SubjectName()) {
-									logger.debug("X509 class: " + o.getClass().getName());
+									log.debug("X509 class: " + o.getClass().getName());
 									if(o instanceof JAXBElement<?>) {
 										JAXBElement<?> e = (JAXBElement<?>)o;
-										logger.debug("X509 class CHILD: " + e.getName().getLocalPart());
-										logger.debug("X509 class CHILD: " + e.getValue().getClass().getName());
+										log.debug("X509 class CHILD: " + e.getName().getLocalPart());
+										log.debug("X509 class CHILD: " + e.getValue().getClass().getName());
 										if(e.getName().getLocalPart().equals("X509Certificate")) {
 											if(e.getValue() instanceof byte[]) {
 												X509Certificate signerCertificate = new X509Certificate((byte[])e.getValue());
@@ -150,47 +147,47 @@ public class MOAVerifier implements IVerifier {
 							}
 						}
 					}
-					
+
 				} else if(element.getName().getLocalPart().equals("SignatureCheck")) {
-					
+
 					if(!(element.getValue() instanceof CheckResultType)) {
 						// TODO throw Exception
 					}
-					
+
 					CheckResultType checkResult = (CheckResultType)element.getValue();
-					
+
 					result.setValueCheckCode(new SignatureCheckImpl(
-							checkResult.getCode().intValue(), 
-							(checkResult.getInfo() != null) ? 
+							checkResult.getCode().intValue(),
+							(checkResult.getInfo() != null) ?
 									checkResult.getInfo().toString() : ""
 								));
-					
+
 				} else if(element.getName().getLocalPart().equals("CertificateCheck")) {
-					
+
 					if(!(element.getValue() instanceof CheckResultType)) {
 						// TODO throw Exception
 					}
-					
+
 					CheckResultType checkResult = (CheckResultType)element.getValue();
-					
+
 					result.setCertificateCheck(new SignatureCheckImpl(
-							checkResult.getCode().intValue(), 
-							(checkResult.getInfo() != null) ? 
+							checkResult.getCode().intValue(),
+							(checkResult.getInfo() != null) ?
 									checkResult.getInfo().toString() : ""
 								));
 				}
-				
-				logger.debug(" ---------------------- ");
+
+				log.debug(" ---------------------- ");
 			}
 			resultList.add(result);
 		} catch (Throwable e) {
-			logger.warn("Verification failed", e);
+			log.warn("Verification failed", e);
 			throw new PdfAsException("error.pdf.verify.02", e);
 		}
 		return resultList;
 	}
 	
-	public void setConfiguration(Configuration config) {
+	public void setConfiguration(ISettings config) {
 		this.moaEndpoint = config.getValue(MOA_VERIFY_URL);
 		this.moaTrustProfile = config.getValue(MOA_VERIFY_TRUSTPROFILE);
 		val timeout = config.getValue(MOA_VERIFY_TIMEOUT);
@@ -198,7 +195,7 @@ public class MOAVerifier implements IVerifier {
 			try {
 				this.moaTimeout = Long.valueOf(timeout);
 			} catch (NumberFormatException e) {
-				logger.warn("Failed to convert MOA verification timeout '{}' to a number", timeout, e);
+				log.warn("Failed to convert MOA verification timeout '{}' to a number", timeout, e);
 			}
 		}
 	}

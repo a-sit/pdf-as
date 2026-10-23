@@ -44,72 +44,69 @@ import lombok.Setter;
 
 public class OperationStatus implements Serializable {
 
-	private static final long serialVersionUID = -2985007198666388528L;
+    private static final long serialVersionUID = -2985007198666388528L;
 
-	private final SignParameter signParamter;
-	@Setter
+    @Getter
+    private final SignParameter signParameter;
+    @Setter
     @Getter
     private PDFObject pdfObject;
 
-	private final ISettings configuration;
+    private final ISettings configuration;
 
-	@Getter(lazy = true)
-	@Transient
-	private final @NonNull PlaceholderConfiguration placeholderConfiguration = new PlaceholderConfiguration(this.configuration);
+    @Getter(lazy = true)
+    @Transient
+    private final @NonNull PlaceholderConfiguration placeholderConfiguration = new PlaceholderConfiguration(this.configuration);
 
-	@Getter(lazy = true)
-	@Transient
-	private final @NonNull GlobalConfiguration globalConfiguration = new GlobalConfiguration(this.configuration);
+    @Getter(lazy = true)
+    @Transient
+    private final @NonNull GlobalConfiguration globalConfiguration = new GlobalConfiguration(this.configuration);
 
-	@Transient
-	private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<>();
-	@Setter
+    @Transient
+    private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<>();
+    @Setter
     @Getter
     private RequestedSignature requestedSignature;
-	@Getter(lazy = true)
-	@Transient
+    @Getter(lazy = true)
+    @Transient
     private final PDFASBackend backend = BackendLoader.getPDFASBackend((ConfigurationImpl)this.configuration);
-	@Getter
+    @Getter
     private final Map<String, String> metaInformations = new HashMap<String, String>();
 
-	public OperationStatus(ISettings configuration, SignParameter signParameter) throws PDFASError {
-		this.configuration = configuration;
-		this.signParamter = signParameter;
-		if (configuration instanceof Configuration config) {
-			backend = BackendLoader.getPDFASBackend(config);
-		} else {
-			backend = BackendLoader.getPDFASBackend();
-		}
-	}
+    public OperationStatus(ISettings configuration, SignParameter signParameter) throws PDFASError {
+        this.configuration = configuration;
+        this.signParameter = signParameter;
+        if (configuration instanceof Configuration config) {
+            backend = BackendLoader.getPDFASBackend(config);
+        } else {
+            backend = BackendLoader.getPDFASBackend();
+        }
+    }
 
-	// ========================================================================
-	
-	public void clear() {
-		if(pdfObject != null) {
-			pdfObject.close();
-		}
-	}
+    // ========================================================================
 
-	public @NonNull SignatureProfileConfiguration getSignatureProfileConfiguration(@NonNull String profileID) {
-		return signatureProfiles.computeIfAbsent(profileID,
-			key -> new SignatureProfileConfiguration(this.configuration, key)
-		);
-	}
+    public void clear() {
+        if(pdfObject != null) {
+            pdfObject.close();
+        }
+    }
 
-	// ========================================================================
+    public @NonNull SignatureProfileConfiguration getSignatureProfileConfiguration(@NonNull String profileID) {
+        return signatureProfiles.computeIfAbsent(profileID,
+            key -> new SignatureProfileConfiguration(this.configuration, key)
+        );
+    }
 
-    public SignParameter getSignParameter() {
-		return signParamter;
-	}
+    // ========================================================================
 
-	public ISettings getSettings() {
-		return this.configuration;
-	}
+    public ISettings getSettings() {
+        return this.configuration;
+    }
 
     public String getTransactionId() {
-      if(this.signParamter != null) {
-          return this.signParamter.getTransactionId();
+      if(this.signParameter != null) {
+          return this.signParameter.getTransactionId();
       }
       return null;
-	}
+    }
 }

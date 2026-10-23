@@ -68,154 +68,154 @@ import org.springframework.stereotype.Component;
 @Component
 @ServletRegistration(urlMappings = "/Verify")
 public class VerifyServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(VerifyServlet.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(VerifyServlet.class);
 
-	private static final String UPLOAD_PDF_DATA = "pdf-file";
-	private static final String UPLOAD_DIRECTORY = "upload";
-	private static final int THRESHOLD_SIZE = 1024 * 1024 * 3; // 3MB
-	private static final int MAX_FILE_SIZE = 1024 * 1024 * 40; // 40MB
-	private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50; // 50MB
+    private static final String UPLOAD_PDF_DATA = "pdf-file";
+    private static final String UPLOAD_DIRECTORY = "upload";
+    private static final int THRESHOLD_SIZE = 1024 * 1024 * 3; // 3MB
+    private static final int MAX_FILE_SIZE = 1024 * 1024 * 40; // 40MB
+    private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 50; // 50MB
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public VerifyServlet() {
-		super();
-	}
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public VerifyServlet() {
+        super();
+    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
+     */
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
 
-	  // invalidate existing http sessions at first
+      // invalidate existing http sessions at first
     request.getSession().invalidate();
-	  
-		logger.info("Get verify request");
+      
+        logger.info("Get verify request");
 
-		String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);
-		PdfAsHelper.setErrorURL(request, response, errorUrl);
-		
-		StatisticEvent statisticEvent = new StatisticEvent();
-		statisticEvent.setStartNow();
-		statisticEvent.setSource(Source.WEB);
-		statisticEvent.setOperation(Operation.VERIFY);
-		statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
-		
-		try {
-			// Mandatory Parameters on Get Request:
-			String invokeUrl = PdfAsParameterExtractor.getInvokeURL(request);
-			PdfAsHelper.setInvokeURL(request, response, invokeUrl);
+        String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);
+        PdfAsHelper.setErrorURL(request, response, errorUrl);
+        
+        StatisticEvent statisticEvent = new StatisticEvent();
+        statisticEvent.setStartNow();
+        statisticEvent.setSource(Source.WEB);
+        statisticEvent.setOperation(Operation.VERIFY);
+        statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
+        
+        try {
+            // Mandatory Parameters on Get Request:
+            String invokeUrl = PdfAsParameterExtractor.getInvokeURL(request);
+            PdfAsHelper.setInvokeURL(request, response, invokeUrl);
 
-			String invokeTarget = PdfAsParameterExtractor.getInvokeTarget(request);
-			PdfAsHelper.setInvokeTarget(request, response, invokeTarget);
-			
-			String pdfUrl = PdfAsParameterExtractor.getPdfUrl(request);
+            String invokeTarget = PdfAsParameterExtractor.getInvokeTarget(request);
+            PdfAsHelper.setInvokeTarget(request, response, invokeTarget);
+            
+            String pdfUrl = PdfAsParameterExtractor.getPdfUrl(request);
 
-			if (pdfUrl == null) {
-				throw new PdfAsWebException(
-						"No PDF URL given! Use POST request to sign without PDF URL.");
-			}
+            if (pdfUrl == null) {
+                throw new PdfAsWebException(
+                        "No PDF URL given! Use POST request to sign without PDF URL.");
+            }
 
-			byte[] pdfData = RemotePDFFetcher.fetchPdfFile(pdfUrl);
-			doVerify(request, response, pdfData, statisticEvent);
-		} catch (Throwable e) {
-			
-			statisticEvent.setStatus(Status.ERROR);
-			statisticEvent.setException(e);
-			if(e instanceof PDFASError) {
-				statisticEvent.setErrorCode(((PDFASError)e).getCode());
-			}
-			statisticEvent.setEndNow();
-			statisticEvent.setTimestampNow();
-			StatisticFrontend.getInstance().storeEvent(statisticEvent);
-			statisticEvent.setLogged(true);
-			
-			logger.warn("Generic Error: ", e);
-			PdfAsHelper.setSessionException(request, response, e.getMessage(),
-					e);
-			PdfAsHelper.gotoError(getServletContext(), request, response);
-		}
-	}
+            byte[] pdfData = RemotePDFFetcher.fetchPdfFile(pdfUrl);
+            doVerify(request, response, pdfData, statisticEvent);
+        } catch (Throwable e) {
+            
+            statisticEvent.setStatus(Status.ERROR);
+            statisticEvent.setException(e);
+            if(e instanceof PDFASError) {
+                statisticEvent.setErrorCode(((PDFASError)e).getCode());
+            }
+            statisticEvent.setEndNow();
+            statisticEvent.setTimestampNow();
+            StatisticFrontend.getInstance().storeEvent(statisticEvent);
+            statisticEvent.setLogged(true);
+            
+            logger.warn("Generic Error: ", e);
+            PdfAsHelper.setSessionException(request, response, e.getMessage(),
+                    e);
+            PdfAsHelper.gotoError(getServletContext(), request, response);
+        }
+    }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+    /**
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+     *      response)
+     */
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
 
-	  // invalidate existing http sessions at first
+      // invalidate existing http sessions at first
     request.getSession().invalidate();
-	  
-		logger.info("Post verify request");
+      
+        logger.info("Post verify request");
 
-		String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);
-		PdfAsHelper.setErrorURL(request, response, errorUrl);
+        String errorUrl = PdfAsParameterExtractor.getInvokeErrorURL(request);
+        PdfAsHelper.setErrorURL(request, response, errorUrl);
 
-		StatisticEvent statisticEvent = new StatisticEvent();
-		statisticEvent.setStartNow();
-		statisticEvent.setSource(Source.WEB);
-		statisticEvent.setOperation(Operation.VERIFY);
-		statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
-		
-		try {
-			byte[] filecontent = null;
+        StatisticEvent statisticEvent = new StatisticEvent();
+        statisticEvent.setStartNow();
+        statisticEvent.setSource(Source.WEB);
+        statisticEvent.setOperation(Operation.VERIFY);
+        statisticEvent.setUserAgent(UserAgentFilter.getUserAgent());
+        
+        try {
+            byte[] filecontent = null;
 
-			// checks if the request actually contains upload file
-			if (!JakartaServletFileUpload.isMultipartContent(request)) {
-				// No Uploaded data!
-				if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
-					doGet(request, response);
-					return;
-				} else {
-					throw new PdfAsWebException("No Signature data defined!");
-				}
-			} else {
-				// configures upload settings
-				DiskFileItemFactory factory = DiskFileItemFactory.builder()
-					.setThreshold(THRESHOLD_SIZE)
-					.setPath(new File(System.getProperty("java.io.tmpdir")).toPath())
-					.get();
+            // checks if the request actually contains upload file
+            if (!JakartaServletFileUpload.isMultipartContent(request)) {
+                // No Uploaded data!
+                if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
+                    doGet(request, response);
+                    return;
+                } else {
+                    throw new PdfAsWebException("No Signature data defined!");
+                }
+            } else {
+                // configures upload settings
+                DiskFileItemFactory factory = DiskFileItemFactory.builder()
+                    .setThreshold(THRESHOLD_SIZE)
+                    .setPath(new File(System.getProperty("java.io.tmpdir")).toPath())
+                    .get();
 
-				val upload = new JakartaServletDiskFileUpload(factory);
-				upload.setMaxFileSize(MAX_FILE_SIZE);
-				upload.setMaxSize(MAX_REQUEST_SIZE);
+                val upload = new JakartaServletDiskFileUpload(factory);
+                upload.setMaxFileSize(MAX_FILE_SIZE);
+                upload.setMaxSize(MAX_REQUEST_SIZE);
 
-				// constructs the directory path to store upload file
-				String uploadPath = getServletContext().getRealPath("")
-						+ File.separator + UPLOAD_DIRECTORY;
-				// creates the directory if it does not exist
-				File uploadDir = new File(uploadPath);
-				if (!uploadDir.exists()) {
-					uploadDir.mkdir();
-				}
+                // constructs the directory path to store upload file
+                String uploadPath = getServletContext().getRealPath("")
+                        + File.separator + UPLOAD_DIRECTORY;
+                // creates the directory if it does not exist
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdir();
+                }
 
-				List<DiskFileItem> formItems = upload.parseRequest(request);
-				logger.debug(formItems.size() + " Items in form data");
-				if (formItems.isEmpty()) {
-					// No Uploaded data!
-					// Try do get
-					// No Uploaded data!
-					if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
-						doGet(request, response);
-						return;
-					} else {
-						throw new PdfAsWebException(
-								"No Signature data defined!");
-					}
-				} else {
+                List<DiskFileItem> formItems = upload.parseRequest(request);
+                logger.debug(formItems.size() + " Items in form data");
+                if (formItems.isEmpty()) {
+                    // No Uploaded data!
+                    // Try do get
+                    // No Uploaded data!
+                    if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
+                        doGet(request, response);
+                        return;
+                    } else {
+                        throw new PdfAsWebException(
+                                "No Signature data defined!");
+                    }
+                } else {
                   for (DiskFileItem item : formItems) {
                     if (item != null) {
                       if (item.getFieldName().equals(UPLOAD_PDF_DATA)) {
                         filecontent = item.getInputStream().readAllBytes();
                         try {
-						  val filename = FilenameUtils.getName(item.getName());
+                          val filename = FilenameUtils.getName(item.getName());
                           File f = new File(filename);
                           String name = f.getName();
                           logger.debug("Got upload: {}", filename);
@@ -245,96 +245,96 @@ public class VerifyServlet extends HttpServlet {
                       }
                     }
                   }
-				}
-			}
+                }
+            }
 
-			if (filecontent == null) {
-				if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
-					filecontent = RemotePDFFetcher
-							.fetchPdfFile(PdfAsParameterExtractor
-									.getPdfUrl(request));
-				}
-			}
+            if (filecontent == null) {
+                if (PdfAsParameterExtractor.getPdfUrl(request) != null) {
+                    filecontent = RemotePDFFetcher
+                            .fetchPdfFile(PdfAsParameterExtractor
+                                    .getPdfUrl(request));
+                }
+            }
 
-			if (filecontent == null) {
-				Object sourceObj = request.getAttribute("source");
-				if (sourceObj != null) {
-					String source = sourceObj.toString();
-					if (source.equals("internal")) {
-						request.setAttribute("FILEERR", true);
-						request.getRequestDispatcher("index.jsp").forward(
-								request, response);
-						
-						statisticEvent.setStatus(Status.ERROR);
-						statisticEvent.setException(new Exception("No file uploaded"));
-						statisticEvent.setEndNow();
-						statisticEvent.setTimestampNow();
-						StatisticFrontend.getInstance().storeEvent(statisticEvent);
-						statisticEvent.setLogged(true);
-						
-						return;
-					}
-				}
-				throw new PdfAsException("No Signature data available");
-			}
+            if (filecontent == null) {
+                Object sourceObj = request.getAttribute("source");
+                if (sourceObj != null) {
+                    String source = sourceObj.toString();
+                    if (source.equals("internal")) {
+                        request.setAttribute("FILEERR", true);
+                        request.getRequestDispatcher("index.jsp").forward(
+                                request, response);
+                        
+                        statisticEvent.setStatus(Status.ERROR);
+                        statisticEvent.setException(new Exception("No file uploaded"));
+                        statisticEvent.setEndNow();
+                        statisticEvent.setTimestampNow();
+                        StatisticFrontend.getInstance().storeEvent(statisticEvent);
+                        statisticEvent.setLogged(true);
+                        
+                        return;
+                    }
+                }
+                throw new PdfAsException("No Signature data available");
+            }
 
-			doVerify(request, response, filecontent, statisticEvent);
-		} catch (Throwable e) {
-			
-			statisticEvent.setStatus(Status.ERROR);
-			statisticEvent.setException(e);
-			if(e instanceof PDFASError) {
-				statisticEvent.setErrorCode(((PDFASError)e).getCode());
-			}
-			statisticEvent.setEndNow();
-			statisticEvent.setTimestampNow();
-			StatisticFrontend.getInstance().storeEvent(statisticEvent);
-			statisticEvent.setLogged(true);
-			
-			logger.warn("Generic Error: ", e);
-			PdfAsHelper.setSessionException(request, response, e.getMessage(),
-					e);
-			PdfAsHelper.gotoError(getServletContext(), request, response);
-		}
-	}
+            doVerify(request, response, filecontent, statisticEvent);
+        } catch (Throwable e) {
+            
+            statisticEvent.setStatus(Status.ERROR);
+            statisticEvent.setException(e);
+            if(e instanceof PDFASError) {
+                statisticEvent.setErrorCode(((PDFASError)e).getCode());
+            }
+            statisticEvent.setEndNow();
+            statisticEvent.setTimestampNow();
+            StatisticFrontend.getInstance().storeEvent(statisticEvent);
+            statisticEvent.setLogged(true);
+            
+            logger.warn("Generic Error: ", e);
+            PdfAsHelper.setSessionException(request, response, e.getMessage(),
+                    e);
+            PdfAsHelper.gotoError(getServletContext(), request, response);
+        }
+    }
 
-	protected void doVerify(HttpServletRequest request,
-			HttpServletResponse response, byte[] pdfData, StatisticEvent statisticEvent) throws Exception {
-		
-		SignatureVerificationLevel lvl = PdfAsParameterExtractor
-				.getVerificationLevel(request);
-		PdfAsHelper.setVerificationLevel(request, lvl);
-		
-		String format = PdfAsParameterExtractor.getFormat(request);
-		
-		logger.debug("doVerify");
-		logger.info("Starting verification of pdf dokument");
-		
-		logger.debug("Format: " + format);
-		
-		List<VerifyResult> results = PdfAsHelper.synchronousVerify(pdfData, -1, lvl,
-				PdfAsParameterExtractor.getPreProcessorMap(request));
+    protected void doVerify(HttpServletRequest request,
+            HttpServletResponse response, byte[] pdfData, StatisticEvent statisticEvent) throws Exception {
+        
+        SignatureVerificationLevel lvl = PdfAsParameterExtractor
+                .getVerificationLevel(request);
+        PdfAsHelper.setVerificationLevel(request, lvl);
+        
+        String format = PdfAsParameterExtractor.getFormat(request);
+        
+        logger.debug("doVerify");
+        logger.info("Starting verification of pdf dokument");
+        
+        logger.debug("Format: " + format);
+        
+        List<VerifyResult> results = PdfAsHelper.synchronousVerify(pdfData, -1, lvl,
+                PdfAsParameterExtractor.getPreProcessorMap(request));
 
-		PdfAsHelper.setVerificationResult(request, results);
-		
-		// Create HTML Snippet for each Verification Result
-		// Put these results into the web page
-		// Or create a JSON response with the verification results for automated
-		// processing
-		
-		VerifyResultEncoder encoder = VerifyEncoder.getEncoder(format);
-		
-		if(encoder == null) {
-			encoder = VerifyEncoder.getEncoder(PdfAsParameterExtractor.PARAM_HTML);
-		}
-		
-		statisticEvent.setStatus(Status.OK);
-		statisticEvent.setEndNow();
-		statisticEvent.setTimestampNow();
-		StatisticFrontend.getInstance().storeEvent(statisticEvent);
-		statisticEvent.setLogged(true);
-		
-		encoder.produce(request, response, results);
-	}
+        PdfAsHelper.setVerificationResult(request, results);
+        
+        // Create HTML Snippet for each Verification Result
+        // Put these results into the web page
+        // Or create a JSON response with the verification results for automated
+        // processing
+        
+        VerifyResultEncoder encoder = VerifyEncoder.getEncoder(format);
+        
+        if(encoder == null) {
+            encoder = VerifyEncoder.getEncoder(PdfAsParameterExtractor.PARAM_HTML);
+        }
+        
+        statisticEvent.setStatus(Status.OK);
+        statisticEvent.setEndNow();
+        statisticEvent.setTimestampNow();
+        StatisticFrontend.getInstance().storeEvent(statisticEvent);
+        statisticEvent.setLogged(true);
+        
+        encoder.produce(request, response, results);
+    }
 
 }

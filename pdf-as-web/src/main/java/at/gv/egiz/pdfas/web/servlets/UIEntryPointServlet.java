@@ -44,7 +44,6 @@ import lombok.val;
 
 @Slf4j
 public class UIEntryPointServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
 	public static final String REQUEST_ID_PARAM = "reqId";
 

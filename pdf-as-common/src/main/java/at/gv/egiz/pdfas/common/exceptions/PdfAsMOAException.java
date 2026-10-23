@@ -27,11 +27,6 @@ import at.gv.egiz.pdfas.common.messages.MessageResolver;
 
 public class PdfAsMOAException extends PdfAsException {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -217112433494784615L;
-	
 	private String faultCode;
 	private String faultString;
 	private String errorResponse;

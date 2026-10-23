@@ -20,11 +20,6 @@ import java.util.List;
 
 @Slf4j
 public class SoapServiceServlet extends CXFNonSpringServlet {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8903883276191902043L;
 
 	@Slf4j
 	public static class Faults implements FaultListener {

@@ -27,11 +27,6 @@ import at.gv.egiz.pdfas.common.messages.MessageResolver;
 
 public class PdfAsValidationException extends PdfAsException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2428540014894153122L;
-
 	private String parameter;
 	
 	public PdfAsValidationException(String msgId, String parameter) {

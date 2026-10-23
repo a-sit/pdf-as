@@ -76,8 +76,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ServletRegistration(urlMappings = "/Sign")
 public class ExternSignServlet extends HttpServlet {
-
-    private static final long serialVersionUID = 1L;
     
     private static final String UPLOAD_PDF_DATA = "pdf-file";
     private static final String UPLOAD_DIRECTORY = "upload";

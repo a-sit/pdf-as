@@ -103,7 +103,7 @@ tasks.register('putDbExtensionLibs', Copy) {
 }
 
 tasks.register('injectPdfAsWebApp', Copy) {
-    dependsOn('putDbExtensionIntoWebApp', 'extractTomcat')
+    dependsOn('putDbExtensionIntoWebApp', 'putWebConfigIntoTomcat')
     from(tasks.named('putDbExtensionIntoWebApp', Zip).flatMap { it.archiveFile }) {
         rename { 'pdf-as-web.war' }
     }

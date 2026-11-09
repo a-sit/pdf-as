@@ -20,7 +20,7 @@ public class RequestParameterResolver implements IResolver {
 
 		MemberAccess memberAccess = new AbstractMemberAccess() {
 			@Override
-			public boolean isAccessible(Map context, Object target, Member member, String propertyName) {
+			public boolean isAccessible(OgnlContext context, Object target, Member member, String propertyName) {
 				int modifiers = member.getModifiers();
 				return Modifier.isPublic(modifiers);
 			}

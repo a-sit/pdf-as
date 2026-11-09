@@ -51,24 +51,24 @@ public class CertificateAndRequestParameterResolver implements IResolver {
         this.certificate = certificate;
         MemberAccess memberAccess = new MemberAccess() {
             @Override
-            public Object setup(Map context, Object target, Member member, String propertyName) {
+            public Object setup(OgnlContext context, Object target, Member member, String propertyName) {
                 return null;
             }
 
             @Override
-            public void restore(Map context, Object target, Member member, String propertyName, Object state) {
+            public void restore(OgnlContext context, Object target, Member member, String propertyName, Object state) {
 
             }
 
             @Override
-            public boolean isAccessible(Map context, Object target, Member member, String propertyName) {
+            public boolean isAccessible(OgnlContext context, Object target, Member member, String propertyName) {
                 int modifiers = member.getModifiers();
                 return Modifier.isPublic(modifiers);
             }
         };
 //        MemberAccess memberAccess = new AbstractMemberAccess() {
 //            @Override
-//            public boolean isAccessible(Map context, Object target, Member member, String propertyName) {
+//            public boolean isAccessible(OgnlContext context, Object target, Member member, String propertyName) {
 //                int modifiers = member.getModifiers();
 //                return Modifier.isPublic(modifiers);
 //            }

@@ -85,7 +85,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-web-server', version: springBootVersion		
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
 	implementation group: 'de.codecentric', name: 'spring-boot-admin-client', version: springBootAdminVersion
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.0'
 	implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.2'
 	implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
 	implementation 'tools.jackson.module:jackson-module-jakarta-xmlbind-annotations'

@@ -75,6 +75,7 @@ dependencies {
 	api group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.14'
 	api group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     api group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: bouncyCastleVersion
+    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: bouncyCastleVersion
 	api group: 'jakarta.activation', name: 'jakarta.activation-api', version: jakartaActivationVersion
 	api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: jaxbApiVersion
 	api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: jaxbRuntimeVersion

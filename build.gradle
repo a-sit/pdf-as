@@ -49,7 +49,7 @@ allprojects {
         	url = "https://repo.spring.io/milestone/"
     	}  
     }
-	version = '5.0.1'
+	version = '5.0.2-SNAPSHOT'
 
 	project.ext{
 		releaseRepoUrl = "file://${project(':').projectDir}/../mvn-repo/releases"

@@ -140,6 +140,21 @@ class SignVerifyTest {
     }
 
     @Test
+    fun signWithPlaceholderSearchAndTextLineOperator() {
+        // The sample PDF uses the ' text operator.
+        val signedPdf = captureSign(getInputPdf("eupl-1.1.pdf"), getKeystoreSigner("test-key")) {
+            isPlaceHolderSearchEnabled = true
+            configuration.setValue(IConfigurationConstants.PLACEHOLDER_SEARCH_ENABLED, "true")
+        }
+        val verificationResult = doVerify(ByteArrayDataSource(signedPdf))
+        Assert.assertEquals(1, verificationResult.size)
+        verificationResult[0].let {
+            Assert.assertTrue(it.isVerificationDone)
+            Assert.assertEquals(getKeystoreSigner("test-key").getCertificate(null), it.signerCertificate)
+        }
+    }
+
+    @Test
     fun signSuspend() {
         val signedPdf = runBlocking {
             captureSignSuspend(getInputPdf("align.pdf"), getKeystoreSigner("test-key").wrapSuspend())

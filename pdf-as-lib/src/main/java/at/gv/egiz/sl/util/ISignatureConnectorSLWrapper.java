@@ -33,8 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
 import at.gv.egiz.pdfas.common.utils.SettingsUtils;
 import at.gv.egiz.pdfas.common.utils.StreamUtils;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
@@ -82,7 +82,7 @@ public class ISignatureConnectorSLWrapper implements ISignatureConnector {
 				}
 			}
 		} catch (CertificateException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
+			throw new PdfAsException("error.pdf.sig.01", e);
 		} 
 		return certificate;
 	}
@@ -112,7 +112,7 @@ public class ISignatureConnectorSLWrapper implements ISignatureConnector {
 			if (!StreamUtils.dataCompare(requestedSignature.getCertificate()
 					.getFingerprintSHA(), ((X509Certificate) verifyResult
 					.getSignerCertificate()).getFingerprintSHA())) {
-				throw new PdfAsSignatureException("Certificates missmatch!");
+				throw new PDFASError(ErrorConstants.ERROR_SIG_CERTIFICATE_MISSMATCH, "Certificates missmatch!");
 			}
 
 			return response.getCMSSignature();

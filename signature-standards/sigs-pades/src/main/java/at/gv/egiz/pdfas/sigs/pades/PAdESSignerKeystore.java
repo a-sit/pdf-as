@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
@@ -192,7 +191,7 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	      return signature;
 	    } catch (NoSuchAlgorithmException | CMSException | IOException | PDFASError | CodingException |
                  CertificateException e) {
-	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
+	      throw new PdfAsException("error.pdf.sig.01", e);
 	    }
      }
 

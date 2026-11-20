@@ -47,7 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
@@ -114,11 +113,11 @@ public class PKCS7DetachedSigner implements IPlainSigner, PKCS7DetachedConstants
 			logger.debug("PKCS7 signature done.");
 			return ci.getEncoded();
 		} catch (NoSuchAlgorithmException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
+			throw new PdfAsException("error.pdf.sig.01", e);
 		} catch (iaik.cms.CMSException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
+			throw new PdfAsException("error.pdf.sig.01", e);
 		} catch (IOException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
+			throw new PdfAsException("error.pdf.sig.01", e);
 		} 
 	}
 

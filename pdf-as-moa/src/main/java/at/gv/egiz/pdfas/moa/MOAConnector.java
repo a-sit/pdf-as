@@ -271,7 +271,7 @@ public class MOAConnector implements ISignatureConnector, IConfigurationConstant
             if (!StreamUtils.dataCompare(requestedSignature.getCertificate()
                     .getFingerprintSHA(), ((X509Certificate) verifyResult
                     .getSignerCertificate()).getFingerprintSHA())) {
-                throw new PdfAsSignatureException("Certificates missmatch!");
+                throw new PDFASError(ErrorConstants.ERROR_SIG_CERTIFICATE_MISSMATCH, "Certificates missmatch!");
             }
 
             return cmsSignatureData;

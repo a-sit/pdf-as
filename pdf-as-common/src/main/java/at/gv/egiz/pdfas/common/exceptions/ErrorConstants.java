@@ -8,7 +8,6 @@ public interface ErrorConstants {
 	// Code below 10000 are reserved for SL Error Codes
 	
 	public static final long ERROR_GENERIC = 10000;
-	public static final long ERROR_NO_INPUT = 10001;
 	public static final long ERROR_NO_BACKEND = 10002;
 	
 	// Signature Errors
@@ -33,7 +32,4 @@ public interface ErrorConstants {
 	public static final long ERROR_SET_INVALID_SETTINGS_OBJ = 13001;
 	public static final long ERROR_INVALID_CERTIFICATE = 13002;
 	public static final long ERROR_INVALID_PLACEHOLDER_MODE = 13003;
-	
-	//Validation Errors
-	public static final long ERROR_NO_CONF_VALIDATION_BACKEND = 14001;
 }

@@ -204,7 +204,7 @@ public class ProvidePDFServlet extends HttpServlet {
       template = template.replace("##PDFLENGTH##",
           String.valueOf(signedData.length));
     } else {      
-      throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
+      throw new PDFASError(ErrorConstants.ERROR_SIG_NO_DATA);
     }
 
     String target = PdfAsHelper.getInvokeTarget(request, response);

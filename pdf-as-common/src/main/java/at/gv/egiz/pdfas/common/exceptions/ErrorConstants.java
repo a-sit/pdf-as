@@ -8,6 +8,7 @@ public interface ErrorConstants {
 	// Code below 10000 are reserved for SL Error Codes
 	
 	public static final long ERROR_GENERIC = 10000;
+	public static final long ERROR_NO_INPUT = 10001;
 	public static final long ERROR_NO_BACKEND = 10002;
 	
 	// Signature Errors
@@ -16,6 +17,7 @@ public interface ErrorConstants {
 	
 	public static final long ERROR_SIG_INVALID_BKU_SIG = 11008;
 	public static final long ERROR_SIG_INVALID_PROFILE = 11009;
+	public static final long ERROR_SIG_NO_DATA = 11010;
 
 	public static final long ERROR_SIG_CERTIFICATE_MISSMATCH = 11019;
 

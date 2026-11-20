@@ -274,7 +274,7 @@ public class VerifyServlet extends HttpServlet {
                         return;
                     }
                 }
-                throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
+                throw new PDFASError(ErrorConstants.ERROR_NO_INPUT);
             }
 
             doVerify(request, response, filecontent, statisticEvent);

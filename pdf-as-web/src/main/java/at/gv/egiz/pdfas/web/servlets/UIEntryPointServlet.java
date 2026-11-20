@@ -114,7 +114,7 @@ public class UIEntryPointServlet extends HttpServlet {
 			PdfAsHelper.setVerificationLevel(req, lvl);
 
 			if (pdfAsRequest.hasNext() && pdfAsRequest.getInput().get(0).getInputData() == null) {
-				throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
+				throw new PDFASError(ErrorConstants.ERROR_NO_INPUT);
 			}
 
 			String pdfDataHash = DigestHelper.getHexEncodedHash(pdfAsRequest.getInput().get(0).getInputData());

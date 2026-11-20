@@ -273,7 +273,7 @@ public class ExternSignServlet extends HttpServlet {
                         return;
                     }
                 }
-                throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
+                throw new PDFASError(ErrorConstants.ERROR_NO_INPUT);
             }
             
             doSignature(request, response, filecontent, statisticEvent);
@@ -298,7 +298,7 @@ public class ExternSignServlet extends HttpServlet {
     protected void doSignature(HttpServletRequest request,
             HttpServletResponse response, byte[] pdfData, StatisticEvent statisticEvent) throws Exception {
         if(pdfData == null) {
-            throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
+            throw new PDFASError(ErrorConstants.ERROR_NO_INPUT);
         }
         
         if(pdfData[0] != 0x25 || pdfData[1] != 0x50 || pdfData[2] != 0x44 || pdfData[3] != 0x46) {

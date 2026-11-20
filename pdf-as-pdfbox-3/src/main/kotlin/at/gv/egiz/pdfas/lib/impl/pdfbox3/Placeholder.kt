@@ -249,10 +249,11 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
                 yieldAll((1..Int.MAX_VALUE).asSequence().map { i -> "${baseName}_${i}"})
             }.first { !seenPlaceholderNames.contains(it) }
 
-        override fun processOperator(operator: Operator, arguments: List<COSBase>) {
+        // PDFBox passes null operands when the ' text operator dispatches T*.
+        override fun processOperator(operator: Operator, arguments: List<COSBase>?) {
             run {
                 if (operator.name != "Do") return@run
-                val objectName = arguments[0] as COSName
+                val objectName = arguments!![0] as COSName
                 val xObject = resources.getXObject(objectName)
                 if (xObject !is PDImageXObject) return@run
 

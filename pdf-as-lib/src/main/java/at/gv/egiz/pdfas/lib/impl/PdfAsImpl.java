@@ -122,9 +122,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
               state2.getSignatureData(), state2.getSignatureDataByteRange(),
               state2.getSignParameter(), state2.getRequestedSignature()));
       return state3.finishSign(output);
-    } catch (final CertificateException e) {
-      throw new PDFASError(ErrorConstants.ERROR_INVALID_CERTIFICATE, e);
-    } catch (final PdfAsException e) {
+    } catch (final Exception e) {
       throw ErrorExtractor.searchPdfAsError(e, state1.getStatus());
     }
   }
@@ -139,9 +137,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
               return signer.getCertificateData(state.getSignParameter()).thenApply(cert -> {
                 try {
                   return state.setCertificate(cert.cert(), cert.pdfFilter(), cert.pdfSubFilter());
-                } catch (final CertificateException e) {
-                  throw new CompletionException(new PDFASError(ErrorConstants.ERROR_INVALID_CERTIFICATE, e));
-                } catch (final PDFASError e) {
+                } catch (final CertificateException | PDFASError e) {
                   throw new CompletionException(e);
                 }
               });
@@ -163,13 +159,8 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
               throw new CompletionException(e);
             }
           })
-          .exceptionallyCompose(e -> {
-            @NonNull val cause = Objects.requireNonNull(e instanceof CompletionException ? e.getCause() : e);
-            if (cause instanceof PdfAsException pe) {
-              return CompletableFuture.failedStage(pe);
-            }
-            return CompletableFuture.failedStage(cause);
-          });
+          .exceptionallyCompose(e -> CompletableFuture.failedStage(
+              ErrorExtractor.searchPdfAsError(e, state1.getStatus())));
     } catch (final PDFASError e) {
       return CompletableFuture.failedStage(e);
     }

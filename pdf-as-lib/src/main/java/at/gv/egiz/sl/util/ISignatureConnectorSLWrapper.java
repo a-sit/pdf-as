@@ -33,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
-import at.gv.egiz.pdfas.common.exceptions.PDFASError;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsErrorCarrier;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
 import at.gv.egiz.pdfas.common.utils.SettingsUtils;
@@ -97,23 +95,18 @@ public class ISignatureConnectorSLWrapper implements ISignatureConnector {
 			CreateCMSSignatureResponseType response = connector.sendCMSRequest(
 					pack, parameter);
 
-			VerifyResult verifyResult;
-			try {
-				verifyResult = SignatureUtils.verifySignature(
-						response.getCMSSignature(), input);
-				if (SettingsUtils.getBooleanValue(requestedSignature
-						.getStatus().getSettings(),
-						IConfigurationConstants.KEEP_INVALID_SIGNATURE, false)) {
-					Base64 b64 = new Base64();
-					requestedSignature
-							.getStatus()
-							.getMetaInformations()
-							.put(ErrorConstants.STATUS_INFO_INVALIDSIG,
-									b64.encodeToString(response
-											.getCMSSignature()));
-				}
-			} catch (PDFASError e) {
-				throw new PdfAsErrorCarrier(e);
+			VerifyResult verifyResult = SignatureUtils.verifySignature(
+					response.getCMSSignature(), input);
+			if (SettingsUtils.getBooleanValue(requestedSignature
+					.getStatus().getSettings(),
+					IConfigurationConstants.KEEP_INVALID_SIGNATURE, false)) {
+				Base64 b64 = new Base64();
+				requestedSignature
+						.getStatus()
+						.getMetaInformations()
+						.put(ErrorConstants.STATUS_INFO_INVALIDSIG,
+								b64.encodeToString(response
+										.getCMSSignature()));
 			}
 
 			if (!StreamUtils.dataCompare(requestedSignature.getCertificate()

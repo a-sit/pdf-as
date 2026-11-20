@@ -24,6 +24,7 @@
 package at.gv.egiz.pdfas.common.exceptions;
 
 import at.gv.egiz.pdfas.common.messages.MessageResolver;
+import lombok.NonNull;
 
 public class PdfAsException extends Exception {
 
@@ -49,7 +50,7 @@ public class PdfAsException extends Exception {
         return localizeMessage(super.getMessage());
     }
 
-    protected String localizeMessage(String msgId) {
+    protected @NonNull String localizeMessage(@NonNull String msgId) {
         return MessageResolver.resolveMessage(msgId);
     }
 }

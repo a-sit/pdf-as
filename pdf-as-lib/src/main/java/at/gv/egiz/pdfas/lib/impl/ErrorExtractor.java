@@ -1,23 +1,22 @@
 package at.gv.egiz.pdfas.lib.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsMOAException;
 import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
+import lombok.extern.slf4j.Slf4j;
 
 import java.security.cert.CertificateException;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 
+@Slf4j
 public class ErrorExtractor implements ErrorConstants {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ErrorExtractor.class);
-	
-	private static final int MAX_CAUSE_DEPTH = 30;
+  private static final int MAX_CAUSE_DEPTH = 30;
 
 	private static PDFASError convertPdfAsError(Throwable e) {
 		if (e instanceof SLPdfAsException ex) {
@@ -34,7 +33,7 @@ public class ErrorExtractor implements ErrorConstants {
 				try {
 					code = Integer.parseInt(ex.getErrorCode());
 				} catch(NumberFormatException numfo) {
-					logger.warn("Failed to convert MOA ErrorCode: " + ex.getErrorCode(), e);
+					log.warn("Failed to convert MOA ErrorCode: " + ex.getErrorCode(), e);
 				}
 			}
 			
@@ -54,7 +53,18 @@ public class ErrorExtractor implements ErrorConstants {
 		return null;
 	}
 
+	/** Resolves legacy [PdfAsException] -> error-coded [PDFASError] */
 	public static PDFASError searchPdfAsError(Throwable e, OperationStatus status) {
+		while ((e instanceof CompletionException || e instanceof ExecutionException) && e.getCause() != null) {
+			e = e.getCause();
+		}
+		if (e instanceof CancellationException cancellation) {
+			throw cancellation;
+		}
+		if (e instanceof Error error) {
+			throw error;
+		}
+
 		Throwable cur = e;
 		PDFASError err = null;
 
@@ -88,7 +98,7 @@ public class ErrorExtractor implements ErrorConstants {
 		}
 
 		if (err == null) {
-			logger.info("Cannot extract correct failure code from: ", e);
+			log.info("Cannot extract correct failure code from: ", e);
 			err =  new PDFASError(ERROR_GENERIC, e);
 		}
 

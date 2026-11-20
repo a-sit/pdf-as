@@ -23,6 +23,8 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.exceptions;
 
+import lombok.NonNull;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,7 +59,7 @@ public class SLPdfAsException extends PdfAsException {
 	  
 	}
 	
-	protected String localizeMessage(String msgId) {
+	protected @NonNull String localizeMessage(@NonNull String msgId) {
 		return String.format("%d : %s", code, info);
 	}
 }

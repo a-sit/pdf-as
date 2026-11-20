@@ -1,5 +1,8 @@
 package at.gv.egiz.pdfas.lib.impl.pdfbox3
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants
+import at.gv.egiz.pdfas.common.exceptions.PDFASError
+import at.gv.egiz.pdfas.common.exceptions.PdfAsException
 import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants
 import at.gv.egiz.pdfas.lib.api.ISuspendingSigner
@@ -31,6 +34,9 @@ import org.junit.runners.BlockJUnit4ClassRunner
 import org.zeroturnaround.zip.ZipUtil
 import java.io.ByteArrayOutputStream
 import java.security.KeyStore
+import java.security.cert.CertificateException
+import java.security.cert.X509Certificate
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 
 @RunWith(BlockJUnit4ClassRunner::class)
@@ -125,6 +131,54 @@ class SignVerifyTest {
                 IAsyncSigner.CertificateData(this@wrapSuspend.getCertificate(parameter), this@wrapSuspend.pdfFilter, this@wrapSuspend.pdfSubFilter)
             override suspend fun signSuspend(input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature) =
                 this@wrapSuspend.sign(input, byteRange, parameter, requestedSignature)
+        }
+    }
+
+    @Test
+    fun signingErrorsAreNormalized() = runBlocking {
+        val failures = listOf(
+            PDFASError(ErrorConstants.ERROR_SIG_INVALID_BKU_SIG, "specific failure") to ErrorConstants.ERROR_SIG_INVALID_BKU_SIG,
+            PdfAsException("error.pdf.sig.01") to ErrorConstants.ERROR_PDF_PROCESSING_FAILED,
+            CertificateException("invalid certificate") to ErrorConstants.ERROR_INVALID_CERTIFICATE,
+            IllegalStateException("unexpected failure") to ErrorConstants.ERROR_GENERIC,
+            AssertionError("fatal failure") to null
+        )
+        for ((failure, expectedCode) in failures) {
+            fun checkFailure(actual: Throwable?) {
+                if (expectedCode == null) {
+                    Assert.assertSame(failure, actual)
+                    return
+                }
+                Assert.assertTrue("Expected PDFASError, got $actual", actual is PDFASError)
+                actual as PDFASError
+                Assert.assertEquals(expectedCode, actual.code)
+                Assert.assertSame(failure, if (failure is PDFASError) actual else actual.cause)
+            }
+
+            // certificate failure during sync signing
+            val signer = object : IPlainSigner by getKeystoreSigner("test-key") {
+                override fun getCertificate(parameter: SignParameter): X509Certificate = throw failure
+            }
+            checkFailure(runCatching { captureSign(getInputPdf("align.pdf"), signer) }.exceptionOrNull())
+
+            // certificate failure during async signing
+            val certificate = CompletableFuture<IAsyncSigner.CertificateData>()
+            val asyncSigner = object : IAsyncSigner {
+                override fun getCertificateData(parameter: SignParameter) = certificate
+                override fun sign(input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature): CompletableFuture<ByteArray> =
+                    error("Certificate lookup should fail")
+            }
+            val result = pdfAs.signAsync(PdfAsFactory.createSignParameter(pdfAs.configuration),
+                getInputPdf("align.pdf"), asyncSigner, ByteArrayOutputStream()).toCompletableFuture()
+            Assert.assertFalse(result.isDone)
+            certificate.completeExceptionally(failure)
+            checkFailure(Assert.assertThrows(CompletionException::class.java) { result.join() }.cause)
+
+            // certificate failure during suspend signing
+            checkFailure(runCatching {
+                pdfAs.signSuspend(PdfAsFactory.createSignParameter(pdfAs.configuration),
+                    getInputPdf("align.pdf"), signer.wrapSuspend(), ByteArrayOutputStream())
+            }.exceptionOrNull())
         }
     }
 

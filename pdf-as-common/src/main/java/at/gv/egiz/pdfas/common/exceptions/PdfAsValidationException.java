@@ -24,6 +24,7 @@
 package at.gv.egiz.pdfas.common.exceptions;
 
 import at.gv.egiz.pdfas.common.messages.MessageResolver;
+import lombok.NonNull;
 
 public class PdfAsValidationException extends PdfAsException {
 
@@ -40,7 +41,7 @@ public class PdfAsValidationException extends PdfAsException {
 	}
 	
 	@Override
-	protected String localizeMessage(String msgId) {
+	protected @NonNull String localizeMessage(@NonNull String msgId) {
 		if(parameter != null) {
 			return String.format(MessageResolver.resolveMessage(msgId), parameter);
 		} 

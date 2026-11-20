@@ -12,7 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.future.future
 import java.io.OutputStream
-import java.security.cert.CertificateException
 
 /** Wrapper to avoid bridging through [PdfAs.signAsync]'s Future wrappers for Kotlin signers. */
 suspend fun PdfAs.signSuspend(param: SignParameter, document: DataSource, signer: IAsyncSigner, output: OutputStream): SignResult {
@@ -28,9 +27,7 @@ suspend fun PdfAs.signSuspend(param: SignParameter, document: DataSource, signer
         }.run {
             finishSign(output)
         }
-    } catch (x: CertificateException) {
-        throw ErrorExtractor.searchPdfAsError(x, state.status)
-    } catch (x: PdfAsException) {
+    } catch (x: Exception) {
         throw ErrorExtractor.searchPdfAsError(x, state.status)
     }
 }

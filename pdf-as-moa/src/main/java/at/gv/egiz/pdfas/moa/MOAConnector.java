@@ -256,21 +256,16 @@ public class MOAConnector implements ISignatureConnector, IConfigurationConstant
         if (resp instanceof byte[] cmsSignatureData) {
             // done the signature!
 
-          VerifyResult verifyResult;
-            try {
-                verifyResult = SignatureUtils.verifySignature(cmsSignatureData,
-                        input);
-                if(SettingsUtils.getBooleanValue(requestedSignature.getStatus().getSettings(), 
-                        IConfigurationConstants.KEEP_INVALID_SIGNATURE, false)) {
-                    Base64 b64 = new Base64();
-                    requestedSignature
-                    .getStatus()
-                    .getMetaInformations()
-                    .put(ErrorConstants.STATUS_INFO_INVALIDSIG,
-                            b64.encodeToString(cmsSignatureData));
-                }
-            } catch (PDFASError e) {
-                throw new PdfAsErrorCarrier(e);
+            VerifyResult verifyResult = SignatureUtils.verifySignature(cmsSignatureData,
+                    input);
+            if(SettingsUtils.getBooleanValue(requestedSignature.getStatus().getSettings(),
+                    IConfigurationConstants.KEEP_INVALID_SIGNATURE, false)) {
+                Base64 b64 = new Base64();
+                requestedSignature
+                .getStatus()
+                .getMetaInformations()
+                .put(ErrorConstants.STATUS_INFO_INVALIDSIG,
+                        b64.encodeToString(cmsSignatureData));
             }
 
             if (!StreamUtils.dataCompare(requestedSignature.getCertificate()

@@ -489,7 +489,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             logger.warn(MessageResolver.resolveMessage("error.pdf.sig.01"), e)
             throw PdfAsException("error.pdf.sig.01", e)
         } catch (e: PDFASError) {
-            logger.warn(e.info)
+            logger.warn(e.message)
             throw PdfAsException("error.pdf.sig.01", e)
         } finally {
             System.gc()

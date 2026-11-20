@@ -28,7 +28,6 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsErrorCarrier;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
@@ -66,20 +65,19 @@ public class PlaceholderFilter implements IConfigurationConstants,
 		return null;
 	}
 	
-	private static int getPlaceHolderMode(ISettings settings, int defaultValue) throws PdfAsErrorCarrier {
+	private static int getPlaceHolderMode(ISettings settings, int defaultValue) throws PDFASError {
     String placeholderModeString = settings.getValue(PLACEHOLDER_MODE);   
     if (StringUtils.isNotEmpty(placeholderModeString)) {
       try {
         int placeholderMode = Integer.parseInt(placeholderModeString);
         if (placeholderMode < PLACEHOLDER_MODE_MIN || placeholderMode > PLACEHOLDER_MODE_MAX) {
-          throw new PdfAsErrorCarrier(new PDFASError(PDFASError.ERROR_INVALID_PLACEHOLDER_MODE));
+          throw new PDFASError(PDFASError.ERROR_INVALID_PLACEHOLDER_MODE);
           
         }
         return placeholderMode;
         
       } catch (NumberFormatException e) {
-        throw new PdfAsErrorCarrier(new PDFASError(
-            PDFASError.ERROR_INVALID_PLACEHOLDER_MODE, e));
+        throw new PDFASError(PDFASError.ERROR_INVALID_PLACEHOLDER_MODE, e);
       }
       
     } else {

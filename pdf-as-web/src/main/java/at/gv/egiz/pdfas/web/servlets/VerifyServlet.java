@@ -42,8 +42,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import at.gv.egiz.pdfas.web.exception.PdfAsWebException;
@@ -274,7 +274,7 @@ public class VerifyServlet extends HttpServlet {
                         return;
                     }
                 }
-                throw new PdfAsException("No Signature data available");
+                throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
             }
 
             doVerify(request, response, filecontent, statisticEvent);

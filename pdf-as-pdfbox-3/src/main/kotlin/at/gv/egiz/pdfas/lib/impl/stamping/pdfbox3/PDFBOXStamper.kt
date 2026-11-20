@@ -1,6 +1,7 @@
 package at.gv.egiz.pdfas.lib.impl.stamping.pdfbox3
 
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants
+import at.gv.egiz.pdfas.common.exceptions.PDFASError
 import at.gv.egiz.pdfas.common.settings.ISettings
 import at.gv.egiz.pdfas.common.utils.ImageUtils
 import at.gv.egiz.pdfas.common.utils.StringUtils
@@ -171,7 +172,7 @@ object PDFBOXStamper: IPDFStamper<PDFBOXObject> {
                     }
                 }
             } catch (e: UnsupportedEncodingException) {
-                throw PdfAsException("Unsupported Encoding", e)
+                throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Unsupported Encoding", e)
             }
         }
 

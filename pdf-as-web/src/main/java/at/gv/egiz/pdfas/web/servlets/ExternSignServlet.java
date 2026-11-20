@@ -44,8 +44,8 @@ import at.gv.egiz.pdfas.api.processing.DocumentToSign;
 import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 import at.gv.egiz.pdfas.api.processing.PdfasSignResponse;
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsValidationException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory;
@@ -273,7 +273,7 @@ public class ExternSignServlet extends HttpServlet {
                         return;
                     }
                 }
-                throw new PdfAsException("No Signature data available");
+                throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
             }
             
             doSignature(request, response, filecontent, statisticEvent);
@@ -298,7 +298,7 @@ public class ExternSignServlet extends HttpServlet {
     protected void doSignature(HttpServletRequest request,
             HttpServletResponse response, byte[] pdfData, StatisticEvent statisticEvent) throws Exception {
         if(pdfData == null) {
-            throw new PdfAsException("No Signature data available");
+            throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
         }
         
         if(pdfData[0] != 0x25 || pdfData[1] != 0x50 || pdfData[2] != 0x44 || pdfData[3] != 0x46) {

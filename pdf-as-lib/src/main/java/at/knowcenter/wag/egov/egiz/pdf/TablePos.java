@@ -51,6 +51,8 @@ package at.knowcenter.wag.egov.egiz.pdf;
 import java.io.Serializable;
 import java.text.MessageFormat;
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -201,7 +203,7 @@ public class TablePos
       throws PdfAsException, NumberFormatException {    
     float value= Float.parseFloat(commandval);
     if (value < minValue) {
-      throw new PdfAsException(MessageFormat.format(errorMsg, value));
+      throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, MessageFormat.format(errorMsg, value));
           
     }       
     return value;
@@ -219,13 +221,13 @@ public class TablePos
        String[] cmd_kv = cmd_kvstring.split(":");
        
        if (cmd_kv.length != 2) {
-         throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
+         throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") is invalid.");
          
        }
        
        String cmdstr =  cmd_kv[0];
        if (cmdstr.length() != 1) {
-         throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
+         throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") is invalid.");
          
        }
        
@@ -264,7 +266,7 @@ public class TablePos
                  } else {
                    int pval = Integer.parseInt(commandval);
                    if (pval<1) {
-                     throw new PdfAsException("Page (p:" + pval + ") must not be lower than 1.");
+                     throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Page (p:" + pval + ") must not be lower than 1.");
                      
                    }
                    this.page =pval;
@@ -288,13 +290,13 @@ public class TablePos
                    flval = flval % 360;
                    // we only support rotation in 90 degree steps
                    if(flval % 90 != 0) {
-                     throw new PdfAsException("Pos string (=" + pos_string + ") is invalid. Rotation is only allowed to be a multiple of 90.");
+                     throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") is invalid. Rotation is only allowed to be a multiple of 90.");
                    }    
                    this.rotation = flval;
                    break;
            }
            default : {
-                      throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
+                      throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") is invalid.");
                       }
          }
       }
@@ -302,7 +304,7 @@ public class TablePos
       }
       catch (NumberFormatException e)
       {
-        throw new PdfAsException("Pos string (=" + pos_string + ") cannot be parsed.");
+        throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") cannot be parsed.", e);
       }
   }
   

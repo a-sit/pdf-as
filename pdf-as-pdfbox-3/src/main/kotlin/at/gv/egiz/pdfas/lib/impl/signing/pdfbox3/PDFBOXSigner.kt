@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.impl.signing.pdfbox3
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants
 import at.gv.egiz.pdfas.common.exceptions.PDFASError
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException
 import at.gv.egiz.pdfas.common.exceptions.PdfAsValidationException
@@ -329,15 +330,15 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                 }
             } catch (e: SyntaxValidationException) {
                 logger.error("The file is syntactically invalid", e)
-                throw PdfAsException("Resulting PDF document is syntactically invalid.")
+                throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Resulting PDF document is syntactically invalid.", e)
             } catch (e: ValidationException) {
                 logger.error("The file is not a valid PDF-A document.", e)
             } catch (e: IOException) {
                 logger.error("IOException (${e.message}) occurred while validating PDF-A conformance", e)
-                throw PdfAsException("Failed validating PDF Document.", e)
+                throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Failed validating PDF Document.", e)
             } catch (e: RuntimeException) {
                 logger.error("RuntimeException occurred while validating PDF-A conformance", e)
-                throw PdfAsException("Failed validating PDF Document.", e)
+                throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Failed validating PDF Document.", e)
             }
         }
     }

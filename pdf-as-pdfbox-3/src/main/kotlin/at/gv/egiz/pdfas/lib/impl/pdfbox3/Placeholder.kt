@@ -1,7 +1,8 @@
 package at.gv.egiz.pdfas.lib.impl.pdfbox3
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants
+import at.gv.egiz.pdfas.common.exceptions.PDFASError
 import at.gv.egiz.pdfas.common.exceptions.PDFIOException
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException
 import at.gv.egiz.pdfas.common.exceptions.PlaceholderExtractionException
 import at.gv.egiz.pdfas.lib.impl.placeholder.PlaceholderExtractor
 import at.gv.egiz.pdfas.lib.impl.placeholder.PlaceholderExtractorConstants
@@ -44,7 +45,7 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
         placeholderID: String?,
         matchMode: Int
     ): SignaturePlaceholderData? {
-        if (pdfObject !is PDFBOXObject) throw PdfAsException("Invalid state")
+        if (pdfObject !is PDFBOXObject) throw PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "Invalid state")
         try {
             return Extractor().extract(pdfObject.document!!, placeholderID, matchMode)
         } catch (e: Throwable) {

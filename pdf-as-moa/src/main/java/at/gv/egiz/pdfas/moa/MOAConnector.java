@@ -91,7 +91,7 @@ public class MOAConnector implements ISignatureConnector, IConfigurationConstant
             if (config.getValue(MOA_SIGN_CERTIFICATE) == null) {
                 log.error(MOA_SIGN_CERTIFICATE
                         + " not configured for MOA connector");
-                throw new PdfAsWrappedIOException(new PdfAsException(
+                throw new PdfAsWrappedIOException(new PDFASError(ErrorConstants.ERROR_SET_INVALID_SETTINGS_OBJ,
                         "Please configure: " + MOA_SIGN_CERTIFICATE
                                 + " to use MOA connector"));
             }
@@ -106,7 +106,7 @@ public class MOAConnector implements ISignatureConnector, IConfigurationConstant
 
                 } catch (MalformedURLException e) {
                     log.error("{} is not a valid url but starts with http!", certificateValue);
-                    throw new PdfAsWrappedIOException(new PdfAsException(certificateValue + " is not a valid url but starts with http!"));
+                    throw new PdfAsWrappedIOException(new PDFASError(ErrorConstants.ERROR_SET_INVALID_SETTINGS_OBJ, certificateValue + " is not a valid url but starts with http!", e));
 
                 }
             } else if (certificateValue.startsWith("base64:")) {
@@ -247,7 +247,7 @@ public class MOAConnector implements ISignatureConnector, IConfigurationConstant
         }
 
         if (response.getCMSSignatureOrErrorResponse().size() != 1) {
-            throw new PdfAsException("Invalid Response Count ["
+            throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Invalid Response Count ["
                     + response.getCMSSignatureOrErrorResponse().size()
                     + "] from MOA!");
         }
@@ -281,7 +281,7 @@ public class MOAConnector implements ISignatureConnector, IConfigurationConstant
                     .getErrorCode().toString());
 
         } else {
-            throw new PdfAsException(
+            throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED,
                     "MOA response is not byte[] nor error but: "
                             + resp.getClass().getName());
         }

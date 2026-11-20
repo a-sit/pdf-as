@@ -38,6 +38,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.text.StringEscapeUtils;
 
 import at.gv.egiz.pdfas.api.processing.SignedDocument;
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.exception.PdfAsStoreException;
@@ -202,7 +204,7 @@ public class ProvidePDFServlet extends HttpServlet {
       template = template.replace("##PDFLENGTH##",
           String.valueOf(signedData.length));
     } else {      
-      throw new PdfAsException("No Signature data available");
+      throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "No Signature data available");
     }
 
     String target = PdfAsHelper.getInvokeTarget(request, response);

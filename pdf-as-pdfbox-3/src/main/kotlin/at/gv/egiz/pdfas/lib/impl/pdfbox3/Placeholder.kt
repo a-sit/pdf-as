@@ -228,7 +228,7 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
             var id: String? = null
             result.splitToSequence(';').drop(1).forEach {
                 val parts = it.split('=')
-                if (parts.size != 2) {
+                if (parts.size != 2 || parts[1].isEmpty()) {
                     logger.debug("Invalid parameter in placeholder data: $it")
                     return@forEach
                 }

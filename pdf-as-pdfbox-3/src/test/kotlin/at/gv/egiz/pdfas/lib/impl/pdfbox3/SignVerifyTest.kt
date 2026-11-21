@@ -387,6 +387,23 @@ class SignVerifyTest {
     }
 
     @Test
+    fun signPdfUaFieldWithoutAlternateName() {
+        val fieldName = "Signature_0"
+        val input = SignVerifyTest::class.java.getResourceAsStream("/1Sign_manyQR.pdf").use {
+            ByteArrayDataSource(it!!.readAllBytes())
+        }
+        val output = captureSign(input, getKeystoreSigner("test-key")) {
+            signatureProfileId = "SIGNATURBLOCK_DE"
+            configuration.setValue("sig_obj.SIGNATURBLOCK_DE.key.SIG_PDFUA_FORCE", "true")
+            configuration.setValue(IConfigurationConstants.SIGNATURE_FIELD_NAME, fieldName)
+        }
+        Loader.loadPDF(output).use { document ->
+            Assert.assertEquals(fieldName, document.signatureFields.single().alternateFieldName)
+        }
+        Assert.assertTrue(doVerify(ByteArrayDataSource(output)).single().isVerificationDone)
+    }
+
+    @Test
     fun existingEmptySignatureField() {
         val fieldName = "ownerSignature"
         val output = captureSign(getInputPdf("acroform-placeholder.pdf"), getKeystoreSigner("test-key")) {

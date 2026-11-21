@@ -274,6 +274,15 @@ class SignVerifyTest {
     }
 
     @Test
+    fun signWithPlaceholderSearchAndJpeg2000Image() {
+        val output = captureSign(getInputPdf("jpeg2000.pdf"), getKeystoreSigner("test-key")) {
+            isPlaceHolderSearchEnabled = true
+            configuration.setValue(IConfigurationConstants.PLACEHOLDER_SEARCH_ENABLED, "true")
+        }
+        Assert.assertTrue(doVerify(ByteArrayDataSource(output)).single().isVerificationDone)
+    }
+
+    @Test
     fun signWithPlaceholderSearchAndTextLineOperator() {
         // The sample PDF uses the ' text operator.
         val signedPdf = captureSign(getInputPdf("eupl-1.1.pdf"), getKeystoreSigner("test-key")) {

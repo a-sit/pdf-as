@@ -39,6 +39,10 @@ public class PDFASError extends PdfAsException implements ErrorConstants {
 		this.code = code;
 	}
 
+	public static @NonNull PDFASError wrap(long code, Throwable cause) {
+		return cause instanceof PDFASError error ? error : new PDFASError(code, cause);
+	}
+
 	@Override
 	protected @NonNull String localizeMessage(@NonNull String message) {
 		// Numeric-code messages and explicit details are already resolved.

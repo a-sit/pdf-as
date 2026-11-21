@@ -24,8 +24,9 @@
 package at.gv.egiz.pdfas.lib.impl.status;
 
 import iaik.x509.X509Certificate;
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
 import at.gv.egiz.pdfas.lib.api.SignaturePosition;
 import at.knowcenter.wag.egov.egiz.pdf.TablePos;
 import lombok.Getter;
@@ -62,7 +63,7 @@ public class RequestedSignature implements ICertificateProvider {
     		profileID = status.getGlobalConfiguration().getDefaultSignatureProfile();
     		
     		if(profileID == null) {
-    			throw new PdfAsSettingsException("error.pdf.sig.07");
+            throw new PDFASError(ErrorConstants.ERROR_SIG_NO_PROFILE);
     		}
     	}
 		

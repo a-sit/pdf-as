@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.common.utils.PDFUtils;
 import at.gv.egiz.pdfas.common.utils.StreamUtils;
@@ -358,7 +357,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       );
       return signResult;
     } catch (final IOException e) {
-      // new PdfAsException("error.pdf.sig.06", e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     } finally {
       if (status != null) {

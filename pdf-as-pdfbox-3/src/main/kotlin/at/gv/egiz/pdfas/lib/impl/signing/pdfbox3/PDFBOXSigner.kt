@@ -3,10 +3,8 @@ package at.gv.egiz.pdfas.lib.impl.signing.pdfbox3
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants
 import at.gv.egiz.pdfas.common.exceptions.PDFASError
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException
-import at.gv.egiz.pdfas.common.exceptions.PdfAsValidationException
 import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException
 import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException
-import at.gv.egiz.pdfas.common.messages.MessageResolver
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings
 import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants
@@ -86,7 +84,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     override fun buildPDFObject(operationStatus: OperationStatus) =
         PDFBOXObject(operationStatus)
 
-    @Throws(PdfAsValidationException::class)
+    @Throws(PDFASError::class)
     override fun checkPDFPermissions(pdfObject: PDFBOXObject) {
 
         pdfObject.document!!.checkPDFPermissions()
@@ -100,7 +98,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
 
                 logger.debug("Document is protected, but signing is still allowed")
             } else {
-                throw PdfAsValidationException("error.pdf.sig.12", null)
+                throw PDFASError(ErrorConstants.ERROR_SIG_DOCUMENT_PROTECTED)
             }
         }
     }
@@ -483,15 +481,11 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             } catch (e: PdfAsWrappedIOException) {
                 throw e.decoratedException.also(::logPdfUpdateError)
             } catch (e: Throwable) {
-                throw PdfAsException("error.pdf.sig.06", e.also(::logPdfUpdateError))
+                throw PDFASError.wrap(ErrorConstants.ERROR_SIG_FINISH_FAILED, e.also(::logPdfUpdateError))
             }
             logger.debug("Signature done!")
         }}} catch (e: IOException) {
-            logger.warn(MessageResolver.resolveMessage("error.pdf.sig.01"), e)
-            throw PdfAsException("error.pdf.sig.01", e)
-        } catch (e: PDFASError) {
-            logger.warn(e.message)
-            throw PdfAsException("error.pdf.sig.01", e)
+            throw PDFASError(ErrorConstants.ERROR_SIG_CREATION_FAILED, e).also { logger.warn(it.message, e) }
         } finally {
             System.gc()
         }

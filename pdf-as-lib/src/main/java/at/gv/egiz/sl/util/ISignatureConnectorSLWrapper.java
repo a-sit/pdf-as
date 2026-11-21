@@ -82,7 +82,7 @@ public class ISignatureConnectorSLWrapper implements ISignatureConnector {
 				}
 			}
 		} catch (CertificateException e) {
-			throw new PdfAsException("error.pdf.sig.01", e);
+			throw new PDFASError(ErrorConstants.ERROR_INVALID_CERTIFICATE, e);
 		} 
 		return certificate;
 	}

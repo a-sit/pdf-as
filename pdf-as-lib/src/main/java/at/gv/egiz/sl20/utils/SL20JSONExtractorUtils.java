@@ -235,7 +235,7 @@ public class SL20JSONExtractorUtils {
 						
 					} catch (Exception e1) {
                         log.debug("DummyCode FAILED, Reason: {} Ignore it ...", e1.getMessage());
-						throw new SL20Exception(e.getMessage(), e);
+						throw new SLCommandoParserException(e1);
 						
 					}
 					

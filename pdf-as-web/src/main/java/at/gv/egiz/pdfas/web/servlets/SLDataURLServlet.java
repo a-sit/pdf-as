@@ -12,12 +12,9 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jose4j.base64url.Base64Url;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -35,13 +32,11 @@ import at.gv.egiz.sl20.exceptions.SLCommandoParserException;
 import at.gv.egiz.sl20.utils.SL20Constants;
 import at.gv.egiz.sl20.utils.SL20JSONExtractorUtils;
 
+@Slf4j
 @MultipartConfig
 public class SLDataURLServlet extends HttpServlet {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SLDataURLServlet.class);
-
-	/**
+  /**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public SLDataURLServlet() {
@@ -82,17 +77,17 @@ public class SLDataURLServlet extends HttpServlet {
 				//Workaround for SIC Handy-Signature, because it sends result in InputStream
 				String isReqInput = StreamUtils.readStream(request.getInputStream(), StandardCharsets.UTF_8);
 				if (StringUtils.isNotEmpty(isReqInput)) {
-					logger.info("Use SIC Handy-Signature work-around!");
+					log.info("Use SIC Handy-Signature work-around!");
 					sl20Result = isReqInput.substring("slcommand=".length());
 					
 				} else {					
-					logger.info("NO SL2.0 commando or result FOUND.");
+					log.info("NO SL2.0 commando or result FOUND.");
 					throw new SL20Exception("sl20.04", null);
 				}
 				
 			}
 
-			logger.trace("Received SL2.0 command: {}", sl20Result);
+			log.trace("Received SL2.0 command: {}", sl20Result);
 			
 			//parse SL2.0 command/result into JSON				
 			try {
@@ -100,8 +95,8 @@ public class SLDataURLServlet extends HttpServlet {
 				sl20ReqObj = sl20Req.getAsJsonObject();
 				
 			} catch (JsonSyntaxException e) {
-				logger.warn("SL2.0 command or result is NOT valid JSON.", e);
-				logger.debug("SL2.0 msg: {}", sl20Result);
+				log.warn("SL2.0 command or result is NOT valid JSON.", e);
+				log.debug("SL2.0 msg: {}", sl20Result);
 				throw new SL20Exception("sl20.02", e);
 				
 			}
@@ -116,8 +111,8 @@ public class SLDataURLServlet extends HttpServlet {
 			String sl20ReqId = (String) request.getSession(false).getAttribute(PdfAsHelper.PDF_SESSION_PREFIX + SL20Constants.SL20_REQID);
 			String inRespTo = SL20JSONExtractorUtils.getStringValue(sl20ReqObj, SL20Constants.SL20_INRESPTO, true);
 			if (sl20ReqId == null || !sl20ReqId.equals(inRespTo)) {
-				logger.debug("SL20 'reqId': " + sl20ReqId + " does NOT match to 'inResponseTo':" + inRespTo);
-				throw new SL20SecurityException("SL20 'reqId': " + sl20ReqId + " does NOT match to 'inResponseTo':" + inRespTo);
+                log.debug("SL20 'reqId': {} does NOT match to 'inResponseTo':{}", sl20ReqId, inRespTo);
+				throw new SL20SecurityException();
 			}
 			
 			JsonSecurityUtils joseTools = JsonSecurityUtils.getInstance();
@@ -130,11 +125,11 @@ public class SLDataURLServlet extends HttpServlet {
 			
 			if ( (payLoadContainer.isValidSigned() == null || !payLoadContainer.isValidSigned())) {
 				if (WebConfiguration.isSL20SigningRequired()) {
-					logger.info("SL20 result from VDA was not valid signed");
-					throw new SL20SecurityException("Signature on SL20 result NOT valid.");
+					log.info("SL20 result from VDA was not valid signed");
+					throw new SL20SecurityException();
 					
 				} else {
-					logger.warn("SL20 result from VDA is NOT valid signed, but signatures-verification is DISABLED by configuration!");
+					log.warn("SL20 result from VDA is NOT valid signed, but signatures-verification is DISABLED by configuration!");
 					
 				}				
 			}
@@ -142,13 +137,13 @@ public class SLDataURLServlet extends HttpServlet {
 			//extract payloaf
 			JsonObject payLoad = payLoadContainer.getPayload();
 			
-			logger.trace("SL2.0 payLoad on DataURL: " + payLoad.toString());
+			log.trace("SL2.0 payLoad on DataURL: " + payLoad.toString());
 			
 			//check response type
 			if (SL20JSONExtractorUtils.getStringValue(
 					payLoad, SL20Constants.SL20_COMMAND_CONTAINER_NAME, true)
 						.equals(SL20Constants.SL20_COMMAND_IDENTIFIER_GETCERTIFICATE)) {
-				logger.debug("Find " + SL20Constants.SL20_COMMAND_IDENTIFIER_GETCERTIFICATE + " result .... ");
+				log.debug("Find " + SL20Constants.SL20_COMMAND_IDENTIFIER_GETCERTIFICATE + " result .... ");
 								
 				JsonElement getCertificateResult = SL20JSONExtractorUtils.extractSL20Result(
 						payLoad, joseTools, 
@@ -160,21 +155,21 @@ public class SLDataURLServlet extends HttpServlet {
 						true);
 				
 				if (certsB64.isEmpty()) {
-					logger.warn("SL20 'getCertificate' result contains NO certificate");
+					log.warn("SL20 'getCertificate' result contains NO certificate");
 					throw new SLCommandoParserException();
 					
 				} else if (certsB64.size() == 1) {
-					logger.debug("SL20 'getCertificate' result contains only one certificate");
+					log.debug("SL20 'getCertificate' result contains only one certificate");
 					PdfAsHelper.injectCertificate(request, response, Base64.getDecoder().decode(certsB64.get(0)), getServletContext());	
 					
 				} else {
-					logger.debug("SL20 'getCertificate' result contains more than one certificate. Certificates must be sorted ... ");
+					log.debug("SL20 'getCertificate' result contains more than one certificate. Certificates must be sorted ... ");
 					List<X509Certificate> certs = new ArrayList<X509Certificate>();
 					for (String certB64 : certsB64)
 						certs.add(new iaik.x509.X509Certificate(Base64.getDecoder().decode(certB64)));
 												
 					List<X509Certificate> sortedCerts = X509Utils.sortCertificates(certs);
-					logger.debug("Sorting of certificate completed. Select end-user certificate ... ");
+					log.debug("Sorting of certificate completed. Select end-user certificate ... ");
 					PdfAsHelper.injectCertificate(request, response, sortedCerts.get(0).getEncoded(), getServletContext());
 					
 				}
@@ -182,7 +177,7 @@ public class SLDataURLServlet extends HttpServlet {
 			} else if (SL20JSONExtractorUtils.getStringValue(
 					payLoad, SL20Constants.SL20_COMMAND_CONTAINER_NAME, true)
 					.equals(SL20Constants.SL20_COMMAND_IDENTIFIER_CREATE_SIG_CADES)) {
-				logger.debug("Find " + SL20Constants.SL20_COMMAND_IDENTIFIER_CREATE_SIG_CADES + " result .... ");
+				log.debug("Find " + SL20Constants.SL20_COMMAND_IDENTIFIER_CREATE_SIG_CADES + " result .... ");
 				
 				JsonElement getCertificateResult = SL20JSONExtractorUtils.extractSL20Result(
 						payLoad, joseTools, 
@@ -195,20 +190,20 @@ public class SLDataURLServlet extends HttpServlet {
 						true);
 				
 				if (StringUtils.isEmpty(cadesSigB64)) {
-					logger.warn("SL20 'createCAdES' result contains NO signature");
+					log.warn("SL20 'createCAdES' result contains NO signature");
 					throw new SLCommandoParserException();
 				}
 				
 				PdfAsHelper.injectSignature(request, response, Base64.getDecoder().decode(cadesSigB64), getServletContext());
 				
 			} else {
-				logger.info("SL20 response is NOT a " + SL20Constants.SL20_COMMAND_IDENTIFIER_QUALIFIEDEID + " result");
+				log.info("SL20 response is NOT a " + SL20Constants.SL20_COMMAND_IDENTIFIER_QUALIFIEDEID + " result");
 				throw new SLCommandoParserException();
 				
 			}	
 			
 		} catch (Exception e) {
-			logger.warn("Error in DataURL Servlet. " , e);
+			log.warn("Error in DataURL Servlet. " , e);
 			PdfAsHelper.setSessionException(request, response, e.getMessage(),
 					e);
 			
@@ -222,7 +217,7 @@ public class SLDataURLServlet extends HttpServlet {
 					PdfAsHelper.buildSL20RedirectResponse(request, response, transactionId, errorUrl);
 					
 				} catch (SL20Exception e1) {
-					logger.error("SL20 error-handling FAILED", e);
+					log.error("SL20 error-handling FAILED", e);
 					response.sendError(500, "Internal Server Error.");
 					
 				}

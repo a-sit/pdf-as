@@ -3,6 +3,7 @@ package at.gv.egiz.pdfas.lib.impl.pdfbox3
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants
 import at.gv.egiz.pdfas.common.exceptions.PDFASError
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException
+import at.gv.egiz.pdfas.common.messages.MessageResolver
 import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource
 import at.gv.egiz.pdfas.lib.api.Configuration
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants
@@ -406,6 +407,24 @@ class SignVerifyTest {
             val acroForm = requireNotNull(doc.documentCatalog.getAcroForm(null))
             Assert.assertFalse(acroForm.cosObject.containsKey(COSName.DA))
             Assert.assertNotEquals(true, acroForm.defaultResources?.fontNames?.any())
+        }
+    }
+
+    @Test
+    fun rejectIncompleteSignatureDictionaries() {
+        for (pdfName in listOf("align-missing-signature-byterange.pdf", "align-missing-signature-contents.pdf")) {
+            val output = captureSign(getInputPdf(pdfName), getKeystoreSigner("test-key")) {
+                signatureProfileId = "INVISIBLE"
+            }
+            Assert.assertTrue(doVerify(ByteArrayDataSource(output)) {
+                whichSignature = 1
+            }.single().isVerificationDone)
+
+            val error = Assert.assertThrows(PDFASError::class.java) {
+                doVerify(ByteArrayDataSource(output))
+            }
+            Assert.assertEquals(PDFASError.ERROR_PDF_PROCESSING_FAILED, error.code)
+            Assert.assertEquals(MessageResolver.resolveMessage("error.pdf.verify.01"), error.info)
         }
     }
 

@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.impl.verify.pdfbox3
 
+import at.gv.egiz.pdfas.common.exceptions.PdfAsException
 import at.gv.egiz.pdfas.common.settings.ISettings
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult
@@ -22,7 +23,6 @@ object PDFBOXVerifier : VerifyBackend {
                 else -> allSignatures
             }
             return selectedSignatures.flatMap {
-                it.contents
                 dispatcher.checkSignature(it, pdfData, parameter)
             }
         }
@@ -31,6 +31,9 @@ object PDFBOXVerifier : VerifyBackend {
     private fun VerifierDispatcher.checkSignature(
         sig: PDSignature, document: ByteArray, parameter: VerifyParameter
     ): List<VerifyResult> {
+        if (sig.byteRange.isEmpty() || sig.contents.isEmpty()) {
+            throw PdfAsException("error.pdf.verify.01")
+        }
         val filterVerifier = getVerifier(sig.filter, sig.subFilter) ?: return emptyList()
         val levelVerifier = getVerifierByLevel(parameter.signatureVerificationLevel)
         synchronized(levelVerifier) {

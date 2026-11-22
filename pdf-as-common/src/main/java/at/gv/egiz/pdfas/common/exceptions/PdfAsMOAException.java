@@ -24,13 +24,9 @@
 package at.gv.egiz.pdfas.common.exceptions;
 
 import at.gv.egiz.pdfas.common.messages.MessageResolver;
+import lombok.NonNull;
 
 public class PdfAsMOAException extends PdfAsException {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -217112433494784615L;
 	
 	private String faultCode;
 	private String faultString;
@@ -46,7 +42,7 @@ public class PdfAsMOAException extends PdfAsException {
 	}
 	
 	@Override
-	protected String localizeMessage(String msgId) {
+	protected @NonNull String localizeMessage(@NonNull String msgId) {
         return String.format(MessageResolver.resolveMessage(msgId), errorResponse, errorCode, faultCode, faultString);
     }
 

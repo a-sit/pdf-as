@@ -24,8 +24,6 @@ import at.gv.egiz.status.impl.TestManager;
  */
 @WebServlet(name="statusServlet", urlPatterns={"/status"}) 
 public class StatusServlet extends HttpServlet {
-       
-	private static final long serialVersionUID = 1201254769913428186L;
 
 	public static final String PARAM_CONTENT_TYPE = "content";
 	public static final String PARAM_FORCE = "force";

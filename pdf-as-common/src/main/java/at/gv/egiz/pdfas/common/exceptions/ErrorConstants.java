@@ -12,11 +12,22 @@ public interface ErrorConstants {
 	public static final long ERROR_NO_BACKEND = 10002;
 	
 	// Signature Errors
+	public static final long ERROR_SIG_CREATION_FAILED = 11001;
 	public static final long ERROR_SIG_FAILED_OPEN_KS = 11002;
 	public static final long ERROR_SIG_INVALID_STATUS = 11004;
+	public static final long ERROR_SIG_FINISH_FAILED = 11006;
+	public static final long ERROR_SIG_NO_PROFILE = 11007;
 	
 	public static final long ERROR_SIG_INVALID_BKU_SIG = 11008;
 	public static final long ERROR_SIG_INVALID_PROFILE = 11009;
+	public static final long ERROR_SIG_NO_DATA = 11010;
+	public static final long ERROR_SIG_DOCUMENT_PROTECTED = 11012;
+	public static final long ERROR_SIG_INVALID_ALIAS = 11013;
+	public static final long ERROR_SIG_INVALID_KEYSTORE_TYPE = 11014;
+	public static final long ERROR_SIG_KEYSTORE_PASSWORD_MISSING = 11015;
+	public static final long ERROR_SIG_KEY_PASSWORD_MISSING = 11016;
+	public static final long ERROR_SIG_CERTIFICATE_MISSING = 11017;
+	public static final long ERROR_SIG_PRIVATE_KEY_MISSING = 11018;
 
 	public static final long ERROR_SIG_CERTIFICATE_MISSMATCH = 11019;
 
@@ -33,7 +44,4 @@ public interface ErrorConstants {
 	public static final long ERROR_SET_INVALID_SETTINGS_OBJ = 13001;
 	public static final long ERROR_INVALID_CERTIFICATE = 13002;
 	public static final long ERROR_INVALID_PLACEHOLDER_MODE = 13003;
-	
-	//Validation Errors
-	public static final long ERROR_NO_CONF_VALIDATION_BACKEND = 14001;
 }

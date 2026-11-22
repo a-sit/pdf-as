@@ -64,13 +64,8 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
  * @see Style
  * @see at.knowcenter.wag.egov.egiz.table.Entry
  */
-public class Table implements Serializable
+public class Table
 {
-
-  /**
-   * SVUID.
-   */
-  private static final long serialVersionUID = 8488947943674086618L;
 
   /**
    * The table column settings.
@@ -222,25 +217,25 @@ public class Table implements Serializable
   }
 
   private void calculateMaxCols(ArrayList<Entry> newrow) {
-	  int colCount = calculateRowSize(newrow);
-	  if (colCount > maxCols_)
-	    {
-	      maxCols_ = colCount;
-	    }
+    int colCount = calculateRowSize(newrow);
+    if (colCount > maxCols_)
+      {
+        maxCols_ = colCount;
+      }
   }
   
   private int calculateRowSize(ArrayList<Entry> newrow) {
-	  int colCount = 0;
-	  for (Entry entry : newrow) {
-		  colCount += entry.getColSpan();
-	  }
-	  return colCount;
+    int colCount = 0;
+    for (Entry entry : newrow) {
+      colCount += entry.getColSpan();
+    }
+    return colCount;
   }
   
   private void recalculateMaxCol() {
-	  for (ArrayList<Entry> row : getRows()) {
-		  calculateMaxCols(row);
-	  }
+    for (ArrayList<Entry> row : getRows()) {
+      calculateMaxCols(row);
+    }
   }
   
   private boolean recursiveNorm = false;
@@ -249,38 +244,38 @@ public class Table implements Serializable
    * Expands the last cell of each column to fill the table
  * @throws PdfAsSettingsException 
    */
-  public void normalize() throws PdfAsSettingsException {	  
-	  for (ArrayList<Entry> row : getRows()) {
-		  
-		  // This row fits just fine
-		  if(row.size() == maxCols_) {
-			  continue;
-		  }
-		  
-		  int rowSize = calculateRowSize(row);
-		  
-		  // This row fits just fine including row spans
-		  if(rowSize == maxCols_) {
-			  continue;
-		  }
-		  
-		  int missingColumns = maxCols_ - rowSize;
-		  
-		  if(missingColumns < 0) {
-			  // wrong max Col value!
-			  // recalculate the maximum Columns and normalize again!
-			  if(recursiveNorm) {
-				 throw new PdfAsSettingsException("Failed to build virtual model of signatur block table."); 
-			  }
-			  recalculateMaxCol();
-			  recursiveNorm = true;
-			  normalize();
-			  recursiveNorm = false;
-			  break;
-		  } else {
-			  row.get(row.size() - 1).setColSpan(row.get(row.size() - 1).getColSpan() + missingColumns);
-		  }
-	  }
+  public void normalize() throws PdfAsSettingsException {    
+    for (ArrayList<Entry> row : getRows()) {
+      
+      // This row fits just fine
+      if(row.size() == maxCols_) {
+        continue;
+      }
+      
+      int rowSize = calculateRowSize(row);
+      
+      // This row fits just fine including row spans
+      if(rowSize == maxCols_) {
+        continue;
+      }
+      
+      int missingColumns = maxCols_ - rowSize;
+      
+      if(missingColumns < 0) {
+        // wrong max Col value!
+        // recalculate the maximum Columns and normalize again!
+        if(recursiveNorm) {
+         throw new PdfAsSettingsException("Failed to build virtual model of signatur block table."); 
+        }
+        recalculateMaxCol();
+        recursiveNorm = true;
+        normalize();
+        recursiveNorm = false;
+        break;
+      } else {
+        row.get(row.size() - 1).setColSpan(row.get(row.size() - 1).getColSpan() + missingColumns);
+      }
+    }
   }
   
   /**

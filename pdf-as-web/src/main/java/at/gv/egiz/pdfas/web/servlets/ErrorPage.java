@@ -50,7 +50,6 @@ import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
  * Servlet implementation class ErrorPage
  */
 public class ErrorPage extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ErrorPage.class);

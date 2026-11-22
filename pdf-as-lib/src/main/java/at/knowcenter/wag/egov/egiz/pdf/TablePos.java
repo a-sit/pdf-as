@@ -51,6 +51,8 @@ package at.knowcenter.wag.egov.egiz.pdf;
 import java.io.Serializable;
 import java.text.MessageFormat;
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -64,17 +66,11 @@ import lombok.Setter;
  * @author mruhmer
  */
 @NoArgsConstructor
-public class TablePos implements Serializable
+public class TablePos
 {
 
   public enum PAGE_MODE {AUTO, LAST, EXACT, NEW}; 
   public enum POS_MODE {AUTO, EXACT};
-  
-  
-  /**
-   * SVUID.
-   */
-  private static final long serialVersionUID = -5299027706623518059L;
 
   /**
    * The page on which the block should be displayed.
@@ -133,7 +129,6 @@ public class TablePos implements Serializable
   
   public boolean isYauto() {
     return yMode.equals(POS_MODE.AUTO);
-	
   } 
   
   public boolean isWauto() {
@@ -199,9 +194,8 @@ public class TablePos implements Serializable
   }
   
   public String toString() {  
-   String thatsme = "pos_x:"+this.posX+" pos_y:"+this.posY+" page:"+this.page+" width:"+this.width+" footer:"+this.footerLine+" rotation:"+this.rotation+"\n "+" autoX:"+xMode+" autoY:"+yMode+" autoW:"+wMode+" pageMode:"+pageMode; 
-   return thatsme;
-   
+    String thatsme = "pos_x:"+this.posX+" pos_y:"+this.posY+" page:"+this.page+" width:"+this.width+" footer:"+this.footerLine+" rotation:"+this.rotation+"\n "+" autoX:"+xMode+" autoY:"+yMode+" autoW:"+wMode+" pageMode:"+pageMode;
+    return thatsme;
   }
   
   
@@ -209,7 +203,7 @@ public class TablePos implements Serializable
       throws PdfAsException, NumberFormatException {    
     float value= Float.parseFloat(commandval);
     if (value < minValue) {
-      throw new PdfAsException(MessageFormat.format(errorMsg, value));
+      throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, MessageFormat.format(errorMsg, value));
           
     }       
     return value;
@@ -217,116 +211,116 @@ public class TablePos implements Serializable
   }
   
   private void parsePosString(String pos_string) throws PdfAsException {
-	//parse posstring and throw exception
-		//[x:x_algo];[y:y_algo];[w:w_algo][p:p_algo];[f:f_algo]
-		
-		String[] strs = pos_string.split(";");
-		try {
-		  for (int cmds = 0;cmds<strs.length;cmds++) {			 
-			 String cmd_kvstring = strs[cmds];
-			 String[] cmd_kv = cmd_kvstring.split(":");
-			 
-			 if (cmd_kv.length != 2) {
-				 throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
-				 
-			 }
-			 
-			 String cmdstr =  cmd_kv[0];
-			 if (cmdstr.length() != 1) {
-				 throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
-				 
-			 }
-			 
-			 char command = cmdstr.charAt(0);
-		   String commandval= cmd_kv[1];
-		   switch (command) {
-		     	case 'x': {
-		     		         if (!commandval.equalsIgnoreCase("auto")) {	     		          
-		     		        	this.posX = parseAndCheck(commandval, 0, "Pos string (x:{0}) is invalid.");
-		     		        	this.xMode = POS_MODE.EXACT;		     		        	
-		     		         }
-		     		         break;
-		     			  }	
-		     	case 'y': {
-			         		if (!commandval.equalsIgnoreCase("auto")) {			         			
-			         			this.posY = parseAndCheck(commandval, 0, "Pos string (y:{0}) is invalid.");
-			         			this.yMode = POS_MODE.EXACT; 			         			
-			         		}    		         
-			         		break;
-		     			  }		
-		     	case 'w': { 
-	         				if (!commandval.equalsIgnoreCase("auto")) {
-	         					this.width = parseAndCheck(commandval, 1, "pos.width (w:{0}) must not be lower or equal 0.");
-	         					this.wMode = POS_MODE.EXACT; 
-	         				}      		         
-	         				break;
-	      				  }
-		     	case 'p': {
-	 						if (!commandval.equalsIgnoreCase("auto")) { 
-	 							if (commandval.equalsIgnoreCase("new")) { 								
-	 							 pageMode = PAGE_MODE.NEW;
-	 							  
-	 							} else if (commandval.equalsIgnoreCase("last")) {                 
-	                 pageMode = PAGE_MODE.LAST;
-	                  	 							 
-	 							} else {
-	 								int pval = Integer.parseInt(commandval);
-	 								if (pval<1) {
-	 									throw new PdfAsException("Page (p:" + pval + ") must not be lower than 1.");
-	 									
-	 								}
-	 								this.page =pval;
-	 								pageMode = PAGE_MODE.EXACT;
-	 								
-	 							}
-	 						
-	 						} else {
-  	 						pageMode = PAGE_MODE.AUTO;
-	 							
-	 						}
-	 						break;
-	      				  }
-		     	case 'f': {
-		     	        footerLine = parseAndCheck(commandval, 0, "Footer pos string (f={0}) is invalid.");
-		     	        break;
-		     			  }
-		     	case 'r': {
-	 		        		float flval=Float.parseFloat(commandval);
-	 		        		// reduce to 0 - 360 degrees
-	 		        		flval = flval % 360;
-	 		        		// we only support rotation in 90 degree steps
-	 		        		if(flval % 90 != 0) {
-	 		        			throw new PdfAsException("Pos string (=" + pos_string + ") is invalid. Rotation is only allowed to be a multiple of 90.");
-	 		        		}    
-	 		        		this.rotation = flval;
-	 		        		break;
-	 			  }
-		     	default : {
-			                throw new PdfAsException("Pos string (=" + pos_string + ") is invalid.");
-		                  }
-		     }
-		  }
+  //parse posstring and throw exception
+    //[x:x_algo];[y:y_algo];[w:w_algo][p:p_algo];[f:f_algo]
+    
+    String[] strs = pos_string.split(";");
+    try {
+      for (int cmds = 0;cmds<strs.length;cmds++) {       
+       String cmd_kvstring = strs[cmds];
+       String[] cmd_kv = cmd_kvstring.split(":");
+       
+       if (cmd_kv.length != 2) {
+         throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") is invalid.");
+         
+       }
+       
+       String cmdstr =  cmd_kv[0];
+       if (cmdstr.length() != 1) {
+         throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") is invalid.");
+         
+       }
+       
+       char command = cmdstr.charAt(0);
+       String commandval= cmd_kv[1];
+       switch (command) {
+           case 'x': {
+                      if (!commandval.equalsIgnoreCase("auto")) {                     
+                       this.posX = parseAndCheck(commandval, 0, "Pos string (x:{0}) is invalid.");
+                       this.xMode = POS_MODE.EXACT;                       
+                      }
+                      break;
+                 }  
+           case 'y': {
+                   if (!commandval.equalsIgnoreCase("auto")) {                     
+                     this.posY = parseAndCheck(commandval, 0, "Pos string (y:{0}) is invalid.");
+                     this.yMode = POS_MODE.EXACT;                      
+                   }                 
+                   break;
+                 }    
+           case 'w': { 
+                   if (!commandval.equalsIgnoreCase("auto")) {
+                     this.width = parseAndCheck(commandval, 1, "pos.width (w:{0}) must not be lower or equal 0.");
+                     this.wMode = POS_MODE.EXACT; 
+                   }                   
+                   break;
+                  }
+           case 'p': {
+               if (!commandval.equalsIgnoreCase("auto")) { 
+                 if (commandval.equalsIgnoreCase("new")) {                 
+                  pageMode = PAGE_MODE.NEW;
+                   
+                 } else if (commandval.equalsIgnoreCase("last")) {                 
+                   pageMode = PAGE_MODE.LAST;
+                                      
+                 } else {
+                   int pval = Integer.parseInt(commandval);
+                   if (pval<1) {
+                     throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Page (p:" + pval + ") must not be lower than 1.");
+                     
+                   }
+                   this.page =pval;
+                   pageMode = PAGE_MODE.EXACT;
+                   
+                 }
+               
+               } else {
+                 pageMode = PAGE_MODE.AUTO;
+                 
+               }
+               break;
+                  }
+           case 'f': {
+                   footerLine = parseAndCheck(commandval, 0, "Footer pos string (f={0}) is invalid.");
+                   break;
+                 }
+           case 'r': {
+                   float flval=Float.parseFloat(commandval);
+                   // reduce to 0 - 360 degrees
+                   flval = flval % 360;
+                   // we only support rotation in 90 degree steps
+                   if(flval % 90 != 0) {
+                     throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") is invalid. Rotation is only allowed to be a multiple of 90.");
+                   }    
+                   this.rotation = flval;
+                   break;
+           }
+           default : {
+                      throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") is invalid.");
+                      }
+         }
+      }
 
-	    }
-	    catch (NumberFormatException e)
-	    {
-	      throw new PdfAsException("Pos string (=" + pos_string + ") cannot be parsed.");
-	    }
+      }
+      catch (NumberFormatException e)
+      {
+        throw new PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Pos string (=" + pos_string + ") cannot be parsed.", e);
+      }
   }
   
   private void readFromPos(TablePos base) {
-	  this.pageMode = base.getPageMode();
-	  this.xMode = base.getXMode();
-	  this.yMode = base.getYMode();	  
-	  this.wMode = base.getWMode();	  	  	 
-	  
-	  this.footerLine = base.getFooterLine();
-	  this.page = base.page;
-	  this.posX = base.posX;
-	  this.posY = base.posY;
-	  this.rotation  = base.rotation;
-	  this.width = base.width;
-	  
+    this.pageMode = base.getPageMode();
+    this.xMode = base.getXMode();
+    this.yMode = base.getYMode();    
+    this.wMode = base.getWMode();           
+    
+    this.footerLine = base.getFooterLine();
+    this.page = base.page;
+    this.posX = base.posX;
+    this.posY = base.posY;
+    this.rotation  = base.rotation;
+    this.width = base.width;
+    
   }
   
 }

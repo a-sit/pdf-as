@@ -23,135 +23,78 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.status;
 
-import java.io.Serializable;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.settings.ISettings;
-import at.gv.egiz.pdfas.common.utils.TempFileHelper;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.backend.PDFASBackend;
+import at.gv.egiz.pdfas.lib.impl.backend.BackendLoader;
 import at.gv.egiz.pdfas.lib.impl.configuration.GlobalConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
-import at.gv.egiz.pdfas.lib.util.TimedFunction;
+import jakarta.persistence.Transient;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
-public class OperationStatus implements Serializable {
+public class OperationStatus {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2985007198666388528L;
-
-	private final SignParameter signParamter;
-	@Setter
+    @Getter
+    private final SignParameter signParameter;
+    @Setter
     @Getter
     private PDFObject pdfObject;
 
-	private final ISettings configuration;
-	private PlaceholderConfiguration placeholderConfiguration = null;
-	private GlobalConfiguration globalConfiguration = null;
-	private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<String, SignatureProfileConfiguration>();
-	private final TempFileHelper helper;
-	@Setter
+    @Getter(lazy = true)
+    @Transient
+    private final @NonNull PlaceholderConfiguration placeholderConfiguration = new PlaceholderConfiguration(this.signParameter.getConfiguration());
+
+    @Getter(lazy = true)
+    @Transient
+    private final @NonNull GlobalConfiguration globalConfiguration = new GlobalConfiguration(this.signParameter.getConfiguration());
+
+    @Transient
+    private final Map<String, SignatureProfileConfiguration> signatureProfiles = new HashMap<>();
+    @Setter
     @Getter
     private RequestedSignature requestedSignature;
-	@Setter
     @Getter
-    private Calendar signingDate;
-	@Getter
+    @Transient
     private final PDFASBackend backend;
-	@Getter
-    private final Map<String, String> metaInformations = new HashMap<String, String>();
     @Getter
-    private final TimedFunction.Context signTimer;
+    private final Map<String, String> metaInformations = new HashMap<String, String>();
 
-//	private HashMap<String, String> requestParameters = new HashMap<String, String>();
+    public OperationStatus(SignParameter signParameter) throws PDFASError {
+        this.signParameter = signParameter;
+        this.backend = BackendLoader.getPDFASBackend(signParameter.getConfiguration());
+    }
 
-	public OperationStatus(ISettings configuration, SignParameter signParameter, PDFASBackend backend, TimedFunction.Context timer) {
-		this.configuration = configuration;
-		this.signParamter = signParameter;
-		this.backend = backend;
-        this.signTimer = timer;
-		this.helper = new TempFileHelper(configuration);
-	}
+    // ========================================================================
 
-	@Override
-	protected void finalize() throws Throwable {
-		if (this.helper != null) {
-			try {
-				this.helper.clear();
-			} catch (Throwable ignored) {
-			}
-		}
-		super.finalize();
-	}
+    public void clear() {
+        if(pdfObject != null) {
+            pdfObject.close();
+        }
+    }
 
-	// ========================================================================
-	
-	public void clear() {
-		if (this.helper != null) {
-			try {
-				this.helper.clear();
-			} catch (Throwable ignored) {
-			}
-		}
-		if(pdfObject != null) {
-			pdfObject.close();
-		}
-	}
+    public @NonNull SignatureProfileConfiguration getSignatureProfileConfiguration(@NonNull String profileID) {
+        return signatureProfiles.computeIfAbsent(profileID,
+            key -> new SignatureProfileConfiguration(this.signParameter.getConfiguration(), key)
+        );
+    }
 
-    public PlaceholderConfiguration getPlaceholderConfiguration() {
-      if (this.placeholderConfiguration == null) {
-          this.placeholderConfiguration = new PlaceholderConfiguration(
-                  this.configuration);
-      }
-      return this.placeholderConfiguration;
-	}
+    // ========================================================================
 
-	public GlobalConfiguration getGlobalConfiguration() {
-		if (this.globalConfiguration == null) {
-			this.globalConfiguration = new GlobalConfiguration(
-					this.configuration);
-		}
-		return this.globalConfiguration;
-	}
-
-	public SignatureProfileConfiguration getSignatureProfileConfiguration(
-			String profileID) {
-
-		SignatureProfileConfiguration signatureProfileConfiguration = signatureProfiles
-				.get(profileID);
-		if (signatureProfileConfiguration == null) {
-			signatureProfileConfiguration = new SignatureProfileConfiguration(
-					this.configuration, profileID);
-			signatureProfiles.put(profileID, signatureProfileConfiguration);
-		}
-
-		return signatureProfileConfiguration;
-	}
-
-	// ========================================================================
-
-    public SignParameter getSignParameter() {
-		return signParamter;
-	}
-
-	public TempFileHelper getTempFileHelper() {
-		return this.helper;
-	}
-
-	public ISettings getSettings() {
-		return this.configuration;
-	}
+    public ISettings getSettings() {
+        return this.signParameter.getConfiguration();
+    }
 
     public String getTransactionId() {
-      if(this.signParamter != null) {
-          return this.signParamter.getTransactionId();
+      if(this.signParameter != null) {
+          return this.signParameter.getTransactionId();
       }
       return null;
-	}
+    }
 }

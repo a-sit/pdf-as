@@ -35,7 +35,6 @@ import java.util.concurrent.CompletionStage;
 
 import at.gv.egiz.pdfas.lib.api.sign.IAsyncSigner;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
-import at.gv.egiz.pdfas.lib.util.TimedFunction;
 import jakarta.activation.DataSource;
 import lombok.NonNull;
 import lombok.val;
@@ -45,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.common.utils.PDFUtils;
 import at.gv.egiz.pdfas.common.utils.StreamUtils;
@@ -91,13 +89,10 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
   private static void verifySignParameter(@NonNull SignParameter parameter) throws PDFASError {
     // Status initialization
-    if (!(parameter.getConfiguration() instanceof ISettings settings)) {
-      throw new PDFASError(ERROR_SET_INVALID_SETTINGS_OBJ);
-    }
 
     final String signatureProfile = parameter.getSignatureProfileId();
     if (signatureProfile != null) {
-      if (!settings.hasPrefix("sig_obj." + signatureProfile)) {
+      if (!parameter.getConfiguration().hasPrefix("sig_obj." + signatureProfile)) {
         throw new PDFASError(ERROR_SIG_INVALID_PROFILE,
             PDFASError.buildInfoString(ERROR_SIG_INVALID_PROFILE,
                 signatureProfile));
@@ -109,7 +104,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   private static void verifyVerifyParameter(@NonNull VerifyParameter parameter)
       throws PDFASError {
     // Status initialization
-    if (!(parameter.getConfiguration() instanceof ISettings)) {
+    if (parameter.getConfiguration() == null) {
       throw new PDFASError(ERROR_SET_INVALID_SETTINGS_OBJ);
     }
   }
@@ -126,9 +121,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
               state2.getSignatureData(), state2.getSignatureDataByteRange(),
               state2.getSignParameter(), state2.getRequestedSignature()));
       return state3.finishSign(output);
-    } catch (final CertificateException e) {
-      throw new PDFASError(ErrorConstants.ERROR_INVALID_CERTIFICATE, e);
-    } catch (final PdfAsException e) {
+    } catch (final Exception e) {
       throw ErrorExtractor.searchPdfAsError(e, state1.getStatus());
     }
   }
@@ -143,9 +136,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
               return signer.getCertificateData(state.getSignParameter()).thenApply(cert -> {
                 try {
                   return state.setCertificate(cert.cert(), cert.pdfFilter(), cert.pdfSubFilter());
-                } catch (final CertificateException e) {
-                  throw new CompletionException(new PDFASError(ErrorConstants.ERROR_INVALID_CERTIFICATE, e));
-                } catch (final PDFASError e) {
+                } catch (final CertificateException | PDFASError e) {
                   throw new CompletionException(e);
                 }
               });
@@ -167,13 +158,8 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
               throw new CompletionException(e);
             }
           })
-          .exceptionallyCompose(e -> {
-            @NonNull val cause = Objects.requireNonNull(e instanceof CompletionException ? e.getCause() : e);
-            if (cause instanceof PdfAsException pe) {
-              return CompletableFuture.failedStage(pe);
-            }
-            return CompletableFuture.failedStage(cause);
-          });
+          .exceptionallyCompose(e -> CompletableFuture.failedStage(
+              ErrorExtractor.searchPdfAsError(e, state1.getStatus())));
     } catch (final PDFASError e) {
       return CompletableFuture.failedStage(e);
     }
@@ -195,30 +181,23 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     }
   }
 
-  private final TimedFunction verifyTimer = new TimedFunction("pdfas.verify");
   @Override
   public @NonNull List<@NonNull VerifyResult> verify(@NonNull VerifyParameter parameter, @NonNull DataSource document)
       throws PDFASError {
 
-    return verifyTimer.timed(() -> {
-        verifyVerifyParameter(parameter);
+    verifyVerifyParameter(parameter);
 
-        // execute pre Processors
-        verifyPreProcessing(parameter);
+    // execute pre Processors
+    verifyPreProcessing(parameter);
 
-        // allocated Backend
-        final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
+    // allocated Backend
+    final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
 
-        if (backend == null) {
-            throw new PDFASError(ERROR_NO_BACKEND);
-        }
-
-        try {
-            return backend.getVerifier().verify(parameter, document);
-        } catch (final Throwable e) {
-            throw ErrorExtractor.searchPdfAsError(e, null);
-        }
-    });
+    try {
+        return backend.getVerifier().verify(parameter, document);
+    } catch (final Throwable e) {
+        throw ErrorExtractor.searchPdfAsError(e, null);
+    }
   }
 
   @Override
@@ -226,7 +205,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     return new ConfigurationImpl(this.settings);
   }
 
-  private final TimedFunction signTimer = new TimedFunction("pdfas.sign");
   @Override
   public @NonNull StatusRequestImpl.Stage1 startSign(
       @NonNull SignParameter parameter, @NonNull DataSource document) throws PDFASError
@@ -235,25 +213,12 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     verifySignParameter(parameter);
     OperationStatus status = null;
     try {
-      // Status initialization
-      if (!(parameter.getConfiguration() instanceof ISettings config)) {
-        throw new PdfAsSettingsException("Invalid settings object!");
-      }
-
       // execute pre Processors
       signPreProcessing(parameter);
 
-      // allocated Backend
-      final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
+      status = new OperationStatus(parameter);
 
-      if (backend == null) {
-        throw new PDFASError(ERROR_NO_BACKEND);
-      }
-
-      status = new OperationStatus(config, parameter,
-          backend, signTimer.start());
-
-      final IPdfSigner signer = backend.getPdfSigner();
+      final IPdfSigner signer = status.getBackend().getPdfSigner();
 
       val pdfObject = signer.buildPDFObject(status);
       pdfObject.setOriginalDocument(document);
@@ -262,13 +227,12 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
       return StatusRequestImpl.create(this, status);
     } catch (final Throwable e) {
-      if (status != null) status.getSignTimer().finishFailure(e);
       logger.warn("startSign", e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     }
   }
 
-  public void processCertificate(
+  void processCertificate(
       @NonNull StatusRequestImpl.Stage1 request, @NonNull X509Certificate certificate,
       @NonNull String pdfFilter, @NonNull String pdfSubFilter) throws PDFASError
   {
@@ -294,14 +258,11 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
           }
       }
 
-      status.setSigningDate(Calendar.getInstance());
-
       final IPdfSigner signer = status.getBackend().getPdfSigner();
 
       final PDFASSignatureExtractor signatureDataExtractor = signer
               .buildBlindSignaturInterface(certificate,
-                      pdfFilter, pdfSubFilter,
-                      status.getSigningDate());
+                      pdfFilter, pdfSubFilter);
 
       signer.signPDF(status.getPdfObject(),
               status.getRequestedSignature(), signatureDataExtractor);
@@ -326,14 +287,13 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       request.setByteRange(byteRange);
 
     } catch (final Throwable e) {
-        status.getSignTimer().finishFailure(e);
         logger.warn("process", e);
         throw ErrorExtractor.searchPdfAsError(e, status);
 
     }
   }
 
-  public void processSignature(
+  void processSignature(
       @NonNull StatusRequestImpl.Stage2 request, byte @NonNull[] signatureValue) throws PDFASError
   {
     final OperationStatus status = request.getStatus();
@@ -369,12 +329,11 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
         status.getPdfObject().getSignedDocument()[offset + i] = pdfSignature[i];
       }
     } catch (final Throwable e) {
-      status.getSignTimer().finishFailure(e);
       throw e;
     }
   }
 
-  public @NonNull SignResult finishSign(@NonNull StatusRequestImpl.Stage3 request, @NonNull OutputStream output) throws PDFASError {
+  @NonNull SignResult finishSign(@NonNull StatusRequestImpl.Stage3 request, @NonNull OutputStream output) throws PDFASError {
     final OperationStatus status = request.getStatus();
 
     try {
@@ -396,11 +355,8 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
           status.getRequestedSignature().getSignaturePosition(),
           status.getMetaInformations()
       );
-      status.getSignTimer().finishSuccess();
       return signResult;
     } catch (final IOException e) {
-      // new PdfAsException("error.pdf.sig.06", e);
-      status.getSignTimer().finishFailure(e);
       throw ErrorExtractor.searchPdfAsError(e, status);
     } finally {
       if (status != null) {
@@ -410,6 +366,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   }
 
   private void listPreProcessors(List<PreProcessor> preProcessors) {
+    if (!logger.isDebugEnabled()) return;
     logger.debug("--------------");
     logger.debug("Listing PreProcessors:");
 
@@ -426,8 +383,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
   private void verifyPreProcessing(VerifyParameter parameter)
       throws PDFASError {
-    final List<PreProcessor> preProcessors = PreProcessorLoader
-        .getPreProcessors(parameter.getConfiguration());
+    final List<PreProcessor> preProcessors = PreProcessorLoader.getPreProcessors();
 
     listPreProcessors(preProcessors);
 
@@ -445,8 +401,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
   }
 
   private void signPreProcessing(SignParameter parameter) throws PDFASError {
-    final List<PreProcessor> preProcessors = PreProcessorLoader
-        .getPreProcessors(parameter.getConfiguration());
+    final List<PreProcessor> preProcessors = PreProcessorLoader.getPreProcessors();
 
     listPreProcessors(preProcessors);
 
@@ -471,22 +426,16 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
     OperationStatus status = null;
     try {
-      // Status initialization
-      if (!(parameter.getConfiguration() instanceof ISettings config)) {
-        throw new PDFASError(ERROR_SET_INVALID_SETTINGS_OBJ);
-      }
       X509Certificate iaikCert;
       if (!(cert instanceof X509Certificate)) {
         iaikCert = new X509Certificate(cert.getEncoded());
       } else {
         iaikCert = (X509Certificate) cert;
       }
-      // allocated Backend
-      final PDFASBackend backend = BackendLoader.getPDFASBackend(parameter.getConfiguration());
 
-      status = new OperationStatus(config, parameter, backend, null);
+      status = new OperationStatus(parameter);
 
-      final IPdfSigner<?, ?> signer = backend.getPdfSigner();
+      final IPdfSigner<?, ?> signer = status.getBackend().getPdfSigner();
 
       status.setPdfObject(signer.buildPDFObject(status));
 

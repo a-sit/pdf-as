@@ -34,9 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsErrorCarrier;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
 import at.gv.egiz.pdfas.common.utils.SettingsUtils;
 import at.gv.egiz.pdfas.common.utils.StreamUtils;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
@@ -84,7 +82,7 @@ public class ISignatureConnectorSLWrapper implements ISignatureConnector {
 				}
 			}
 		} catch (CertificateException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
+			throw new PDFASError(ErrorConstants.ERROR_INVALID_CERTIFICATE, e);
 		} 
 		return certificate;
 	}
@@ -97,29 +95,24 @@ public class ISignatureConnectorSLWrapper implements ISignatureConnector {
 			CreateCMSSignatureResponseType response = connector.sendCMSRequest(
 					pack, parameter);
 
-			VerifyResult verifyResult;
-			try {
-				verifyResult = SignatureUtils.verifySignature(
-						response.getCMSSignature(), input);
-				if (SettingsUtils.getBooleanValue(requestedSignature
-						.getStatus().getSettings(),
-						IConfigurationConstants.KEEP_INVALID_SIGNATURE, false)) {
-					Base64 b64 = new Base64();
-					requestedSignature
-							.getStatus()
-							.getMetaInformations()
-							.put(ErrorConstants.STATUS_INFO_INVALIDSIG,
-									b64.encodeToString(response
-											.getCMSSignature()));
-				}
-			} catch (PDFASError e) {
-				throw new PdfAsErrorCarrier(e);
+			VerifyResult verifyResult = SignatureUtils.verifySignature(
+					response.getCMSSignature(), input);
+			if (SettingsUtils.getBooleanValue(requestedSignature
+					.getStatus().getSettings(),
+					IConfigurationConstants.KEEP_INVALID_SIGNATURE, false)) {
+				Base64 b64 = new Base64();
+				requestedSignature
+						.getStatus()
+						.getMetaInformations()
+						.put(ErrorConstants.STATUS_INFO_INVALIDSIG,
+								b64.encodeToString(response
+										.getCMSSignature()));
 			}
 
 			if (!StreamUtils.dataCompare(requestedSignature.getCertificate()
 					.getFingerprintSHA(), ((X509Certificate) verifyResult
 					.getSignerCertificate()).getFingerprintSHA())) {
-				throw new PdfAsSignatureException("Certificates missmatch!");
+				throw new PDFASError(ErrorConstants.ERROR_SIG_CERTIFICATE_MISSMATCH, "Certificates missmatch!");
 			}
 
 			return response.getCMSSignature();

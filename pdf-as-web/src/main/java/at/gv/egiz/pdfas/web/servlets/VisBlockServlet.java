@@ -17,8 +17,6 @@ import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 
 public class VisBlockServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
-
 	private static final Logger logger = LoggerFactory
 			.getLogger(VisBlockServlet.class);
 

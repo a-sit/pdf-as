@@ -33,6 +33,8 @@ import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.lib.api.Configuration;
@@ -147,7 +149,7 @@ public class VerifierDispatcher {
 							);
 
 					if (oldFilter != null) {
-						throw new PdfAsException("Filter allready registered");
+						throw new PDFASError(ErrorConstants.ERROR_SET_INVALID_SETTINGS_OBJ, "Filter allready registered");
 					}
 
 					filters.put(entry.getSubFilter(), filter);
@@ -177,6 +179,6 @@ public class VerifierDispatcher {
 				return verifier;
 			}
 		}
-		throw new PdfAsException("No Verifier with level " + level.toString() + " available!");
+		throw new PDFASError(ErrorConstants.ERROR_NO_BACKEND, "No Verifier with level " + level.toString() + " available!");
 	}
 }

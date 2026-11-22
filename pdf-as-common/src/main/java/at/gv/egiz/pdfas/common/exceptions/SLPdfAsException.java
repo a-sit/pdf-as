@@ -23,33 +23,14 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.exceptions;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
-public class SLPdfAsException extends PdfAsException {
+public class SLPdfAsException extends PDFASError {
 
-  private static final List<Integer> ERRORCODES_ON_INFO_LEVEL = Arrays.asList(6000, 6001, 6002); 
-  
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1261346424827136327L;
+  private static final Set<Long> ERRORCODES_ON_INFO_LEVEL = Set.of(6000L, 6001L, 6002L);
 
-	private int code;
-	private String info;
-
-	public SLPdfAsException(int code, String info) {
-		super();
-		this.code = code;
-		this.info = info;
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public String getInfo() {
-		return info;
+	public SLPdfAsException(long code, String info) {
+		super(code, info);
 	}
 
 	/**
@@ -58,11 +39,6 @@ public class SLPdfAsException extends PdfAsException {
 	 * @return <code>true</code> in case of a critical error, otherwise <code>false</code>
 	 */
 	public boolean isCriticalError() {
-	  return !ERRORCODES_ON_INFO_LEVEL.contains(code);
-	  
-	}
-	
-	protected String localizeMessage(String msgId) {
-		return String.format("%d : %s", code, info);
+	  return !ERRORCODES_ON_INFO_LEVEL.contains(getCode());
 	}
 }

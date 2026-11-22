@@ -40,13 +40,13 @@ import java.util.Date;
 import java.util.List;
 
 import iaik.cms.*;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants;
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
@@ -84,7 +84,7 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 		try {
 			readKeyStore(ks, alias, keypassword);
 		} catch (Throwable e) {
-			throw new PDFASError(PDFASError.ERROR_SIG_FAILED_OPEN_KS, e);
+			throw PDFASError.wrap(PDFASError.ERROR_SIG_FAILED_OPEN_KS, e);
 		}
 	}
 	
@@ -103,7 +103,10 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 				logger.error("Keystore IAIK provider error: ", e);
 				logger.error("Keystore " + fallBackProvider
 						+ " provider error: ", e1);
-				throw new PDFASError(PDFASError.ERROR_SIG_FAILED_OPEN_KS, e1);
+
+				val x = PDFASError.wrap(PDFASError.ERROR_SIG_FAILED_OPEN_KS, e1);
+				x.addSuppressed(e);
+				throw x;
 			}
 		}
 	}
@@ -192,7 +195,7 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	      return signature;
 	    } catch (NoSuchAlgorithmException | CMSException | IOException | PDFASError | CodingException |
                  CertificateException e) {
-	      throw new PdfAsSignatureException("error.pdf.sig.01", e);
+	      throw PDFASError.wrap(ErrorConstants.ERROR_SIG_CREATION_FAILED, e);
 	    }
      }
 
@@ -206,7 +209,7 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	
 	 private void readKeyStore(KeyStore ks, String alias, String keypassword)  throws Throwable {
 	    if (keypassword == null) {
-	      throw new PdfAsException("error.pdf.sig.16");
+	      throw new PDFASError(ErrorConstants.ERROR_SIG_KEY_PASSWORD_MISSING);
 	    }
 	    PasswordProtection pwdProt = new PasswordProtection(
 	        keypassword.toCharArray());
@@ -216,7 +219,7 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	    Entry entry = ks.getEntry(alias, pwdProt);
 
 	    if (!(entry instanceof PrivateKeyEntry)) {
-	      throw new PdfAsException("error.pdf.sig.18");
+	      throw new PDFASError(ErrorConstants.ERROR_SIG_PRIVATE_KEY_MISSING);
 	    }
 
 	    PrivateKeyEntry privateEntry = (PrivateKeyEntry) entry;
@@ -224,7 +227,7 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	    privKey = privateEntry.getPrivateKey();
 
 	    if (privKey == null) {
-	      throw new PdfAsException("error.pdf.sig.13");
+	      throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_ALIAS);
 	    }
 
 	    Certificate c = privateEntry.getCertificate();
@@ -238,7 +241,7 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	    }
 
 	    if (c == null) {
-	      throw new PdfAsException("error.pdf.sig.17");
+	      throw new PDFASError(ErrorConstants.ERROR_SIG_CERTIFICATE_MISSING);
 	    }
 
 	    cert = new X509Certificate(c.getEncoded());
@@ -258,10 +261,10 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	    }
 
 	    if (ks == null) {
-	      throw new PdfAsException("error.pdf.sig.14");
+	      throw new PDFASError(ErrorConstants.ERROR_SIG_INVALID_KEYSTORE_TYPE);
 	    }
 	    if (kspassword == null) {
-	      throw new PdfAsException("error.pdf.sig.15");
+	      throw new PDFASError(ErrorConstants.ERROR_SIG_KEYSTORE_PASSWORD_MISSING);
 	    }
 	    FileInputStream is = null;
 	    try {

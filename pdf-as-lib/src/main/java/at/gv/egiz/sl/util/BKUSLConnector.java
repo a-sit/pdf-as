@@ -26,11 +26,11 @@ package at.gv.egiz.sl.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import at.gv.egiz.pdfas.common.settings.ISettings;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 
@@ -51,7 +51,6 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException;
 import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException;
 import at.gv.egiz.pdfas.common.utils.PDFUtils;
-import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.impl.BKUHeaderHolder;
 import at.gv.egiz.sl.schema.CreateCMSSignatureResponseType;
@@ -75,7 +74,7 @@ public class BKUSLConnector extends BaseSLConnector {
 		this.bkuUrl = bkuUrl;
 	}
 
-	public BKUSLConnector(Configuration config) {
+	public BKUSLConnector(ISettings config) {
 		this.bkuUrl = config.getValue(CONFIG_BKU_URL);
 	}
 

@@ -30,12 +30,7 @@ package at.gv.egiz.pdfas.common.exceptions;
  * Time: 10:54 AM
  * To change this template use File | Settings | File Templates.
  */
-public class PdfAsSettingsValidationException extends PdfAsException {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3277787631624822104L;
+public class PdfAsSettingsValidationException extends Exception {
 
 
 	public PdfAsSettingsValidationException(String msgId) {

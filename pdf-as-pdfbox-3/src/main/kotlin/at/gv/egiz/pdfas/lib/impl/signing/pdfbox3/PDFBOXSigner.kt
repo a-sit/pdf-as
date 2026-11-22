@@ -1,11 +1,10 @@
 package at.gv.egiz.pdfas.lib.impl.signing.pdfbox3
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants
 import at.gv.egiz.pdfas.common.exceptions.PDFASError
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException
-import at.gv.egiz.pdfas.common.exceptions.PdfAsValidationException
 import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException
 import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException
-import at.gv.egiz.pdfas.common.messages.MessageResolver
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings
 import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants
@@ -85,7 +84,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     override fun buildPDFObject(operationStatus: OperationStatus) =
         PDFBOXObject(operationStatus)
 
-    @Throws(PdfAsValidationException::class)
+    @Throws(PDFASError::class)
     override fun checkPDFPermissions(pdfObject: PDFBOXObject) {
 
         pdfObject.document!!.checkPDFPermissions()
@@ -99,7 +98,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
 
                 logger.debug("Document is protected, but signing is still allowed")
             } else {
-                throw PdfAsValidationException("error.pdf.sig.12", null)
+                throw PDFASError(ErrorConstants.ERROR_SIG_DOCUMENT_PROTECTED)
             }
         }
     }
@@ -107,13 +106,11 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     class SignatureDataExtractor(
         val certificate: X509Certificate,
         private val pdfFilter: String,
-        private val pdfSubFilter: String,
-        private val signingDate: Calendar)
+        private val pdfSubFilter: String)
         : PDFASSignatureExtractor, PDFASSignatureInterface, SignatureInterface {
 
         override fun getPDFFilter() = pdfFilter
         override fun getPDFSubFilter() = pdfSubFilter
-        override fun getSigningDate() = signingDate
 
         private lateinit var signatureData: ByteArray
         override fun getSignatureData() = signatureData
@@ -137,9 +134,8 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     override fun buildBlindSignaturInterface(
         certificate: X509Certificate,
         filter: String,
-        subfilter: String,
-        date: Calendar
-    ) = SignatureDataExtractor(certificate, filter, subfilter, date)
+        subfilter: String
+    ) = SignatureDataExtractor(certificate, filter, subfilter)
 
     private fun findExistingSignature(doc: PDDocument, sigFieldName: String?): PDSignature? =
         doc.documentCatalog.getAcroForm(null)
@@ -332,15 +328,15 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                 }
             } catch (e: SyntaxValidationException) {
                 logger.error("The file is syntactically invalid", e)
-                throw PdfAsException("Resulting PDF document is syntactically invalid.")
+                throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Resulting PDF document is syntactically invalid.", e)
             } catch (e: ValidationException) {
                 logger.error("The file is not a valid PDF-A document.", e)
             } catch (e: IOException) {
                 logger.error("IOException (${e.message}) occurred while validating PDF-A conformance", e)
-                throw PdfAsException("Failed validating PDF Document.", e)
+                throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Failed validating PDF Document.", e)
             } catch (e: RuntimeException) {
                 logger.error("RuntimeException occurred while validating PDF-A conformance", e)
-                throw PdfAsException("Failed validating PDF Document.", e)
+                throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Failed validating PDF Document.", e)
             }
         }
     }
@@ -485,15 +481,11 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             } catch (e: PdfAsWrappedIOException) {
                 throw e.decoratedException.also(::logPdfUpdateError)
             } catch (e: Throwable) {
-                throw PdfAsException("error.pdf.sig.06", e.also(::logPdfUpdateError))
+                throw PDFASError.wrap(ErrorConstants.ERROR_SIG_FINISH_FAILED, e.also(::logPdfUpdateError))
             }
             logger.debug("Signature done!")
         }}} catch (e: IOException) {
-            logger.warn(MessageResolver.resolveMessage("error.pdf.sig.01"), e)
-            throw PdfAsException("error.pdf.sig.01", e)
-        } catch (e: PDFASError) {
-            logger.warn(e.info)
-            throw PdfAsException("error.pdf.sig.01", e)
+            throw PDFASError(ErrorConstants.ERROR_SIG_CREATION_FAILED, e).also { logger.warn(it.message, e) }
         } finally {
             System.gc()
         }

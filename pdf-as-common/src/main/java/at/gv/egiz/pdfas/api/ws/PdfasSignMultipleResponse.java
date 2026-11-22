@@ -1,6 +1,5 @@
 package at.gv.egiz.pdfas.api.ws;
 
-import java.io.Serializable;
 import java.util.List;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -15,8 +14,7 @@ import lombok.Setter;
 @Setter
 @XmlType(name="signMultipleResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PdfasSignMultipleResponse implements Serializable {
-	private static final long serialVersionUID = 2544165926674778203L;
+public class PdfasSignMultipleResponse {
 
 	@XmlElement(required = true, nillable = false, name="requestID")
 	String requestID;

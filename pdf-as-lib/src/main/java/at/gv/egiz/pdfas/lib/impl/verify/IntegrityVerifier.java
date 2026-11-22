@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import at.gv.egiz.pdfas.common.settings.ISettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
-import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import iaik.asn1.ObjectID;
@@ -146,8 +147,8 @@ public class IntegrityVerifier implements IVerifier {
 							"not checked"));
 					verifyResult.setVerificationDone(false);
 					verifyResult
-							.setVerificationException(new PdfAsSignatureException(
-									"failed to check signature", ex));
+							.setVerificationException(new PDFASError(
+									ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "failed to check signature", ex));
 				}
 				result.add(verifyResult);
 			}
@@ -158,9 +159,7 @@ public class IntegrityVerifier implements IVerifier {
 		}
 	}
 
-	public void setConfiguration(Configuration config) {
-
-	}
+	public void setConfiguration(ISettings config) {}
 
 	@Override
 	public SignatureVerificationLevel getLevel() {

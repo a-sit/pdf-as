@@ -29,7 +29,7 @@ import java.util.Map;
 import jakarta.activation.DataSource;
 
 
-public abstract class PDFObject {
+public abstract class PDFObject implements AutoCloseable {
 	
 	protected OperationStatus status;
 	
@@ -45,7 +45,7 @@ public abstract class PDFObject {
 		super.finalize();
 	}
 
-	public abstract void close();
+	@Override public abstract void close();
 	
 	public DataSource getOriginalDocument() {
 		return originalDocument;

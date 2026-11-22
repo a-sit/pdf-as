@@ -56,8 +56,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PDFData extends HttpServlet {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * @see HttpServlet#HttpServlet()
    */

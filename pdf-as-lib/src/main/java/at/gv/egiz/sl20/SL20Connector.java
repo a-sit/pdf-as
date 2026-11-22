@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
+import at.gv.egiz.pdfas.common.settings.ISettings;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonObject;
 
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.sl.schema.CreateCMSSignatureResponseType;
 import at.gv.egiz.sl.schema.InfoboxReadRequestType;
@@ -41,9 +40,8 @@ public class SL20Connector extends BaseSLConnector {
 		this.bkuUrl = bkuUrl;
 	}
 	
-	public SL20Connector(Configuration config) {
+	public SL20Connector(ISettings config) {
 		this.bkuUrl = config.getValue(CONFIG_BKU_URL);
-		
 	}
 
 	public JsonObject sendSL20Request(JsonObject sl20Req, SignParameter parameter, String vdaURL) {					

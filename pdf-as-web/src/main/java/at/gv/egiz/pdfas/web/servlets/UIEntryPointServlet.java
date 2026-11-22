@@ -32,7 +32,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import at.gv.egiz.pdfas.api.ws.PDFASSignParameters.Connector;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter.SignatureVerificationLevel;
 import at.gv.egiz.pdfas.web.exception.PdfAsStoreException;
 import at.gv.egiz.pdfas.web.exception.PdfAsWebException;
@@ -44,7 +45,6 @@ import lombok.val;
 
 @Slf4j
 public class UIEntryPointServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
 	public static final String REQUEST_ID_PARAM = "reqId";
 
@@ -114,7 +114,7 @@ public class UIEntryPointServlet extends HttpServlet {
 			PdfAsHelper.setVerificationLevel(req, lvl);
 
 			if (pdfAsRequest.hasNext() && pdfAsRequest.getInput().get(0).getInputData() == null) {
-				throw new PdfAsException("No Signature data available");
+				throw new PDFASError(ErrorConstants.ERROR_NO_INPUT);
 			}
 
 			String pdfDataHash = DigestHelper.getHexEncodedHash(pdfAsRequest.getInput().get(0).getInputData());

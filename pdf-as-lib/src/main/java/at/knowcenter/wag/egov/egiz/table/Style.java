@@ -69,16 +69,11 @@ import java.util.Set;
  * @author wlackner
  * @see java.awt.Color
  */
-public class Style implements Serializable {
+public class Style {
 
 // 03.11.2010 changed by exthex - added valuevalign and valuehalign to allow separate layout for value and non-value cells.
 // Also the hardcoded default values for halign and valign were removed to allow proper inheritment.
 // 04.11.2010 changed by exthex - added imagevalign and imagehalign analog to valuevalign/valuehalign
-
-  /**
-   * SVUID.
-   */
-  private static final long serialVersionUID = 5855722896712428387L;
 
   /**
    * New Style to set each line centered

@@ -35,13 +35,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
 import at.gv.egiz.pdfas.web.helper.PdfAsHelper;
 
 public class PDFSignatureData extends HttpServlet {
-
-	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(PDFSignatureData.class);
@@ -77,7 +77,7 @@ public class PDFSignatureData extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		try {
 			if(request.getParameter(SIGN_ID) == null) {
-				throw new PdfAsException("Missing Parameter");
+				throw new PDFASError(ErrorConstants.ERROR_SET_INVALID_SETTINGS_OBJ, "Missing Parameter");
 			}
 			
 			String sigID = request.getParameter(SIGN_ID);

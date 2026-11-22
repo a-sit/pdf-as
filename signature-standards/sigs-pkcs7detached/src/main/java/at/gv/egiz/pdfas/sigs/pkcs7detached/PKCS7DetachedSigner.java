@@ -46,8 +46,9 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
+import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
-import at.gv.egiz.pdfas.common.exceptions.PdfAsSignatureException;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
@@ -113,12 +114,8 @@ public class PKCS7DetachedSigner implements IPlainSigner, PKCS7DetachedConstants
 			ContentInfo ci = new ContentInfo(si);
 			logger.debug("PKCS7 signature done.");
 			return ci.getEncoded();
-		} catch (NoSuchAlgorithmException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
-		} catch (iaik.cms.CMSException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
-		} catch (IOException e) {
-			throw new PdfAsSignatureException("error.pdf.sig.01", e);
+		} catch (NoSuchAlgorithmException | iaik.cms.CMSException | IOException e) {
+			throw new PDFASError(ErrorConstants.ERROR_SIG_CREATION_FAILED, e);
 		} 
 	}
 

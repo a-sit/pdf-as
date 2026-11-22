@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException;
+import at.gv.egiz.pdfas.common.messages.ErrorCodeResolver;
 import at.gv.egiz.sl.util.BKUSLConnector;
 
 public class LegacySLExtractor {
@@ -38,7 +39,7 @@ public class LegacySLExtractor {
 			fail("Failed to extract SL Error");
 		}
 		
-		if(e.getCode() != 1501 || !e.getInfo().equals("Fehler in XML-Struktur der Anfrage. (Element content is invalid according to the DTD/Schema.)")) {
+		if(e.getCode() != 1501 || !e.getMessage().equals("Fehler in XML-Struktur der Anfrage. (Element content is invalid according to the DTD/Schema.)")) {
 			fail("Failed to extract SL Error");
 		}
 		
@@ -48,7 +49,7 @@ public class LegacySLExtractor {
 			fail("Failed to extract SL Error");
 		}
 		
-		if(e1.getCode() != 1501 || e1.getInfo() != null) {
+		if(e1.getCode() != 1501 || !e1.getMessage().equals(ErrorCodeResolver.resolveMessage(1501))) {
 			fail("Failed to extract SL Error");
 		}
 		

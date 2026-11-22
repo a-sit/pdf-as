@@ -1,6 +1,7 @@
 package at.gv.egiz.pdfas.lib.impl.stamping.pdfbox3
 
-import at.gv.egiz.pdfas.common.exceptions.PdfAsException
+import at.gv.egiz.pdfas.common.exceptions.ErrorConstants
+import at.gv.egiz.pdfas.common.exceptions.PDFASError
 import at.gv.egiz.pdfas.common.settings.ISettings
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings
 import at.gv.egiz.pdfas.common.utils.ImageUtils
@@ -212,7 +213,7 @@ object PDFAsVisualSignature {
                 alternativeTableCaption)
         } catch (e: Throwable) {
             logger.warn("Failed to create visual signature block", e)
-            throw PdfAsException("Failed to create visual signature block", e)
+            throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Failed to create visual signature block", e)
         }
     }
 

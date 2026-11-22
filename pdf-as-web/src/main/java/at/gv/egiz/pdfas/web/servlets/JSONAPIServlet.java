@@ -40,8 +40,6 @@ import at.gv.egiz.pdfas.web.stats.StatisticFrontend;
  * Created by Andreas Fitzek on 6/23/16.
  */
 public class JSONAPIServlet extends HttpServlet {
-
-  private static final long serialVersionUID = -2319338922500393376L;
     private static final String JSON_PROFILE = "profile";
     private static final String JSON_POSITION = "position";
     private static final String JSON_CONNECTOR = "connector";

@@ -4,7 +4,6 @@ import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsMOAException;
-import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,13 +18,7 @@ public class ErrorExtractor implements ErrorConstants {
   private static final int MAX_CAUSE_DEPTH = 30;
 
 	private static PDFASError convertPdfAsError(Throwable e) {
-		if (e instanceof SLPdfAsException ex) {
-            if (ex.getInfo() != null) {
-				return new PDFASError(ex.getCode(), ex.getInfo(), e);
-			} else {
-				return new PDFASError(ex.getCode(), e);
-			}
-		} else if (e instanceof PdfAsMOAException ex) {
+		if (e instanceof PdfAsMOAException ex) {
             int code = -1;
 			String errorInfo = ex.getErrorResponse();
 			

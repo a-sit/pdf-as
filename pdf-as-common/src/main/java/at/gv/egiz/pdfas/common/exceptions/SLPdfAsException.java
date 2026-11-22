@@ -23,30 +23,14 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.exceptions;
 
-import lombok.NonNull;
+import java.util.Set;
 
-import java.util.Arrays;
-import java.util.List;
+public class SLPdfAsException extends PDFASError {
 
-public class SLPdfAsException extends PdfAsException {
+  private static final Set<Long> ERRORCODES_ON_INFO_LEVEL = Set.of(6000L, 6001L, 6002L);
 
-  private static final List<Integer> ERRORCODES_ON_INFO_LEVEL = Arrays.asList(6000, 6001, 6002);
-
-	private int code;
-	private String info;
-
-	public SLPdfAsException(int code, String info) {
-		super();
-		this.code = code;
-		this.info = info;
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public String getInfo() {
-		return info;
+	public SLPdfAsException(long code, String info) {
+		super(code, info);
 	}
 
 	/**
@@ -55,11 +39,6 @@ public class SLPdfAsException extends PdfAsException {
 	 * @return <code>true</code> in case of a critical error, otherwise <code>false</code>
 	 */
 	public boolean isCriticalError() {
-	  return !ERRORCODES_ON_INFO_LEVEL.contains(code);
-	  
-	}
-	
-	protected @NonNull String localizeMessage(@NonNull String msgId) {
-		return String.format("%d : %s", code, info);
+	  return !ERRORCODES_ON_INFO_LEVEL.contains(getCode());
 	}
 }

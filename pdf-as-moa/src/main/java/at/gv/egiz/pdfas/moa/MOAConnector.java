@@ -243,7 +243,7 @@ public class MOAConnector implements ISignatureConnector, IConfigurationConstant
             }
         } catch (WebServiceException e) {
             val cause = (e.getCause() != null) ? e.getCause() : e;
-            throw new SLPdfAsException((int) ErrorConstants.ERROR_SIG_CONNECT_ERROR, cause.getMessage());
+            throw new SLPdfAsException(ErrorConstants.ERROR_SIG_CONNECT_ERROR, cause.getMessage());
         }
 
         if (response.getCMSSignatureOrErrorResponse().size() != 1) {

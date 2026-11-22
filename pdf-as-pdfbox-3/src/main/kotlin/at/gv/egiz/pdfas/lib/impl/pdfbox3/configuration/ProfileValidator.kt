@@ -85,16 +85,18 @@ class ProfileValidator : ConfigurationValidator {
                 val opState = OperationStatus(
                     PdfAsFactory.createSignParameter(ConfigurationImpl(settings))
                         .apply { signatureProfileId = id })
-                val pdfBoxObject = PDFBOXObject(opState)
-                pdfBoxObject.setOriginalDocument(ByteArrayDataSource(baos.toByteArray()))
-                val t = TableFactory.createSigTable(profileSetting, "main", opState, certProvider)
-                PDFBOXStamper.createVisualPDFObject(pdfBoxObject,t!!)
-                profileConfiguration.defaultPositioning?.let(::TablePos)
-                    ?.takeUnless(TablePos::isWauto)?.width
-                    ?.let { defaultWidth -> PDFBOXStamper.Table(t, null, defaultWidth, pdfBoxObject) }
+                PDFBOXObject(opState).use { pdfBoxObject ->
+                    opState.pdfObject = pdfBoxObject
+                    pdfBoxObject.setOriginalDocument(ByteArrayDataSource(baos.toByteArray()))
+                    val t = TableFactory.createSigTable(profileSetting, "main", opState, certProvider)
+                    PDFBOXStamper.createVisualPDFObject(pdfBoxObject, t!!)
+                    profileConfiguration.defaultPositioning?.let(::TablePos)
+                        ?.takeUnless(TablePos::isWauto)?.width
+                        ?.let { defaultWidth -> PDFBOXStamper.Table(t, null, defaultWidth, pdfBoxObject) }
+                }
             } catch (e: Exception) {
                 logger.error("Suspect signature-profile configuration found.", e)
-                throw PdfAsSettingsValidationException("Configuration validation for profile {id} failed.", e)
+                throw PdfAsSettingsValidationException("Configuration validation for profile $id failed.", e)
             }
         }
     }

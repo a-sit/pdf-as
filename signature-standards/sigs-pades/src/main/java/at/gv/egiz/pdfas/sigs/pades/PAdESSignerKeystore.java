@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.List;
 
 import iaik.cms.*;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +93,6 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 		try {
 			// Load keystore with default security provider (IAIK)
 			loadKeystore(file, alias, kspassword, keypassword, type, null);
-		} catch (PDFASError e) {
-			throw e;
 		} catch (Throwable e) {
 			try {
 				// IAIK Provider seems to have problem with some PKCS12 files..
@@ -104,7 +103,10 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 				logger.error("Keystore IAIK provider error: ", e);
 				logger.error("Keystore " + fallBackProvider
 						+ " provider error: ", e1);
-				throw PDFASError.wrap(PDFASError.ERROR_SIG_FAILED_OPEN_KS, e1);
+
+				val x = PDFASError.wrap(PDFASError.ERROR_SIG_FAILED_OPEN_KS, e1);
+				x.addSuppressed(e);
+				throw x;
 			}
 		}
 	}

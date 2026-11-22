@@ -248,6 +248,32 @@ class SignVerifyTest {
     }
 
     @Test
+    fun signFlatTreePdfWithoutParentTreeNextKey() {
+        val input = getInputPdf("platzhalter_en_de_test.pdf") {
+            Assert.assertFalse(documentCatalog.structureTreeRoot.cosObject.containsKey(COSName.PARENT_TREE_NEXT_KEY))
+        }
+        val output = captureSign(input, getKeystoreSigner("test-key"))
+        Loader.loadPDF(output).use { document ->
+            Assert.assertEquals(1, document.signatureFields.single().widgets.single().structParent)
+            Assert.assertEquals(2, document.documentCatalog.structureTreeRoot.parentTreeNextKey)
+        }
+        Assert.assertTrue(doVerify(ByteArrayDataSource(output)).single().isVerificationDone)
+    }
+
+    @Test
+    fun signNestedTreePdfWithoutParentTreeNextKey() {
+        val input = getInputPdf("align-parent-tree-no-next-key-nested.pdf") {
+            Assert.assertFalse(documentCatalog.structureTreeRoot.cosObject.containsKey(COSName.PARENT_TREE_NEXT_KEY))
+        }
+        val output = captureSign(input, getKeystoreSigner("test-key"))
+        Loader.loadPDF(output).use { document ->
+            Assert.assertEquals(1, document.signatureFields.single().widgets.single().structParent)
+            Assert.assertEquals(2, document.documentCatalog.structureTreeRoot.parentTreeNextKey)
+        }
+        Assert.assertTrue(doVerify(ByteArrayDataSource(output)).single().isVerificationDone)
+    }
+
+    @Test
     fun signWithPlaceholderSearchAndTextLineOperator() {
         // The sample PDF uses the ' text operator.
         val signedPdf = captureSign(getInputPdf("eupl-1.1.pdf"), getKeystoreSigner("test-key")) {

@@ -216,6 +216,11 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             .first { !existingSignatureNames.contains(it) }
     }
 
+    private fun maxParentTreeKey(tree: PDNumberTreeNode): Int = maxOf(
+        tree.numbers?.keys?.maxOrNull() ?: -1,
+        tree.kids?.maxOfOrNull(::maxParentTreeKey) ?: -1
+    )
+
     private fun injectPdfUaContent(doc: PDDocument, signatureField: PDSignatureField,
                                    signatureProfileSettings: SignatureProfileSettings) {
         try {
@@ -258,9 +263,9 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                 Pair(getCOSArray(COSName.KIDS), getCOSArray(COSName.NUMS))
             }
 
-            val parentTreeNextKey = structureTreeRoot.parentTreeNextKey.takeIf { it >= 0 } ?: run {
-                structureTreeRoot.parentTree.upperLimit?.plus(1) ?: 0
-            }
+            val parentTreeNextKey =
+                structureTreeRoot.parentTreeNextKey.takeIf { it >= 0 }
+                    ?: (maxParentTreeKey(ntn) + 1)
             val parentTreeNextKeyCOS = COSInteger.get(parentTreeNextKey.toLong())
 
             if ((ntnKids != null) && (ntnNumbers == null)) {

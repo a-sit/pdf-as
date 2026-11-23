@@ -19,6 +19,8 @@ dependencies {
     implementation("org.apache.pdfbox", "xmpbox", pdfboxVersion)
     implementation("org.apache.pdfbox", "preflight", pdfboxVersion)
     implementation("org.apache.pdfbox", "jbig2-imageio", "3.0.5")
+    implementation("com.github.jai-imageio", "jai-imageio-jpeg2000", "1.4.0")
+    implementation("com.twelvemonkeys.imageio", "imageio-jpeg", "3.15.3")
 
     testImplementation("ch.qos.logback", "logback-classic", project.ext["logbackVersion"] as String)
     testImplementation(project(":signature-standards:sigs-pades"))

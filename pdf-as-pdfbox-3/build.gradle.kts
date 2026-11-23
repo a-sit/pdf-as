@@ -27,6 +27,7 @@ dependencies {
     testImplementation(project(":signature-standards:sigs-pkcs7detached"))
     testImplementation(group = "org.zeroturnaround", name = "zt-zip", version = project.ext["ztZipVersion"] as String)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    testImplementation("org.verapdf:validation-model-jakarta:1.30.4")
 }
 
 tasks.register("releases", Copy::class) {

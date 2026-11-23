@@ -36,6 +36,9 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.BlockJUnit4ClassRunner
+import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider
+import org.verapdf.pdfa.Foundries
+import org.verapdf.pdfa.flavours.PDFAFlavour
 import org.zeroturnaround.zip.ZipUtil
 import java.io.ByteArrayOutputStream
 import java.security.KeyStore
@@ -134,6 +137,29 @@ class SignVerifyTest {
             override suspend fun signSuspend(input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature) =
                 this@wrapSuspend.sign(input, byteRange, parameter, requestedSignature)
         }
+    }
+
+    @Test
+    fun signingPreservesPdfA3Conformance() {
+        val input = getInputPdf("platzhalter_en_de_test.pdf").inputStream.use { it.readAllBytes() }
+        VeraGreenfieldFoundryProvider.initialise()
+        fun assertConformance(label: String, bytes: ByteArray) {
+            Foundries.defaultInstance().createParser(bytes.inputStream(), PDFAFlavour.PDFA_3_B).use { parser ->
+                Foundries.defaultInstance().createValidator(PDFAFlavour.PDFA_3_B, false).use { validator ->
+                    val result = validator.validate(parser)
+                    Assert.assertTrue("$label failed veraPDF PDF/A-3b validation: ${result.testAssertions}", result.isCompliant)
+                }
+            }
+        }
+        assertConformance("Input", input)
+        val output = captureSign(ByteArrayDataSource(input), getKeystoreSigner("test-key")) {
+            signatureProfileId = "SIGNATURBLOCK_DE_PDFA"
+            // Keep QR placeholders from overriding the PDF/A signing profile.
+            isPlaceHolderSearchEnabled = false
+            // Exercise composite glyphs in the embedded font subsets.
+            configuration.setValue("sig_obj.SIGNATURBLOCK_DE_PDFA.value.SIG_SUBJECT", "\u00e9\u00c5\u00fc")
+        }
+        assertConformance("Signed output", output)
     }
 
     @Test
@@ -401,6 +427,26 @@ class SignVerifyTest {
             Assert.assertEquals(fieldName, document.signatureFields.single().alternateFieldName)
         }
         Assert.assertTrue(doVerify(ByteArrayDataSource(output)).single().isVerificationDone)
+    }
+
+    @Test
+    fun signingReusesDiscoveredNestedSignatureField() {
+        // align.pdf with one empty signature field named group.approval.
+        val input = getInputPdf("align-nested-signature-field.pdf")
+        val fieldName = input.inputStream.use { stream ->
+            Loader.loadPDF(stream.readAllBytes()).use { document ->
+                PDFBoxPlaceholderExtractor.findEmptySignatureFields(document).single()
+            }
+        }
+        val output = captureSign(input, getKeystoreSigner("test-key")) {
+            configuration.setValue(IConfigurationConstants.SIGNATURE_FIELD_NAME, fieldName)
+        }
+        Loader.loadPDF(output).use { document ->
+            Assert.assertEquals("Signing must reuse the existing nested field", 1, document.signatureFields.size)
+            val field = document.documentCatalog.getAcroForm(null)
+                .getField("group.approval") as PDSignatureField
+            Assert.assertNotNull("The existing nested field must be signed", field.signature)
+        }
     }
 
     @Test

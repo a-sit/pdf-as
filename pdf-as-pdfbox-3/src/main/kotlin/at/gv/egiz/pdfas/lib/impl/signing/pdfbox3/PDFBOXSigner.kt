@@ -298,7 +298,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             structureTreeRoot.parentTreeNextKey = parentTreeNextKey + 1
             annotationPage.cosObject.setName("Tabs", "S")
 
-            if (signatureField.alternateFieldName.isEmpty())
+            if (signatureField.alternateFieldName.isNullOrEmpty())
                 signatureField.alternateFieldName = signatureField.partialName
 
         } catch (e: Throwable) {

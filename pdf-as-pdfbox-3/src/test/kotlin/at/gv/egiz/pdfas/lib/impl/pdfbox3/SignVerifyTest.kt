@@ -430,6 +430,26 @@ class SignVerifyTest {
     }
 
     @Test
+    fun signingReusesDiscoveredNestedSignatureField() {
+        // align.pdf with one empty signature field named group.approval.
+        val input = getInputPdf("align-nested-signature-field.pdf")
+        val fieldName = input.inputStream.use { stream ->
+            Loader.loadPDF(stream.readAllBytes()).use { document ->
+                PDFBoxPlaceholderExtractor.findEmptySignatureFields(document).single()
+            }
+        }
+        val output = captureSign(input, getKeystoreSigner("test-key")) {
+            configuration.setValue(IConfigurationConstants.SIGNATURE_FIELD_NAME, fieldName)
+        }
+        Loader.loadPDF(output).use { document ->
+            Assert.assertEquals("Signing must reuse the existing nested field", 1, document.signatureFields.size)
+            val field = document.documentCatalog.getAcroForm(null)
+                .getField("group.approval") as PDSignatureField
+            Assert.assertNotNull("The existing nested field must be signed", field.signature)
+        }
+    }
+
+    @Test
     fun existingEmptySignatureField() {
         val fieldName = "ownerSignature"
         val output = captureSign(getInputPdf("acroform-placeholder.pdf"), getKeystoreSigner("test-key")) {

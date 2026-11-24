@@ -92,7 +92,7 @@ jobs:
           cache: gradle
 
       - name: Compile & Test
-        run: ./gradlew --warning-mode all clean build
+        run: ./gradlew --warning-mode all clean build jacocoRootReport
 
       - name: Upload Analysis Reports
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -103,7 +103,7 @@ jobs:
             ${{ env.REPO_PATH }}/**/build/reports/pmd/*.xml
             ${{ env.REPO_PATH }}/**/build/reports/spotbugs/*.xml
             ${{ env.REPO_PATH }}/**/build/reports/checkstyle/*.xml
-            ${{ env.REPO_PATH }}/**/build/reports/jacoco/**/jacocoTestReport.xml
+            ${{ env.REPO_PATH }}/build/reports/jacoco/aggregate/jacocoTestReport.xml
             ${{ env.REPO_PATH }}/**/build/test-results/test/TEST-*.xml
           if-no-files-found: warn
           retention-days: 1
@@ -132,7 +132,7 @@ jobs:
         run: |
           if [ "${{ steps.tests.outputs.has_tests }}" = "true" ]; then
             echo "name=Run Quality Monitor (with coverage)" >> "$GITHUB_OUTPUT"
-            echo 'config={"tests":{"tools":[{"id":"junit","name":"Unittests","pattern":"**/build/test-results/test/TEST-*.xml"}]},"analysis":[{"name":"Style","id":"style","tools":[{"id":"checkstyle","pattern":"**/build/reports/checkstyle/*.xml"}]},{"name":"Code Analyzer","id":"pmd","tools":[{"id":"pmd","pattern":"**/build/reports/pmd/*.xml"}]},{"name":"Bugs","id":"bugs","tools":[{"id":"spotbugs","pattern":"**/build/reports/spotbugs/*.xml"}]}],"coverage":[{"name":"JaCoCo","tools":[{"id":"jacoco","metric":"line","pattern":"**/build/reports/jacoco/**/jacocoTestReport.xml"},{"id":"jacoco","metric":"branch","pattern":"**/build/reports/jacoco/**/jacocoTestReport.xml"}]}]}' >> "$GITHUB_OUTPUT"
+            echo 'config={"tests":{"tools":[{"id":"junit","name":"Unittests","pattern":"**/build/test-results/test/TEST-*.xml"}]},"analysis":[{"name":"Style","id":"style","tools":[{"id":"checkstyle","pattern":"**/build/reports/checkstyle/*.xml"}]},{"name":"Code Analyzer","id":"pmd","tools":[{"id":"pmd","pattern":"**/build/reports/pmd/*.xml"}]},{"name":"Bugs","id":"bugs","tools":[{"id":"spotbugs","pattern":"**/build/reports/spotbugs/*.xml"}]}],"coverage":[{"name":"JaCoCo","tools":[{"id":"jacoco","metric":"line","pattern":"**/build/reports/jacoco/aggregate/jacocoTestReport.xml"},{"id":"jacoco","metric":"branch","pattern":"**/build/reports/jacoco/aggregate/jacocoTestReport.xml"}]}]}' >> "$GITHUB_OUTPUT"
             echo 'gates={"qualityGates":[{"metric":"line","threshold":75.0,"criticality":"UNSTABLE"},{"metric":"branch","threshold":75.0,"criticality":"UNSTABLE"},{"metric":"checkstyle","threshold":70.0,"criticality":"UNSTABLE"},{"metric":"pmd","threshold":70.0,"criticality":"UNSTABLE"},{"metric":"spotbugs","threshold":10.0,"criticality":"UNSTABLE"}]}' >> "$GITHUB_OUTPUT"
           else
             echo "name=Run Quality Monitor (without coverage)" >> "$GITHUB_OUTPUT"

@@ -35,6 +35,7 @@ import at.gv.egiz.pdfas.lib.impl.configuration.GlobalConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.PlaceholderConfiguration;
 import at.gv.egiz.pdfas.lib.impl.configuration.SignatureProfileConfiguration;
 import jakarta.persistence.Transient;
+import jakarta.activation.DataSource;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -43,9 +44,11 @@ public class OperationStatus {
 
     @Getter
     private final SignParameter signParameter;
+    @Getter
+    private final DataSource originalDocument;
     @Setter
     @Getter
-    private PDFObject pdfObject;
+    private byte[] signedDocument;
 
     @Getter(lazy = true)
     @Transient
@@ -66,18 +69,13 @@ public class OperationStatus {
     @Getter
     private final Map<String, String> metaInformations = new HashMap<String, String>();
 
-    public OperationStatus(SignParameter signParameter) throws PDFASError {
+    public OperationStatus(SignParameter signParameter, DataSource originalDocument) throws PDFASError {
         this.signParameter = signParameter;
+        this.originalDocument = originalDocument;
         this.backend = BackendLoader.getPDFASBackend(signParameter.getConfiguration());
     }
 
     // ========================================================================
-
-    public void clear() {
-        if(pdfObject != null) {
-            pdfObject.close();
-        }
-    }
 
     public @NonNull SignatureProfileConfiguration getSignatureProfileConfiguration(@NonNull String profileID) {
         return signatureProfiles.computeIfAbsent(profileID,
@@ -87,7 +85,7 @@ public class OperationStatus {
 
     // ========================================================================
 
-    public ISettings getSettings() {
+    public @NonNull ISettings getSettings() {
         return this.signParameter.getConfiguration();
     }
 

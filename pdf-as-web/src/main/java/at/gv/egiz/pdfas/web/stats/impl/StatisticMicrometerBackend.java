@@ -28,7 +28,7 @@ public class StatisticMicrometerBackend implements StatisticBackend {
     SpringContextProxy(MeterRegistry registry) { meterRegistry = registry; }
   }
   public static final String NAME = "StatisticMicrometerBackend";
-  @Override public String getName() { return NAME; }
+  @Override public @NonNull String getName() { return NAME; }
 
   @Override
   public void storeEvent(StatisticEvent e) {

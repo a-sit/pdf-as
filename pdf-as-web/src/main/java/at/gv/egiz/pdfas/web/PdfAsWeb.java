@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web;
 
+import lombok.NonNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -12,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PdfAsWeb extends SpringBootServletInitializer {
 
   @Override
-  protected SpringApplicationBuilder createSpringApplicationBuilder() {
+  protected @NonNull SpringApplicationBuilder createSpringApplicationBuilder() {
     SpringApplicationBuilder builder = new SpringApplicationBuilder();
     builder.sources(PdfAsWeb.class);
     return builder;

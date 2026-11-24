@@ -1,6 +1,7 @@
 
 package at.gv.egiz.pdfas.lib.util;
 
+import lombok.NonNull;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,7 +85,7 @@ public class StreamUtils {
    * @return The bytes contained in the given <code>InputStream</code>.
    * @throws IOException on any exception thrown
    */
-  public static byte[] readStream(InputStream in) throws IOException {
+  public static byte @NonNull[] readStream(InputStream in) throws IOException {
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     copyStream(in, out, null);
@@ -109,7 +110,7 @@ public class StreamUtils {
    * a <code>String</code>.
    * @throws IOException on any exception thrown
    */
-  public static String readStream(InputStream in, Charset encoding) throws IOException {
+  public static @NonNull String readStream(InputStream in, Charset encoding) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     copyStream(in, out, null);
 
@@ -160,7 +161,7 @@ public class StreamUtils {
    * @param t The <code>Throwable</code>.
    * @return a String representing the stack trace of the <code>Throwable</code>.
    */
-  public static String getStackTraceAsString(Throwable t)
+  public static @NonNull String getStackTraceAsString(Throwable t)
   {
     ByteArrayOutputStream stackTraceBIS = new ByteArrayOutputStream();
     t.printStackTrace(new PrintStream(stackTraceBIS));

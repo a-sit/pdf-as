@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.messages;
 
+import lombok.NonNull;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -50,7 +51,7 @@ public class MessageResolver {
         bundle = ResourceBundle.getBundle(messageResource, locale);
     }
 
-    public static String resolveMessage(String msgId) {
+    public static @NonNull String resolveMessage(String msgId) {
         if(bundle == null) {
             return missingMsg + msgId;
         }

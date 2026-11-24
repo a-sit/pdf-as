@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests.serialization.html;
 
+import lombok.NonNull;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -42,14 +43,14 @@ public class PDFAHTMLSerizalier extends HTMLSerializer<PDFATestInfo> {
     }
 
     @Override
-    public PDFATestInfo createTestInfo() {
+    public @NonNull PDFATestInfo createTestInfo() {
         testInfo = new PDFATestInfo();
         baseTestInfo = testInfo;
         return testInfo;
     }
 
     @Override
-    public TestInfoSerializer<PDFATestInfo> cloneSerializer() {
+    public @NonNull TestInfoSerializer<PDFATestInfo> cloneSerializer() {
         return new PDFAHTMLSerizalier(testInfo);
     }
 
@@ -135,7 +136,7 @@ public class PDFAHTMLSerizalier extends HTMLSerializer<PDFATestInfo> {
     }
 
     @Override
-    public String getTestType() {
+    public @NonNull String getTestType() {
         return "PDF-A";
     }
 

@@ -48,6 +48,8 @@
  */
 package at.knowcenter.wag.egov.egiz.pdf;
 
+import lombok.NonNull;
+
 /**
  * The positioning instruction holds information of where to place the signature
  * block.
@@ -209,7 +211,7 @@ public class PositioningInstruction
 		return true;
 	}
 
-	public String toString() {
+	public @NonNull String toString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("PositioningInstruction [page=");
 		buffer.append(page);

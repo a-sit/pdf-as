@@ -1,5 +1,6 @@
 package at.gv.egiz.sl20.utils;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -120,7 +121,7 @@ public class SL20JSONExtractorUtils {
 	 * @return
 	 * @throws SLCommandoParserException
 	 */
-	public static Map<String, String> getMapOfStringElements(JsonObject input, String keyID, boolean isRequired) throws SLCommandoParserException {
+	public static @NonNull Map<String, String> getMapOfStringElements(JsonObject input, String keyID, boolean isRequired) throws SLCommandoParserException {
 		JsonElement internal = getAndCheck(input, keyID, isRequired);
 		return getMapOfStringElements(internal);
 		
@@ -135,7 +136,7 @@ public class SL20JSONExtractorUtils {
 	 * @return
 	 * @throws SLCommandoParserException
 	 */
-	public static List<String> getListOfStringElements(JsonObject input, String keyID, boolean isRequired) throws SLCommandoParserException {
+	public static @NonNull List<String> getListOfStringElements(JsonObject input, String keyID, boolean isRequired) throws SLCommandoParserException {
 		JsonElement internal = getAndCheck(input, keyID, isRequired);
 
 		List<String> result = new ArrayList<String>();
@@ -168,7 +169,7 @@ public class SL20JSONExtractorUtils {
 	 * @return
 	 * @throws SLCommandoParserException
 	 */
-	public static Map<String, String> getMapOfStringElements(JsonElement input) throws SLCommandoParserException {		
+	public static @NonNull Map<String, String> getMapOfStringElements(JsonElement input) throws SLCommandoParserException {
 		Map<String, String> result = new HashMap<String, String>();
 				
 		if (input != null) {

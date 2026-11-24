@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.utils;
 
+import lombok.NonNull;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -56,7 +57,7 @@ public class ImageUtils {
 	private static final Logger logger = LoggerFactory
 			.getLogger(ImageUtils.class);
 
-	public static BufferedImage removeAlphaChannel(BufferedImage src) {
+	public static @NonNull BufferedImage removeAlphaChannel(BufferedImage src) {
 		//if (src.getColorModel().hasAlpha()) {
 			BufferedImage image = new BufferedImage(src.getWidth(),
 					src.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -76,7 +77,7 @@ public class ImageUtils {
 		 */
 	}
 
-	public static BufferedImage convertRGBAToIndexed(BufferedImage src) {
+	public static @NonNull BufferedImage convertRGBAToIndexed(BufferedImage src) {
 		BufferedImage dest = new BufferedImage(src.getWidth(), src.getHeight(),
 				BufferedImage.TYPE_BYTE_INDEXED);
 		Graphics g = dest.getGraphics();
@@ -90,7 +91,7 @@ public class ImageUtils {
 		return dest;
 	}
 
-	public static BufferedImage makeTransparent(BufferedImage image, int x,
+	public static @NonNull BufferedImage makeTransparent(BufferedImage image, int x,
 			int y) {
 		ColorModel cm = image.getColorModel();
 		if (!(cm instanceof IndexColorModel))
@@ -112,7 +113,7 @@ public class ImageUtils {
 				null);
 	}
 
-	public static Dimension getImageDimensions(InputStream is)
+	public static @NonNull Dimension getImageDimensions(InputStream is)
 			throws IOException {
 		ImageInputStream in = ImageIO.createImageInputStream(is);
 		try {
@@ -134,7 +135,7 @@ public class ImageUtils {
 		}
 	}
 
-	public static File getImageFile(String imageFile, ISettings settings)
+	public static @NonNull File getImageFile(String imageFile, ISettings settings)
 			throws PdfAsException, IOException {
 		File img_file = new File(imageFile);
 		if (!img_file.isAbsolute()) {
@@ -156,7 +157,7 @@ public class ImageUtils {
 		return img_file;
 	}
 
-	public static Dimension getImageDimensions(String imageValue,
+	public static @NonNull Dimension getImageDimensions(String imageValue,
 			ISettings settings) throws PdfAsException, IOException {
 		InputStream is = getImageInputStream(imageValue, settings);
 		try {

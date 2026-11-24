@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.stamping;
 
+import lombok.NonNull;
 import static at.gv.egiz.pdfas.common.utils.StringUtils.extractLastID;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ import at.gv.egiz.pdfas.common.settings.IProfileConstants;
 import at.gv.egiz.pdfas.common.settings.ISettings;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.lib.impl.status.ICertificateProvider;
-import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
+import at.gv.egiz.pdfas.lib.impl.status.PDFObject;
 import at.knowcenter.wag.egov.egiz.pdf.sig.SignatureEntry;
 import at.knowcenter.wag.egov.egiz.table.Entry;
 import at.knowcenter.wag.egov.egiz.table.Style;
@@ -104,12 +105,12 @@ public class TableFactory implements IProfileConstants {
      * @see at.knowcenter.wag.egov.egiz.table.Table
      * @see at.knowcenter.wag.egov.egiz.table.Entry
      */
-    public static Table createSigTable(SignatureProfileSettings profile, String tableID, OperationStatus operationStatus,
+    public static Table createSigTable(SignatureProfileSettings profile, String tableID, PDFObject pdfObject,
     		ICertificateProvider certProvider) throws PdfAsSettingsException
     {
         String table_key_prefix = SIG_OBJ + profile.getProfileID() + "." + TABLE;
         String table_key = table_key_prefix + tableID;
-        ISettings configuration = operationStatus.getSettings();
+        ISettings configuration = pdfObject.getStatus().getSettings();
         // String caption_prefix = SignatureTypes.SIG_OBJ + getSignationType() +
         // ".key.";
         // String value_prefix = SignatureTypes.SIG_OBJ + getSignationType() +
@@ -172,7 +173,7 @@ public class TableFactory implements IProfileConstants {
                     if (TYPE_TABLE.equals(key))
                     {
                         // add a table entry
-                        Table table = createSigTable(profile, type, operationStatus, certProvider);
+                        Table table = createSigTable(profile, type, pdfObject, certProvider);
                         if (table != null)
                         {
                             Entry entry = new Entry(Entry.TYPE_TABLE, table, key);
@@ -197,7 +198,7 @@ public class TableFactory implements IProfileConstants {
                     if (TYPE_VALUE.equals(type))
                     {
                         // add a single value entry
-                    	 ValueResolver resolver = new ValueResolver(certProvider, operationStatus);
+                        ValueResolver resolver = new ValueResolver(certProvider, pdfObject);
                         String value = profile.getValue(key);
                         Entry entry = new Entry(Entry.TYPE_VALUE, 
                         		resolver.resolve(key, value, profile), key);
@@ -211,7 +212,7 @@ public class TableFactory implements IProfileConstants {
                     if (TYPE_CAPTION.equals(type))
                     {
                         // add a single value entry
-                    	 ValueResolver resolver = new ValueResolver(certProvider, operationStatus);
+                        ValueResolver resolver = new ValueResolver(certProvider, pdfObject);
                         String value = profile.getCaption(key);
                         Entry entry = new Entry(Entry.TYPE_CAPTION, 
                         		resolver.resolve(key, value, profile), key);
@@ -231,7 +232,7 @@ public class TableFactory implements IProfileConstants {
                         //String caption = getSigCaption(key);
                         //String value = getSigValue(key);
 
-                        ValueResolver resolver = new ValueResolver(certProvider, operationStatus);
+                        ValueResolver resolver = new ValueResolver(certProvider, pdfObject);
                                                 
                         if (value != null) {
                             Entry c_entry = new Entry(Entry.TYPE_CAPTION, caption, key);
@@ -271,7 +272,7 @@ public class TableFactory implements IProfileConstants {
         return sig_table;
     }
 
-    public static SignatureProfileSettings createProfile(String profileID, ISettings configuration) throws PDFASError {
+    public static @NonNull SignatureProfileSettings createProfile(String profileID, ISettings configuration) throws PDFASError {
         return new SignatureProfileSettings(profileID, configuration);
     }
 
@@ -345,7 +346,7 @@ public class TableFactory implements IProfileConstants {
      * @return the defined style informations
      * @see at.knowcenter.wag.egov.egiz.table.Style
      */
-    private static Style readStyle(String styleKey, ISettings configuration)
+    private static @NonNull Style readStyle(String styleKey, ISettings configuration)
     {
         Map<String, String> styles = configuration.getValuesPrefix(styleKey);
         Style style = new Style();

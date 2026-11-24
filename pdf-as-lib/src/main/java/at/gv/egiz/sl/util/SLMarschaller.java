@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.sl.util;
 
+import lombok.NonNull;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
@@ -61,7 +62,7 @@ public class SLMarschaller {
 		marshaller.marshal(obj, os);
 	}
 
-	public static synchronized String marshalToString(Object obj) throws JAXBException {
+	public static synchronized @NonNull String marshalToString(Object obj) throws JAXBException {
 		Marshaller marshaller = createMarshaller();
 		StringWriter sw = new StringWriter();
 		marshaller.marshal(obj, sw);

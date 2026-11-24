@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.web_xml_bridges;
 
+import lombok.NonNull;
 import org.apache.catalina.filters.SetCharacterEncodingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,7 @@ import lombok.val;
 @Configuration
 public class FilterBridge {
   @Bean
-  public FilterRegistrationBean<Filter> setCharacterEncodingFilter() {
+  public @NonNull FilterRegistrationBean<Filter> setCharacterEncodingFilter() {
     val reg = new FilterRegistrationBean<Filter>(new SetCharacterEncodingFilter());
     reg.addUrlPatterns("/*");
     reg.addInitParameter("encoding", "UTF-8");
@@ -25,7 +26,7 @@ public class FilterBridge {
   }
 
   @Bean
-  public FilterRegistrationBean<Filter> exceptionCatchFilter() {
+  public @NonNull FilterRegistrationBean<Filter> exceptionCatchFilter() {
     val reg = new FilterRegistrationBean<Filter>(new ExceptionCatchFilter());
     reg.addUrlPatterns("/*");
     reg.addInitParameter("statelessServlets", "/actuator,/placeholder,/visblock");
@@ -34,7 +35,7 @@ public class FilterBridge {
   }
 
   @Bean
-  public FilterRegistrationBean<Filter> userAgentFilter() {
+  public @NonNull FilterRegistrationBean<Filter> userAgentFilter() {
     val reg = new FilterRegistrationBean<Filter>(new UserAgentFilter());
     reg.addUrlPatterns("/*");
     reg.setOrder(3);
@@ -42,7 +43,7 @@ public class FilterBridge {
   }
 
   @Bean
-  public FilterRegistrationBean<Filter> cors() {
+  public @NonNull FilterRegistrationBean<Filter> cors() {
     val reg = new FilterRegistrationBean<Filter>(new CORSFilter());
     reg.addUrlPatterns("/*");
     reg.addInitParameter("cors.allowOrigin", "*");

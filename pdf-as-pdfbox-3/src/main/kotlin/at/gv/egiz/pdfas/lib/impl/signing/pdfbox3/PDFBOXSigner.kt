@@ -6,7 +6,6 @@ import at.gv.egiz.pdfas.common.exceptions.PdfAsException
 import at.gv.egiz.pdfas.common.exceptions.PdfAsWrappedIOException
 import at.gv.egiz.pdfas.common.exceptions.SLPdfAsException
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings
-import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource
 import at.gv.egiz.pdfas.lib.api.IConfigurationConstants
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter
 import at.gv.egiz.pdfas.lib.impl.ErrorExtractor
@@ -87,7 +86,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     @Throws(PDFASError::class)
     override fun checkPDFPermissions(pdfObject: PDFBOXObject) {
 
-        pdfObject.document!!.checkPDFPermissions()
+        pdfObject.document.checkPDFPermissions()
     }
 
     fun PDDocument.checkPDFPermissions() {
@@ -104,7 +103,6 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     }
 
     class SignatureDataExtractor(
-        val certificate: X509Certificate,
         private val pdfFilter: String,
         private val pdfSubFilter: String)
         : PDFASSignatureExtractor, PDFASSignatureInterface, SignatureInterface {
@@ -114,7 +112,6 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
 
         private lateinit var signatureData: ByteArray
         override fun getSignatureData() = signatureData
-        lateinit var byteRange: IntArray private set
 
         /** Called by PDFBox.
          * We save the data to be signed and return an all-zeros signature (padded by pdfbox).
@@ -125,17 +122,12 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             return byteArrayOf(0)
         }
 
-        fun setPDSignature(signature: PDSignature) {
-            byteRange = signature.byteRange
-        }
-
-
     }
     override fun buildBlindSignaturInterface(
         certificate: X509Certificate,
         filter: String,
         subfilter: String
-    ) = SignatureDataExtractor(certificate, filter, subfilter)
+    ) = SignatureDataExtractor(filter, subfilter)
 
     private fun findExistingSignature(doc: PDDocument, sigFieldName: String?): PDSignature? =
         doc.documentCatalog.getAcroForm(null)
@@ -353,7 +345,8 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
     ) {
 
         val isAdobeSignatureForm: Boolean
-        try { SignatureOptions().use { options -> pdfObject.document!!.use { doc ->
+        val doc = pdfObject.document
+        try { SignatureOptions().use { options ->
             val signature = findExistingSignature(doc, getSignatureFieldNameConfig(pdfObject))
                 .also { isAdobeSignatureForm = (it != null) }
                 ?: PDSignature()
@@ -363,7 +356,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             logger.debug("Signing at {}", signature.signDate.time)
 
             val nextPlaceholderData: SignaturePlaceholderData? = PlaceholderFilter.checkPlaceholderSignatureLocation(
-                pdfObject.status, pdfObject.status.settings,
+                pdfObject, pdfObject.status.settings,
                 pdfObject.status.signParameter.placeHolderId)
             if (nextPlaceholderData != null) {
                 logger.info("Placeholder data found.")
@@ -380,14 +373,12 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
 
             val signatureProfileSettings =
                 TableFactory.createProfile(requestedSignature.signatureProfileID, pdfObject.status.settings)
-            val resolver = ValueResolver(requestedSignature, pdfObject.status)
+            val resolver = ValueResolver(requestedSignature, pdfObject)
 
             signature.name = resolver.resolve("SIG_SUBJECT",
                 signatureProfileSettings.getValue("SIG_SUBJECT"), signatureProfileSettings)
             signature.reason =
                 (signatureProfileSettings.signingReason ?: "PAdES Signature").also { logger.debug("Signing reason: $it") }
-
-            signer.setPDSignature(signature)
 
             if (signatureProfileSettings.isPDFA() || signatureProfileSettings.isPDFA3) {
                 signatureProfileSettings.setPDFAVersion(getPDFAVersion(doc))
@@ -407,7 +398,7 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                         pdfObject.status.signParameter.signaturePosition)
                 val main = TableFactory.createSigTable(
                     signatureProfileSettings, IConfigurationConstants.MAIN,
-                    pdfObject.status, requestedSignature)
+                    pdfObject, requestedSignature)
 
                 val visualObject = PDFBOXStamper.createVisualPDFObject(pdfObject, main)
 
@@ -477,11 +468,9 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
             injectPdfUaContent(doc, signatureField, signatureProfileSettings)
 
             try {
-                synchronized(doc) {
-                    pdfObject.signedDocument = ByteArrayOutputStream().also(doc::saveIncremental).toByteArray()
-                    if (signatureProfileSettings.isPDFA) {
-                        validatePDFAPreflight(pdfObject.signedDocument)
-                    }
+                pdfObject.status.signedDocument = ByteArrayOutputStream().also(doc::saveIncremental).toByteArray()
+                if (signatureProfileSettings.isPDFA) {
+                    validatePDFAPreflight(pdfObject.status.signedDocument)
                 }
             } catch (e: PdfAsWrappedIOException) {
                 throw e.decoratedException.also(::logPdfUpdateError)
@@ -489,10 +478,8 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                 throw PDFASError.wrap(ErrorConstants.ERROR_SIG_FINISH_FAILED, e.also(::logPdfUpdateError))
             }
             logger.debug("Signature done!")
-        }}} catch (e: IOException) {
+        }} catch (e: IOException) {
             throw PDFASError(ErrorConstants.ERROR_SIG_CREATION_FAILED, e).also { logger.warn(it.message, e) }
-        } finally {
-            System.gc()
         }
     }
 
@@ -504,34 +491,23 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
         requestedSignature: RequestedSignature
     ): Image {
         try {
-            val pdfObject = status.pdfObject as PDFBOXObject
-
-            val signatureProfileSettings: SignatureProfileSettings
-            val visualObject: PDFBOXStamper.VisualObject
-            val positioningInstruction: PositioningInstruction
-            PDDocument().use { previewDoc ->
-                previewDoc.addPage(PDPage(PDRectangle.A4))
-                pdfObject.originalDocument = ByteArrayDataSource(
-                    ByteArrayOutputStream().use {
-                        previewDoc.save(it)
-                        it.toByteArray()
-                    })
-
-                signatureProfileSettings = TableFactory.createProfile(
+            return PDFBOXObject(status, PDDocument()).use { pdfObject ->
+                pdfObject.document.addPage(PDPage(PDRectangle.A4))
+                val signatureProfileSettings = TableFactory.createProfile(
                     requestedSignature.signatureProfileID,
                     pdfObject.status.settings
                 )
 
-                visualObject =
+                val visualObject =
                     PDFBOXStamper.createVisualPDFObject(
                             pdfObject,
                             TableFactory.createSigTable(
                                 signatureProfileSettings, IConfigurationConstants.MAIN,
-                                pdfObject.status, requestedSignature
+                                pdfObject, requestedSignature
                             )
                         )
 
-                positioningInstruction = when (
+                val positioningInstruction = when (
                     val signaturePosString = pdfObject.status
                         .getSignatureProfileConfiguration(requestedSignature.signatureProfileID)
                         .defaultPositioning
@@ -541,50 +517,50 @@ object PDFBOXSigner : IPdfSigner<PDFBOXObject, PDFBOXSigner.SignatureDataExtract
                 }.let {
                     Positioning.determineTablePositioning(
                         it,
-                        previewDoc,
+                        pdfObject.document,
                         visualObject,
                         pdfObject.status.settings,
                         signatureProfileSettings
                     )
                 }
-            }
 
-            val stdRes = 72.0
-            val targetRes = resolution.toFloat()
-            val factor = targetRes / stdRes
+                val stdRes = 72.0
+                val targetRes = resolution.toFloat()
+                val factor = targetRes / stdRes
 
-            requestedSignature.signaturePosition = makeSignaturePositionImpl(positioningInstruction, visualObject)
-            val pageImage =
-                PDFAsVisualSignature.build(
-                    pdfObject,
-                    visualObject,
-                    positioningInstruction,
-                    signatureProfileSettings,
-                    true
-                )
-                    .let { (bytes, _) ->
-                        synchronized(PDDocument::class.java) { Loader.loadPDF(bytes) }
-                    }
-                    .use { visualDoc ->
-                        PDFRenderer(visualDoc)
-                            .renderImageWithDPI(0, targetRes, ImageType.ARGB)
-                    }
+                requestedSignature.signaturePosition = makeSignaturePositionImpl(positioningInstruction, visualObject)
+                val pageImage =
+                    PDFAsVisualSignature.build(
+                        pdfObject,
+                        visualObject,
+                        positioningInstruction,
+                        signatureProfileSettings,
+                        true
+                    )
+                        .let { (bytes, _) ->
+                            synchronized(PDDocument::class.java) { Loader.loadPDF(bytes) }
+                        }
+                        .use { visualDoc ->
+                            PDFRenderer(visualDoc)
+                                .renderImageWithDPI(0, targetRes, ImageType.ARGB)
+                        }
 
 
-            return BufferedImage(
-                (requestedSignature.signaturePosition.width * factor).toInt(),
-                (requestedSignature.signaturePosition.height * factor).toInt(),
-                BufferedImage.TYPE_4BYTE_ABGR
-            ).also { cutOut ->
-                // TODO: these coordinates feel scuffed
-                (cutOut.graphics as Graphics2D).drawImage(
-                    pageImage, 0, 0, cutOut.width, cutOut.height,
-                    (0 * factor).toInt(),
-                    (pageImage.height - (requestedSignature.signaturePosition.height + 1) * factor).toInt(),
-                    ((requestedSignature.signaturePosition.width + 2) * factor).toInt(),
-                    (pageImage.height),
-                    null
-                )
+                BufferedImage(
+                    (requestedSignature.signaturePosition.width * factor).toInt(),
+                    (requestedSignature.signaturePosition.height * factor).toInt(),
+                    BufferedImage.TYPE_4BYTE_ABGR
+                ).also { cutOut ->
+                    // TODO: these coordinates feel scuffed
+                    (cutOut.graphics as Graphics2D).drawImage(
+                        pageImage, 0, 0, cutOut.width, cutOut.height,
+                        (0 * factor).toInt(),
+                        (pageImage.height - (requestedSignature.signaturePosition.height + 1) * factor).toInt(),
+                        ((requestedSignature.signaturePosition.width + 2) * factor).toInt(),
+                        (pageImage.height),
+                        null
+                    )
+                }
             }
         } catch (e: Throwable) {
             logger.warn("Failed to generate signature preview", e)

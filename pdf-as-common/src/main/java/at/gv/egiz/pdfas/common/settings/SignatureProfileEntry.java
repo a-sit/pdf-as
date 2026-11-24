@@ -23,6 +23,8 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.settings;
 
+import lombok.NonNull;
+
 public class SignatureProfileEntry {
     private String key = null;
     private String caption = null;
@@ -62,7 +64,7 @@ public class SignatureProfileEntry {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return getKey() + "[ " + getCaption() + " : " + getValue() + " ]";
     }
 }

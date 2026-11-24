@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.helper;
 
+import lombok.NonNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -12,7 +13,7 @@ import java.util.Map.Entry;
 
 public class UrlParameterExtractor {
 
-	public static Map<String, String> splitQuery(URL url)
+	public static @NonNull Map<String, String> splitQuery(URL url)
 			throws UnsupportedEncodingException {
 		Map<String, String> query_pairs = new LinkedHashMap<String, String>();
 		String query = url.getQuery();
@@ -28,7 +29,7 @@ public class UrlParameterExtractor {
 		return query_pairs;
 	}
 
-	public static String buildParameterFormString(URL url) throws IOException {
+	public static @NonNull String buildParameterFormString(URL url) throws IOException {
 		Map<String, String> query_pairs = splitQuery(url);
 		Iterator<Entry<String, String>> entryIt = query_pairs.entrySet()
 				.iterator();

@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests;
 
+import lombok.NonNull;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public class SignatureTest {
      * @throws CertificateException
      * @throws PdfAsException
      */
-    protected File signPDFFile() throws IOException, FileNotFoundException,
+    protected @NonNull File signPDFFile() throws IOException, FileNotFoundException,
             CertificateException, PDFASError, PdfAsException {
         File inputFile = new File(baseTestData.getPdfFile());
         File outputPdfFile = new File(baseTestData.getOutputFile());

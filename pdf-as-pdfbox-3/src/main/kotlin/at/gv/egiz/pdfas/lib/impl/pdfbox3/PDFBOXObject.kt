@@ -12,32 +12,24 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Path
-import jakarta.activation.DataSource
 
-class PDFBOXObject(status: OperationStatus) : PDFObject(status) {
+class PDFBOXObject(status: OperationStatus, val document: PDDocument) : PDFObject(status) {
     companion object { private val logger = LoggerFactory.getLogger(PDFBOXObject::class.java) }
     public val settings get() = status.settings
-    public var document: PDDocument? = null; private set
+    constructor(status: OperationStatus) : this(status,
+        requireNotNull(status.originalDocument) { "No original document supplied for PDF processing" }
+            .inputStream.use { it.readAllBytes() }.let { bytes ->
+                synchronized(PDDocument::class.java) {
+                    // TODO: can we somehow make this leverage random access
+                    Loader.loadPDF(bytes)
+                }
+            }
+    )
 
-    override fun close() {
-        try {
-            document?.close()
-        } finally {
-            document = null
-        }
-    }
-
-    override fun setOriginalDocument(originalDocument: DataSource) {
-        this.originalDocument = originalDocument
-        close()
-        synchronized(PDDocument::class.java) {
-            // TODO: can we somehow make this leverage random access
-            document = Loader.loadPDF(originalDocument.inputStream.readAllBytes())
-        }
-    }
+    override fun close() = document.close()
 
     override fun getPDFVersion() =
-        document!!.document.version.toString()
+        document.document.version.toString()
 
     fun generateFont(fontType: String, fontDerivative: String?) = when {
         fontType.startsWith("TTF:") -> generateTTFFont(fontType)

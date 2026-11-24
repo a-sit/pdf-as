@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.sigs.pkcs7detached;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -54,7 +55,7 @@ public class PKCS7DetachedVerifier implements IVerifyFilter, PKCS7DetachedConsta
         
     }
 
-    public List<FilterEntry> getFiters() {
+    public @NonNull List<FilterEntry> getFiters() {
         List<FilterEntry> result = new ArrayList<FilterEntry>();
         result.add(new FilterEntry(FILTER_ADOBE_PPKLITE, SUBFILTER_ADBE_PKCS7_DETACHED));
         return result;

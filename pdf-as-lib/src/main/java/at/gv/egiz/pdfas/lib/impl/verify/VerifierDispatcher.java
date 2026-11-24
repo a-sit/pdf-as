@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.verify;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,7 +74,7 @@ public class VerifierDispatcher {
 		}
 	}
 
-	private String[] getClasses(ISettings settings) {
+	private String @NonNull[] getClasses(ISettings settings) {
 		String confVerifiers = settings.getValue(CONF_VERIFIER_LIST);
 		String[] classes;
 		if (confVerifiers != null) {

@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.sl.util;
 
+import lombok.NonNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -68,7 +69,7 @@ public abstract class BaseSLConnector implements ISLConnector,
 
 	protected ObjectFactory of = new ObjectFactory();
 
-	public InfoboxReadRequestType createInfoboxReadRequest(
+	public @NonNull InfoboxReadRequestType createInfoboxReadRequest(
 			SignParameter parameter) {
 		InfoboxReadRequestType request = new InfoboxReadRequestType();
 		request.setInfoboxIdentifier("Certificates");
@@ -82,7 +83,7 @@ public abstract class BaseSLConnector implements ISLConnector,
 		return request;
 	}
 
-	public RequestPackage createCMSRequest(byte[] signatureData,
+	public @NonNull RequestPackage createCMSRequest(byte[] signatureData,
 			int[] byteRange, SignParameter parameter) throws PDFIOException {
 		boolean base64 = true;
 		String requestType = parameter.getConfiguration().getValue(

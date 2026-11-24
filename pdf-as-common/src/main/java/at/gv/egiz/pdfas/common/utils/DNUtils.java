@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.utils;
 
+import lombok.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ import javax.naming.ldap.Rdn;
 public class DNUtils {
   private static final Map<String, String> RFC2255_NAME_MAPPER = Map.of("title", "T");
 
-  public static Map<String, String> dnToMap(String dn) throws InvalidNameException {
+  public static @NonNull Map<String, String> dnToMap(String dn) throws InvalidNameException {
     final Map<String, String> map = new HashMap<>();
 
     final LdapName ldapName = new LdapName(dn);

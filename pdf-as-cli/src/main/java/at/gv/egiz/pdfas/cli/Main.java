@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.cli;
 
+import lombok.NonNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -121,7 +122,7 @@ public class Main {
 
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-	private static Options createOptions() {
+	private static @NonNull Options createOptions() {
 		Options cliOptions = new Options();
 
 		Option modeOption = new Option(CLI_ARG_MODE_SHORT, CLI_ARG_MODE, true,

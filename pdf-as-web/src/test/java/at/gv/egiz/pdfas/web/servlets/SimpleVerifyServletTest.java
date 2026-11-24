@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.servlets;
 
+import lombok.NonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -76,7 +77,7 @@ class SimpleVerifyServletTest {
 	
 
 	@SneakyThrows
-	private MockHttpServletResponse executeTest(String pdfResource) {
+	private @NonNull MockHttpServletResponse executeTest(String pdfResource) {
 		val pdf = IOUtils.toByteArray(SimpleVerifyServletTest.class.getResourceAsStream(pdfResource));
 	    MockHttpServletRequest httpReq = new MockHttpServletRequest("POST", "https://localhost/pdfas");
 	    MockHttpServletResponse httpResp = new MockHttpServletResponse();

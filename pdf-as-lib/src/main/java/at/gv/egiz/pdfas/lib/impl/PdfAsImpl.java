@@ -165,7 +165,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
     }
   }
 
-  private X509Certificate getValidCertificate(X509Certificate certificate) throws PDFASError {
+  private @NonNull X509Certificate getValidCertificate(X509Certificate certificate) throws PDFASError {
     Date notAfter = certificate.getNotAfter();
     Date notBefore = certificate.getNotBefore();
     Date now = new Date();
@@ -216,14 +216,13 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       // execute pre Processors
       signPreProcessing(parameter);
 
-      status = new OperationStatus(parameter);
+      status = new OperationStatus(parameter, document);
 
       final IPdfSigner signer = status.getBackend().getPdfSigner();
 
-      val pdfObject = signer.buildPDFObject(status);
-      pdfObject.setOriginalDocument(document);
-      status.setPdfObject(pdfObject);
-      signer.checkPDFPermissions(pdfObject);
+      try (val pdfObject = signer.buildPDFObject(status)) {
+        signer.checkPDFPermissions(pdfObject);
+      }
 
       return StatusRequestImpl.create(this, status);
     } catch (final Throwable e) {
@@ -264,8 +263,12 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
               .buildBlindSignaturInterface(certificate,
                       pdfFilter, pdfSubFilter);
 
-      signer.signPDF(status.getPdfObject(),
-              status.getRequestedSignature(), signatureDataExtractor);
+      try (val pdfObject = signer.buildPDFObject(status)) {
+        signer.checkPDFPermissions(pdfObject);
+        signer.signPDF(pdfObject, status.getRequestedSignature(), signatureDataExtractor);
+      } catch (final IOException e) {
+        throw new PDFASError(ERROR_SIG_CREATION_FAILED, e);
+      }
 
       final StringBuilder sb = new StringBuilder();
 
@@ -304,7 +307,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       final byte[] pdfSignature = status.getBackend().getPdfSigner()
           .rewritePlainSignature(signatureValue);
       // byte[] input =
-      // PDFUtils.blackOutSignature(status.getPdfObject().getSignedDocument(),
+      // PDFUtils.blackOutSignature(status.getSignedDocument(),
       // request.getSignatureDataByteRange());
       final VerifyResult verifyResult = SignatureUtils.verifySignature(
           signatureValue, request.getSignatureData());
@@ -326,7 +329,7 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       }
 
       for (int i = 0; i < pdfSignature.length; i++) {
-        status.getPdfObject().getSignedDocument()[offset + i] = pdfSignature[i];
+        status.getSignedDocument()[offset + i] = pdfSignature[i];
       }
     } catch (final Throwable e) {
       throw e;
@@ -338,14 +341,14 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
 
     try {
 
-      val signedDocument = status.getPdfObject().getSignedDocument();
+      val signedDocument = status.getSignedDocument();
       if (signedDocument == null || signedDocument.length == 0) {
         logger.warn("No signed document in session. Maybe signing-service communication stopped by an error");
         throw new PDFASError(ERROR_SIG_INVALID_STATUS,
             "No signed document in session. Maybe signing-service communication stopped by an error");
       }
 
-      output.write(status.getPdfObject().getSignedDocument());
+      output.write(signedDocument);
       output.flush();
 
       // ================================================================
@@ -358,10 +361,6 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
       return signResult;
     } catch (final IOException e) {
       throw ErrorExtractor.searchPdfAsError(e, status);
-    } finally {
-      if (status != null) {
-        status.clear();
-      }
     }
   }
 
@@ -433,11 +432,9 @@ public class PdfAsImpl implements PdfAs, IConfigurationConstants,
         iaikCert = (X509Certificate) cert;
       }
 
-      status = new OperationStatus(parameter);
+      status = new OperationStatus(parameter, null);
 
       final IPdfSigner<?, ?> signer = status.getBackend().getPdfSigner();
-
-      status.setPdfObject(signer.buildPDFObject(status));
 
       final RequestedSignature requestedSignature = new RequestedSignature(
           status, iaikCert, "", "");

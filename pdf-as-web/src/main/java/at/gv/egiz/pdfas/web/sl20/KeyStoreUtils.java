@@ -24,6 +24,7 @@
 
 package at.gv.egiz.pdfas.web.sl20;
 
+import lombok.NonNull;
 import iaik.x509.X509Certificate;
 
 import java.io.BufferedInputStream;
@@ -160,7 +161,7 @@ public class KeyStoreUtils {
    * @throws IOException thrown while reading the certificate from file
    * @throws GeneralSecurityException thrown while creating the certificate
    */
-  private static Certificate loadCertificate(String certFilename)
+  private static @NonNull Certificate loadCertificate(String certFilename)
     throws IOException, GeneralSecurityException {
 
     FileInputStream in = new FileInputStream(certFilename);

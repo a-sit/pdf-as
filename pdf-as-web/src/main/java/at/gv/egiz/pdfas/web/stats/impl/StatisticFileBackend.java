@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.stats.impl;
 
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ public class StatisticFileBackend implements StatisticBackend {
 		sb.append(";");
 	}
 
-	private String getLogEntry(StatisticEvent statisticEvent) {
+	private @NonNull String getLogEntry(StatisticEvent statisticEvent) {
 		StringBuilder sb = new StringBuilder();
 		addCSVValue(String.valueOf(statisticEvent.getTimestamp()), sb);
 		addCSVValue(statisticEvent.getOperation().getName(), sb);
@@ -50,7 +51,7 @@ public class StatisticFileBackend implements StatisticBackend {
 	}
 
 	@Override
-	public String getName() {
+	public @NonNull String getName() {
 		return NAME;
 	}
 

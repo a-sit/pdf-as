@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests.serialization.html;
 
+import lombok.NonNull;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -101,7 +102,7 @@ public class HTMLTestSummaryWriter implements TestSummaryWriter {
      *            the verdict of a test
      * @return HTML-string for a verdict label
      */
-    static String verdictToLabel(TestVerdict verdict) {
+    static @NonNull String verdictToLabel(TestVerdict verdict) {
         switch (verdict) {
         case FAILED:
             return "<span class=\"label label-danger\">Fail</span>";

@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.test.stamping;
 
+import lombok.NonNull;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -26,18 +27,22 @@ import at.gv.egiz.pdfas.lib.impl.SignParameterImpl;
 import at.gv.egiz.pdfas.lib.impl.stamping.ValueResolver;
 import at.gv.egiz.pdfas.lib.impl.status.ICertificateProvider;
 import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
+import at.gv.egiz.pdfas.lib.impl.status.PDFObject;
 import iaik.x509.X509Certificate;
  
 @RunWith(JUnit4.class)
 public class CertificateAndRequestParameterResolverTest {
 
-  private OperationStatus opStatus;
+  private PDFObject pdfObject;
   private SignatureProfileSettings sigProfileSetting;
   
   @Before
   public void initialize() throws PDFASError {
     SignParameter signParams = new SignParameterImpl(new ConfigurationImpl(buildDummySettings()), null, null);
-    opStatus = new OperationStatus(signParams);
+    pdfObject = new PDFObject(new OperationStatus(signParams, null)) {
+      @Override public void close() { }
+      @Override public @NonNull String getPDFVersion() { return "1.7"; }
+    };
     
     sigProfileSetting = new SignatureProfileSettings("test", buildDummySettings());
     
@@ -48,12 +53,13 @@ public class CertificateAndRequestParameterResolverTest {
     X509Certificate cert = new X509Certificate(
         CertificateAndRequestParameterResolverTest.class.getResourceAsStream(
             "/data/Hermann_Peyerl.20210930-20260930.SerNo651789F5.cer"));    
-    ValueResolver resolver = new ValueResolver(buildCertProvider(cert), opStatus);
+    ValueResolver resolver = new ValueResolver(buildCertProvider(cert), pdfObject);
     
     String result = resolver.resolve("", 
         "${subject.T != null ? (subject.T + \" \") : \"\"}${subject.CN}", 
         sigProfileSetting);            
     assertEquals("wrong signer Name", "A.Univ.Prof.DDr. Hermann Peyerl", result);
+    assertEquals("1.7", resolver.resolve("", "${iui.pdfVersion}", sigProfileSetting));
     
   }
   
@@ -62,7 +68,7 @@ public class CertificateAndRequestParameterResolverTest {
     X509Certificate cert = new X509Certificate(
         CertificateAndRequestParameterResolverTest.class.getResourceAsStream(
             "/data/Hermann_Peyerl.20210930-20260930.SerNo651789F5.cer"));    
-    ValueResolver resolver = new ValueResolver(buildCertProvider(cert), opStatus);
+    ValueResolver resolver = new ValueResolver(buildCertProvider(cert), pdfObject);
     
     String result = resolver.resolve("", 
         "${subject.title != null ? (subject.title + \" \") : \"\"}${subject.CN}", 
@@ -71,7 +77,7 @@ public class CertificateAndRequestParameterResolverTest {
     
   }
   
-  private ICertificateProvider buildCertProvider(final X509Certificate cert) {
+  private @NonNull ICertificateProvider buildCertProvider(final X509Certificate cert) {
     return new ICertificateProvider() {
       
       @Override
@@ -81,7 +87,7 @@ public class CertificateAndRequestParameterResolverTest {
     };
   }
 
-  private ISettings buildDummySettings() {
+  private @NonNull ISettings buildDummySettings() {
     Map<String, String> configMap = new HashMap<>();
     configMap.put(IProfileConstants.SIG_OBJ + "test", "test");
     

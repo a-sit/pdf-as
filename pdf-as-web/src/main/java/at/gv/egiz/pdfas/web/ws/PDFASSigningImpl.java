@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.ws;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -356,7 +357,7 @@ public class PDFASSigningImpl implements PDFASSigning {
 
   }
 
-  private PdfasSignRequest buildOperationRequest(PdfasSignMultipleRequest request) {
+  private @NonNull PdfasSignRequest buildOperationRequest(PdfasSignMultipleRequest request) {
     final PdfasSignRequest data = new PdfasSignRequest();
     data.setRequestID(request.getRequestID());
     data.setVerificationLevel(request.getVerificationLevel());
@@ -393,7 +394,7 @@ public class PDFASSigningImpl implements PDFASSigning {
 
   }
 
-  private PdfasSignMultipleResponse buildMultiResponseFromInternalResult(PdfasSignResponse internalResp,
+  private @NonNull PdfasSignMultipleResponse buildMultiResponseFromInternalResult(PdfasSignResponse internalResp,
       String reqId, String transactionId) {
     final PdfasSignMultipleResponse resp = new PdfasSignMultipleResponse();
     resp.setRequestID(reqId);
@@ -419,7 +420,7 @@ public class PDFASSigningImpl implements PDFASSigning {
     }
   }
 
-  private PdfasSignRequest buildOperationRequest(PDFASSignRequest request) {
+  private @NonNull PdfasSignRequest buildOperationRequest(PDFASSignRequest request) {
     final PdfasSignRequest data = new PdfasSignRequest();
     data.setRequestID(request.getRequestID());
     data.setVerificationLevel(request.getVerificationLevel());
@@ -451,7 +452,7 @@ public class PDFASSigningImpl implements PDFASSigning {
 
   }
 
-  private PDFASSignResponse buildResponseFromInternalResult(PdfasSignResponse internalResp, String reqId) {
+  private @NonNull PDFASSignResponse buildResponseFromInternalResult(PdfasSignResponse internalResp, String reqId) {
     final PDFASSignResponse resp = new PDFASSignResponse();
     resp.setRequestID(reqId);
     resp.setSignedPDF(internalResp.getSignedPdfs().get(0).getOutputData());

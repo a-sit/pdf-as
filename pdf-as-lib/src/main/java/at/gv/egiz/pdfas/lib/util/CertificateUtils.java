@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.util;
 
+import lombok.NonNull;
 import iaik.asn1.structures.AlgorithmID;
 import iaik.x509.X509Certificate;
 import java.security.NoSuchAlgorithmException;
@@ -31,7 +32,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 
 public class CertificateUtils {
-	public static AlgorithmID[] getAlgorithmIDs(X509Certificate signingCertificate)
+	public static AlgorithmID @NonNull[] getAlgorithmIDs(X509Certificate signingCertificate)
 			throws NoSuchAlgorithmException {
 		PublicKey publicKey = signingCertificate.getPublicKey();
 		String algorithm = publicKey.getAlgorithm();

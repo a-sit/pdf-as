@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.test;
 
+import lombok.NonNull;
 import at.gv.e_government.reference.namespace.moa._20020822_.*;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
@@ -80,7 +81,7 @@ public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
     public final IPlainSigner signer;
 
     @SneakyThrows
-    private Properties getBaseProperties() {
+    private @NonNull Properties getBaseProperties() {
       try (InputStream in = new FileInputStream(config.getPdfAsWebConfPath())) {
         val props = new Properties();
         props.load(in);
@@ -129,7 +130,7 @@ public class MockMoaSigningTest extends TestUtils.CanWatchOperationCount {
     }
 
     @Override
-    public CreateCMSSignatureResponseType createCMSSignature(CreateCMSSignatureRequest body) throws MOAFault {
+    public @NonNull CreateCMSSignatureResponseType createCMSSignature(CreateCMSSignatureRequest body) throws MOAFault {
       val signatureInfoList = body.getSingleSignatureInfo();
       Assertions.assertEquals(1, signatureInfoList.size());
       val signatureInfo = signatureInfoList.get(0);

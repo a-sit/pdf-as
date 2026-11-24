@@ -9,5 +9,5 @@ public class ConfigValidatorLoader {
 	private static final Iterable<@NonNull ConfigurationValidator> configurationValidator =
 			IterableUtils.toList(ServiceLoader.load(ConfigurationValidator.class));
 
-	public static Iterable<@NonNull ConfigurationValidator> getAvailableValidators() { return configurationValidator; }
+	public static @NonNull Iterable<@NonNull ConfigurationValidator> getAvailableValidators() { return configurationValidator; }
 }

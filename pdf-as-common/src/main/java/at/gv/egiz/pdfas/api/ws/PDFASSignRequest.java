@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.api.ws;
 
+import lombok.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public class PDFASSignRequest {
 	}
 
 	@XmlElement(required = false, nillable = true, name="signatureBlockParameter")
-	public Map<String, String> getSignatureBlockParameters() {
+	public @NonNull Map<String, String> getSignatureBlockParameters() {
 		if(signatureBlockParameters == null)
 			signatureBlockParameters = new HashMap<>();
 		return signatureBlockParameters;

@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.filter;
 
+import lombok.NonNull;
 import java.io.IOException;
 
 import jakarta.servlet.Filter;
@@ -24,7 +25,7 @@ public class UserAgentFilter implements Filter {
 	private static final ThreadLocal<String> requestUserAgent = new ThreadLocal<String>() {
 
 		@Override
-		protected String initialValue() {
+		protected @NonNull String initialValue() {
 			return "unkown";
 		}
 		

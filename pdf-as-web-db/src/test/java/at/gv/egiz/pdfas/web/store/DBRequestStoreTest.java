@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.store;
 
+import lombok.NonNull;
 import at.gv.egiz.pdfas.api.processing.PdfasSignRequest;
 import at.gv.egiz.pdfas.web.config.WebConfiguration;
 import at.gv.egiz.pdfas.web.stats.StatisticEvent;
@@ -36,7 +37,7 @@ public class DBRequestStoreTest {
         new ByteArrayInputStream(config.getBytes(StandardCharsets.UTF_8)));
   }
 
-  public static String azstring(int length) {
+  public static @NonNull String azstring(int length) {
     return
         new Random().ints(97,123).limit(length)
             .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)

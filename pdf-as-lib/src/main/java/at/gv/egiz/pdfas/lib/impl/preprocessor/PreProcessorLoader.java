@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.impl.preprocessor;
 
+import lombok.NonNull;
 import java.util.*;
 
 import lombok.Getter;
@@ -10,7 +11,7 @@ import at.gv.egiz.pdfas.lib.api.preprocessor.PreProcessor;
 @Slf4j
 public class PreProcessorLoader {
 
-    private static List<PreProcessor> loadPreProcessors() {
+    private static @NonNull List<PreProcessor> loadPreProcessors() {
         log.debug("building PreProcessors");
 
         List<PreProcessor> processors = new ArrayList<>();

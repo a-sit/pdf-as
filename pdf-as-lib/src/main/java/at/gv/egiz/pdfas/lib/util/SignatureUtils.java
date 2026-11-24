@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.util;
 
+import lombok.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.SignatureException;
@@ -27,7 +28,7 @@ public class SignatureUtils implements ErrorConstants {
      * Verifies the CMS signature for the given input.
      * Throws if the signature is invalid.
      */
-  public static VerifyResult verifySignature(byte[] signature, byte[] input)
+  public static @NonNull VerifyResult verifySignature(byte[] signature, byte[] input)
       throws PDFASError {
     // List<VerifyResult> results = new ArrayList<VerifyResult>();
     try {

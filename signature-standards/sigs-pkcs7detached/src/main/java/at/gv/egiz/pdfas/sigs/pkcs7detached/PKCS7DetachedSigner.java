@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.sigs.pkcs7detached;
 
+import lombok.NonNull;
 import iaik.asn1.ASN1Object;
 import iaik.asn1.ObjectID;
 import iaik.asn1.structures.AlgorithmID;
@@ -119,11 +120,11 @@ public class PKCS7DetachedSigner implements IPlainSigner, PKCS7DetachedConstants
 		} 
 	}
 
-	public String getPDFSubFilter() {
+	public @NonNull String getPDFSubFilter() {
 		return SUBFILTER_ADBE_PKCS7_DETACHED;
 	}
 
-	public String getPDFFilter() {
+	public @NonNull String getPDFFilter() {
 		return FILTER_ADOBE_PPKLITE;
 	}
 

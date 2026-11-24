@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.impl.verify;
 
+import lombok.NonNull;
 import java.io.ByteArrayInputStream;
 import java.security.SignatureException;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class IntegrityVerifier implements IVerifier {
 	private static final Logger logger = LoggerFactory
 			.getLogger(IntegrityVerifier.class);
 
-	public List<VerifyResult> verify(byte[] signature, SignatureInputData inputData,
+	public @NonNull List<VerifyResult> verify(byte[] signature, SignatureInputData inputData,
 			Date verificationTime) throws PdfAsException {
 		try {
 			List<VerifyResult> result = new ArrayList<VerifyResult>();
@@ -162,7 +163,7 @@ public class IntegrityVerifier implements IVerifier {
 	public void setConfiguration(ISettings config) {}
 
 	@Override
-	public SignatureVerificationLevel getLevel() {
+	public @NonNull SignatureVerificationLevel getLevel() {
 		return SignatureVerificationLevel.INTEGRITY_ONLY_VERIFICATION;
 	}
 }

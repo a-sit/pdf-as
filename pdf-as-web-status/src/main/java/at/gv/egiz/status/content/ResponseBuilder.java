@@ -1,5 +1,6 @@
 package at.gv.egiz.status.content;
 
+import lombok.NonNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class ResponseBuilder {
 	        return (otherName == null)? false:name.equals(otherName);
 	    }
 
-	    public String toString(){
+	    public @NonNull String toString(){
 	       return name;
 	    }
 	}

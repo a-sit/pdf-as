@@ -46,6 +46,7 @@
  */
 package at.gv.egiz.pdfas.lib.impl.placeholder;
 
+import lombok.NonNull;
 import at.knowcenter.wag.egov.egiz.pdf.TablePos;
 
 /**
@@ -143,7 +144,7 @@ public class SignaturePlaceholderData {
    }
 
    @Override
-   public String toString() {
+   public @NonNull String toString() {
       return "SignaturePlaceholderData{" +
           "profile='" + profile + '\'' +
           ", type='" + type + '\'' +

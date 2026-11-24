@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.utils;
 
+import lombok.NonNull;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +34,7 @@ import java.io.InputStream;
  */
 public class StreamUtils {
 
-	public static byte[] inputStreamToByteArray(InputStream stream)
+	public static byte @NonNull[] inputStreamToByteArray(InputStream stream)
 			throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		byte[] buffer = new byte[4096];

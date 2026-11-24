@@ -48,6 +48,7 @@
  */
 package at.knowcenter.wag.egov.egiz.pdf.sig;
 
+import lombok.NonNull;
 import java.io.Serializable;
 
 /**
@@ -170,7 +171,7 @@ public class SignatureEntry {
   /**
    * The toString method, used for tests or debugging.
    */
-  public String toString() {
+  public @NonNull String toString() {
     String the_string = "";
     the_string += "\n    Key:" + key_;
     the_string += "\nCaption:" + caption_;

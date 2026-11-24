@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.client.test;
 
+import lombok.NonNull;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -70,7 +71,7 @@ public class BulkRequestThread implements Runnable {
 
 	}
 
-	private PDFASSignRequest getNewRequest() {
+	private @NonNull PDFASSignRequest getNewRequest() {
 		PDFASSignRequest request = new PDFASSignRequest();
 		request.setInputData(inputData);
 		request.setParameters(signParameters);
@@ -78,7 +79,7 @@ public class BulkRequestThread implements Runnable {
 		return request;
 	}
 
-	private PDFASBulkSignRequest getBlukRequest(int count) {
+	private @NonNull PDFASBulkSignRequest getBlukRequest(int count) {
 
 		List<PDFASSignRequest> bulk = new ArrayList<PDFASSignRequest>();
 		for (int i = 0; i < count; i++) {

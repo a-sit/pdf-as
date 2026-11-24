@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.settings;
 
+import lombok.NonNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -344,7 +345,7 @@ public class Settings implements ISettings, IProfileConstants {
     return properties.containsKey(key);
   }
 
-  private Map<String, String> getValuesPrefix(String prefix, Properties props) {
+  private @NonNull Map<String, String> getValuesPrefix(String prefix, Properties props) {
     return props.entrySet().stream()
         .filter(el -> el.getKey().toString().startsWith(prefix))
         .collect(Collectors.toMap(key -> key.getKey().toString(), value -> value.getValue().toString()));
@@ -352,11 +353,11 @@ public class Settings implements ISettings, IProfileConstants {
   }
 
   @Override
-  public Map<String, String> getValuesPrefix(String prefix) {
+  public @NonNull Map<String, String> getValuesPrefix(String prefix) {
     return getValuesPrefix(prefix, properties);
   }
 
-  public Vector<String> getKeys(String prefix) {
+  public @NonNull Vector<String> getKeys(String prefix) {
     final Iterator<Object> keyIterator = properties.keySet().iterator();
     final Vector<String> valueMap = new Vector<>();
     while (keyIterator.hasNext()) {
@@ -408,7 +409,7 @@ public class Settings implements ISettings, IProfileConstants {
   }
 
   @Override
-  public String getWorkingDirectory() {
+  public @NonNull String getWorkingDirectory() {
     return this.workDirectory.getAbsolutePath();
   }
 

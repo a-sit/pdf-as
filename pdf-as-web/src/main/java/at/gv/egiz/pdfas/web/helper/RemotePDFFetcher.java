@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.helper;
 
+import lombok.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -43,7 +44,7 @@ public class RemotePDFFetcher {
 
 	private static final Logger logger = LoggerFactory.getLogger(RemotePDFFetcher.class);
 
-	public static String[] extractSensitiveInformationFromURL(String pdfURL) throws IOException {
+	public static String @NonNull[] extractSensitiveInformationFromURL(String pdfURL) throws IOException {
 		if (pdfURL.contains("@")) {
 			String lowerURL = pdfURL.toLowerCase();
 			int startIndex = 0;
@@ -87,7 +88,7 @@ public class RemotePDFFetcher {
 		}
 	}
 	
-	public static byte[] fetchPdfFile(String pdfURL) throws PdfAsWebException {
+	public static byte @NonNull[] fetchPdfFile(String pdfURL) throws PdfAsWebException {
 		URL url;
 		String[] fetchInfos;
 		try {

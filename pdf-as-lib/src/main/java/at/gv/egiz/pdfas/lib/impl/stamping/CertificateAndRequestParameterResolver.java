@@ -27,7 +27,7 @@ import at.gv.egiz.pdfas.common.settings.IProfileConstants;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.common.utils.DNUtils;
 import at.gv.egiz.pdfas.common.utils.OgnlUtils;
-import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
+import at.gv.egiz.pdfas.lib.impl.status.PDFObject;
 import iaik.x509.X509Certificate;
 import ognl.MemberAccess;
 import ognl.OgnlContext;
@@ -47,7 +47,7 @@ public class CertificateAndRequestParameterResolver implements IResolver {
     private OgnlContext ctx;
     private X509Certificate certificate;
 
-    public CertificateAndRequestParameterResolver(X509Certificate certificate, OperationStatus operationStatus) {
+    public CertificateAndRequestParameterResolver(X509Certificate certificate, PDFObject pdfObject) {
         this.certificate = certificate;
         MemberAccess memberAccess = new MemberAccess() {
             @Override
@@ -77,7 +77,7 @@ public class CertificateAndRequestParameterResolver implements IResolver {
         this.ctx = new OgnlContext(null, null, memberAccess);
 
         this.ctx = new OgnlContext(null, null, memberAccess);
-        Map<String, String> map = operationStatus.getSignParameter().getDynamicSignatureBlockArguments();
+        Map<String, String> map = pdfObject.getStatus().getSignParameter().getDynamicSignatureBlockArguments();
         if(map == null)
             map = new HashMap<>();
         this.ctx.put(IProfileConstants.SIGNATURE_BLOCK_PARAMETER, map);
@@ -100,7 +100,7 @@ public class CertificateAndRequestParameterResolver implements IResolver {
 
         Map<String, String> iuiMap = new HashMap<String, String>();
         try {
-        	iuiMap.put("pdfVersion", operationStatus.getPdfObject().getPDFVersion());
+            iuiMap.put("pdfVersion", pdfObject.getPDFVersion());
         } catch(Throwable e) {
         	logger.warn("Cannot determine pdfVersion: " + e.getMessage());
         }

@@ -1,5 +1,7 @@
 package at.gv.egiz.status;
 
+import lombok.NonNull;
+
 /**
  * The Interface Test.
  */
@@ -10,7 +12,7 @@ public interface Test {
 	 *
 	 * @return the name
 	 */
-	public String getName();
+	public @NonNull String getName();
 	
 	/**
 	 * Gets the cache delay.
@@ -24,5 +26,5 @@ public interface Test {
 	 *
 	 * @return the test result
 	 */
-	public TestResult runTest();
+	public @NonNull TestResult runTest();
 }

@@ -80,11 +80,11 @@ public class RequestedSignature implements ICertificateProvider {
         return this.status.getSignatureProfileConfiguration(signatureProfile).isVisualSignature();
     }
     
-    public TablePos getTablePos() {
+    public @NonNull TablePos getTablePos() {
     	return this.tablePosition;
     }
 
-    public String getSignatureProfileID() {
+    public @NonNull String getSignatureProfileID() {
     	return this.signatureProfile;
     }
 

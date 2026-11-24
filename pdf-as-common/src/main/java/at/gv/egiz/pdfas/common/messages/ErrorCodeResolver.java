@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.messages;
 
+import lombok.NonNull;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -49,7 +50,7 @@ public class ErrorCodeResolver {
         bundle = ResourceBundle.getBundle(messageResource, locale);
     }
 
-    public static String resolveMessage(long code) {
+    public static @NonNull String resolveMessage(long code) {
     	String msgId = String.valueOf(code);
         if(bundle == null) {
             return missingMsg + msgId;

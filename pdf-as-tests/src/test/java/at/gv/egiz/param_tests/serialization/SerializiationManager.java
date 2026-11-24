@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests.serialization;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +37,7 @@ public class SerializiationManager {
      * 
      * @return the singleton instance
      */
-    public static SerializiationManager getInstance() {
+    public static @NonNull SerializiationManager getInstance() {
         // implement locking if needed
         if (instance == null) {
             instance = new SerializiationManager();

@@ -29,11 +29,12 @@ import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.sl.schema.CreateCMSSignatureResponseType;
 import at.gv.egiz.sl.schema.InfoboxReadRequestType;
 import at.gv.egiz.sl.schema.InfoboxReadResponseType;
+import lombok.NonNull;
 
 public interface ISLConnector {
 
-	public InfoboxReadRequestType createInfoboxReadRequest(SignParameter parameter);
+	public @NonNull InfoboxReadRequestType createInfoboxReadRequest(SignParameter parameter);
 	public InfoboxReadResponseType sendInfoboxReadRequest(InfoboxReadRequestType request, SignParameter parameter)  throws PdfAsException;
-	public RequestPackage createCMSRequest(byte[] signatureData, int[] byteRange, SignParameter parameter) throws PDFIOException;
+	public @NonNull RequestPackage createCMSRequest(byte[] signatureData, int[] byteRange, SignParameter parameter) throws PDFIOException;
 	public CreateCMSSignatureResponseType sendCMSRequest(RequestPackage pack, SignParameter parameter) throws PdfAsException;
 }

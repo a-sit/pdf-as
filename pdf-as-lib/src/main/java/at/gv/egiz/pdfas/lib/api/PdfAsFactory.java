@@ -213,7 +213,7 @@ public class PdfAsFactory implements IConfigurationConstants {
      *            The PDF-AS configuration
      * @return
      */
-    public static PdfAs createPdfAs(File configuration) {
+    public static @NonNull PdfAs createPdfAs(File configuration) {
         PdfAs pdfas = new PdfAsImpl(configuration);
 
         if (!initialized) {
@@ -232,7 +232,7 @@ public class PdfAsFactory implements IConfigurationConstants {
      *            the settings
      * @return the pdf as
      */
-    public static PdfAs createPdfAs(ISettings settings) {
+    public static @NonNull PdfAs createPdfAs(ISettings settings) {
         if (!initialized) {
             synchronized (init_mutex) {
                 initialize(settings);
@@ -242,7 +242,7 @@ public class PdfAsFactory implements IConfigurationConstants {
         return new PdfAsImpl(settings);
     }
 
-    public static SignParameter createSignParameter(@NonNull Configuration configuration) {
+    public static @NonNull SignParameter createSignParameter(@NonNull Configuration configuration) {
         return new SignParameterImpl(configuration, null, null);
     }
 
@@ -250,14 +250,14 @@ public class PdfAsFactory implements IConfigurationConstants {
      * Deprecated in favor of {@link createSignParameter(Configuration)},
      * with `dataSource` and `output` being passed directly to {@link PdfAs#sign}. */
     @Deprecated
-    public static SignParameter createSignParameter(
+    public static @NonNull SignParameter createSignParameter(
             @NonNull Configuration configuration, DataSource dataSource,
             OutputStream output) {
         return new SignParameterImpl(configuration, dataSource, output);
     }
 
     /** Creates a verify parameter. */
-    public static VerifyParameter createVerifyParameter(@NonNull Configuration configuration) {
+    public static @NonNull VerifyParameter createVerifyParameter(@NonNull Configuration configuration) {
         return new VerifyParameterImpl(configuration, null);
     }
 
@@ -265,7 +265,7 @@ public class PdfAsFactory implements IConfigurationConstants {
      * Deprecated in favor of {@link createVerifyParameter(Configuration)},
      * with `dataSource` being passed directly to {@link PdfAs#verify}. */
     @Deprecated
-    public static VerifyParameter createVerifyParameter(
+    public static @NonNull VerifyParameter createVerifyParameter(
             @NonNull Configuration configuration, DataSource dataSource) {
         return new VerifyParameterImpl(configuration, dataSource);
     }

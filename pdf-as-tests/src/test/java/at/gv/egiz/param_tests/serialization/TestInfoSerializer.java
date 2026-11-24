@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.gv.egiz.param_tests.testinfo.TestInfo;
+import lombok.NonNull;
 
 /**
  * Base for all test information serializer. It uses template method pattern,
@@ -46,7 +47,7 @@ public abstract class TestInfoSerializer<T extends TestInfo> {
      * 
      * @return instance of a <code>TestInfo</code>-subclass
      */
-    public abstract T createTestInfo();
+    public abstract @NonNull T createTestInfo();
 
     /**
      * Clone method for serializer, it shall create a shallow copy of
@@ -56,7 +57,7 @@ public abstract class TestInfoSerializer<T extends TestInfo> {
      * 
      * @return a clone of <code>this</code>
      */
-    public abstract TestInfoSerializer<T> cloneSerializer();
+    public abstract @NonNull TestInfoSerializer<T> cloneSerializer();
 
     /**
      * getter
@@ -158,7 +159,7 @@ public abstract class TestInfoSerializer<T extends TestInfo> {
      * 
      * @return the file ending string
      */
-    public abstract String fileEnding();
+    public abstract @NonNull String fileEnding();
 
     /**
      * This method returns a description of the concrete test type, which a
@@ -166,5 +167,5 @@ public abstract class TestInfoSerializer<T extends TestInfo> {
      * 
      * @return a test type description
      */
-    public abstract String getTestType();
+    public abstract @NonNull String getTestType();
 }

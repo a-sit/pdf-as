@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.test;
 
+import lombok.NonNull;
 import at.gv.egiz.pdfas.web.stats.impl.StatisticMicrometerBackend;
 import com.jayway.jsonpath.JsonPath;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -40,13 +41,13 @@ public class TestUtils {
     public void rebindStatisticsBackend() {
       StatisticMicrometerBackend.SpringContextProxy.meterRegistry = meterRegistry;
     }
-    protected AutoCloseable OperationCountWatcher(String... tags) throws Exception {
+    protected @NonNull AutoCloseable OperationCountWatcher(String... tags) throws Exception {
       val initialCount = TestUtils.getOperationCount(mvc, tags);
       return () -> Assertions.assertEquals(initialCount+1.0, TestUtils.getOperationCount(mvc, tags), 0.0001);
     }
   }
 
-  public static String azstring(int length) {
+  public static @NonNull String azstring(int length) {
     return
         new Random().ints(97,123).limit(length)
             .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
@@ -111,22 +112,22 @@ public class TestUtils {
       private Builder() {}
       private final ArrayList<Multipart> parts = new ArrayList<>();
 
-      public Builder Value(String key, String value) {
+      public @NonNull Builder Value(String key, String value) {
         parts.add(new Value(key, value));
         return this;
       }
 
-      public Builder File(String key, String filename, String contentType, byte[] contents) {
+      public @NonNull Builder File(String key, String filename, String contentType, byte[] contents) {
         parts.add(new File(key, filename, contentType, contents));
         return this;
       }
 
-      public Multipart.Body build() {
+      public @NonNull Multipart.Body build() {
         return buildMultipartBody(parts.toArray(new Multipart[0]));
       }
     }
 
-    static Builder builder() { return new Builder(); }
+    static @NonNull Builder builder() { return new Builder(); }
 
     @lombok.Value
     class Body {
@@ -135,7 +136,7 @@ public class TestUtils {
     }
   }
 
-  private static String findMultipartBoundary(Multipart[] parts) {
+  private static @NonNull String findMultipartBoundary(Multipart[] parts) {
     while (true) {
       val boundaryCandidate = "----"+azstring(32);
       val candidateBytes = boundaryCandidate.getBytes(StandardCharsets.UTF_8);
@@ -155,7 +156,7 @@ public class TestUtils {
     }
   }
 
-  public static Multipart.Body buildMultipartBody(Multipart... parts) {
+  public static @NonNull Multipart.Body buildMultipartBody(Multipart... parts) {
     val boundary = findMultipartBoundary(parts);
     val preName = ("--"+boundary+"\r\nContent-Disposition: form-data; name=\"").getBytes(StandardCharsets.UTF_8);
     val postNameKV = "\"\r\n\r\n".getBytes(StandardCharsets.UTF_8);

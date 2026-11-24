@@ -48,6 +48,7 @@
  */
 package at.knowcenter.wag.egov.egiz.pdf;
 
+import lombok.NonNull;
 import java.io.Serializable;
 import java.text.MessageFormat;
 
@@ -193,7 +194,7 @@ public class TablePos
     
   }
   
-  public String toString() {  
+  public @NonNull String toString() {
     String thatsme = "pos_x:"+this.posX+" pos_y:"+this.posY+" page:"+this.page+" width:"+this.width+" footer:"+this.footerLine+" rotation:"+this.rotation+"\n "+" autoX:"+xMode+" autoY:"+yMode+" autoW:"+wMode+" pageMode:"+pageMode;
     return thatsme;
   }

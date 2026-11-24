@@ -48,6 +48,7 @@
  */
 package at.knowcenter.wag.egov.egiz.table;
 
+import lombok.NonNull;
 import java.awt.Color;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -521,7 +522,7 @@ public class Style {
   /**
    * The toString method, used for tests or debugging.
    */
-  public String toString() {
+  public @NonNull String toString() {
     return "bgcolor:" + getBgColor() + " halign:" + getHAlign() + " valueAlign:" + getValueHAlign()+ " valign:" + getVAlign() + " padding:" + getPadding() + " border:" + getBorder() + " font:" + getFont() + " valuefont:" + getValueFont() + " imageScaleToFit:" + getImageScaleToFit();
   }
 
@@ -539,7 +540,7 @@ public class Style {
    * @param inheritStyle the style object that serves as a secondary style source in case a style attribute is not defined on the primary style source. 
    * @return Returns a new Style object being fully equipped with styles.
    */
-  public static Style doInherit(Style baseStyle, Style inheritStyle) {
+  public static @NonNull Style doInherit(Style baseStyle, Style inheritStyle) {
     Style newStyle = new Style();
     
     if (baseStyle != null)

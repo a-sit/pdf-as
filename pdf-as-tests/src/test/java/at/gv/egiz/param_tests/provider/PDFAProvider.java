@@ -3,6 +3,8 @@ package at.gv.egiz.param_tests.provider;
 import java.io.File;
 import java.util.Properties;
 
+import lombok.NonNull;
+
 /**
  * Signature data provider for PDF-A conformance tests
  * 
@@ -17,7 +19,7 @@ public class PDFAProvider extends BaseSignatureDataProvider {
      * it does not need any other parameters.
      */
     @Override
-    protected Object[] extractDataFromConfig(File configFile,
+    protected Object @NonNull[] extractDataFromConfig(File configFile,
             Properties rootProps, Properties configProps) {
         return extractStandardDataFromConfig(configFile, rootProps, configProps);
     }

@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests;
 
+import lombok.NonNull;
 import org.junit.AssumptionViolatedException;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -46,7 +47,7 @@ public class SignatureTestWatcher extends TestWatcher {
      *            the name which is displayed for a test
      * @return the directory of the test
      */
-    private String extractDirectoryName(String displayName) {
+    private @NonNull String extractDirectoryName(String displayName) {
     	return displayName.substring(displayName.indexOf('[') + 1,
                displayName.lastIndexOf(']'));
     	

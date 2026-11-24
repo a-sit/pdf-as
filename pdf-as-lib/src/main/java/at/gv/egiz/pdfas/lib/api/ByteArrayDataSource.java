@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.api;
 
+import lombok.NonNull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,12 +17,12 @@ public class ByteArrayDataSource implements DataSource {
 	}
 	
 	@Override
-	public String getContentType() {
+	public @NonNull String getContentType() {
 		return "application/pdf";
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public @NonNull InputStream getInputStream() throws IOException {
 		return new ByteArrayInputStream(data);
 	}
 

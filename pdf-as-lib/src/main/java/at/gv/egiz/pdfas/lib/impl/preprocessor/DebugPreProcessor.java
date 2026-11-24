@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.impl.preprocessor;
 
+import lombok.NonNull;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -53,7 +54,7 @@ public class DebugPreProcessor implements PreProcessor {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return NAME;
     }
 

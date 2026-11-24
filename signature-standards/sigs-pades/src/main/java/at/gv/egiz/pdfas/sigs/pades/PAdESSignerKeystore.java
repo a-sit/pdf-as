@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.sigs.pades;
 
+import lombok.NonNull;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -199,11 +200,11 @@ public class PAdESSignerKeystore implements IPlainSigner, PAdESConstants {
 	    }
      }
 
-	  public String getPDFSubFilter() {
+	  public @NonNull String getPDFSubFilter() {
 	    return SUBFILTER_ETSI_CADES_DETACHED;
 	  }
 
-	  public String getPDFFilter() {
+	  public @NonNull String getPDFFilter() {
 	    return FILTER_ADOBE_PPKLITE;
 	  }
 	

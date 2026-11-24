@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests;
 
+import lombok.NonNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Closeable;
@@ -85,7 +86,7 @@ public class PDFASignatureTest extends SignatureTest {
      */
     //@Parameters(name = "{index}-pdfa signature test:<{0}> - {1}")
     @Parameters(name = "{index}-{1}")
-    public static Collection<Object[]> data() {
+    public static @NonNull Collection<Object[]> data() {
         return new PDFAProvider().gatherData();
     }
 
@@ -134,7 +135,7 @@ public class PDFASignatureTest extends SignatureTest {
      *         which might have been thrown during the validation (both possibly
      *         null)
      */
-    private Pair<ValidationResult, Throwable> checkPDFAConformance(File fd) {
+    private @NonNull Pair<ValidationResult, Throwable> checkPDFAConformance(File fd) {
         ValidationResult result = null;
         try {
             PreflightParser parser = new PreflightParser(fd);

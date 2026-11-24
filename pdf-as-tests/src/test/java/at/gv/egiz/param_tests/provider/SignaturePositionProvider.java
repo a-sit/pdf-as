@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests.provider;
 
+import lombok.NonNull;
 import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class SignaturePositionProvider extends BaseSignatureDataProvider {
      * for these properties are defined as string constants.
      */
     @Override
-    protected Object[] extractDataFromConfig(File configFile,
+    protected Object @NonNull[] extractDataFromConfig(File configFile,
             Properties rootProps, Properties configProps) {
         Object[] standardData = extractStandardDataFromConfig(configFile,
                 rootProps, configProps);

@@ -50,7 +50,7 @@ public class StatusRequestImpl {
   }
 
   class StageBase implements StatusRequest {
-    public OperationStatus getStatus() { return status; }
+    public @NonNull OperationStatus getStatus() { return status; }
     @Override public @NonNull SignParameter getSignParameter() { return status.getSignParameter(); }
   }
 
@@ -66,7 +66,7 @@ public class StatusRequestImpl {
   public class Stage1 extends StageBase implements StatusRequest.Stage1 {
     public void setSignatureData(byte @NonNull[] data) { signatureData = data; }
     public void setByteRange(int @NonNull[] range) { byteRange = range; }
-    public StatusRequestImpl.Stage2 setCertificate(iaik.x509.X509Certificate certificate, String pdfFilter, String pdfSubFilter) throws PDFASError {
+    public @NonNull StatusRequestImpl.Stage2 setCertificate(iaik.x509.X509Certificate certificate, String pdfFilter, String pdfSubFilter) throws PDFASError {
       pdfAs.processCertificate(this, certificate, pdfFilter, pdfSubFilter);
       return new StatusRequestImpl.Stage2();
     }

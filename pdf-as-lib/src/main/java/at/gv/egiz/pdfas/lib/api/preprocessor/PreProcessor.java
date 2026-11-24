@@ -4,6 +4,7 @@ import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.sign.SignParameter;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyParameter;
+import lombok.NonNull;
 
 /** A pre-processor that can process sign/verify requests before they are performed. Loaded via {@link java.util.ServiceLoader}. */
 public interface PreProcessor {
@@ -30,5 +31,5 @@ public interface PreProcessor {
 	/**
 	 * The preprocessor's name. Only used for debugging.
 	 */
-	public String getName();
+	public @NonNull String getName();
 }

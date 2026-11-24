@@ -40,6 +40,7 @@ import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider
 import org.verapdf.pdfa.Foundries
 import org.verapdf.pdfa.flavours.PDFAFlavour
 import org.zeroturnaround.zip.ZipUtil
+import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.security.KeyStore
 import java.security.cert.CertificateException
@@ -137,6 +138,53 @@ class SignVerifyTest {
             override suspend fun signSuspend(input: ByteArray, byteRange: IntArray, parameter: SignParameter, requestedSignature: RequestedSignature) =
                 this@wrapSuspend.sign(input, byteRange, parameter, requestedSignature)
         }
+    }
+
+    private fun assertVisiblePreview(parameter: SignParameter, resolution: Int): BufferedImage {
+        val label = "${parameter.signatureProfileId} at $resolution DPI"
+        val preview = pdfAs.generateVisibleSignaturePreview(parameter,
+            getKeystoreSigner("test-key").getCertificate(parameter), resolution) as BufferedImage
+        val width = preview.width
+        val height = preview.height
+        Assert.assertTrue("$label should have positive dimensions", width > 0 && height > 0)
+
+        var contentPixels = 0
+        for (y in 0 until height) for (x in 0 until width) {
+            val argb = preview.getRGB(x, y)
+            val opacity = (argb ushr 24) / 255.0
+            val darkness = 255 - minOf((argb ushr 16) and 255, (argb ushr 8) and 255, argb and 255)
+            // Measure contrast against white so transparent pixels do not count as content.
+            if (opacity * darkness > 31) contentPixels++
+        }
+        val coverage = contentPixels.toDouble() / (width.toDouble() * height)
+        // Broad bounds reject blank or solid output without depending on font rasterization.
+        Assert.assertTrue("$label should contain visible content and background; coverage=$coverage",
+            coverage > 0.01 && coverage < 0.90)
+        return preview
+    }
+
+    @Test
+    fun visibleSignaturePreviewRendersAndScalesWithResolution() {
+        for (profile in listOf("SIGNATURBLOCK_SMALL_EN_NOTE", "SIGNATURBLOCK_DE_PDFA")) {
+            val parameter = PdfAsFactory.createSignParameter(pdfAs.configuration).apply {
+                signatureProfileId = profile
+            }
+            val normal = assertVisiblePreview(parameter, 72)
+            val doubled = assertVisiblePreview(parameter, 144)
+            Assert.assertEquals("$profile width should scale with DPI",
+                normal.width * 2.0, doubled.width.toDouble(), 1.0)
+            Assert.assertEquals("$profile height should scale with DPI",
+                normal.height * 2.0, doubled.height.toDouble(), 1.0)
+        }
+    }
+
+    @Test
+    fun invisibleSignatureHasNoPreview() {
+        val parameter = PdfAsFactory.createSignParameter(pdfAs.configuration).apply {
+            signatureProfileId = "INVISIBLE"
+        }
+        Assert.assertNull(pdfAs.generateVisibleSignaturePreview(parameter,
+            getKeystoreSigner("test-key").getCertificate(parameter), 72))
     }
 
     @Test

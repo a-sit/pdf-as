@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.db.status;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class DBTest implements Test {
 	}
 	
 	@Override
-	public String getName() {
+	public @NonNull String getName() {
 		return "DB";
 	}
 
@@ -28,7 +29,7 @@ public class DBTest implements Test {
 	}
 
 	@Override
-	public TestResult runTest() {
+	public @NonNull TestResult runTest() {
 		BaseTestResult result = new BaseTestResult();
 		try {
 			this.requestStore.cleanOldRequestException();

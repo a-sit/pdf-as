@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.utils;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +51,7 @@ public class PDFUtils {
 	private static final byte range_seperation = (byte) 0x20;
 	private static final byte range_end = (byte) 0x5D;
 
-	public static int[] buildExcludeRange(int[] byteRange) throws PDFIOException {
+	public static int @NonNull[] buildExcludeRange(int[] byteRange) throws PDFIOException {
 		
 		if(byteRange.length % 2 != 0) {
 			throw new PDFIOException("error.pdf.io.09");
@@ -69,7 +70,7 @@ public class PDFUtils {
 		return exclude_range;
 	}
 	
-	public static byte[] blackOutSignature(byte[] signatureData, int[] byteRange) throws PDFIOException {
+	public static byte @NonNull[] blackOutSignature(byte[] signatureData, int[] byteRange) throws PDFIOException {
 		if(byteRange.length % 2 != 0) {
 			throw new PDFIOException("error.pdf.io.09");
 		}
@@ -96,7 +97,7 @@ public class PDFUtils {
 		return data;
 	}
 	
-	public static byte[] extractSignatureData(byte[] signatureData, int[] byteRange) throws PDFIOException {
+	public static byte @NonNull[] extractSignatureData(byte[] signatureData, int[] byteRange) throws PDFIOException {
 		if(byteRange.length % 2 != 0) {
 			throw new PDFIOException("error.pdf.io.09");
 		}

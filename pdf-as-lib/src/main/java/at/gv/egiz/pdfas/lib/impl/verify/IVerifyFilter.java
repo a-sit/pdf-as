@@ -29,10 +29,11 @@ import java.util.List;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.Configuration;
 import at.gv.egiz.pdfas.lib.api.verify.VerifyResult;
+import lombok.NonNull;
 
 public interface IVerifyFilter {
 	public List<VerifyResult> verify(SignatureInputData signedData,
 			byte[] signature, Date verificationTime,
 			IVerifier verifier) throws PdfAsException;
-	public List<FilterEntry> getFiters();
+	public @NonNull List<FilterEntry> getFiters();
 }

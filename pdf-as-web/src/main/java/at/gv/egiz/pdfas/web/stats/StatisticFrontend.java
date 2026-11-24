@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.stats;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -57,7 +58,7 @@ public class StatisticFrontend implements StatisticBackend {
 		}
 	}
 
-	public static StatisticFrontend getInstance() {
+	public static @NonNull StatisticFrontend getInstance() {
 		if (_instance == null) {
 			_instance = new StatisticFrontend();
 		}
@@ -65,7 +66,7 @@ public class StatisticFrontend implements StatisticBackend {
 	}
 
 	@Override
-	public String getName() {
+	public @NonNull String getName() {
 		return StatisticFrontend.class.getSimpleName();
 	}
 

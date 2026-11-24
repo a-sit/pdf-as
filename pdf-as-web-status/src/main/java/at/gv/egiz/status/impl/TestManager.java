@@ -1,5 +1,6 @@
 package at.gv.egiz.status.impl;
 
+import lombok.NonNull;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -136,7 +137,7 @@ public class TestManager {
 	 * @param forceExecution the force execution
 	 * @return the map
 	 */
-	public Map<String, TestResult> runAllTests(boolean forceExecution) {
+	public @NonNull Map<String, TestResult> runAllTests(boolean forceExecution) {
 		Map<String, TestResult> results = new HashMap<String, TestResult>();
 		Iterator<Test> testIterator = tests.values().iterator();
 		while(testIterator.hasNext()) {

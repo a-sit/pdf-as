@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.test;
 
+import lombok.NonNull;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -69,7 +70,7 @@ public class SpringBootAdminClientRegistrationTest {
       server.start();
     }
 
-    public String url() { return "http://127.0.0.1:"+server.getAddress().getPort(); }
+    public @NonNull String url() { return "http://127.0.0.1:"+server.getAddress().getPort(); }
 
     public void stop() { server.stop(0); }
 

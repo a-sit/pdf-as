@@ -26,7 +26,7 @@ package at.gv.egiz.pdfas.lib.impl.stamping;
 import at.gv.egiz.pdfas.common.settings.IProfileConstants;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.lib.impl.status.ICertificateProvider;
-import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
+import at.gv.egiz.pdfas.lib.impl.status.PDFObject;
 
 import at.gv.egiz.pdfas.lib.impl.status.RequestedSignature;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -63,9 +63,9 @@ public class ValueResolver implements IProfileConstants, IResolver {
 
 
 	private IResolver internalResolver;
-	public ValueResolver(ICertificateProvider certProvider, OperationStatus operationStatus) {
+	public ValueResolver(ICertificateProvider certProvider, PDFObject pdfObject) {
 		internalResolver = new CertificateAndRequestParameterResolver(certProvider.getCertificate(),
-				operationStatus);
+				pdfObject);
 	}
 
 	public String resolve(String key, String value,

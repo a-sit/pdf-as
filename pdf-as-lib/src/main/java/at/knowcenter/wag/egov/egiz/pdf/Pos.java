@@ -48,6 +48,8 @@
  */
 package at.knowcenter.wag.egov.egiz.pdf;
 
+import lombok.NonNull;
+
 /**
  * Encapsulation of a position on a PDF page.
  * 
@@ -85,7 +87,7 @@ public class Pos
   /**
    * @see Object#toString()
    */
-  public String toString()
+  public @NonNull String toString()
   {
     return "(" + this.x + "," + this.y + "," + this.z + ")";
   }

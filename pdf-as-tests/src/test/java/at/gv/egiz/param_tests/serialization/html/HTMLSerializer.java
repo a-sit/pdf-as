@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests.serialization.html;
 
+import lombok.NonNull;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map.Entry;
@@ -24,7 +25,7 @@ public abstract class HTMLSerializer<T extends TestInfo> extends
         TestInfoSerializer<T> {
 
     @Override
-    public String fileEnding() {
+    public @NonNull String fileEnding() {
         return "html";
     }
 
@@ -56,7 +57,7 @@ public abstract class HTMLSerializer<T extends TestInfo> extends
      * 
      * @return HTML-string defining the tabs
      */
-    protected String createBasicTestData() {
+    protected @NonNull String createBasicTestData() {
         BaseSignatureTestData baseData = baseTestInfo.getBaseTestData();
         String basicParameterBody = createBasicParameterRepresentation(baseData);
         StringBuilder basicTestDataPanel = new StringBuilder();
@@ -95,7 +96,7 @@ public abstract class HTMLSerializer<T extends TestInfo> extends
      *            basic test parameters
      * @return HTML-string defining a definition list
      */
-    private String createBasicParameterRepresentation(
+    private @NonNull String createBasicParameterRepresentation(
             BaseSignatureTestData baseData) {
         StringBuilder sb = new StringBuilder();
         sb.append("<dl>");
@@ -166,7 +167,7 @@ public abstract class HTMLSerializer<T extends TestInfo> extends
      *            <code>Throwable</code>-object which should be displayed
      * @return HTML-string for the throwable
      */
-    protected String createExceptionDataString(Throwable t) {
+    protected @NonNull String createExceptionDataString(Throwable t) {
         StringBuilder exceptionData = new StringBuilder();
         exceptionData.append("<dl class=\"dl-horizontal\">");
         exceptionData.append(createDescription("Cause", t.toString()));
@@ -187,7 +188,7 @@ public abstract class HTMLSerializer<T extends TestInfo> extends
      *            the definition of the item (the value)
      * @return an HTML-string for the definition list item
      */
-    protected String createDescription(String term, String definition) {
+    protected @NonNull String createDescription(String term, String definition) {
         return String.format("<dt>%s</dt><dd>%s</dd>%n", term, definition);
     }
 

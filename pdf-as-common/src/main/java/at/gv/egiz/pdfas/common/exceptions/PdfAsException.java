@@ -41,12 +41,12 @@ public class PdfAsException extends Exception {
     }
 
     @Override
-    public String getMessage() {
+    public @NonNull String getMessage() {
         return localizeMessage(super.getMessage());
     }
 
     @Override
-    public String getLocalizedMessage() {
+    public @NonNull String getLocalizedMessage() {
         return localizeMessage(super.getMessage());
     }
 

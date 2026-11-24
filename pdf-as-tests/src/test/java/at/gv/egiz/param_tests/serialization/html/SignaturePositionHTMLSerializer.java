@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests.serialization.html;
 
+import lombok.NonNull;
 import java.awt.Rectangle;
 import java.io.PrintWriter;
 import java.util.List;
@@ -40,14 +41,14 @@ public class SignaturePositionHTMLSerializer extends
     }
 
     @Override
-    public SignaturePositionTestInfo createTestInfo() {
+    public @NonNull SignaturePositionTestInfo createTestInfo() {
         testInfo = new SignaturePositionTestInfo();
         baseTestInfo = testInfo;
         return testInfo;
     }
 
     @Override
-    public TestInfoSerializer<SignaturePositionTestInfo> cloneSerializer() {
+    public @NonNull TestInfoSerializer<SignaturePositionTestInfo> cloneSerializer() {
         return new SignaturePositionHTMLSerializer(testInfo);
     }
 
@@ -114,7 +115,7 @@ public class SignaturePositionHTMLSerializer extends
      *            the alternative text
      * @return HTML-image-tag
      */
-    private String getImageString(String imageFileName, String altText) {
+    private @NonNull String getImageString(String imageFileName, String altText) {
         String imageString;
         if (imageFileName != null)
             imageString = String.format(
@@ -127,7 +128,7 @@ public class SignaturePositionHTMLSerializer extends
     }
 
     @Override
-    public String getTestType() {
+    public @NonNull String getTestType() {
         return "Signature Position";
     }
 
@@ -160,7 +161,7 @@ public class SignaturePositionHTMLSerializer extends
      *            list of ignored areas
      * @return HTML-string representing the ignored areas
      */
-    private String createIgnoredAreasDescription(List<Rectangle> ignoredAreas) {
+    private @NonNull String createIgnoredAreasDescription(List<Rectangle> ignoredAreas) {
         StringBuilder sb = new StringBuilder();
         sb.append("<ul>");
         for (Rectangle r : ignoredAreas) {

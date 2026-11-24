@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.common.utils;
 
+import lombok.NonNull;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +42,7 @@ public class StringUtils {
 			.getLogger(StringUtils.class);
   private static final CharSequence TABULATOR = '\u0009'+"";
 
-	public static String bytesToHexString(byte[] bytes) {
+	public static @NonNull String bytesToHexString(byte[] bytes) {
 		StringBuilder sb = new StringBuilder(bytes.length * 2);
 
 		Formatter formatter = new Formatter(sb);
@@ -53,7 +54,7 @@ public class StringUtils {
 		return sb.toString();
 	}
 
-	public static String extractLastID(String id) {
+	public static @NonNull String extractLastID(String id) {
 		int lastIDX = id.lastIndexOf('.');
 		String result = id;
 		if (lastIDX > 0) {
@@ -82,12 +83,12 @@ public class StringUtils {
 		
 	}
 
-	private static String replaceSpecialCharacters(String value) {
+	private static @NonNull String replaceSpecialCharacters(String value) {
 	  return value.replace(TABULATOR, " ");
 	  
   }
 
-  public static byte[] applyWinAnsiEncoding(String text)
+  public static byte @NonNull[] applyWinAnsiEncoding(String text)
 			throws UnsupportedEncodingException {
 		byte[] replace_bytes;
 		replace_bytes = text.getBytes("windows-1252");// CP1252 =
@@ -103,7 +104,7 @@ public class StringUtils {
 	 * @return Returns the decoded String.
 	 * @throws UnsupportedEncodingException 
 	 */
-	public static String unapplyWinAnsiEncoding(byte[] replace_bytes) throws UnsupportedEncodingException {
+	public static @NonNull String unapplyWinAnsiEncoding(byte[] replace_bytes) throws UnsupportedEncodingException {
 		String text = new String(replace_bytes, "windows-1252");
 		return text;
 	}

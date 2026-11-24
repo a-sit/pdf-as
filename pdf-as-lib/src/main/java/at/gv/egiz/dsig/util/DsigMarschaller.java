@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.dsig.util;
 
+import lombok.NonNull;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
@@ -58,7 +59,7 @@ public class DsigMarschaller {
 		marshaller.marshal(obj, os);
 	}
 
-	public static String marshalToString(Object obj) throws JAXBException {
+	public static @NonNull String marshalToString(Object obj) throws JAXBException {
 		StringWriter sw = new StringWriter();
 		marshaller.marshal(obj, sw);
 		return sw.toString();

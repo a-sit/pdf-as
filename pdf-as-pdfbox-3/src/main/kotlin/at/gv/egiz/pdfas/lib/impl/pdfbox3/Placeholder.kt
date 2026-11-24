@@ -47,7 +47,7 @@ object PDFBoxPlaceholderExtractor : PlaceholderExtractor {
     ): SignaturePlaceholderData? {
         if (pdfObject !is PDFBOXObject) throw PDFASError(ErrorConstants.ERROR_SIG_INVALID_STATUS, "Invalid state")
         try {
-            return Extractor().extract(pdfObject.document!!, placeholderID, matchMode)
+            return Extractor().extract(pdfObject.document, placeholderID, matchMode)
         } catch (e: Throwable) {
             when (e) {
                 is IOException, is ClassNotFoundException, is InstantiationException,

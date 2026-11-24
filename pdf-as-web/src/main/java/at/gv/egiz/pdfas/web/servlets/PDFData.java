@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.servlets;
 
+import lombok.NonNull;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -162,7 +163,7 @@ public class PDFData extends HttpServlet {
     
   }
 
-  private byte[] packageSignedPdfsIntoZip(List<SignedDocument> signedPdfs) throws IOException {    
+  private byte @NonNull[] packageSignedPdfsIntoZip(List<SignedDocument> signedPdfs) throws IOException {
     ByteArrayOutputStream baOut = new ByteArrayOutputStream();
     
     try {    

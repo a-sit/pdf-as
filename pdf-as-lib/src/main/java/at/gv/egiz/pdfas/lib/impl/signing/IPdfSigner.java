@@ -26,6 +26,7 @@ package at.gv.egiz.pdfas.lib.impl.signing;
 import iaik.x509.X509Certificate;
 
 import java.awt.Image;
+import java.io.IOException;
 import java.util.Calendar;
 
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
@@ -40,7 +41,7 @@ public interface IPdfSigner<PDFObjectT extends PDFObject, SignerT extends PDFASS
 
 	SignerT buildBlindSignaturInterface(X509Certificate certificate, String filter, String subfilter);
 
-	PDFObjectT buildPDFObject(OperationStatus operationStatus);
+	PDFObjectT buildPDFObject(OperationStatus operationStatus) throws IOException;
 
 	void checkPDFPermissions(PDFObjectT object) throws PdfAsException;
 	

@@ -1,5 +1,6 @@
 package at.gv.egiz.sl20.utils;
 
+import lombok.NonNull;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -25,7 +26,7 @@ public class SL20JSONBuilderUtils {
 	 * @throws SLCommandoBuildException
 	 * @return
 	 */
-	public static JsonObject createCommand(String name, JsonElement params) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createCommand(String name, JsonElement params) throws SLCommandoBuildException {
 		JsonObject command = new JsonObject();		
 		addSingleStringElement(command, SL20Constants.SL20_COMMAND_CONTAINER_NAME, name, true);
 		addSingleJSONElement(command, SL20Constants.SL20_COMMAND_CONTAINER_PARAMS, params, true);				
@@ -59,7 +60,7 @@ public class SL20JSONBuilderUtils {
 	 * @throws SLCommandoBuildException
 	 * @return
 	 */
-	public static JsonObject createCommandResponse(String name, JsonElement result, String encryptedResult) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createCommandResponse(String name, JsonElement result, String encryptedResult) throws SLCommandoBuildException {
 		JsonObject command = new JsonObject();
 		addSingleStringElement(command, SL20Constants.SL20_COMMAND_CONTAINER_NAME, name, true);		
 		addOnlyOnceOfTwo(command, 
@@ -98,7 +99,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createRedirectCommandParameters(String url, JsonElement command, JsonElement signedCommand, Boolean ipcRedirect) throws SLCommandoBuildException{
+	public static @NonNull JsonObject createRedirectCommandParameters(String url, JsonElement command, JsonElement signedCommand, Boolean ipcRedirect) throws SLCommandoBuildException{
 		JsonObject redirectReqParams = new JsonObject();
 		addOnlyOnceOfTwo(redirectReqParams, 
 				SL20Constants.SL20_COMMAND_PARAM_GENERAL_REDIRECT_COMMAND, SL20Constants.SL20_COMMAND_PARAM_GENERAL_REDIRECT_SIGNEDCOMMAND, 
@@ -119,7 +120,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createCallCommandParameters(String url, String method, Boolean includeTransactionId, Map<String, String> reqParameters) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createCallCommandParameters(String url, String method, Boolean includeTransactionId, Map<String, String> reqParameters) throws SLCommandoBuildException {
 		JsonObject callReqParams = new JsonObject();
 		addSingleStringElement(callReqParams, SL20Constants.SL20_COMMAND_PARAM_GENERAL_CALL_URL, url, true);
 		addSingleStringElement(callReqParams, SL20Constants.SL20_COMMAND_PARAM_GENERAL_CALL_METHOD, method, true);
@@ -137,7 +138,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createErrorCommandResult(String errorCode, String errorMsg) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createErrorCommandResult(String errorCode, String errorMsg) throws SLCommandoBuildException {
 		JsonObject result = new JsonObject();
 		addSingleStringElement(result, SL20Constants.SL20_COMMAND_PARAM_GENERAL_RESPONSE_ERRORCODE, errorCode, true);
 		addSingleStringElement(result, SL20Constants.SL20_COMMAND_PARAM_GENERAL_RESPONSE_ERRORMESSAGE, errorMsg, true);
@@ -157,7 +158,7 @@ public class SL20JSONBuilderUtils {
 	 * @throws CertificateEncodingException
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createQualifiedeIDCommandParameters(String authBlockId,  String dataUrl, 
+	public static @NonNull JsonObject createQualifiedeIDCommandParameters(String authBlockId,  String dataUrl,
 			Map<String, String> additionalReqParameters, X509Certificate x5cEnc) throws CertificateEncodingException, SLCommandoBuildException {
 		JsonObject params = new JsonObject();
 		addSingleStringElement(params, SL20Constants.SL20_COMMAND_PARAM_EID_AUTHBLOCKID, authBlockId, true);
@@ -168,7 +169,7 @@ public class SL20JSONBuilderUtils {
 
 	}
 	
-	public static JsonObject createGetCertificateCommandParameters(String keyId,  String dataUrl, 
+	public static @NonNull JsonObject createGetCertificateCommandParameters(String keyId,  String dataUrl,
 			X509Certificate x5cEnc) throws CertificateEncodingException, SLCommandoBuildException {		
 		JsonObject params = new JsonObject();
 		addSingleStringElement(params, SL20Constants.SL20_COMMAND_PARAM_GETCERTIFICATE_KEYID, keyId, true);
@@ -178,7 +179,7 @@ public class SL20JSONBuilderUtils {
 		
 	}
 		
-	public static JsonObject createCreateCAdESCommandParameters(String keyId,
+	public static @NonNull JsonObject createCreateCAdESCommandParameters(String keyId,
 			byte[] content, String contentUrl, String contentMode, String mimeType, boolean padesCompatiblem, List<JsonElement> byteRanges, String cadesLevel,			
 			String dataUrl, X509Certificate x5cEnc) throws CertificateEncodingException, SLCommandoBuildException {		
 		JsonObject params = new JsonObject();
@@ -227,7 +228,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createQualifiedeIDCommandResult(byte[] idl, byte[] authBlock, String ccsURL, String LoA) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createQualifiedeIDCommandResult(byte[] idl, byte[] authBlock, String ccsURL, String LoA) throws SLCommandoBuildException {
 		JsonObject result = new JsonObject();
 		addSingleByteElement(result, SL20Constants.SL20_COMMAND_PARAM_EID_RESULT_IDL, idl, true);
 		addSingleByteElement(result, SL20Constants.SL20_COMMAND_PARAM_EID_RESULT_AUTHBLOCK, authBlock, true);
@@ -254,7 +255,7 @@ public class SL20JSONBuilderUtils {
 	 * @throws SLCommandoBuildException
 	 * @throws CertificateEncodingException
 	 */
-	public static JsonObject createBindingKeyCommandParams(String kontoId, String subjectName, int keySize, String keyAlg, 
+	public static @NonNull JsonObject createBindingKeyCommandParams(String kontoId, String subjectName, int keySize, String keyAlg,
 			Map<String, String> policies, String dataUrl, X509Certificate x5cVdaTrust, Boolean reqUserPassword, X509Certificate x5cEnc) throws SLCommandoBuildException, CertificateEncodingException {
 		JsonObject params = new JsonObject();
 		addSingleStringElement(params, SL20Constants.SL20_COMMAND_PARAM_BINDING_CREATE_KONTOID, kontoId, true);
@@ -281,7 +282,7 @@ public class SL20JSONBuilderUtils {
 	 * @throws SLCommandoBuildException
 	 * @throws CertificateEncodingException
 	 */
-	public static JsonObject createBindingKeyCommandResult(String appId, byte[] csr, X509Certificate attCert, byte[] password) throws SLCommandoBuildException, CertificateEncodingException {
+	public static @NonNull JsonObject createBindingKeyCommandResult(String appId, byte[] csr, X509Certificate attCert, byte[] password) throws SLCommandoBuildException, CertificateEncodingException {
 		JsonObject result = new JsonObject();
 		addSingleStringElement(result, SL20Constants.SL20_COMMAND_PARAM_BINDING_CREATE_RESULT_APPID, appId, true);
 		addSingleByteElement(result, SL20Constants.SL20_COMMAND_PARAM_BINDING_CREATE_RESULT_CSR, csr, true);
@@ -300,7 +301,7 @@ public class SL20JSONBuilderUtils {
 	 * @throws CertificateEncodingException
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createStoreBindingCertCommandParams(X509Certificate cert, String dataUrl) throws CertificateEncodingException, SLCommandoBuildException {
+	public static @NonNull JsonObject createStoreBindingCertCommandParams(X509Certificate cert, String dataUrl) throws CertificateEncodingException, SLCommandoBuildException {
 		JsonObject params = new JsonObject();
 		addSingleCertificateElement(params, SL20Constants.SL20_COMMAND_PARAM_BINDING_STORE_CERTIFICATE, cert, true);
 		addSingleStringElement(params, SL20Constants.SL20_COMMAND_PARAM_BINDING_STORE_DATAURL, dataUrl, true);		
@@ -314,7 +315,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createStoreBindingCertCommandSuccessResult() throws SLCommandoBuildException {
+	public static @NonNull JsonObject createStoreBindingCertCommandSuccessResult() throws SLCommandoBuildException {
 		JsonObject result = new JsonObject();
 		addSingleStringElement(result, SL20Constants.SL20_COMMAND_PARAM_BINDING_STORE_RESULT_SUCESS, 
 				SL20Constants.SL20_COMMAND_PARAM_BINDING_STORE_RESULT_SUCESS_VALUE, true);
@@ -333,7 +334,7 @@ public class SL20JSONBuilderUtils {
 	 * @throws SLCommandoBuildException
 	 * @throws CertificateEncodingException
 	 */
-	public static JsonObject createIdAndPasswordCommandParameters(String keyAlg, String dataUrl, X509Certificate x5cEnc) throws SLCommandoBuildException, CertificateEncodingException {
+	public static @NonNull JsonObject createIdAndPasswordCommandParameters(String keyAlg, String dataUrl, X509Certificate x5cEnc) throws SLCommandoBuildException, CertificateEncodingException {
 		JsonObject params = new JsonObject();		
 		addSingleStringElement(params, SL20Constants.SL20_COMMAND_PARAM_AUTH_IDANDPASSWORD_KEYALG, keyAlg, true);
 		addSingleStringElement(params, SL20Constants.SL20_COMMAND_PARAM_AUTH_IDANDPASSWORD_DATAURL, dataUrl, true);
@@ -350,7 +351,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createIdAndPasswordCommandResult(String kontoId, byte[] password) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createIdAndPasswordCommandResult(String kontoId, byte[] password) throws SLCommandoBuildException {
 		JsonObject result = new JsonObject();
 		addSingleStringElement(result, SL20Constants.SL20_COMMAND_PARAM_AUTH_IDANDPASSWORD_RESULT_KONTOID, kontoId, true);
 		addSingleByteElement(result, SL20Constants.SL20_COMMAND_PARAM_AUTH_IDANDPASSWORD_RESULT_USERPASSWORD, password, true);		
@@ -368,7 +369,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createJwsTokenAuthCommandParams(String nonce, String dataUrl, List<String> displayData, List<String> displayUrl) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createJwsTokenAuthCommandParams(String nonce, String dataUrl, List<String> displayData, List<String> displayUrl) throws SLCommandoBuildException {
 		JsonObject params = new JsonObject();
 		addSingleStringElement(params, SL20Constants.SL20_COMMAND_PARAM_AUTH_JWSTOKEN_NONCE, nonce, true);
 		addSingleStringElement(params, SL20Constants.SL20_COMMAND_PARAM_AUTH_JWSTOKEN_DATAURL, dataUrl, true);
@@ -385,7 +386,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createJwsTokenAuthCommandResult(String nonce) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createJwsTokenAuthCommandResult(String nonce) throws SLCommandoBuildException {
 		JsonObject result = new JsonObject();
 		addSingleStringElement(result, SL20Constants.SL20_COMMAND_PARAM_AUTH_JWSTOKEN_RESULT_NONCE, nonce, true);		
 		return result;
@@ -403,7 +404,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static JsonObject createGenericRequest(String reqId, String transactionId, JsonElement payLoad, String signedPayload) throws SLCommandoBuildException {
+	public static @NonNull JsonObject createGenericRequest(String reqId, String transactionId, JsonElement payLoad, String signedPayload) throws SLCommandoBuildException {
 		JsonObject req = new JsonObject();
 		addSingleIntegerElement(req, SL20Constants.SL20_VERSION, SL20Constants.CURRENT_SL20_VERSION, true);
 		addSingleStringElement(req, SL20Constants.SL20_REQID, reqId, true);
@@ -425,7 +426,7 @@ public class SL20JSONBuilderUtils {
 	 * @return
 	 * @throws SLCommandoBuildException
 	 */
-	public static final JsonObject createGenericResponse(String respId, String inResponseTo, String transactionId, 
+	public static final @NonNull JsonObject createGenericResponse(String respId, String inResponseTo, String transactionId,
 			JsonElement payLoad, String signedPayload) throws SLCommandoBuildException {
 		
 		JsonObject req = new JsonObject();

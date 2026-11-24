@@ -42,17 +42,16 @@ object PDFAsVisualSignature {
         pos: PositioningInstruction, signatureProfileSettings: SignatureProfileSettings,
         buildPreviewOnly: Boolean
     ): Pair<ByteArray, String> {
-        try {
+        try { PDDocument().use { template ->
             val main = visualObject.table
             val rotationAngle = pos.rotation
-            val origDoc = pdfObject.document
 
             if (pos.page < 1) {
                 throw IllegalArgumentException("PDF pages start at 1, expected page number >= 1, got ${pos.page}")
             }
 
             val (pageWidth, pageHeight, pageRotation) =
-                pdfObject.document!!.documentCatalog.pages.let { pages ->
+                pdfObject.document.documentCatalog.pages.let { pages ->
                     when (pos.isMakeNewPage) {
                         true -> pages[pages.count-1]
                         false -> pages[pos.page-1]
@@ -67,10 +66,6 @@ object PDFAsVisualSignature {
                     }
                 }
 
-            val page = when (pos.isMakeNewPage) {
-                true -> pdfObject.document!!.documentCatalog.pages.let { it[it.count-1] }
-                false -> pdfObject.document!!.documentCatalog.pages[pos.page-1]
-            }
             val posx = pos.x
             val posy = pageHeight - pos.y
 
@@ -84,7 +79,7 @@ object PDFAsVisualSignature {
                 mediaBox = PDRectangle(pageWidth, pageHeight)
                 rotation = pageRotation
             }
-            pdfStructure.template = PDDocument().apply {
+            pdfStructure.template = template.apply {
                 addPage(pdfStructure.page)
             }
             pdfStructure.acroForm = PDAcroForm(pdfStructure.template).also {
@@ -208,10 +203,9 @@ object PDFAsVisualSignature {
             return Pair(
                 ByteArrayOutputStream().also {
                     pdfStructure.template.save(it)
-                    pdfStructure.template.close()
                 }.toByteArray(),
                 alternativeTableCaption)
-        } catch (e: Throwable) {
+        }} catch (e: Throwable) {
             logger.warn("Failed to create visual signature block", e)
             throw PDFASError(ErrorConstants.ERROR_PDF_PROCESSING_FAILED, "Failed to create visual signature block", e)
         }

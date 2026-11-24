@@ -1,5 +1,6 @@
 package at.gv.egiz.status.impl;
 
+import lombok.NonNull;
 import at.gv.egiz.status.TestStatus;
 
 // TODO: Auto-generated Javadoc
@@ -14,7 +15,7 @@ public class TestStatusString {
 	 * @param status the status
 	 * @return the string
 	 */
-	public static String getString(TestStatus status) {
+	public static @NonNull String getString(TestStatus status) {
 		switch (status) {
 		case OK:
 			return "OK";

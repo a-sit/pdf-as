@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.api.ws;
 
+import lombok.NonNull;
 import jakarta.xml.bind.annotation.XmlEnumValue;
 import jakarta.xml.bind.annotation.XmlType;
 
@@ -19,7 +20,7 @@ public enum VerificationLevel {
 		return (otherName == null) ? false : name.equals(otherName);
 	}
 
-	public String toString() {
+	public @NonNull String toString() {
 		return name;
 	}
 }

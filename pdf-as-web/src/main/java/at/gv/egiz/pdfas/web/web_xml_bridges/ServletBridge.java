@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.web_xml_bridges;
 
+import lombok.NonNull;
 import at.gv.egiz.pdfas.web.servlets.*;
 import jakarta.servlet.Servlet;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -10,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ServletBridge {
   @Bean
-  public ServletRegistrationBean<Servlet> cxfServlet() {
+  public @NonNull ServletRegistrationBean<Servlet> cxfServlet() {
     return new ServletRegistrationBean<>(
         /** from <servlet> */         new SoapServiceServlet(),
         /** from <servlet-mapping> */ "/services/*"
@@ -18,7 +19,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> visBlockServlet() {
+  public @NonNull ServletRegistrationBean<Servlet> visBlockServlet() {
     return new ServletRegistrationBean<>(
         new VisBlockServlet(),
         "/visblock"
@@ -26,7 +27,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> providePDF() {
+  public @NonNull ServletRegistrationBean<Servlet> providePDF() {
     return new ServletRegistrationBean<>(
         new ProvidePDFServlet(),
         "/ProvidePDF"
@@ -34,7 +35,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> dataURLServlet() {
+  public @NonNull ServletRegistrationBean<Servlet> dataURLServlet() {
     return new ServletRegistrationBean<>(
         new DataURLServlet(),
         "/DataURL"
@@ -42,7 +43,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> slDataURLServlet() {
+  public @NonNull ServletRegistrationBean<Servlet> slDataURLServlet() {
     return new ServletRegistrationBean<>(
         new SLDataURLServlet(),
         "/DataURLSL20"
@@ -50,7 +51,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> pdfData() {
+  public @NonNull ServletRegistrationBean<Servlet> pdfData() {
     return new ServletRegistrationBean<>(
         new PDFData(),
         "/PDFData"
@@ -58,7 +59,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> errorPage() {
+  public @NonNull ServletRegistrationBean<Servlet> errorPage() {
     return new ServletRegistrationBean<>(
         new ErrorPage(),
         "/ErrorPage"
@@ -66,7 +67,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> pdfVerifyData() {
+  public @NonNull ServletRegistrationBean<Servlet> pdfVerifyData() {
     return new ServletRegistrationBean<>(
         new PDFSignatureData(),
         "/signData"
@@ -74,7 +75,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> pdfVerifyCert() {
+  public @NonNull ServletRegistrationBean<Servlet> pdfVerifyCert() {
     return new ServletRegistrationBean<>(
         new PDFSignatureCertificateData(),
         "/signCert"
@@ -82,7 +83,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> uiEntryPointServlet() {
+  public @NonNull ServletRegistrationBean<Servlet> uiEntryPointServlet() {
     return new ServletRegistrationBean<>(
         new UIEntryPointServlet(),
         "/userentry"
@@ -90,7 +91,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> qrPlaceholderGenerator() {
+  public @NonNull ServletRegistrationBean<Servlet> qrPlaceholderGenerator() {
     return new ServletRegistrationBean<>(
         new PlaceholderGeneratorServlet(),
         "/placeholder"
@@ -98,7 +99,7 @@ public class ServletBridge {
   }
 
   @Bean
-  public ServletRegistrationBean<Servlet> jsonAPIServlet() {
+  public @NonNull ServletRegistrationBean<Servlet> jsonAPIServlet() {
     return new ServletRegistrationBean<>(
         new JSONAPIServlet(),
         "/api/v1/sign"

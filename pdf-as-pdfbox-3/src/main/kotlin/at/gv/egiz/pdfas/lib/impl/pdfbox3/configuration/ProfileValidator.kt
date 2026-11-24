@@ -3,7 +3,6 @@ package at.gv.egiz.pdfas.lib.impl.pdfbox3.configuration
 import at.gv.egiz.pdfas.common.exceptions.PdfAsSettingsValidationException
 import at.gv.egiz.pdfas.common.settings.ISettings
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings
-import at.gv.egiz.pdfas.lib.api.ByteArrayDataSource
 import at.gv.egiz.pdfas.lib.api.PdfAsFactory
 import at.gv.egiz.pdfas.lib.configuration.ConfigurationValidator
 import at.gv.egiz.pdfas.lib.impl.configuration.ConfigurationImpl
@@ -22,8 +21,6 @@ import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.math.BigInteger
 
 class ProfileValidator : ConfigurationValidator {
@@ -46,8 +43,6 @@ class ProfileValidator : ConfigurationValidator {
         }
         logger.debug("Validating {} Profiles.", profileIds.size)
 
-        val profileSettings = ArrayList<SignatureProfileSettings>()
-
         val dummyCert = X509Certificate()
         dummyCert.serialNumber = BigInteger("123")
         val n = Name()
@@ -61,34 +56,19 @@ class ProfileValidator : ConfigurationValidator {
 
         val certProvider: ICertificateProvider = DummyCertificateProvider(dummyCert)
 
-        val origDoc = PDDocument()
-        origDoc.addPage(PDPage(PDRectangle.A4))
-        val baos = ByteArrayOutputStream()
-        try {
-            origDoc.save(baos)
-            baos.close()
-            origDoc.close()
-        } catch (e1: IOException) {
-            logger.info("Configuration validation failed!")
-            throw PdfAsSettingsValidationException("Configuration validation failed!", e1)
-        }
-
-
         for (id in profileIds) {
             try {
                 val profileSetting = SignatureProfileSettings(id, settings)
                 val profileConfiguration = SignatureProfileConfiguration(settings, id)
-                profileSettings.add(profileSetting)
                 if (!profileConfiguration.isVisualSignature) {
                     continue
                 }
                 val opState = OperationStatus(
                     PdfAsFactory.createSignParameter(ConfigurationImpl(settings))
-                        .apply { signatureProfileId = id })
-                PDFBOXObject(opState).use { pdfBoxObject ->
-                    opState.pdfObject = pdfBoxObject
-                    pdfBoxObject.setOriginalDocument(ByteArrayDataSource(baos.toByteArray()))
-                    val t = TableFactory.createSigTable(profileSetting, "main", opState, certProvider)
+                        .apply { signatureProfileId = id }, null)
+                PDFBOXObject(opState, PDDocument()).use { pdfBoxObject ->
+                    pdfBoxObject.document.addPage(PDPage(PDRectangle.A4))
+                    val t = TableFactory.createSigTable(profileSetting, "main", pdfBoxObject, certProvider)
                     PDFBOXStamper.createVisualPDFObject(pdfBoxObject, t!!)
                     profileConfiguration.defaultPositioning?.let(::TablePos)
                         ?.takeUnless(TablePos::isWauto)?.width

@@ -15,7 +15,7 @@ public class SignatureInputData {
   @Getter(lazy = true)
   byte[] signatureInputBytes = buildSignatureInputBytes();
 
-  private byte[] buildSignatureInputBytes() {
+  private byte @NonNull[] buildSignatureInputBytes() {
     assert(signedByteRanges.length % 2 == 0);
     val builder = new ByteArrayOutputStream();
     for (int i = 0; i < signedByteRanges.length; i += 2) {

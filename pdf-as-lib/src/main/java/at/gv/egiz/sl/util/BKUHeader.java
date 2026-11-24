@@ -1,5 +1,7 @@
 package at.gv.egiz.sl.util;
 
+import lombok.NonNull;
+
 public class BKUHeader {
 	private String name;
 	private String value;
@@ -26,7 +28,7 @@ public class BKUHeader {
 	}
 
 	@Override
-	public String toString() {
+	public @NonNull String toString() {
 		return getName() + " = " + getValue();
 	}
 }

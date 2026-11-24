@@ -23,55 +23,23 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.lib.impl.status;
 
-import java.io.IOException;
-import java.util.Map;
+import lombok.Getter;
+import lombok.NonNull;
 
-import jakarta.activation.DataSource;
+import java.io.IOException;
 
 
 public abstract class PDFObject implements AutoCloseable {
-	
-	protected OperationStatus status;
-	
-	protected DataSource originalDocument;
-	protected byte[] signedDocument;
 
-	public PDFObject(OperationStatus operationStatus) {
+	@Getter
+	private final @NonNull OperationStatus status;
+	
+	public PDFObject(@NonNull OperationStatus operationStatus) {
 		this.status = operationStatus;
 	}
 	
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-	}
+	@Override public abstract void close() throws IOException;
 
-	@Override public abstract void close();
-	
-	public DataSource getOriginalDocument() {
-		return originalDocument;
-	}
-
-	public abstract void setOriginalDocument(DataSource originalDocument) throws IOException;
-	
-	public byte[] getSignedDocument() {
-		return signedDocument;
-	}
-
-	public void setSignedDocument(byte[] signedDocument) {
-		this.signedDocument = signedDocument;
-	}
-
-	public OperationStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(OperationStatus status) {
-		this.status = status;
-	}
-	
 	public abstract String getPDFVersion();
 
-	public Map<String, String> getRequestParameters() {
-		return status.getSignParameter().getDynamicSignatureBlockArguments();
-	}
 }

@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.web.sl20;
 
+import lombok.NonNull;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -50,7 +51,7 @@ public class JsonSecurityUtils implements IJOSETools{
 	
 	private static JsonSecurityUtils instance = null;
 		
-	public static JsonSecurityUtils getInstance() {
+	public static @NonNull JsonSecurityUtils getInstance() {
 		if (instance == null) {
 			instance = new JsonSecurityUtils();
 			instance.initalize();
@@ -174,7 +175,7 @@ public class JsonSecurityUtils implements IJOSETools{
 	}
 	
 	@Override
-	public VerificationResult validateSignature(String serializedContent) throws SL20Exception {
+	public @NonNull VerificationResult validateSignature(String serializedContent) throws SL20Exception {
 		try {
 			JsonWebSignature jws = new JsonWebSignature();
 			//set payload

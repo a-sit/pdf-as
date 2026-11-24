@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.sl.util;
 
+import lombok.NonNull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -127,7 +128,7 @@ public class BKUSLConnector extends BaseSLConnector {
 		return null;
 	}
 
-	private String performHttpRequestToBKU(String xmlRequest,
+	private @NonNull String performHttpRequestToBKU(String xmlRequest,
 			RequestPackage pack, SignParameter parameter)
 			throws ClientProtocolException, IOException, IllegalStateException {
 		CloseableHttpClient client = null;

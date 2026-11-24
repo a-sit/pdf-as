@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.sigs.pades;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,7 +58,7 @@ public class PAdESVerifier implements IVerifyFilter, PAdESConstants {
 		return verifieResults;
 	}
 
-	public List<FilterEntry> getFiters() {
+	public @NonNull List<FilterEntry> getFiters() {
 		List<FilterEntry> result = new ArrayList<FilterEntry>();
 		result.add(new FilterEntry(FILTER_ADOBE_PPKLITE,
 				SUBFILTER_ETSI_CADES_DETACHED));

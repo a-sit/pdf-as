@@ -1,6 +1,7 @@
 package at.gv.egiz.status;
 
 import java.util.List;
+import lombok.NonNull;
 
 /**
  * A factory for creating Test objects.
@@ -12,5 +13,5 @@ public interface TestFactory {
 	 *
 	 * @return the list< test>
 	 */
-	public List<Test> createTests();
+	public @NonNull List<Test> createTests();
 }

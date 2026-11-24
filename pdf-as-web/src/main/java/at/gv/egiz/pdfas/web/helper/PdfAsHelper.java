@@ -46,6 +46,7 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.ws.WebServiceException;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.val;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -289,7 +290,7 @@ public class PdfAsHelper {
         return sb.toString();
     }
 
-    public static List<VerifyResult> synchronousVerify(
+    public static @NonNull List<VerifyResult> synchronousVerify(
             HttpServletRequest request, HttpServletResponse response,
             byte[] pdfData) throws Exception {
         String signidxString = PdfAsParameterExtractor.getSigIdx(request);
@@ -314,7 +315,7 @@ public class PdfAsHelper {
         return pdfAs.verify(verifyParameter, dataSource);
     }
 
-    public static List<VerifyResult> synchronousVerify(byte[] pdfData,
+    public static @NonNull List<VerifyResult> synchronousVerify(byte[] pdfData,
                                                                                                          int signIdx, SignatureVerificationLevel lvl,
                                                                                                          Map<String, String> preProcessor) throws Exception {
         log.debug("Verifing Signature index: " + signIdx);
@@ -329,7 +330,7 @@ public class PdfAsHelper {
         return pdfAs.verify(verifyParameter, dataSource);
     }
     
-  public static PdfasSignResponse synchronousServerSignature(PdfasSignRequest internalReq) throws Exception {
+  public static @NonNull PdfasSignResponse synchronousServerSignature(PdfasSignRequest internalReq) throws Exception {
     log.debug("Find #{} files to sign synchronized. Starting signing process ... ", internalReq.getInput().size());    
     PdfasSignResponseBuilder respBuilder = PdfasSignResponse.builder();            
     respBuilder.requestId(internalReq.getRequestID());
@@ -354,7 +355,7 @@ public class PdfAsHelper {
    * @return Signing result
    * @throws Exception In case of an error
    */
-    private static SignedDocument synchronousServerSignature(DocumentToSign documentToSign, CoreSignParams coreParams) throws Exception {
+    private static @NonNull SignedDocument synchronousServerSignature(DocumentToSign documentToSign, CoreSignParams coreParams) throws Exception {
       log.debug("Signing file with transactionId:{}", coreParams.getTransactionId());
       
         Configuration config = pdfAs.getConfiguration();
@@ -494,7 +495,7 @@ public class PdfAsHelper {
     
     }
 
-    private static StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest)
+    private static @NonNull StatusRequest.Stage1 initializeSigningContextForNewDocument(HttpServletRequest request, Connector connector, PdfasSignRequest pdfAsRequest)
       throws PdfAsWebException, WriterException, IOException, PdfAsException, PDFASError {   
     HttpSession session = request.getSession();
     
@@ -517,7 +518,7 @@ public class PdfAsHelper {
         
   }
 
-  private static StatusRequest.Stage1 buildPdfasStatusRequestToSignSingleDocument(DocumentToSign pdfToSign, HttpSession session, IPlainSigner signer,
+  private static @NonNull StatusRequest.Stage1 buildPdfasStatusRequestToSignSingleDocument(DocumentToSign pdfToSign, HttpSession session, IPlainSigner signer,
       CoreSignParams coreSignParams, String qrCodeContent, Configuration config) throws WriterException, IOException, PdfAsException, PDFASError {
         
     // Generate Sign Parameter
@@ -567,7 +568,7 @@ public class PdfAsHelper {
     
   }
 
-  private static IPlainSigner getSignerFromConnector(Connector connector, HttpSession session) throws PdfAsWebException {
+  private static @NonNull IPlainSigner getSignerFromConnector(Connector connector, HttpSession session) throws PdfAsWebException {
     val slConnector = switch(connector) {
         case BKU, ONLINEBKU, MOBILEBKU -> new BKUSLConnector(generateBKUURL(connector));
         case SECLAYER20 -> new SL20Connector(WebConfiguration.getSecurityLayer20URL());
@@ -1027,43 +1028,43 @@ public class PdfAsHelper {
     }
   }
 
-  private static String getTemplateSL() throws IOException {
+  private static @NonNull String getTemplateSL() throws IOException {
         return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_sl.html")),
                 StandardCharsets.UTF_8);
     }
 
-    public static String getErrorRedirectTemplateSL() throws IOException {
+    public static @NonNull String getErrorRedirectTemplateSL() throws IOException {
         return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_error_redirect.html")),
                 StandardCharsets.UTF_8);
     }
 
-    public static String getProvideTemplate() throws IOException {
+    public static @NonNull String getProvideTemplate() throws IOException {
         return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_provide.html")),
                 StandardCharsets.UTF_8);
     }
 
-    public static String getErrorTemplate() throws IOException {
+    public static @NonNull String getErrorTemplate() throws IOException {
         return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_error.html")),
                 StandardCharsets.UTF_8);
     }
 
-    public static String getGenericTemplate() throws IOException {
+    public static @NonNull String getGenericTemplate() throws IOException {
         return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_generic_param.html")),
                 StandardCharsets.UTF_8);
     }
 
-    public static String getInvokeRedirectTemplateSL() throws IOException {
+    public static @NonNull String getInvokeRedirectTemplateSL() throws IOException {
         return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_invoke_redirect.html")),
                 StandardCharsets.UTF_8);
     }
 
-  public static String getInvokeRedirectTemplateMoreFiles() throws IOException {
+  public static @NonNull String getInvokeRedirectTemplateMoreFiles() throws IOException {
     return FileUtils.readFileToString(
             FileUtils.toFile(PdfAsHelper.class.getResource("/template_invoke_redirect_more_files.html")),
                 StandardCharsets.UTF_8);
@@ -1211,7 +1212,7 @@ public class PdfAsHelper {
         
     }
     
-    public static PDF_RESPONSE_MODES getResponseMode(HttpServletRequest request,
+    public static @NonNull PDF_RESPONSE_MODES getResponseMode(HttpServletRequest request,
             HttpServletResponse response) {
         HttpSession session = request.getSession();
         Object obj = session.getAttribute(PDF_RESPONSE_MODE);
@@ -1227,13 +1228,13 @@ public class PdfAsHelper {
                 
     }
     
-    private static String generateURL(HttpServletRequest request,
+    private static @NonNull String generateURL(HttpServletRequest request,
             HttpServletResponse response, String Servlet) {
         return generateURL(request, response, Servlet, WebConfiguration.getPublicURL());
         
     }
 
-     private static String generateURL(HttpServletRequest request,
+     private static @NonNull String generateURL(HttpServletRequest request,
           HttpServletResponse response, String Servlet, String publicURL) {
         HttpSession session = request.getSession();
         String dataURL = null;
@@ -1257,36 +1258,36 @@ public class PdfAsHelper {
         return dataURL;
       }
 
-    public static String generateDataURLSL20(HttpServletRequest request,
+    public static @NonNull String generateDataURLSL20(HttpServletRequest request,
             HttpServletResponse response) {
         return generateURL(request, response, PDF_SL20_DATAURL_PAGE,
         WebConfiguration.getPublicDataURL() != null 
             ? WebConfiguration.getPublicDataURL() : WebConfiguration.getPublicURL());
     }
     
-    public static String generateDataURL(HttpServletRequest request,
+    public static @NonNull String generateDataURL(HttpServletRequest request,
             HttpServletResponse response) {
         return generateURL(request, response, PDF_DATAURL_PAGE,
             WebConfiguration.getPublicDataURL() != null 
                 ? WebConfiguration.getPublicDataURL() : WebConfiguration.getPublicURL());
     }
 
-    public static String generateProvideURL(HttpServletRequest request,
+    public static @NonNull String generateProvideURL(HttpServletRequest request,
             HttpServletResponse response) {
         return generateURL(request, response, PDF_PROVIDE_PAGE);
     }
 
-    public static String generateErrorURL(HttpServletRequest request,
+    public static @NonNull String generateErrorURL(HttpServletRequest request,
             HttpServletResponse response) {
         return generateURL(request, response, PDF_ERROR_PAGE);
     }
 
-    public static String generatePdfURL(HttpServletRequest request,
+    public static @NonNull String generatePdfURL(HttpServletRequest request,
             HttpServletResponse response) {
         return generateURL(request, response, PDF_PDFDATA_PAGE);
     }
 
-    public static String generateNSPdfURL(HttpServletRequest request,
+    public static @NonNull String generateNSPdfURL(HttpServletRequest request,
                                         HttpServletResponse response) {
         return generateURL(request, response, PDF_PDFDATAURL_PAGE);
     }
@@ -1415,7 +1416,7 @@ public class PdfAsHelper {
         session.setAttribute(PDF_VER_LEVEL, lvl);
     }
 
-    public static SignatureVerificationLevel getVerificationLevel(
+    public static @NonNull SignatureVerificationLevel getVerificationLevel(
             HttpServletRequest request) {
         HttpSession session = request.getSession();
         Object obj = session.getAttribute(PDF_VER_LEVEL);

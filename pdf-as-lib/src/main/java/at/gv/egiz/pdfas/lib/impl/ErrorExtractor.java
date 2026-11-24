@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.lib.impl;
 
+import lombok.NonNull;
 import at.gv.egiz.pdfas.common.exceptions.ErrorConstants;
 import at.gv.egiz.pdfas.common.exceptions.PDFASError;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
@@ -47,7 +48,7 @@ public class ErrorExtractor implements ErrorConstants {
 	}
 
 	/** Resolves legacy [PdfAsException] -> error-coded [PDFASError] */
-	public static PDFASError searchPdfAsError(Throwable e, OperationStatus status) {
+	public static @NonNull PDFASError searchPdfAsError(Throwable e, OperationStatus status) {
 		while ((e instanceof CompletionException || e instanceof ExecutionException) && e.getCause() != null) {
 			e = e.getCause();
 		}

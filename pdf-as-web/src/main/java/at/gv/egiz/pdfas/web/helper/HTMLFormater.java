@@ -23,9 +23,11 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.helper;
 
+import lombok.NonNull;
+
 public class HTMLFormater {
 
-	public static String formatStackTrace(StackTraceElement[] elements) {
+	public static @NonNull String formatStackTrace(StackTraceElement[] elements) {
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < elements.length; i++) {
 			sb.append(elements[i].toString());

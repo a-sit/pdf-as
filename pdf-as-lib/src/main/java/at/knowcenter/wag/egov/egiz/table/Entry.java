@@ -48,6 +48,7 @@
  */
 package at.knowcenter.wag.egov.egiz.table;
 
+import lombok.NonNull;
 import java.io.Serializable;
 
 /**
@@ -239,7 +240,7 @@ public class Entry
   /**
    * The toString method, used for tests or debugging.
    */
-  public String toString()
+  public @NonNull String toString()
   {
     Object obj = getValue();
     String value = null;

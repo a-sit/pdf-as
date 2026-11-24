@@ -61,7 +61,7 @@ public class PDFASSignParameters {
 	        return (otherName == null)? false:name.equals(otherName);
 	    }
 
-	    public String toString(){
+	    public @NonNull String toString(){
 	       return name;
 	    }
 	    

@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.helper;
 
+import lombok.NonNull;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -87,7 +88,7 @@ public class PdfAsParameterExtractor {
 		return Connector.fromString((String)request.getAttribute(PARAM_CONNECTOR));
 	}
 
-	public static Map<String,String> getDynamicSignatureBlockParameters(HttpServletRequest request) throws Exception {
+	public static @NonNull Map<String,String> getDynamicSignatureBlockParameters(HttpServletRequest request) throws Exception {
 		HashMap<String, String> signatureBlockParametersMap = new HashMap<String, String>();
 		logger.debug("Default charset:"+ Charset.defaultCharset());
 		logger.debug("Request charset:"+ request.getCharacterEncoding());
@@ -144,7 +145,7 @@ public class PdfAsParameterExtractor {
 		return (String)request.getAttribute(PARAM_INVOKE_URL);
 	}
 	
-	public static Map<String, String> getPreProcessorMap(HttpServletRequest request) {
+	public static @NonNull Map<String, String> getPreProcessorMap(HttpServletRequest request) {
 		Map<String, String> map = new HashMap<String, String>();
 		
 		Enumeration<String> parameterNames = request.getAttributeNames();
@@ -160,7 +161,7 @@ public class PdfAsParameterExtractor {
 		return map;
 	}
 	
-	public static Map<String, String> getOverwriteMap(HttpServletRequest request) {
+	public static @NonNull Map<String, String> getOverwriteMap(HttpServletRequest request) {
 		Map<String, String> map = new HashMap<String, String>();
 		
 		Enumeration<String> parameterNames = request.getAttributeNames();
@@ -176,7 +177,7 @@ public class PdfAsParameterExtractor {
 		return map;
 	}
 	
-	public static SignatureVerificationLevel getVerificationLevel(HttpServletRequest request) {
+	public static @NonNull SignatureVerificationLevel getVerificationLevel(HttpServletRequest request) {
 		String value = (String)request.getAttribute(PARAM_VERIFY_LEVEL);
 		if(value != null) {
 			if(value.equals(PARAM_VERIFY_LEVEL_OPTION_FULL)) {

@@ -1,5 +1,6 @@
 package at.gv.egiz.pdfas.moa;
 
+import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -45,7 +46,7 @@ public class MOAVerifier implements IVerifier {
 	private String moaTrustProfile;
 
 	
-	public List<VerifyResult> verify(byte[] signature, SignatureInputData signatureContent,
+	public @NonNull List<VerifyResult> verify(byte[] signature, SignatureInputData signatureContent,
 			Date verificationTime) throws PdfAsException {
 		List<VerifyResult> resultList = new ArrayList<VerifyResult>();
 		try {
@@ -201,7 +202,7 @@ public class MOAVerifier implements IVerifier {
 	}
 
 	@Override
-	public SignatureVerificationLevel getLevel() {
+	public @NonNull SignatureVerificationLevel getLevel() {
 		return SignatureVerificationLevel.FULL_VERIFICATION;
 	}
 

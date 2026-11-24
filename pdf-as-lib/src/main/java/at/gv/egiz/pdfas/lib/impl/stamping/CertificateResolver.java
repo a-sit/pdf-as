@@ -26,7 +26,7 @@ package at.gv.egiz.pdfas.lib.impl.stamping;
 import at.gv.egiz.pdfas.common.settings.SignatureProfileSettings;
 import at.gv.egiz.pdfas.common.utils.DNUtils;
 import at.gv.egiz.pdfas.common.utils.OgnlUtils;
-import at.gv.egiz.pdfas.lib.impl.status.OperationStatus;
+import at.gv.egiz.pdfas.lib.impl.status.PDFObject;
 import iaik.x509.X509Certificate;
 import ognl.AbstractMemberAccess;
 import ognl.MemberAccess;
@@ -49,7 +49,7 @@ public class CertificateResolver implements IResolver {
     private OgnlContext ctx;
     private X509Certificate certificate;
 
-    public CertificateResolver(X509Certificate certificate, OperationStatus operationStatus) {
+    public CertificateResolver(X509Certificate certificate, PDFObject pdfObject) {
         this.certificate = certificate;
 
         MemberAccess memberAccess = new AbstractMemberAccess() {
@@ -80,7 +80,7 @@ public class CertificateResolver implements IResolver {
 
         Map<String, String> iuiMap = new HashMap<String, String>();
         try {
-        	iuiMap.put("pdfVersion", operationStatus.getPdfObject().getPDFVersion());
+            iuiMap.put("pdfVersion", pdfObject.getPDFVersion());
         } catch(Throwable e) {
         	logger.warn("Cannot determine pdfVersion: " + e.getMessage());
         }

@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import at.gv.egiz.sl20.data.VerificationResult;
 import at.gv.egiz.sl20.exceptions.SL20Exception;
 import at.gv.egiz.sl20.exceptions.SLCommandoBuildException;
+import lombok.NonNull;
 
 public interface IJOSETools {
 
@@ -33,7 +34,7 @@ public interface IJOSETools {
 	 * @throws SLCommandoParserException
 	 * @throws SL20Exception 
 	 */
-	public VerificationResult validateSignature(String serializedContent) throws SL20Exception;
+	public @NonNull VerificationResult validateSignature(String serializedContent) throws SL20Exception;
 	
 	/**
 	 * Get the encryption certificate for SL2.0 End-to-End encryption

@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests.provider;
 
+import lombok.NonNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -122,7 +123,7 @@ public abstract class BaseSignatureDataProvider {
      * 
      * @return parameters for the parameterized unit tests
      */
-    public List<Object[]> gatherData() {
+    public @NonNull List<Object[]> gatherData() {
         String testDir = System.getProperty("test.dir");
         logger.info("Data from: " + testDir);
         String testFilter = System.getProperty("test.filter");
@@ -202,7 +203,7 @@ public abstract class BaseSignatureDataProvider {
      *            the properties read from the config file
      * @return parameters for one parameterized unit test
      */
-    protected abstract Object[] extractDataFromConfig(File configFile,
+    protected abstract Object @NonNull[] extractDataFromConfig(File configFile,
             Properties rootProps, Properties configProps);
 
     /**
@@ -218,7 +219,7 @@ public abstract class BaseSignatureDataProvider {
      *            the properties read from the config file
      * @return basic parameters for one parameterized unit test
      */
-    protected Object[] extractStandardDataFromConfig(File configFile,
+    protected Object @NonNull[] extractStandardDataFromConfig(File configFile,
             Properties rootProps, Properties configProps) {
         String testDirectory = null;
         try {
@@ -371,7 +372,7 @@ public abstract class BaseSignatureDataProvider {
      *            the config properties for the test
      * @return the output file name
      */
-    protected String getOutputFileName(String pdfFile, File configFile,
+    protected @NonNull String getOutputFileName(String pdfFile, File configFile,
             Properties configProps) {
         String outputFile = configProps.getProperty(OUTPUT_FILE);
         if (outputFile == null) {

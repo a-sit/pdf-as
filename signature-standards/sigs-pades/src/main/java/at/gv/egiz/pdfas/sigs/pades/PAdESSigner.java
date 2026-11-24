@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.sigs.pades;
 
+import lombok.NonNull;
 import iaik.x509.X509Certificate;
 import at.gv.egiz.pdfas.common.exceptions.PdfAsException;
 import at.gv.egiz.pdfas.lib.api.sign.IPlainSigner;
@@ -53,11 +54,11 @@ public class PAdESSigner implements IPlainSigner, PAdESConstants {
 		return this.plainSigner.sign(input, byteRange, parameter, requestedSignature);
 	}
 
-	public String getPDFSubFilter() {
+	public @NonNull String getPDFSubFilter() {
 		return SUBFILTER_ETSI_CADES_DETACHED;
 	}
 
-	public String getPDFFilter() {
+	public @NonNull String getPDFFilter() {
 		return FILTER_ADOBE_PPKLITE;
 	}
 

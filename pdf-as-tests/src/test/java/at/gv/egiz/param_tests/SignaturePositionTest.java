@@ -1,5 +1,6 @@
 package at.gv.egiz.param_tests;
 
+import lombok.NonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -131,7 +132,7 @@ public class SignaturePositionTest extends SignatureTest {
      *            the name of the file
      * @return the directory name part of the file
      */
-    private String extractDirectoryString(String fileName) {
+    private @NonNull String extractDirectoryString(String fileName) {
         try {
             return new File(fileName).getCanonicalFile().getParent() + "/";
         } catch (IOException e) {
@@ -149,7 +150,7 @@ public class SignaturePositionTest extends SignatureTest {
      */
     //@Parameters(name = "{index}-signature position test:<{0}> - {1}")
     @Parameters(name = "{index}-{1}")
-    public static Collection<Object[]> data() {
+    public static @NonNull Collection<Object[]> data() {
         return new SignaturePositionProvider().gatherData();
     }
 

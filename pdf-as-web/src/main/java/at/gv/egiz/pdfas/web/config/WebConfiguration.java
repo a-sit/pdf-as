@@ -23,6 +23,7 @@
  ******************************************************************************/
 package at.gv.egiz.pdfas.web.config;
 
+import lombok.NonNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -491,7 +492,7 @@ public class WebConfiguration implements IConfigurationConstants {
 		return true;
 	}
 
-	public static Properties getHibernateProps() {
+	public static @NonNull Properties getHibernateProps() {
 		return (Properties) hibernateProps.clone();
 	}
 
@@ -508,7 +509,7 @@ public class WebConfiguration implements IConfigurationConstants {
 		return ivalue;
 	}
 	
-	public static String getStoreClass() {
+	public static @NonNull String getStoreClass() {
 		String cls = properties.getProperty(REQUEST_STORE);
 
 		if (cls != null) {

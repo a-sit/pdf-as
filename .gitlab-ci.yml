@@ -47,13 +47,14 @@ assemble:
   except:
     - tags
   script: |
-    ./gradlew --warning-mode all clean build
+    ./gradlew --warning-mode all clean build jacocoRootReport
   artifacts:
     when: always
     reports:
       junit: "**/build/test-results/test/**/TEST-*.xml"
     paths:
       - "**/pdf-as-tests/src/test/test-suites"
+      - "build/reports/jacoco/aggregate"
 
 
 release_packaging:

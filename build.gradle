@@ -33,6 +33,7 @@ licenseReport {
 
 allprojects {
 	apply plugin: "io.github.ben-manes.versions"
+	apply plugin: 'jacoco'
 
     tasks.withType(JavaCompile).configureEach {
         options.compilerArgs += ['-Xlint:deprecation']
@@ -91,6 +92,11 @@ allprojects {
 		pdfboxVersion = '3.0.8'
 		ztZipVersion = '1.18.3'
 		lombokVersion = '1.18.48'
+		jacocoVersion = '0.8.14'
+	}
+
+	jacoco {
+		toolVersion = jacocoVersion
 	}
 }
 
@@ -100,7 +106,6 @@ subprojects {
 	apply plugin: 'maven-publish'
 	apply plugin: 'checkstyle'
 	apply plugin: 'pmd'
-	apply plugin: 'jacoco'
 	apply plugin: 'com.github.spotbugs'
 	group = 'at.gv.egiz.pdfas'
 
@@ -140,22 +145,8 @@ subprojects {
 		}
 	}
 
-	jacoco {
-		toolVersion = "0.8.14"
-	}
-
 	tasks.withType(Test).configureEach {
 		useJUnitPlatform()
-		finalizedBy jacocoTestReport
-	}
-
-	jacocoTestReport {
-		dependsOn test
-		reports {
-			xml.required = true
-			html.required = true
-			csv.required = false
-		}
 	}
 	
 
@@ -293,6 +284,26 @@ subprojects {
 	
 	//doFullRelease jar war distZip distTar releases sourcesJar uploadArchives
 
+}
+
+tasks.register('jacocoRootReport', JacocoReport) {
+	group = 'verification'
+	description = 'Reports coverage of all production modules from all test tasks.'
+
+	subprojects.each { subproject ->
+		def testTasks = subproject.tasks.withType(Test)
+		dependsOn(testTasks, subproject.tasks.named('classes'))
+		executionData(testTasks)
+		sourceSets(subproject.sourceSets.main)
+	}
+
+	reports {
+		xml.required = true
+		xml.outputLocation = layout.buildDirectory.file('reports/jacoco/aggregate/jacocoTestReport.xml')
+		html.required = true
+		html.outputLocation = layout.buildDirectory.dir('reports/jacoco/aggregate/html')
+		csv.required = false
+	}
 }
 
 tasks.register('doFullRelease') {
